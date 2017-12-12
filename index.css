@@ -1,0 +1,41 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    color: white;
+    background-color: black;
+    font-family: monospace;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+p {
+    margin: 0;
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+main {
+    text-align: center;
+}
+
+main .name {
+    font-family: 'Italianno', cursive;
+    font-size: 72px;
+}
+main .at {
+    font-family: monospace;
+    font-size: 16px;
+}
+main .url {
+    font-family: monospace;
+    font-size: 20px;
+}

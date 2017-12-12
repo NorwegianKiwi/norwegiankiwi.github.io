@@ -1,0 +1,98 @@
+body {
+    color: black;
+    background-color: white;
+    text-align: left;
+    font-size: 24px;
+    font-family: "Times New Roman", serif;
+    margin: 0 0 60px;
+    box-sizing: border-box;
+}
+
+p {
+    margin: 0;
+}
+
+ul {
+    margin: 0;
+    list-style-type: square;
+}
+
+li {
+    padding: 7px 0;
+}
+
+header, section {
+    margin: 0 auto;
+    width: 80%;
+}
+
+header {
+    text-align: center;
+    font-size: 72px;
+    font-family: 'Italianno', cursive;
+    padding: 50px 0 0;
+}
+
+.section-title {
+    font-size: 46px;
+    font-family: "Arial", sans-serif;
+    padding: 50px 0 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    font-family: "Arial", sans-serif;
+    padding: 10px 30px 10px 5px;
+    white-space: nowrap;
+    font-size: 0.9em;
+    vertical-align: text-top;
+}
+
+td {
+    vertical-align: text-top;
+    padding: 10px 0;
+}
+
+tr:nth-child(even) {
+    background-color: #ddd;
+}
+
+table tr td:nth-child(2) {
+    width: 99%;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.mono {
+    font-family: monospace;
+}
+
+.portrait {
+    padding: 0;
+    vertical-align: middle;
+}
+.portrait img{
+    height: 300px;
+    margin-left: 30px;
+    border-radius: 10px;
+}
+
+.email img {
+    height: 23px;
+    margin-bottom: -5px;
+}
+
+.subtext {
+    font-size: 0.7em;
+    padding-left: 40px;
+}

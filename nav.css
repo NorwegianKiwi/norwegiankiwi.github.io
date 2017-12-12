@@ -1,0 +1,48 @@
+nav {
+    background-color: #555;
+    font-size: 28px;
+    line-height: 50px;
+    width: 100%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.nav-text {
+    color: #aaa;
+    font-weight: bold;
+    display: inline-block;
+    width: 32%;
+}
+
+.nav-link {
+    color: white;
+    font-weight: normal;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+
+.subnav {
+    background-color: #aaa;
+    color: black;
+}
+
+.subnav-text {
+    color: #555;
+    font-weight: bold;
+    display: inline-block;
+    width: 32%;
+}
+
+.subnav-link {
+    color: black;
+    font-weight: normal;
+    text-decoration: none;
+}
+
+.subnav-link:hover {
+    text-decoration: underline;
+}

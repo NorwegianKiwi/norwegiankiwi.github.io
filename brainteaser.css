@@ -1,0 +1,93 @@
+body {
+    color: white;
+    background-color: black;
+    font-family: monospace;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+main {
+    font-size: 18px;
+    font-family: monospace;
+    text-align: center;
+}
+
+.blue {
+    color: deepskyblue;
+}
+
+.bigger {
+    font-size: 1.2em;
+}
+
+.center {
+    text-align: center;
+}
+
+.title {
+    font-family: 'Italianno', cursive;
+    font-size: 72px;
+    text-align: center;
+    margin: 50px 0 0;
+    padding: 0;
+}
+
+.subtitle {
+    font-family: monospace;
+    font-size: 16px;
+    text-align: center;
+    margin-top: -20px;
+    color: #aaa;
+}
+
+.digits {
+    padding: 50px 0;
+}
+.digits span {
+    background-color: #222;
+    border: 1px solid #666;
+    padding: 15px 20px;
+    border-radius: 10px;
+}
+
+.instructions {
+    color: black;
+    background-color: #ccc;
+    width: 50%;
+    text-align: left;
+    margin: 0 auto;
+    border-radius: 10px;
+    padding: 5px 20px 5px 5px;
+}
+
+.instructions ul {
+    list-style-type: square;
+}
+
+.instructions li {
+    padding: 5px 0;
+}
+
+.email {
+    height: 23px;
+    vertical-align: text-bottom;
+    margin-bottom: -2px;
+}
+
+.luck {
+    padding-bottom: 50px;
+    font-size: 1.5em;
+}
+
+.congratulations {
+    padding: 5px 0 5px 20px;
+    text-align: left;
+    width: 45%;
+    margin: 0 auto;
+    background-color: #333;
+    border-radius: 10px;
+}
+
+.congratulations ul {
+    list-style-type: none;
+}
