@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Julequiz 2024</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f9f1f1; /* Lys bakgrunn med juletema */
+            color: #333;
+        }
+        h1 {
+            color: darkred;
+            font-size: 2.5rem;
+        }
+        h2 {
+            color: #444;
+            margin-top: 20px;
+            font-size: 1.8rem;
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        .menu, .questions {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+        button {
+            margin: 10px;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background-color: #c0392b; /* Dyp rød farge */
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #e74c3c; /* Lysere rød ved hover */
+        }
+        ol {
+            text-align: left;
+            display: inline-block;
+            margin: 20px auto;
+            padding: 0;
+        }
+        ol li {
+            font-size: 1.2rem;
+            line-height: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        .answer {
+            display: none;
+            font-size: 1.1rem;
+            color: darkgreen;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+        .show-answers .answer {
+            display: block;
+        }
+        .container {
+            padding: 20px 50px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            max-width: 700px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Julequiz 2024</h1>
+    <div id="main-menu" class="menu visible">
+        <div class="container">
+            <p>Velkommen til julequiz 2024. Velg en kategori:</p>
+            <button onclick="showQuestions('A')">Kategori A: Juletradisjoner</button>
+            <button onclick="showQuestions('B')">Kategori B: Julefilmer, -musikk og -litteratur</button>
+            <button onclick="showQuestions('C')">Kategori C: Julens mat og drikke</button>
+        </div>
+    </div>
+    <div id="questions-container" class="questions">
+        <h2 id="category-title"></h2>
+        <div class="container" id="questions-content">
+            <ol id="questions-list"></ol>
+            <button id="toggle-answers" onclick="toggleAnswers()">Vis svarene</button>
+            <button onclick="showMenu()">Tilbake</button>
+        </div>
+    </div>
+    <script>
+        const questions = {
+            A: [
+                ["Hva kaller de julenissen i Nederland?", "Sinterklaas"],
+                ["Når kommer julenissen i Nederland med gaver?", "På kvelden den 5. desember, som kalles Sinterklaasavond eller Pakjesavond."],
+                ["I hvilket land er det tradisjon å pynte juletreet med edderkoppspinn?", "Ukraina. Dette stammer fra en folkelegende om en fattig familie som fikk hjelp av en edderkopp til å dekorere treet sitt."],
+                ["I hvilket land er det en populær tradisjon å spise frityrstekt kylling fra KFC rundt juletider? (Hint: Det er ikke USA.)", "Japan. Tradisjonen startet med en markedsføringskampanje på 1970-tallet og har siden blitt en juletradisjon for mange japanere."],
+                ["Hva kalles den svenske julegeita som ofte bygges av halm?", "Gävlebukken (Gävlebocken). Den bygges av halm og plasseres hvert år i Gävle."],
+                ["I hvilket land er julehesten “Mari Lwyd” en tradisjon?", "Wales. Den består av en hestehodeskalle montert på en stang, dekorert med bånd og et hvitt laken, og brukes i en tradisjon der grupper går fra hus til hus og synger eller konkurrerer i rim."],
+                ["Når kommer den italienske juleheksen La Befana med gaver?", "Natt til 6. januar, helligtrekongersdag."],
+                ["Hvem er Krampus?", "Krampus er en skikkelse (fra folketro i områdene rundt Alpene) som fungerer som julenissens motstykke. Han straffer rampete barn i løpet av adventstiden, ofte avbildet som et demonisk vesen med horn og bjeller."],
+                ["Når og hvor feires Las Posadas?", "Las Posadas feires i Mexico og andre latinamerikanske land fra 16. til 24. desember hvert år. Det markerer reisen til Maria og Josef på vei til Betlehem."],
+                ["Hva kalles den norske tradisjonen der man kler seg ut og går fra dør til dør og synger julesanger?", "Julebukk. Folk, ofte barn, kler seg ut og går fra dør til dør for å synge julesanger i bytte mot godteri eller små gaver."],
+            ],
+            B: [
+                ["Hva heter julefilmen der en gutt ved et uhell blir glemt hjemme mens familien reiser på juleferie?", "Home Alone (Alene hjemme)."],
+                ["Hvilken sang åpner med linjen: “It’s Christmas time, there’s no need to be afraid”?", "Do They Know It’s Christmas? (Band Aid)."],
+                ["Hvem var det som opprinnelig skrev historien om Grinchen som stjal julen?", "Historien om Grinchen som stjal julen, “How the Grinch Stole Christmas!”, ble opprinnelig skrevet av Dr. Seuss (Theodor Seuss Geisel) og publisert i 1957."],
+                ["I filmen Love Actually, hva heter statsministeren, og hvem spiller ham?", "Hugh Grant spiller statsministeren David."],
+                ["Hvilken kjent Disney-figur er basert på en karakter med fornavn Ebenezer fra Charles Dickens’ julefortelling?", "Disney-figuren Onkel Skrue (Scrooge McDuck på engelsk) er basert på Ebenezer Scrooge fra Charles Dickens’ julefortelling 'A Christmas Carol'."],
+                ["Hva heter H.C. Andersens fortelling om en jente som selger fyrstikker i vinterkulden?", "Piken med svovelstikkene."],
+                ["I hvilken film sier en karakter: ‘The best way to spread Christmas cheer is singing loud for all to hear’?", "Elf (2003). Det blir sagt av karakteren Buddy, spilt av Will Ferrell."],
+                ["Hvem synger den klassiske sangen “White Christmas”?", "Bing Crosby. Sangen er skrevet av Irving Berlin. Hans innspilling fra 1942 er den mest kjente og en av de bestselgende singlene gjennom tidene."],
+                ["Hva heter filmen der en liten gutt tar et magisk tog på julaften?", "The Polar Express."],
+                ["Hvilken kjent norsk forfatter skrev fortellingen “Karens jul”?", "Amalie Skram."],
+            ],
+            C: [
+                ["Nevn minst tre krydder som ofte brukes i gløgg?", "Kanel, nellik, kardemomme, ingefær og stjerneanis."],
+                ["Hva er den mest spiste julekaken i Norge?", "Pepperkaker."],
+                ["Hva heter den britiske desserten laget av tørket frukt og krydder, ofte servert til jul?", "Christmas pudding (også kjent som plum pudding). Den er laget av tørket frukt, krydder, og ofte tilsatt brandy."],
+                ["Hvilken rett på det svenske julebordet består av en grateng laget av poteter, løk, brødsmuler og ansjos?", "Janssons fristelse (Janssons frestelse)."],
+                ["Hva kalles den amerikanske juledrikken laget med melk, sukker og egg?", "Egg nog."],
+                ["I hvilket europeisk land er det en tradisjon å spise panert og fritert karpe servert med potetsalat på julaften?", "Tsjekkia."],
+                ["Hvilken type fisk er tradisjonelt brukt i lutefisk?", "Tørrfisk av torsk."],
+                ["Hva heter det tyske julebrødet som er fylt med tørket frukt og nøtter, og ofte marsipan, og dekket med et lag melis?", "Stollen (eller Christstollen)."],
+                ["I hvilket tiår begynte Coca-Cola å bruke julenissen i sin reklame, noe som bidro til dagens ikoniske bilde av nissen?", "1930-tallet (første reklame med julenissen var i 1931)."],
+                ["Hva er de to viktigste ingrediensene i marsipan?", "Mandler og sukker (eller melis)."],
+            ],
+        };
+
+        let answersVisible = false;
+
+        function showMenu() {
+            document.getElementById("main-menu").classList.add("visible");
+            document.getElementById("questions-container").classList.remove("visible");
+        }
+
+        function showQuestions(category) {
+            const list = document.getElementById("questions-list");
+            const title = document.getElementById("category-title");
+            const container = document.getElementById("questions-content");
+            list.innerHTML = "";
+            title.textContent = category === "A" ? "Kategori A: Juletradisjoner" :
+                                category === "B" ? "Kategori B: Julefilmer, -musikk og -litteratur" :
+                                "Kategori C: Julens mat og drikke";
+            questions[category].forEach(([question, answer]) => {
+                const li = document.createElement("li");
+                li.innerHTML = `${question} <span class="answer">${answer}</span>`;
+                list.appendChild(li);
+            });
+            container.classList.remove("show-answers");
+            answersVisible = false;
+            updateAnswerButton();
+            document.getElementById("main-menu").classList.remove("visible");
+            document.getElementById("questions-container").classList.add("visible");
+        }
+
+        function toggleAnswers() {
+            const container = document.getElementById("questions-content");
+            answersVisible = !answersVisible;
+            container.classList.toggle("show-answers", answersVisible);
+            updateAnswerButton();
+        }
+
+        function updateAnswerButton() {
+            const button = document.getElementById("toggle-answers");
+            button.textContent = answersVisible ? "Skjul svarene" : "Vis svarene";
+        }
+    </script>
+</body>
+</html>
