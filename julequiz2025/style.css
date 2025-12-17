@@ -1,0 +1,160 @@
+:root {
+  --bg: #0b1410;        /* dyp grønnsvart */
+  --card: #121f18;      /* mørk gran-grønn */
+  --card2: #0f1a14;     /* subtil variant */
+  --text: #eef5f0;      /* varm hvit */
+  --muted: #b3c6bb;     /* dempet grønn-grå */
+  --border: #263c31;    /* gran-aktig kant */
+  --primary: #1f9d55;   /* rolig julegrønn */
+  --danger: #e25555;    /* dempet jule-rød */
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header { margin-bottom: 14px; }
+h1 { margin: 8px 0 6px; }
+h2 { margin: 0 0 10px; }
+h3 { margin: 0 0 6px; }
+
+.muted { color: var(--muted); }
+.footer { margin-top: 18px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 14px 0;
+}
+.card.subtle { background: var(--card2); }
+
+.row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.letters-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.letters {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  letter-spacing: 2px;
+  font-size: 18px;
+  padding: 10px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  min-width: 260px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn.primary {
+  border-color: rgba(31,157,85,0.65);
+  background: rgba(31,157,85,0.18);
+}
+
+.btn.danger {
+  border-color: rgba(226,85,85,0.65);
+  background: rgba(226,85,85,0.14);
+}
+
+.btn:focus {
+  outline: 2px solid rgba(31,157,85,0.55);
+  outline-offset: 2px;
+}
+
+.link {
+  color: var(--muted);
+  text-decoration: none;
+}
+.link:hover { text-decoration: underline; }
+
+.question { margin-bottom: 12px; }
+
+.options {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 16px;
+}
+
+.option {
+  position: relative;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* Skjul radiosirkel/bullet, men behold tilgjengelighet */
+.option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.option .badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex: 0 0 auto;
+  color: var(--text);
+}
+
+.option.selected {
+  border-color: rgba(31,157,85,0.70);
+  background: rgba(31,157,85,0.12);
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}

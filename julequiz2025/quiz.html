@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Julequiz – Del</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <a class="link" href="index.html">← Til forsiden</a>
+      <h1 id="part-title">Del</h1>
+      <p class="muted" id="progress">Spørsmål 1 av 10</p>
+    </header>
+
+    <section class="card">
+      <h2 class="question" id="question-text">Spørsmålstekst</h2>
+
+      <form id="options" class="options" aria-label="Svaralternativer">
+        <!-- Alternativer settes inn av JS -->
+      </form>
+
+      <div class="nav">
+        <button class="btn" id="prev" type="button">Forrige</button>
+        <button class="btn primary" id="next" type="button">Neste</button>
+      </div>
+    </section>
+
+    <section class="card subtle">
+      <div class="row">
+        <div>
+          <h3>Valgte bokstaver i denne delen</h3>
+          <div class="letters" id="letters-live">_ _ _</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer muted">
+      <small>Ingen fasit underveis. Du kan endre svar når som helst.</small>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Julequiz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>Julequiz</h1>
+      <p class="muted">
+        Svar på spørsmålene. Hvert svaralternativ har en bokstav. Etter hvert spørsmål står du igjen med en bokstav.
+        Bokstavene utgjør et anagram som blir et julerelatert løsningsord for hver del.
+      </p>
+    </header>
+
+    <section class="card">
+      <h2>Del 1</h2>
+      <p class="muted">10 spørsmål</p>
+
+      <div class="letters-row">
+        <div class="letters" id="letters-part-1" aria-label="Valgte bokstaver for del 1">_ _ _ _ _ _ _ _ _ _</div>
+        <div class="actions">
+          <a class="btn primary" id="start-part-1" href="quiz.html?part=1">Start</a>
+          <button class="btn" id="reset-part-1" type="button">Nullstill del 1</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Del 2</h2>
+      <p class="muted">9 spørsmål</p>
+
+      <div class="letters-row">
+        <div class="letters" id="letters-part-2" aria-label="Valgte bokstaver for del 2">_ _ _ _ _ _ _ _ _</div>
+        <div class="actions">
+          <a class="btn primary" id="start-part-2" href="quiz.html?part=2">Start</a>
+          <button class="btn" id="reset-part-2" type="button">Nullstill del 2</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card subtle">
+      <div class="row">
+        <div>
+          <h3>Tips</h3>
+          <p class="muted">
+            Du kan hoppe frem og tilbake uten å svare. Tidligere valg lagres automatisk og vises igjen.
+          </p>
+        </div>
+        <div class="actions">
+          <button class="btn danger" id="reset-all" type="button">Nullstill alt</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer muted">
+      <small>Statisk side – lagrer svar lokalt i nettleseren.</small>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
