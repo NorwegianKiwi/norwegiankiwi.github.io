@@ -195,3 +195,20 @@ h3 { margin: 0 0 6px; }
 
 .solve-result.ok { color: var(--primary); }
 .solve-result.bad { color: var(--danger); }
+
+.header {
+  position: relative;
+}
+
+.header-deco {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 140px;
+  height: 100px;
+  pointer-events: none;
+}
+
+.header {
+  padding-right: 160px;
+}
