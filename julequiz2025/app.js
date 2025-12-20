@@ -8,309 +8,309 @@
 const questions = {
   1: [
     {
-      q: "Hvilket land har hovedstaden Ottawa?",
+      q: "Hva er den største planeten i solsystemet?",
       options: [
-        { letter: "B", text: "Australia" },
-        { letter: "L", text: "Canada" },
-        { letter: "C", text: "Sverige" },
-        { letter: "D", text: "Tyskland" },
-        { letter: "F", text: "Japan" }
+        { letter: "R", text: "Mars" },
+        { letter: "T", text: "Saturn" },
+        { letter: "K", text: "Uranus" },
+        { letter: "H", text: "Neptun" },
+        { letter: "L", text: "Ingen av disse" }
       ]
     },
     {
-      q: "Hva kalles en figur med tre sider?",
+      q: "Hvilket navn hører ikke hjemme i Kaptein Sabeltanns univers?",
       options: [
-        { letter: "I", text: "Trekant" },
-        { letter: "B", text: "Firkant" },
-        { letter: "C", text: "Femkant" },
-        { letter: "D", text: "Sekskant" },
-        { letter: "F", text: "Sirkel" }
+        { letter: "A", text: "Langemann" },
+        { letter: "I", text: "Synnøve" },
+        { letter: "O", text: "Skalken" },
+        { letter: "Å", text: "Pelle" },
+        { letter: "Æ", text: "Ruben" }
       ]
     },
     {
-      q: "Hva heter planeten vi bor på?",
+      q: "Hvor mange hjerter har en blekksprut?",
       options: [
-        { letter: "B", text: "Mars" },
-        { letter: "C", text: "Venus" },
-        { letter: "N", text: "Jorden" },
-        { letter: "D", text: "Jupiter" },
-        { letter: "F", text: "Merkur" }
+        { letter: "M", text: "1" },
+        { letter: "R", text: "2" },
+        { letter: "N", text: "3" },
+        { letter: "K", text: "8" },
+        { letter: "T", text: "Blekkspruter er hjerteløse" }
       ]
     },
     {
-      q: "Hvilken gass trenger vi for å puste (mest relevant for kroppen)?",
+      q: "Hva veier mest?",
       options: [
-        { letter: "B", text: "Nitrogen" },
-        { letter: "C", text: "Helium" },
-        { letter: "D", text: "Hydrogen" },
-        { letter: "E", text: "Oksygen" },
-        { letter: "F", text: "Karbondioksid" }
+        { letter: "A", text: "1 kg snø" },
+        { letter: "O", text: "1 kg ferskvann" },
+        { letter: "Å", text: "1 kg saltvann" },
+        { letter: "Æ", text: "Det kommer an på temperaturen" },
+        { letter: "E", text: "Alle veier like mye" }
       ]
     },
     {
-      q: "Hvilket kontinent ligger Egypt i?",
+      q: "Hva er hovedstaden i Australia?",
       options: [
-        { letter: "B", text: "Europa" },
-        { letter: "C", text: "Asia" },
-        { letter: "J", text: "Afrika" },
-        { letter: "D", text: "Sør-Amerika" },
-        { letter: "F", text: "Oseania" }
+        { letter: "M", text: "Brisbane" },
+        { letter: "J", text: "Canberra" },
+        { letter: "T", text: "Melbourne" },
+        { letter: "K", text: "Perth" },
+        { letter: "R", text: "Sydney" }
       ]
     },
     {
-      q: "Hvor mange minutter er det i en time?",
+      q: "Hva er hovedingrediensen i kaviar?",
       options: [
-        { letter: "B", text: "30" },
-        { letter: "E", text: "60" },
-        { letter: "C", text: "90" },
-        { letter: "D", text: "45" },
-        { letter: "F", text: "120" }
+        { letter: "A", text: "Tang" },
+        { letter: "O", text: "Majones" },
+        { letter: "E", text: "Fiskeegg" },
+        { letter: "Å", text: "Fiskelever" },
+        { letter: "Æ", text: "Sukker" }
       ]
     },
     {
-      q: "Hvilket av disse er et pattedyr?",
+      q: "Hvilken dag er årets korteste i Norge?",
       options: [
-        { letter: "B", text: "Laks" },
-        { letter: "C", text: "Øgle" },
-        { letter: "D", text: "Frosk" },
-        { letter: "S", text: "Delfin" },
-        { letter: "F", text: "Hummer" }
+        { letter: "R", text: "18. desember" },
+        { letter: "T", text: "2. søndag i advent" },
+        { letter: "S", text: "21. desember" },
+        { letter: "K", text: "Julaften" },
+        { letter: "M", text: "Nyttårsaften" }
       ]
     },
     {
-      q: "Hva heter instrumentet som måler temperatur?",
+      q: "Hvor mange land er det i Sør-Amerika?",
       options: [
-        { letter: "U", text: "Termometer" },
-        { letter: "B", text: "Barometer" },
-        { letter: "C", text: "Seismograf" },
-        { letter: "D", text: "Hygrometer" },
-        { letter: "F", text: "Kompass" }
+        { letter: "U", text: "12" },
+        { letter: "A", text: "13" },
+        { letter: "O", text: "14" },
+        { letter: "Y", text: "15" },
+        { letter: "Æ", text: "Flere enn 15" }
       ]
     },
     {
-      q: "Hva kalles det som faller fra himmelen om vinteren og er hvitt og kaldt?",
+      q: "Hva er det tiende primtallet?",
       options: [
-        { letter: "B", text: "Regn" },
-        { letter: "C", text: "Hagl" },
-        { letter: "D", text: "Dugg" },
-        { letter: "S", text: "Snø" },
-        { letter: "F", text: "Tåke" }
+        { letter: "R", text: "10" },
+        { letter: "T", text: "19" },
+        { letter: "K", text: "23" },
+        { letter: "S", text: "29" },
+        { letter: "M", text: "31" }
       ]
     }
   ],
 
   2: [
     {
-      q: "Hva er hovedstaden i Norge?",
+      q: "Hvilket språk har flest morsmålsbrukere i verden?",
       options: [
-        { letter: "S", text: "Oslo" },
-        { letter: "B", text: "Bergen" },
-        { letter: "C", text: "Trondheim" },
-        { letter: "F", text: "Stavanger" },
-        { letter: "G", text: "Tromsø" }
+        { letter: "R", text: "Arabisk" },
+        { letter: "L", text: "Engelsk" },
+        { letter: "M", text: "Hindi" },
+        { letter: "S", text: "Mandarin" },
+        { letter: "K", text: "Spansk" }
       ]
     },
     {
-      q: "Hva er 7 + 5?",
+      q: "Hvilket land hadde flest innbyggere i 2025?",
       options: [
-        { letter: "B", text: "10" },
-        { letter: "I", text: "12" },
-        { letter: "C", text: "11" },
-        { letter: "F", text: "13" },
-        { letter: "G", text: "14" }
+        { letter: "I", text: "India" },
+        { letter: "Å", text: "Indonesia" },
+        { letter: "Y", text: "Kina" },
+        { letter: "U", text: "Russland" },
+        { letter: "O", text: "USA" }
       ]
     },
     {
-      q: "Hvilken av disse er en væske ved romtemperatur?",
+      q: "Hvor mange ganger har det norske landslaget i håndball for kvinner vunnet VM?",
       options: [
-        { letter: "B", text: "Stein" },
-        { letter: "C", text: "Is" },
-        { letter: "F", text: "Jern" },
-        { letter: "V", text: "Vann" },
-        { letter: "G", text: "Glass" }
+        { letter: "R", text: "4" },
+        { letter: "V", text: "5" },
+        { letter: "K", text: "6" },
+        { letter: "M", text: "7" },
+        { letter: "H", text: "8" }
       ]
     },
     {
-      q: "Hva kalles en baby-katt på norsk?",
+      q: "Hva er adressen til Slottet?",
       options: [
-        { letter: "D", text: "Kattunge" },
-        { letter: "B", text: "Kalv" },
-        { letter: "C", text: "Valp" },
-        { letter: "F", text: "Lam" },
-        { letter: "G", text: "Føll" }
+        { letter: "R", text: "Karl Johans gate 1" },
+        { letter: "K", text: "Henrik Ibsens gate 1" },
+        { letter: "M", text: "Dronningens gate 1" },
+        { letter: "H", text: "Drammensveien 1" },
+        { letter: "D", text: "Slottsplassen 1" }
       ]
     },
     {
-      q: "Hvilken farge får du hvis du blander rød og hvit?",
+      q: "Hva heter sangen der de synger at de ikke har tid fordi de må finne skjegget?",
       options: [
-        { letter: "B", text: "Lilla" },
-        { letter: "C", text: "Oransje" },
-        { letter: "A", text: "Rosa" },
-        { letter: "F", text: "Grønn" },
-        { letter: "G", text: "Brun" }
+        { letter: "O", text: "Klippe-klippe" },
+        { letter: "A", text: "Spikke-sage-lime-banke" },
+        { letter: "U", text: "Putti Plutti Pott" },
+        { letter: "Y", text: "Vi ha’kke tid, for vi må finne skjegget" },
+        { letter: "Å", text: "Jakten på julenissens skjegg" }
       ]
     },
     {
-      q: "Hvor mange dager er det i en uke?",
+      q: "Hvilket av disse landene er minst i areal?",
       options: [
-        { letter: "B", text: "5" },
-        { letter: "C", text: "6" },
-        { letter: "T", text: "7" },
-        { letter: "F", text: "8" },
-        { letter: "G", text: "10" }
+        { letter: "R", text: "Liechtenstein" },
+        { letter: "K", text: "Malta" },
+        { letter: "M", text: "Monaco" },
+        { letter: "H", text: "San Marino" },
+        { letter: "T", text: "Vatikanstaten" }
       ]
     },
     {
-      q: "Hvilket av disse er en frukt?",
+      q: "Hvilket av disse ordene betyr ikke jul?",
       options: [
-        { letter: "B", text: "Gulrot" },
-        { letter: "C", text: "Potet" },
-        { letter: "F", text: "Løk" },
-        { letter: "T", text: "Eple" },
-        { letter: "G", text: "Salat" }
+        { letter: "R", text: "Navidad" },
+        { letter: "T", text: "Nager" },
+        { letter: "M", text: "Natal" },
+        { letter: "K", text: "Noël" },
+        { letter: "H", text: "Jólin" }
       ]
     },
     {
-      q: "Hva er den største planeten i solsystemet?",
+      q: "Hvilken pris fikk Kunstsiloen i Kristiansand i 2025?",
       options: [
-        { letter: "N", text: "Jupiter" },
-        { letter: "B", text: "Mars" },
-        { letter: "C", text: "Venus" },
-        { letter: "F", text: "Merkur" },
-        { letter: "G", text: "Jorden" }
+        { letter: "R", text: "Norges mest miljøvennlige offentlige bygg" },
+        { letter: "K", text: "Europas mest originale museum" },
+        { letter: "N", text: "Verdens vakreste museum" },
+        { letter: "M", text: "Nord-Europas mest besøkte kunstmuseum" },
+        { letter: "H", text: "Skandinavias mest innflytelsesrike museum" }
       ]
     },
     {
-      q: "Hva kalles en voksen hann av sau?",
+      q: "Når ble Tre nøtter til Askepott første gang vist på NRK?",
       options: [
-        { letter: "B", text: "Ku" },
-        { letter: "C", text: "Hane" },
-        { letter: "F", text: "Orne" },
-        { letter: "E", text: "Vær" },
-        { letter: "G", text: "Bukk" }
+        { letter: "O", text: "1973" },
+        { letter: "E", text: "1975" },
+        { letter: "U", text: "1979" },
+        { letter: "Y", text: "1981" },
+        { letter: "Å", text: "1982" }
       ]
     },
     {
-      q: "Hva er motsatt av 'opp'?",
+      q: "I hvilken by bor familien til Kevin i filmen «Home Alone»?",
       options: [
-        { letter: "D", text: "Ned" },
-        { letter: "B", text: "Rundt" },
-        { letter: "C", text: "Bort" },
-        { letter: "F", text: "Forbi" },
-        { letter: "G", text: "Over" }
+        { letter: "R", text: "Boston" },
+        { letter: "D", text: "Chicago" },
+        { letter: "M", text: "Los Angeles" },
+        { letter: "K", text: "New York" },
+        { letter: "H", text: "Seattle" }
       ]
     }
   ],
 
   3: [
     {
-      q: "Hva heter måneden etter oktober?",
+      q: "Hvilken julelåt inneholder teksten «I don’t want a lot for Christmas»?",
       options: [
-        { letter: "B", text: "September" },
-        { letter: "C", text: "Oktober" },
-        { letter: "N", text: "November" },
-        { letter: "D", text: "August" },
-        { letter: "E", text: "Januar" }
+        { letter: "H", text: "Santa Baby" },
+        { letter: "M", text: "Jingle Bell Rock" },
+        { letter: "N", text: "All I Want for Christmas Is You" },
+        { letter: "F", text: "Merry Christmas Everyone" },
+        { letter: "V", text: "Do They Know It’s Christmas?" }
       ]
     },
     {
-      q: "Hvilket av disse er et tall?",
+      q: "Hvilket av disse landene ligger ikke på ekvator?",
       options: [
-        { letter: "Y", text: "7" },
-        { letter: "B", text: "Blå" },
-        { letter: "C", text: "Hund" },
-        { letter: "D", text: "Vinter" },
-        { letter: "E", text: "Rund" }
+        { letter: "O", text: "Brasil" },
+        { letter: "E", text: "Ecuador" },
+        { letter: "Å", text: "Indonesia" },
+        { letter: "Æ", text: "Kenya" },
+        { letter: "Y", text: "Malaysia" }
       ]
     },
     {
-      q: "Hva kalles en figur med fire like sider og fire rette vinkler?",
+      q: "Hvor langt er det rundt ekvator?",
       options: [
-        { letter: "B", text: "Sirkel" },
-        { letter: "K", text: "Kvadrat" },
-        { letter: "C", text: "Trekant" },
-        { letter: "D", text: "Trapes" },
-        { letter: "E", text: "Femkant" }
+        { letter: "H", text: "4 000 km" },
+        { letter: "K", text: "40 000 km" },
+        { letter: "M", text: "400 000 km" },
+        { letter: "F", text: "4 millioner km" },
+        { letter: "V", text: "40 millioner km" }
       ]
     },
     {
-      q: "Hva kalles fargen du får hvis du blander blått og gult?",
+      q: "Hvilken påstand er sann?",
       options: [
-        { letter: "B", text: "Lilla" },
-        { letter: "C", text: "Rød" },
-        { letter: "D", text: "Rosa" },
-        { letter: "R", text: "Grønn" },
-        { letter: "E", text: "Brun" }
+        { letter: "H", text: "Alle primtall er oddetall" },
+        { letter: "M", text: "89 er det største primtallet under 100" },
+        { letter: "R", text: "Det finnes uendelig mange primtall" },
+        { letter: "F", text: "39 er et primtall" },
+        { letter: "V", text: "1000 har flere forskjellige primtallsfaktorer enn 100" }
       ]
     },
     {
-      q: "Hvilken bokstav er en vokal?",
+      q: "Norge har kvalifisert seg til fotball-VM 2026. Hvor mange mål scoret Norge i kvalifiseringen?",
       options: [
-        { letter: "Ø", text: "Ø" },
-        { letter: "B", text: "B" },
-        { letter: "C", text: "C" },
-        { letter: "D", text: "D" },
-        { letter: "F", text: "F" }
+        { letter: "E", text: "34" },
+        { letter: "I", text: "35" },
+        { letter: "Æ", text: "36" },
+        { letter: "Ø", text: "37" },
+        { letter: "Å", text: "38" }
       ]
     },
     {
-      q: "Hva kalles en 'kald natt' ofte om vinteren?",
+      q: "Hva har ikke vært en OL-gren?",
       options: [
-        { letter: "B", text: "Sommernatt" },
-        { letter: "C", text: "Høststorm" },
-        { letter: "D", text: "Vårdag" },
-        { letter: "L", text: "Frostnatt" },
-        { letter: "E", text: "Regnvær" }
+        { letter: "L", text: "Etthjulssykling" },
+        { letter: "H", text: "Tandemsykling" },
+        { letter: "M", text: "Levende due-skyting" },
+        { letter: "F", text: "Tautrekking" },
+        { letter: "V", text: "Lengdestup" }
       ]
     },
     {
-      q: "Hva kalles et tog som går under bakken i store byer?",
+      q: "Hvilken av disse er ikke en trekkfugl?",
       options: [
-        { letter: "B", text: "Trikk" },
-        { letter: "C", text: "Buss" },
-        { letter: "D", text: "Taxi" },
-        { letter: "F", text: "Ferje" },
-        { letter: "L", text: "T-bane" }
+        { letter: "H", text: "Gjøk" },
+        { letter: "M", text: "Stær" },
+        { letter: "L", text: "Skjære" },
+        { letter: "F", text: "Bokfink" },
+        { letter: "V", text: "Svarttrost" }
       ]
     },
     {
-      q: "Hva heter Norges nasjonalfjell (ofte omtalt i skolekunnskap)?",
+      q: "Hvor mye koster porto for et brev (20 g) innenlands i Norge i 2025?",
       options: [
-        { letter: "T", text: "Galdhøpiggen" },
-        { letter: "B", text: "K2" },
-        { letter: "C", text: "Mount Everest" },
-        { letter: "D", text: "Fuji" },
-        { letter: "E", text: "Kilimanjaro" }
+        { letter: "H", text: "12 kr" },
+        { letter: "M", text: "15 kr" },
+        { letter: "F", text: "18 kr" },
+        { letter: "V", text: "22 kr" },
+        { letter: "T", text: "25 kr" }
       ]
     },
     {
-      q: "Hva er 2 + 2?",
+      q: "Hvor mye kostet porto for et brev (20 g) innenlands i Norge i år 2000?",
       options: [
-        { letter: "A", text: "4" },
-        { letter: "B", text: "3" },
-        { letter: "C", text: "5" },
-        { letter: "D", text: "6" },
-        { letter: "E", text: "2" }
+        { letter: "A", text: "4 kr" },
+        { letter: "E", text: "6 kr" },
+        { letter: "I", text: "8 kr" },
+        { letter: "O", text: "10 kr" },
+        { letter: "Å", text: "12 kr" }
       ]
     },
     {
-      q: "Hva kalles den årstiden som kommer etter høst?",
+      q: "Hvor mange tidssoner har Russland?",
       options: [
-        { letter: "S", text: "Vinter" },
-        { letter: "B", text: "Sommer" },
-        { letter: "C", text: "Vår" },
-        { letter: "D", text: "Høst" },
-        { letter: "E", text: "Monsoon" }
+        { letter: "H", text: "3" },
+        { letter: "M", text: "5" },
+        { letter: "F", text: "7" },
+        { letter: "V", text: "9" },
+        { letter: "S", text: "11" }
       ]
     },
     {
-      q: "Hva kalles et varmt drikkeord som ofte serveres i desember i Norge?",
+      q: "Hvilken påstand er sann?",
       options: [
-        { letter: "S", text: "Gløgg" },
-        { letter: "B", text: "Smoothie" },
-        { letter: "C", text: "Is-te" },
-        { letter: "D", text: "Mineralvann" },
-        { letter: "E", text: "Kakao-is" }
+        { letter: "H", text: "Denne oppgaven har ingen rette svar" },
+        { letter: "S", text: "Denne oppgaven har ett rett svar" },
+        { letter: "M", text: "Denne oppgaven har to rette svar" },
+        { letter: "F", text: "Ingen av de andre alternativene er riktige" },
+        { letter: "V", text: "Alle de andre alternativene er riktige" }
       ]
     }
   ]
