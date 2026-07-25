@@ -585,15 +585,15 @@ footer a {
 .answer-card.is-correct {
   border-color: var(--green);
   background: var(--card);
-  outline: 2px solid var(--green);
-  outline-offset: -3px;
+  outline: 4px solid var(--green);
+  outline-offset: 0;
 }
 
 .answer-card.is-wrong {
   border-color: var(--coral);
   background: var(--card);
-  outline: 2px solid var(--coral);
-  outline-offset: -3px;
+  outline: 6px solid var(--coral);
+  outline-offset: 0;
 }
 
 .answer-card.is-muted {
@@ -603,8 +603,8 @@ footer a {
 .answer-card.is-correction {
   border-color: var(--green);
   background: var(--card);
-  outline: 5px double var(--green);
-  outline-offset: -5px;
+  outline: 6px solid var(--green);
+  outline-offset: 0;
   box-shadow: none;
 }
 
@@ -612,6 +612,16 @@ footer a {
   transform: translateY(-3px);
   border-color: var(--green);
   box-shadow: 0 10px 24px rgba(36, 93, 69, 0.13);
+}
+
+.text-grid .answer-card.is-wrong strong {
+  opacity: 0.45;
+}
+
+.text-grid .answer-card.is-correction {
+  z-index: 2;
+  animation: correction-flag-pulse 1s ease-in-out infinite;
+  will-change: transform;
 }
 
 .keyboard-hint-index {
