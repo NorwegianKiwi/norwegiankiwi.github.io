@@ -294,7 +294,7 @@ export default function Home() {
   const progress = ((questionIndex + 1) / questions.length) * 100;
 
   return (
-    <main className="quiz-shell">
+    <main className="quiz-shell quiz-active">
       <header className="quiz-header">
         <button className="brand brand-button" onClick={returnToSetup}>
           <span className="brand-mark" aria-hidden="true">
@@ -414,7 +414,7 @@ export default function Home() {
           })}
         </div>
 
-        {answered && (
+        {answered ? (
           <div className={`feedback-bar ${isCorrect ? "correct" : "wrong"}`}>
             <div>
               <span>{isCorrect ? "Riktig!" : "Ikke helt."}</span>
@@ -429,6 +429,8 @@ export default function Home() {
               <span aria-hidden="true">→</span>
             </button>
           </div>
+        ) : (
+          <div className="feedback-bar feedback-placeholder" aria-hidden="true" />
         )}
       </section>
     </main>
