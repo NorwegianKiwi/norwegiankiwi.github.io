@@ -91,10 +91,6 @@ a:focus-visible {
   transform: rotate(-4deg);
 }
 
-.brand-mark::first-letter {
-  transform: rotate(4deg);
-}
-
 .edition {
   color: var(--muted);
   font-size: 12px;
@@ -676,10 +672,6 @@ footer a {
 }
 
 /* Result */
-.result-shell {
-  min-height: 100vh;
-}
-
 .result-card {
   width: min(760px, 100%);
   margin: 0 auto;
@@ -852,7 +844,6 @@ footer a {
   }
 
   .quiz-active .text-grid .answer-card {
-    min-height: 0;
     padding-top: 8px;
     padding-bottom: 8px;
   }

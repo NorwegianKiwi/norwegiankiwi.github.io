@@ -220,7 +220,7 @@
             : "Verden venter.";
 
     return `
-      <main class="quiz-shell result-shell">
+      <main class="quiz-shell">
         <header class="quiz-header">${brandMarkup(true)}</header>
         <section class="result-card">
           <p class="kicker">Øvelsen er fullført</p>
@@ -413,12 +413,16 @@
     }
   }
 
+  function renderAtTop() {
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function returnToSetup() {
     state.screen = "setup";
     state.questions = [];
     state.selectedCode = null;
-    render();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    renderAtTop();
   }
 
   app.addEventListener("click", (event) => {
@@ -445,8 +449,7 @@
       state.selectedCode = null;
       state.score = 0;
       state.screen = "quiz";
-      render();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderAtTop();
       return;
     }
 
@@ -469,8 +472,7 @@
         state.questionIndex += 1;
         state.selectedCode = null;
       }
-      render();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderAtTop();
       return;
     }
 

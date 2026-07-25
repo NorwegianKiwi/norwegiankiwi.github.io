@@ -217,19 +217,18 @@ const countries = rows.map(([code, name, capital, regions]) => ({
 }));
 
 const regionOptions = [
-  { id: "world", label: "Hele verden", eyebrow: "196 land" },
-  { id: "europe", label: "Europa", eyebrow: "47 land" },
-  { id: "africa", label: "Afrika", eyebrow: "54 land" },
-  { id: "asia", label: "Asia", eyebrow: "49 land" },
-  { id: "oceania", label: "Oseania", eyebrow: "14 land" },
-  { id: "americas", label: "Amerika", eyebrow: "35 land" },
+  { id: "world", label: "Hele verden" },
+  { id: "europe", label: "Europa" },
+  { id: "africa", label: "Afrika" },
+  { id: "asia", label: "Asia" },
+  { id: "oceania", label: "Oseania" },
+  { id: "americas", label: "Amerika" },
   {
     id: "north-central-america",
     label: "Nord- og Mellom-Amerika",
-    eyebrow: "10 land",
   },
-  { id: "south-america", label: "Sør-Amerika", eyebrow: "12 land" },
-  { id: "caribbean", label: "Karibia", eyebrow: "13 land" },
+  { id: "south-america", label: "Sør-Amerika" },
+  { id: "caribbean", label: "Karibia" },
 ];
 
 window.ATLAS_DATA = Object.freeze({
