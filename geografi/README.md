@@ -13,6 +13,8 @@ utviklingsserver, bygging eller tredjepakker.
 - `styles.css` – utforming og responsiv layout
 - `countries.js` – land- og regiondata
 - `world-map.js` – lokalt, projisert kartgrunnlag fra Natural Earth
+- `MAP-DATA.md` – kontroll- og oppdateringsprosedyre for kartdata
+- `tools/` – maskinlesbart kartmanifest og avhengighetsfrie kontrollverktøy
 - `app.js` – quizlogikk og rendering
 - `favicon.svg` – jordklode brukt som favicon og dekorasjon i heroen
 - `flags/` – de 196 flaggene quizen bruker, med
@@ -32,6 +34,15 @@ håndjusterte utsnitt for de sju enkeltregionene i Kartquiz. Oseania er
 stillehavssentrert slik at øystatene på begge sider av datolinjen vises
 samlet. Reprojiseringen skjer ikke i nettleseren og tilfører ingen
 runtime-avhengigheter.
+
+Kildeversjon, eksakte arkivadresser, kontrollersummer, kodeavvik,
+projeksjoner, faste utsnitt og redaksjonelle regler er lagret i
+`tools/map-sources.json`. Se `MAP-DATA.md` før kartdata kontrolleres eller
+oppdateres. En rask, nettverksfri konsistenskontroll kjøres med:
+
+```sh
+python3 tools/map_maintenance.py validate
+```
 
 Kartquizen har i tillegg et lite formvindu med nordvendte landsilhuetter
 generert fra Natural Earth 1:10m Admin 0 Countries, versjon 5.1.1. Den høyere
