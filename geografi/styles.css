@@ -515,8 +515,12 @@ footer a {
   gap: var(--answer-gap);
 }
 
+.answer-grid-stage {
+  display: contents;
+}
+
 .flag-grid {
-  --answer-gap: 12px;
+  --answer-gap: 16px;
 }
 
 .answer-card {
@@ -668,23 +672,46 @@ footer a {
 }
 
 .flag-grid .answer-card.is-correct .answer-flag {
-  outline: 3px solid var(--green);
-  outline-offset: 0;
+  outline: 4px solid var(--green);
+  outline-offset: -4px;
 }
 
 .flag-grid .answer-card.is-wrong .answer-flag {
-  outline: 3px solid var(--coral);
+  background: #efb7a6;
+  outline: 6px solid var(--coral);
   outline-offset: 0;
 }
 
+.flag-grid .answer-card.is-wrong .answer-flag .flag {
+  opacity: 0.4;
+  filter: saturate(0.4) contrast(0.9);
+}
+
 .flag-grid .answer-card.is-correction .answer-flag {
-  outline: 5px double var(--green);
+  outline: 6px solid var(--green);
   outline-offset: 0;
+  animation: correction-flag-pulse 1s ease-in-out infinite;
+  will-change: transform;
+}
+
+.flag-grid .answer-card.is-correction {
+  z-index: 2;
 }
 
 .flag-grid .answer-card:not(.is-correct):not(.is-wrong):not(.is-correction):hover .answer-flag,
 .flag-grid .answer-card:not(.is-correct):not(.is-wrong):not(.is-correction):focus-visible .answer-flag {
   box-shadow: 0 0 0 3px rgba(36, 93, 69, 0.5);
+}
+
+@keyframes correction-flag-pulse {
+  0%,
+  100% {
+    transform: scale(1.06);
+  }
+
+  50% {
+    transform: scale(0.98);
+  }
 }
 
 .sr-only {
@@ -1241,8 +1268,18 @@ body.modal-open {
     grid-template-rows: repeat(3, minmax(0, 1fr));
   }
 
+  .mode-country-flag .answer-grid-stage {
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    container-type: size;
+  }
+
   .quiz-active .flag-grid {
-    --answer-gap: clamp(10px, 1.6vh, 12px);
+    --answer-gap: 16px;
+    width: min(100cqw, calc(133.333cqh - 10.667px));
+    grid-template-rows: repeat(3, auto);
+    align-content: center;
   }
 
   .quiz-active .capital-grid {
@@ -1255,17 +1292,18 @@ body.modal-open {
   }
 
   .quiz-active .flag-grid .answer-card {
+    aspect-ratio: 4 / 3;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: auto;
     gap: 0;
     padding: 0;
   }
 
   .quiz-active .flag-grid .answer-flag {
     grid-column: 1;
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
     max-width: 100%;
     justify-self: center;
   }
@@ -1446,7 +1484,7 @@ body.modal-open {
   }
 
   .flag-grid {
-    --answer-gap: 8px;
+    --answer-gap: 12px;
   }
 
   .flag-grid .answer-card {
@@ -1565,6 +1603,7 @@ body.modal-open {
   *::before,
   *::after {
     scroll-behavior: auto !important;
+    animation: none !important;
     transition-duration: 0.01ms !important;
   }
 }

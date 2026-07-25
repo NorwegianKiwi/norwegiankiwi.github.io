@@ -585,12 +585,14 @@
             <p class="kicker">${selectedMode().label}</p>
             ${promptMarkup(question, answered)}
           </div>
-          <div class="answer-grid ${gridClass}">
-            ${question.choices
-              .map((choice, index) =>
-                answerMarkup(choice, index, question),
-              )
-              .join("")}
+          <div class="answer-grid-stage">
+            <div class="answer-grid ${gridClass}">
+              ${question.choices
+                .map((choice, index) =>
+                  answerMarkup(choice, index, question),
+                )
+                .join("")}
+            </div>
           </div>
           <p class="sr-only" aria-live="assertive">${escapeHtml(
             answerAnnouncement(question),
