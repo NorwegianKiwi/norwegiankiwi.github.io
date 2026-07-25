@@ -701,38 +701,119 @@ footer a {
 }
 
 .country-silhouette-inset {
+  --silhouette-edge: 14px;
+  --silhouette-size: clamp(96px, 16vw, 118px);
   position: absolute;
   z-index: 2;
-  width: clamp(96px, 17%, 118px);
-  aspect-ratio: 1;
+  box-sizing: border-box;
   padding: 9px;
-  pointer-events: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: inherit;
+  cursor: zoom-in;
   border: 1px solid rgba(24, 35, 29, 0.28);
   border-radius: 15px;
   background: rgba(255, 253, 247, 0.94);
   box-shadow:
     0 8px 22px rgba(24, 35, 29, 0.15),
     inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  transition:
+    top 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    right 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    bottom 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms ease;
 }
 
-.country-silhouette-inset.is-bottom-left,
+.country-silhouette-inset:hover {
+  border-color: rgba(24, 35, 29, 0.52);
+  box-shadow:
+    0 10px 26px rgba(24, 35, 29, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.country-silhouette-inset:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+
+.country-silhouette-inset.is-bottom-left {
+  inset:
+    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
+    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
+    var(--silhouette-edge)
+    var(--silhouette-edge);
+}
+
 .country-silhouette-inset.is-bottom-right {
-  bottom: 14px;
+  inset:
+    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
+    var(--silhouette-edge)
+    var(--silhouette-edge)
+    calc(100% - var(--silhouette-edge) - var(--silhouette-size));
 }
 
-.country-silhouette-inset.is-top-left,
-.country-silhouette-inset.is-top-right {
-  top: 14px;
-}
-
-.country-silhouette-inset.is-bottom-left,
 .country-silhouette-inset.is-top-left {
-  left: 14px;
+  inset:
+    var(--silhouette-edge)
+    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
+    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
+    var(--silhouette-edge);
 }
 
-.country-silhouette-inset.is-bottom-right,
 .country-silhouette-inset.is-top-right {
-  right: 14px;
+  inset:
+    var(--silhouette-edge)
+    var(--silhouette-edge)
+    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
+    calc(100% - var(--silhouette-edge) - var(--silhouette-size));
+}
+
+.country-silhouette-inset.is-expanded {
+  inset: var(--silhouette-edge);
+  padding: 18px;
+  cursor: zoom-out;
+  border-radius: 12px;
+  box-shadow:
+    0 14px 34px rgba(24, 35, 29, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.82);
+}
+
+.silhouette-toggle-icon {
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  background: rgba(255, 253, 247, 0.94);
+  box-shadow: 0 2px 7px rgba(24, 35, 29, 0.12);
+}
+
+.silhouette-toggle-icon::before,
+.silhouette-toggle-icon::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+  transform: translate(-50%, -50%);
+  transition: transform 180ms ease;
+}
+
+.silhouette-toggle-icon::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.country-silhouette-inset.is-expanded .silhouette-toggle-icon::after {
+  transform: translate(-50%, -50%) rotate(90deg) scaleX(0);
 }
 
 .country-silhouette {
@@ -1881,29 +1962,14 @@ body.modal-open {
   }
 
   .country-silhouette-inset {
-    width: 88px;
+    --silhouette-edge: 8px;
+    --silhouette-size: 88px;
     padding: 7px;
     border-radius: 12px;
   }
 
-  .country-silhouette-inset.is-bottom-left,
-  .country-silhouette-inset.is-bottom-right {
-    bottom: 8px;
-  }
-
-  .country-silhouette-inset.is-top-left,
-  .country-silhouette-inset.is-top-right {
-    top: 8px;
-  }
-
-  .country-silhouette-inset.is-bottom-left,
-  .country-silhouette-inset.is-top-left {
-    left: 8px;
-  }
-
-  .country-silhouette-inset.is-bottom-right,
-  .country-silhouette-inset.is-top-right {
-    right: 8px;
+  .country-silhouette-inset.is-expanded {
+    padding: 13px;
   }
 
   .mode-map-country .map-answer-grid {

@@ -64,6 +64,7 @@
     questionIndex: 0,
     selectedCode: null,
     answerStatus: "unanswered",
+    silhouetteExpanded: false,
     score: 0,
     wrongAnswers: [],
     flashcards: [],
@@ -366,13 +367,18 @@
             )}
           </g>
         </svg>
-        <div
-          class="country-silhouette-inset is-${silhouette.corner}"
-          aria-hidden="true"
+        <button
+          type="button"
+          class="country-silhouette-inset is-${silhouette.corner}${state.silhouetteExpanded ? " is-expanded" : ""}"
+          data-action="toggle-silhouette"
+          aria-expanded="${state.silhouetteExpanded}"
+          aria-label="${state.silhouetteExpanded ? "Forminsk landformen" : "Forstørr landformen"}"
         >
+          <span class="silhouette-toggle-icon" aria-hidden="true"></span>
           <svg
             class="country-silhouette"
             viewBox="${mapData.silhouetteViewBox}"
+            aria-hidden="true"
             focusable="false"
             preserveAspectRatio="xMidYMid meet"
           >
@@ -383,7 +389,7 @@
             }
             ${silhouetteMarkers}
           </svg>
-        </div>
+        </button>
       </div>
     `;
   }
@@ -979,9 +985,23 @@
     });
   }
 
+  function setSilhouetteExpanded(expanded) {
+    state.silhouetteExpanded = expanded;
+    const control = app.querySelector('[data-action="toggle-silhouette"]');
+    if (!control) return;
+
+    control.classList.toggle("is-expanded", expanded);
+    control.setAttribute("aria-expanded", String(expanded));
+    control.setAttribute(
+      "aria-label",
+      expanded ? "Forminsk landformen" : "Forstørr landformen",
+    );
+  }
+
   function advanceQuestion() {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
+    state.silhouetteExpanded = false;
     if (state.questionIndex === state.questions.length - 1) {
       state.screen = "result";
     } else {
@@ -1010,6 +1030,7 @@
     state.questionIndex = 0;
     state.selectedCode = null;
     state.answerStatus = "unanswered";
+    state.silhouetteExpanded = false;
     state.score = 0;
     state.wrongAnswers = [];
     state.screen = "quiz";
@@ -1023,6 +1044,7 @@
     state.questions = [];
     state.selectedCode = null;
     state.answerStatus = "unanswered";
+    state.silhouetteExpanded = false;
     state.wrongAnswers = [];
     state.modalCode = null;
     renderAtTop();
@@ -1041,6 +1063,7 @@
     state.flashcards = shuffle(countriesInRegion(state.region));
     state.flashcardIndex = 0;
     state.flashcardRevealed = false;
+    state.silhouetteExpanded = false;
     state.modalCode = null;
     state.screen = "flashcards";
     renderAtTop({ focusFlashcard: true });
@@ -1053,6 +1076,7 @@
     state.questions = [];
     state.selectedCode = null;
     state.answerStatus = "unanswered";
+    state.silhouetteExpanded = false;
     state.wrongAnswers = [];
     state.flashcards = [];
     state.flashcardIndex = 0;
@@ -1116,6 +1140,11 @@
 
     if (action === "answer") {
       selectAnswer(control.dataset.code);
+      return;
+    }
+
+    if (action === "toggle-silhouette") {
+      setSilhouetteExpanded(!state.silhouetteExpanded);
       return;
     }
 
@@ -1280,9 +1309,22 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || state.modalCode === null) return;
-    event.preventDefault();
-    closeFlagModal();
+    if (event.key !== "Escape") return;
+
+    if (state.modalCode !== null) {
+      event.preventDefault();
+      closeFlagModal();
+      return;
+    }
+
+    if (
+      state.screen === "quiz" &&
+      state.mode === "map-country" &&
+      state.silhouetteExpanded
+    ) {
+      event.preventDefault();
+      setSilhouetteExpanded(false);
+    }
   });
 
   render();
