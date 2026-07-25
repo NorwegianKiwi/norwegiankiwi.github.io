@@ -47,6 +47,13 @@
       description: "Du får landet og flagget – finn hovedstaden.",
       tone: "gold",
     },
+    {
+      id: "map-country",
+      label: "Kartquiz",
+      description: "Se et uthevet land – velg riktig navn.",
+      tone: "map",
+      choiceCount: 6,
+    },
   ];
 
   const state = {
@@ -112,11 +119,11 @@
     return countries.filter((country) => regionMatches(country.region, region));
   }
 
-  function createQuestions(pool) {
+  function createQuestions(pool, choiceCount = 9) {
     return shuffle(pool).map((country) => {
       const distractors = shuffle(
         pool.filter((item) => item.code !== country.code),
-      ).slice(0, 8);
+      ).slice(0, choiceCount - 1);
       return {
         country,
         choices: shuffle([country, ...distractors]),
@@ -256,6 +263,100 @@
     `;
   }
 
+  function regionalMapPathMarkup(feature, className) {
+    return `
+      <path
+        class="${className}"
+        d="${feature.path}"
+        vector-effect="non-scaling-stroke"
+      />
+    `;
+  }
+
+  function regionalMapMarkerMarkup(
+    marker,
+    className,
+    radius,
+  ) {
+    return `
+      <circle
+        class="${className}"
+        cx="${marker.x}"
+        cy="${marker.y}"
+        r="${radius}"
+        vector-effect="non-scaling-stroke"
+      />
+    `;
+  }
+
+  function regionalQuestionMapMarkup(regionId, targetCode) {
+    const view = mapData.quizRegions[regionId];
+    const region = regionOptions.find((option) => option.id === regionId);
+    const [, , viewWidth] = view.viewBox.split(/\s+/).map(Number);
+    const markerRadius = Math.min(3.8, Math.max(0.7, viewWidth * 0.0045));
+    const contextFeatures = view.features.filter(
+      (feature) => mapRegionForCode(feature.code) !== regionId,
+    );
+    const regionFeatures = view.features.filter(
+      (feature) =>
+        mapRegionForCode(feature.code) === regionId &&
+        feature.code !== targetCode,
+    );
+    const targetFeatures = view.features.filter(
+      (feature) => feature.code === targetCode,
+    );
+    const regionMarkers = view.markers.filter(
+      (marker) =>
+        mapRegionForCode(marker.code) === regionId &&
+        marker.code !== targetCode,
+    );
+    const targetMarkers = view.markers.filter(
+      (marker) => marker.code === targetCode,
+    );
+
+    const pathMarkup = (features, className) =>
+      features
+        .map((feature) => regionalMapPathMarkup(feature, className))
+        .join("");
+    const markerMarkup = (markers, className, radius) =>
+      markers
+        .map((marker) =>
+          regionalMapMarkerMarkup(marker, className, radius),
+        )
+        .join("");
+
+    return `
+      <div class="map-quiz-visual">
+        <svg
+          class="question-map"
+          viewBox="${view.viewBox}"
+          role="img"
+          aria-label="Kart over ${escapeHtml(region.label)} med ett land uthevet"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <rect class="question-map-ocean" x="-1000" y="-500" width="3000" height="1500" />
+          <g aria-hidden="true">
+            ${pathMarkup(contextFeatures, "question-map-country is-context")}
+            ${pathMarkup(regionFeatures, "question-map-country")}
+            ${markerMarkup(regionMarkers, "question-map-marker", markerRadius)}
+            ${pathMarkup(targetFeatures, "question-map-target-halo")}
+            ${pathMarkup(targetFeatures, "question-map-country is-target")}
+            ${markerMarkup(
+              targetMarkers,
+              "question-map-marker is-target-halo",
+              markerRadius * 2.8,
+            )}
+            ${markerMarkup(
+              targetMarkers,
+              "question-map-marker is-target",
+              markerRadius * 1.35,
+            )}
+          </g>
+        </svg>
+      </div>
+    `;
+  }
+
   function setupMarkup() {
     return `
       <main class="site-shell setup-shell">
@@ -299,17 +400,28 @@
         <section class="action-section" aria-label="Velg aktivitet">
           <div class="action-grid">
             ${modes
-              .map(
-                (option) => `
-                  <button class="action-card tone-${option.tone}" data-action="mode" data-value="${option.id}">
+              .map((option) => {
+                const unavailable =
+                  option.id === "map-country" &&
+                  !mapSelectableRegions.includes(state.region);
+                const description = unavailable
+                  ? "Velg en enkelt region"
+                  : option.description;
+                return `
+                  <button
+                    class="action-card tone-${option.tone}"
+                    data-action="mode"
+                    data-value="${option.id}"
+                    ${unavailable ? "disabled" : ""}
+                  >
                     <span class="action-copy">
                       <strong>${option.label}</strong>
-                      <small>${option.description}</small>
+                      <small>${description}</small>
                     </span>
                     <span class="action-arrow" aria-hidden="true">→</span>
                   </button>
-                `,
-              )
+                `;
+              })
               .join("")}
             <button class="action-card tone-blue" data-action="flashcards">
               <span class="action-copy">
@@ -601,6 +713,12 @@
       `;
     }
 
+    if (state.mode === "map-country") {
+      return `
+        <span class="question-label">Hvilket land er uthevet?</span>
+      `;
+    }
+
     return `
       <span class="question-label">Hva er hovedstaden i</span>
       <div class="country-with-flag">
@@ -632,7 +750,7 @@
     const label =
       state.mode === "country-capital"
         ? choice.capital
-        : state.mode === "flag-country"
+        : state.mode === "flag-country" || state.mode === "map-country"
           ? choice.name
           : `Alternativ ${index + 1}`;
     const baseAccessibleLabel =
@@ -659,7 +777,14 @@
         ${
           state.mode === "country-flag"
             ? flagMarkup(choice, "answer-flag", answered)
-            : `<strong>${escapeHtml(label)}</strong>`
+            : state.mode === "map-country"
+              ? `
+                <span class="map-answer-content">
+                  ${flagMarkup(choice, "map-answer-flag", false)}
+                  <strong>${escapeHtml(label)}</strong>
+                </span>
+              `
+              : `<strong>${escapeHtml(label)}</strong>`
         }
         <span class="keyboard-hint-index" aria-hidden="true">${index + 1}</span>
       </button>
@@ -687,7 +812,34 @@
         ? "flag-grid"
         : state.mode === "country-capital"
           ? "text-grid capital-grid"
-          : "text-grid country-grid";
+          : state.mode === "map-country"
+            ? "text-grid map-answer-grid"
+            : "text-grid country-grid";
+    const questionBody =
+      state.mode === "map-country"
+        ? `
+          <div class="map-quiz-layout">
+            ${regionalQuestionMapMarkup(state.region, question.country.code)}
+            <div class="answer-grid ${gridClass}">
+              ${question.choices
+                .map((choice, index) =>
+                  answerMarkup(choice, index, question),
+                )
+                .join("")}
+            </div>
+          </div>
+        `
+        : `
+          <div class="answer-grid-stage">
+            <div class="answer-grid ${gridClass}">
+              ${question.choices
+                .map((choice, index) =>
+                  answerMarkup(choice, index, question),
+                )
+                .join("")}
+            </div>
+          </div>
+        `;
 
     return `
       <main class="quiz-shell quiz-active mode-${state.mode} ${keyboardHintsVisible ? "show-keyboard-hints" : ""}">
@@ -715,15 +867,7 @@
             <p class="kicker">${selectedMode().label}</p>
             ${promptMarkup(question, answered)}
           </div>
-          <div class="answer-grid-stage">
-            <div class="answer-grid ${gridClass}">
-              ${question.choices
-                .map((choice, index) =>
-                  answerMarkup(choice, index, question),
-                )
-                .join("")}
-            </div>
-          </div>
+          ${questionBody}
           <p class="sr-only" aria-live="assertive">${escapeHtml(
             answerAnnouncement(question),
           )}</p>
@@ -820,8 +964,18 @@
   function startQuiz(mode) {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
+    if (
+      mode === "map-country" &&
+      !mapSelectableRegions.includes(state.region)
+    ) {
+      return;
+    }
     state.mode = mode;
-    state.questions = createQuestions(countriesInRegion(state.region));
+    const modeConfig = modes.find((option) => option.id === mode);
+    state.questions = createQuestions(
+      countriesInRegion(state.region),
+      modeConfig?.choiceCount,
+    );
     state.questionIndex = 0;
     state.selectedCode = null;
     state.answerStatus = "unanswered";

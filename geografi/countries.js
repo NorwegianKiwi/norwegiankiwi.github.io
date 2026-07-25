@@ -130,6 +130,7 @@ const rows = [
   ["ps", "Palestina", "Øst-Jerusalem / Ramallah", "asia"],
   ["ph", "Filippinene", "Manila", "asia"],
   ["qa", "Qatar", "Doha", "asia"],
+  ["ru", "Russland", "Moskva", "asia"],
   ["sa", "Saudi-Arabia", "Riyadh", "asia"],
   ["sg", "Singapore", "Singapore", "asia"],
   ["kr", "Sør-Korea", "Seoul", "asia"],
@@ -180,7 +181,6 @@ const rows = [
   ["pl", "Polen", "Warszawa", "europe"],
   ["pt", "Portugal", "Lisboa", "europe"],
   ["ro", "Romania", "București", "europe"],
-  ["ru", "Russland", "Moskva", "europe"],
   ["sm", "San Marino", "San Marino", "europe"],
   ["rs", "Serbia", "Beograd", "europe"],
   ["sk", "Slovakia", "Bratislava", "europe"],
@@ -223,7 +223,7 @@ const countryNotes = Object.freeze({
   cy:
     "FN plasserer Kypros i Vest-Asia i M49-inndelingen, mens landet har vært medlem av EU siden 2004.",
   ru:
-    "Russland ligger i både Europa og Asia. I denne quizen er landet plassert i Europa etter FNs M49-inndeling.",
+    "Russland ligger i både Europa og Asia. I denne quizen er landet plassert i Asia for å gi én tydelig regioninndeling og et mer lesbart regionkart.",
   tr:
     "Tyrkia ligger i både Asia og Europa. I denne quizen er landet plassert i Asia etter FNs M49-inndeling.",
   za:

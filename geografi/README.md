@@ -1,7 +1,8 @@
 # Geografi-quiz
 
-En statisk geografi-quiz med 196 land, lokale SVG-flagg, tre quizmoduser,
-flashcards og en alfabetisk landoversikt.
+En statisk geografi-quiz med 196 land, lokale SVG-flagg, fire quizmoduser,
+flashcards og en alfabetisk landoversikt. Kartquizen viser ett uthevet land på
+et regionkart og gir seks landnavn å velge mellom.
 
 Åpne `index.html` direkte i en nettleser. Siden krever ingen installasjon,
 utviklingsserver, bygging eller tredjepakker.
@@ -26,6 +27,12 @@ Earth-projeksjon og er forenklet for visning i nettleseren. Natural Earth-data
 er public domain; kilde- og bruksvilkår er dokumentert i
 `licenses/natural-earth-public-domain.txt`.
 
+`world-map.js` inneholder også forhåndsgenerert Mercator-geometri med
+håndjusterte utsnitt for de sju enkeltregionene i Kartquiz. Oseania er
+stillehavssentrert slik at øystatene på begge sider av datolinjen vises
+samlet. Reprojiseringen skjer ikke i nettleseren og tilfører ingen
+runtime-avhengigheter.
+
 ## Jordklode
 
 Jordkloden er Twemojis
@@ -41,9 +48,11 @@ Norske landnavn, hovedsteder og regioninndeling vedlikeholdes lokalt i
 flagg eller en hovedstad endres, bør både landdataene og de tilhørende lokale
 SVG-filene kontrolleres.
 
-Hvert land har én `region`, basert på FNs
-[M49-inndeling](https://unstats.un.org/unsd/methodology/m49/overview/). Det gir
-Russland plassering i Europa, mens Kypros og Tyrkia plasseres i Asia.
+Hvert land har én `region`, med FNs
+[M49-inndeling](https://unstats.un.org/unsd/methodology/m49/overview/) som
+utgangspunkt. Russland er et bevisst pedagogisk unntak: Landet plasseres i
+Asia for å gi én tydelig regioninndeling og lesbare regionkart. Kypros og
+Tyrkia plasseres også i Asia.
 Amerikanske land lagrer den mest spesifikke regionen
 (`north-central-america`, `south-america` eller `caribbean`); den samlede
 `americas`-kategorien utledes i applikasjonen.
