@@ -1,22 +1,7 @@
-export type RegionId =
-  | "world"
-  | "europe"
-  | "africa"
-  | "asia"
-  | "oceania"
-  | "americas"
-  | "north-central-america"
-  | "south-america"
-  | "caribbean";
+(function () {
+  "use strict";
 
-export type Country = {
-  code: string;
-  name: string;
-  capital: string;
-  regions: RegionId[];
-};
-
-const rows: Array<[string, string, string, RegionId[]]> = [
+const rows = [
   // Afrika
   ["dz", "Algerie", "Alger", ["africa"]],
   ["ao", "Angola", "Luanda", ["africa"]],
@@ -224,18 +209,14 @@ const rows: Array<[string, string, string, RegionId[]]> = [
   ["vu", "Vanuatu", "Port Vila", ["oceania"]],
 ];
 
-export const countries: Country[] = rows.map(([code, name, capital, regions]) => ({
+const countries = rows.map(([code, name, capital, regions]) => ({
   code,
   name,
   capital,
   regions,
 }));
 
-export const regionOptions: Array<{
-  id: RegionId;
-  label: string;
-  eyebrow: string;
-}> = [
+const regionOptions = [
   { id: "world", label: "Hele verden", eyebrow: "196 land" },
   { id: "europe", label: "Europa", eyebrow: "47 land" },
   { id: "africa", label: "Afrika", eyebrow: "54 land" },
@@ -250,3 +231,9 @@ export const regionOptions: Array<{
   { id: "south-america", label: "Sør-Amerika", eyebrow: "12 land" },
   { id: "caribbean", label: "Karibia", eyebrow: "13 land" },
 ];
+
+window.ATLAS_DATA = Object.freeze({
+  countries: Object.freeze(countries),
+  regionOptions: Object.freeze(regionOptions),
+});
+})();
