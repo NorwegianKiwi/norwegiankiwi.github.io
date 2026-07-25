@@ -19,6 +19,14 @@
     "south-america",
     "caribbean",
   ];
+  const americanRegions = new Set([
+    "north-central-america",
+    "south-america",
+    "caribbean",
+  ]);
+  const countriesByCode = new Map(
+    countries.map((country) => [country.code, country]),
+  );
 
   const modes = [
     {
@@ -92,10 +100,16 @@
     return copy;
   }
 
+  function regionMatches(countryRegion, selectedRegion) {
+    return (
+      selectedRegion === "world" ||
+      countryRegion === selectedRegion ||
+      (selectedRegion === "americas" && americanRegions.has(countryRegion))
+    );
+  }
+
   function countriesInRegion(region) {
-    return region === "world"
-      ? countries
-      : countries.filter((country) => country.regions.includes(region));
+    return countries.filter((country) => regionMatches(country.region, region));
   }
 
   function createQuestions(pool) {
@@ -146,20 +160,24 @@
     `;
   }
 
-  function mapShapeIsActive(regions) {
-    return state.region === "world" || regions.includes(state.region);
+  function mapRegionForCode(code) {
+    return countriesByCode.get(code)?.region ?? null;
+  }
+
+  function mapShapeIsActive(region) {
+    return regionMatches(region, state.region);
   }
 
   function mapPathMarkup(feature) {
-    const regions = feature.regions.join(" ");
+    const region = mapRegionForCode(feature.code);
     const codeAttribute = feature.code
       ? ` data-code="${escapeHtml(feature.code)}"`
       : "";
     return `
       <path
-        class="map-country ${mapShapeIsActive(feature.regions) ? "is-active" : ""}"
+        class="map-country ${mapShapeIsActive(region) ? "is-active" : ""}"
         d="${feature.path}"
-        data-regions="${escapeHtml(regions)}"
+        data-region="${escapeHtml(region ?? "")}"
         ${codeAttribute}
         vector-effect="non-scaling-stroke"
       />
@@ -167,14 +185,14 @@
   }
 
   function mapMarkerMarkup(marker) {
-    const regions = marker.regions.join(" ");
+    const region = mapRegionForCode(marker.code);
     return `
       <circle
-        class="map-marker ${mapShapeIsActive(marker.regions) ? "is-active" : ""}"
+        class="map-marker ${mapShapeIsActive(region) ? "is-active" : ""}"
         cx="${marker.x}"
         cy="${marker.y}"
         r="2.8"
-        data-regions="${escapeHtml(regions)}"
+        data-region="${escapeHtml(region ?? "")}"
         data-code="${escapeHtml(marker.code)}"
         vector-effect="non-scaling-stroke"
       />
@@ -186,13 +204,12 @@
     const count = countriesInRegion(regionId).length;
     const paths = mapData.features
       .filter(
-        (feature) =>
-          feature.code !== null && feature.selectRegion === regionId,
+        (feature) => mapRegionForCode(feature.code) === regionId,
       )
       .map(mapPathMarkup)
       .join("");
     const markers = mapData.markers
-      .filter((marker) => marker.selectRegion === regionId)
+      .filter((marker) => mapRegionForCode(marker.code) === regionId)
       .map(mapMarkerMarkup)
       .join("");
 
@@ -214,10 +231,7 @@
 
   function worldMapMarkup() {
     const contextPaths = mapData.features
-      .filter(
-        (feature) =>
-          feature.code === null || feature.selectRegion === null,
-      )
+      .filter((feature) => mapRegionForCode(feature.code) === null)
       .map(mapPathMarkup)
       .join("");
 
@@ -482,10 +496,15 @@
                 aria-label="Stort flagg: ${escapeHtml(modalCountry.name)}"
                 tabindex="-1"
               >
-                <div class="flag-modal-card">
+                <div class="flag-modal-card ${modalCountry.note ? "has-note" : ""}">
                   ${flagMarkup(modalCountry, "modal-flag", true)}
                   <strong>${escapeHtml(modalCountry.name)}</strong>
-                  <span>Trykk hvor som helst for å lukke</span>
+                  ${
+                    modalCountry.note
+                      ? `<p class="country-note">${escapeHtml(modalCountry.note)}</p>`
+                      : ""
+                  }
+                  <span class="modal-close-hint">Trykk hvor som helst for å lukke</span>
                 </div>
               </div>
             `
@@ -778,10 +797,9 @@
     });
 
     app.querySelectorAll(".map-country, .map-marker").forEach((shape) => {
-      const regions = shape.dataset.regions?.split(" ") ?? [];
+      const region = shape.dataset.region || null;
       const matches =
-        regionId === "world" ||
-        (regionId !== null && regions.includes(regionId));
+        regionId !== null && regionMatches(region, regionId);
       shape.classList.toggle("is-preview", matches);
     });
   }

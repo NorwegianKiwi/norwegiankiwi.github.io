@@ -41,8 +41,18 @@ Norske landnavn, hovedsteder og regioninndeling vedlikeholdes lokalt i
 flagg eller en hovedstad endres, bør både landdataene og de tilhørende lokale
 SVG-filene kontrolleres.
 
-Hvert land tilhører én overordnet verdensdel etter FNs
+Hvert land har én `region`, basert på FNs
 [M49-inndeling](https://unstats.un.org/unsd/methodology/m49/overview/). Det gir
-Russland plassering i Europa, mens Kypros og Tyrkia plasseres i Asia. De
-amerikanske landene har i tillegg en underregion og den samlede
-`americas`-kategorien.
+Russland plassering i Europa, mens Kypros og Tyrkia plasseres i Asia.
+Amerikanske land lagrer den mest spesifikke regionen
+(`north-central-america`, `south-america` eller `caribbean`); den samlede
+`americas`-kategorien utledes i applikasjonen.
+
+Et land kan også ha et valgfritt, kort `note`-felt. De første notatene forklarer
+verdensdelstilhørigheten til Russland og Tyrkia med støtte i
+[Store norske leksikon](https://snl.no/Europa), Kypros' geografiske plassering
+og EU-medlemskap med støtte i
+[FN M49](https://unstats.un.org/unsd/methodology/m49/overview/) og
+[Den europeiske union](https://european-union.europa.eu/principles-countries-history/eu-countries/cyprus_en),
+og Sør-Afrikas tre hovedsteder med støtte i
+[South African Government](https://www.gov.za/south-africa-glance).
