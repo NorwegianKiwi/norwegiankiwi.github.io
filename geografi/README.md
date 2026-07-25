@@ -11,11 +11,20 @@ utviklingsserver, bygging eller tredjepakker.
 - `index.html` – dokument og metadata
 - `styles.css` – utforming og responsiv layout
 - `countries.js` – land- og regiondata
+- `world-map.js` – lokalt, projisert kartgrunnlag fra Natural Earth
 - `app.js` – quizlogikk og rendering
 - `favicon.svg` – jordklode brukt som favicon og dekorasjon i heroen
 - `flags/` – de 196 flaggene quizen bruker, med
   [kilde- og oppdateringsinformasjon](flags/README.md)
 - `licenses/` – lisenser for flaggfilene og jordkloden
+
+## Verdenskart
+
+Det interaktive verdenskartet er generert fra Natural Earth 1:50m Admin 0
+Countries og Tiny Country Points, versjon 5.1.1. Kartet bruker Equal
+Earth-projeksjon og er forenklet for visning i nettleseren. Natural Earth-data
+er public domain; kilde- og bruksvilkår er dokumentert i
+`licenses/natural-earth-public-domain.txt`.
 
 ## Jordklode
 

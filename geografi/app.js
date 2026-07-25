@@ -2,13 +2,23 @@
   "use strict";
 
   const data = window.GEOGRAFI_QUIZ_DATA;
+  const mapData = window.GEOGRAFI_QUIZ_MAP_DATA;
   const app = document.getElementById("app");
 
-  if (!data || !app) {
+  if (!data || !mapData || !app) {
     throw new Error("Geografi-quiz kunne ikke laste landdataene.");
   }
 
   const { countries, regionOptions } = data;
+  const mapSelectableRegions = [
+    "europe",
+    "africa",
+    "asia",
+    "oceania",
+    "north-central-america",
+    "south-america",
+    "caribbean",
+  ];
 
   const modes = [
     {
@@ -123,16 +133,112 @@
     if (asButton) {
       return `
         <button class="brand brand-button" data-action="setup">
-          <span class="brand-mark" aria-hidden="true">G</span>
+          <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
           <span>Geografi-quiz</span>
         </button>
       `;
     }
     return `
       <a class="brand" href="#top" aria-label="Geografi-quiz – til toppen">
-        <span class="brand-mark" aria-hidden="true">G</span>
+        <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
         <span>Geografi-quiz</span>
       </a>
+    `;
+  }
+
+  function mapShapeIsActive(regions) {
+    return state.region === "world" || regions.includes(state.region);
+  }
+
+  function mapPathMarkup(feature) {
+    const regions = feature.regions.join(" ");
+    const codeAttribute = feature.code
+      ? ` data-code="${escapeHtml(feature.code)}"`
+      : "";
+    return `
+      <path
+        class="map-country ${mapShapeIsActive(feature.regions) ? "is-active" : ""}"
+        d="${feature.path}"
+        data-regions="${escapeHtml(regions)}"
+        ${codeAttribute}
+        vector-effect="non-scaling-stroke"
+      />
+    `;
+  }
+
+  function mapMarkerMarkup(marker) {
+    const regions = marker.regions.join(" ");
+    return `
+      <circle
+        class="map-marker ${mapShapeIsActive(marker.regions) ? "is-active" : ""}"
+        cx="${marker.x}"
+        cy="${marker.y}"
+        r="2.8"
+        data-regions="${escapeHtml(regions)}"
+        data-code="${escapeHtml(marker.code)}"
+        vector-effect="non-scaling-stroke"
+      />
+    `;
+  }
+
+  function mapRegionMarkup(regionId) {
+    const region = regionOptions.find((option) => option.id === regionId);
+    const count = countriesInRegion(regionId).length;
+    const paths = mapData.features
+      .filter(
+        (feature) =>
+          feature.code !== null && feature.selectRegion === regionId,
+      )
+      .map(mapPathMarkup)
+      .join("");
+    const markers = mapData.markers
+      .filter((marker) => marker.selectRegion === regionId)
+      .map(mapMarkerMarkup)
+      .join("");
+
+    return `
+      <g
+        class="map-region"
+        data-action="map-region"
+        data-value="${regionId}"
+        data-map-region="${regionId}"
+        role="button"
+        tabindex="0"
+        aria-label="${escapeHtml(region.label)}, ${count} land"
+      >
+        ${paths}
+        ${markers}
+      </g>
+    `;
+  }
+
+  function worldMapMarkup() {
+    const contextPaths = mapData.features
+      .filter(
+        (feature) =>
+          feature.code === null || feature.selectRegion === null,
+      )
+      .map(mapPathMarkup)
+      .join("");
+
+    return `
+      <div class="region-map-card">
+        <p class="sr-only" id="region-map-description">
+          Velg et område på kartet, eller bruk områdeknappene ved siden av.
+        </p>
+        <svg
+          class="region-map"
+          viewBox="${mapData.viewBox}"
+          role="group"
+          aria-label="Interaktivt verdenskart"
+          aria-describedby="region-map-description"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <rect class="map-ocean" width="1000" height="500" rx="26" />
+          <g class="map-context" aria-hidden="true">${contextPaths}</g>
+          ${mapSelectableRegions.map(mapRegionMarkup).join("")}
+        </svg>
+      </div>
     `;
   }
 
@@ -152,23 +258,27 @@
 
         <section class="region-panel" aria-labelledby="region-heading">
           <h2 id="region-heading">Velg område</h2>
-          <div class="region-grid">
-            ${regionOptions
-              .map((option) => {
-                const count = countriesInRegion(option.id).length;
-                return `
-                  <button
-                    class="region-card ${state.region === option.id ? "is-selected" : ""}"
-                    data-action="region"
-                    data-value="${option.id}"
-                    aria-pressed="${state.region === option.id}"
-                  >
-                    <span>${option.label}</span>
-                    <small>${count} land</small>
-                  </button>
-                `;
-              })
-              .join("")}
+          <div class="region-picker-layout">
+            ${worldMapMarkup()}
+            <div class="region-grid">
+              ${regionOptions
+                .map((option) => {
+                  const count = countriesInRegion(option.id).length;
+                  return `
+                    <button
+                      class="region-card ${state.region === option.id ? "is-selected" : ""}"
+                      data-action="region"
+                      data-value="${option.id}"
+                      data-map-region="${option.id}"
+                      aria-pressed="${state.region === option.id}"
+                    >
+                      <span>${option.label}</span>
+                      <small>${count} land</small>
+                    </button>
+                  `;
+                })
+                .join("")}
+            </div>
           </div>
         </section>
 
@@ -209,6 +319,7 @@
           <span class="license-links">
             <a href="./licenses/flag-icons-MIT.txt">Flagg fra flag-icons · MIT</a>
             <a href="./licenses/twemoji-CC-BY-4.0.txt">Jordklode fra Twemoji · CC BY 4.0</a>
+            <a href="./licenses/natural-earth-public-domain.txt">Kart fra Natural Earth · public domain</a>
           </span>
         </footer>
       </main>
@@ -656,6 +767,25 @@
       ?.classList.toggle("show-keyboard-hints", keyboardHintsVisible);
   }
 
+  function setRegionPreview(regionId) {
+    if (state.screen !== "setup") return;
+
+    app.querySelectorAll("[data-map-region]").forEach((control) => {
+      control.classList.toggle(
+        "is-preview",
+        regionId !== null && control.dataset.mapRegion === regionId,
+      );
+    });
+
+    app.querySelectorAll(".map-country, .map-marker").forEach((shape) => {
+      const regions = shape.dataset.regions?.split(" ") ?? [];
+      const matches =
+        regionId === "world" ||
+        (regionId !== null && regions.includes(regionId));
+      shape.classList.toggle("is-preview", matches);
+    });
+  }
+
   function advanceQuestion() {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
@@ -775,7 +905,7 @@
       return;
     }
 
-    if (action === "region") {
+    if (action === "region" || action === "map-region") {
       state.region = control.dataset.value;
       render();
       return;
@@ -821,6 +951,62 @@
     if (action === "setup") {
       returnToSetup();
     }
+  });
+
+  app.addEventListener("pointerover", (event) => {
+    const control = event.target.closest("[data-map-region]");
+    if (
+      !control ||
+      !app.contains(control) ||
+      control.contains(event.relatedTarget)
+    ) {
+      return;
+    }
+    setRegionPreview(control.dataset.mapRegion);
+  });
+
+  app.addEventListener("pointerout", (event) => {
+    const control = event.target.closest("[data-map-region]");
+    if (
+      !control ||
+      !app.contains(control) ||
+      control.contains(event.relatedTarget)
+    ) {
+      return;
+    }
+    setRegionPreview(null);
+  });
+
+  app.addEventListener("focusin", (event) => {
+    const control = event.target.closest("[data-map-region]");
+    if (control && app.contains(control)) {
+      setRegionPreview(control.dataset.mapRegion);
+    }
+  });
+
+  app.addEventListener("focusout", (event) => {
+    const control = event.target.closest("[data-map-region]");
+    if (
+      control &&
+      app.contains(control) &&
+      !control.contains(event.relatedTarget)
+    ) {
+      setRegionPreview(null);
+    }
+  });
+
+  app.addEventListener("keydown", (event) => {
+    const control = event.target.closest('[data-action="map-region"]');
+    if (
+      !control ||
+      !app.contains(control) ||
+      (event.key !== "Enter" && event.key !== " ")
+    ) {
+      return;
+    }
+    event.preventDefault();
+    state.region = control.dataset.value;
+    render();
   });
 
   document.addEventListener("keydown", (event) => {

@@ -97,14 +97,10 @@ a:focus-visible {
 .brand-mark {
   width: 35px;
   height: 35px;
-  border-radius: 50% 50% 45% 55% / 55% 42% 58% 45%;
-  background: var(--green);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 19px;
-  transform: rotate(-4deg);
+  flex: 0 0 auto;
+  border-radius: 50%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 7px rgba(24, 35, 29, 0.18));
 }
 
 .edition {
@@ -116,7 +112,7 @@ a:focus-visible {
 }
 
 .hero {
-  padding: 20px 0 18px;
+  padding: 14px 0 12px;
   max-width: 900px;
   position: relative;
 }
@@ -170,18 +166,98 @@ a:focus-visible {
 }
 
 .region-panel {
-  padding: 12px 14px 14px;
+  padding: 10px 12px 12px;
   border: 1px solid rgba(36, 93, 69, 0.18);
   border-radius: 16px;
   background: var(--green-soft);
 }
 
 .region-panel h2 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 25px;
   font-weight: 400;
   letter-spacing: -0.025em;
+}
+
+.region-picker-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(340px, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.region-map-card {
+  width: min(100%, 600px);
+  justify-self: center;
+  position: relative;
+}
+
+.region-map {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.map-ocean {
+  fill: rgba(220, 235, 240, 0.8);
+  stroke: rgba(65, 111, 131, 0.24);
+  stroke-width: 1;
+}
+
+.map-country {
+  fill: #b9c8be;
+  stroke: rgba(255, 253, 247, 0.92);
+  stroke-width: 0.75;
+  fill-rule: evenodd;
+  transition:
+    fill 150ms ease,
+    stroke 150ms ease,
+    opacity 150ms ease;
+}
+
+.map-context {
+  pointer-events: none;
+}
+
+.map-context .map-country {
+  fill: #cbd3cd;
+}
+
+.map-region {
+  cursor: pointer;
+  outline: none;
+}
+
+.map-marker {
+  fill: #82998a;
+  stroke: var(--card);
+  stroke-width: 1.2;
+  pointer-events: none;
+  transition:
+    fill 150ms ease,
+    r 150ms ease;
+}
+
+.map-country.is-active,
+.map-marker.is-active {
+  fill: var(--green);
+}
+
+.map-country.is-preview,
+.map-marker.is-preview {
+  fill: var(--coral);
+}
+
+.map-region:focus .map-country,
+.map-region:focus .map-marker {
+  stroke: var(--gold);
+  stroke-width: 2.2;
+}
+
+.map-region:hover .map-country:not(.is-preview) {
+  fill: #d88467;
 }
 
 .action-section {
@@ -279,15 +355,15 @@ a:focus-visible {
 
 .region-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .region-card {
-  min-height: 48px;
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 10px 14px;
+  padding: 8px 10px;
   background: rgba(255, 253, 247, 0.82);
   cursor: pointer;
   display: flex;
@@ -310,12 +386,21 @@ a:focus-visible {
   box-shadow: inset 4px 0 0 var(--green);
 }
 
+.region-card.is-preview {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+  box-shadow: inset 4px 0 0 var(--coral);
+}
+
 .region-card span {
   font-weight: 720;
+  font-size: 13px;
+  line-height: 1.18;
 }
 
 .region-card small {
   color: var(--muted);
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -371,7 +456,9 @@ footer a {
 .license-links {
   display: flex;
   align-items: center;
-  gap: 18px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 5px 16px;
 }
 
 /* Quiz */
@@ -1227,7 +1314,6 @@ body.modal-open {
   .quiz-active .brand-mark {
     width: 31px;
     height: 31px;
-    font-size: 17px;
   }
 
   .quiz-active .question-area {
@@ -1370,6 +1456,18 @@ body.modal-open {
 
 @media (max-width: 979px) {
   .action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .region-picker-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .region-map-card {
+    width: min(100%, 680px);
+  }
+
+  .region-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
