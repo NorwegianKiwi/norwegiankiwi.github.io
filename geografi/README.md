@@ -1,7 +1,7 @@
 # Geografi-quiz
 
-En statisk geografi-quiz med 196 land, lokale SVG-flagg, tre quizmoduser og en
-alfabetisk landoversikt.
+En statisk geografi-quiz med 196 land, lokale SVG-flagg, tre quizmoduser,
+flashcards og en alfabetisk landoversikt.
 
 Åpne `index.html` direkte i en nettleser. Siden krever ingen installasjon,
 utviklingsserver, bygging eller tredjepakker.

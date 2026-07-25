@@ -15,16 +15,19 @@
       id: "country-flag",
       label: "Gjett flagget",
       description: "Du får landet – finn riktig flagg.",
+      tone: "coral",
     },
     {
       id: "flag-country",
       label: "Gjett landet",
       description: "Du får flagget – finn riktig land.",
+      tone: "green",
     },
     {
       id: "country-capital",
       label: "Gjett hovedstaden",
       description: "Du får landet og flagget – finn hovedstaden.",
+      tone: "gold",
     },
   ];
 
@@ -35,8 +38,14 @@
     questions: [],
     questionIndex: 0,
     selectedCode: null,
+    answerStatus: "unanswered",
     score: 0,
     wrongAnswers: [],
+    flashcards: [],
+    flashcardIndex: 0,
+    flashcardRevealed: false,
+    modalCode: null,
+    exploreScrollTop: 0,
   };
   let autoAdvanceTimer = null;
   const norwegianCollator = new Intl.Collator("nb", { sensitivity: "base" });
@@ -88,7 +97,12 @@
   function flagMarkup(country, className = "", revealName = false) {
     const name = escapeHtml(country.name);
     const alt = revealName ? `Flagget til ${name}` : "";
-    return `<img class="flag ${className}" src="./flags/${country.code}.svg" alt="${alt}" draggable="false" />`;
+    const lazy = className === "table-flag" ? ' loading="lazy"' : "";
+    return `
+      <span class="flag-frame ${className}">
+        <img class="flag" src="./flags/${country.code}.svg" alt="${alt}" draggable="false"${lazy} />
+      </span>
+    `;
   }
 
   function brandMarkup(asButton = false) {
@@ -119,7 +133,7 @@
         <section class="hero" id="top">
           <p class="kicker">Lær verden, ett land om gangen</p>
           <h1>Hvor godt kjenner du <em>verden?</em></h1>
-          <p class="hero-copy">Velg et område og deretter hva du vil gjette på.</p>
+          <p class="hero-copy">Velg et område og deretter hvordan du vil øve.</p>
         </section>
 
         <section class="region-panel" aria-labelledby="region-heading">
@@ -149,7 +163,7 @@
             ${modes
               .map(
                 (option) => `
-                  <button class="action-card" data-action="mode" data-value="${option.id}">
+                  <button class="action-card tone-${option.tone}" data-action="mode" data-value="${option.id}">
                     <span class="action-copy">
                       <strong>${option.label}</strong>
                       <small>${option.description}</small>
@@ -159,7 +173,14 @@
                 `,
               )
               .join("")}
-            <button class="action-card" data-action="explore">
+            <button class="action-card tone-blue" data-action="flashcards">
+              <span class="action-copy">
+                <strong>Flashcards</strong>
+                <small>Se flagget, tenk selv og avslør svaret.</small>
+              </span>
+              <span class="action-arrow" aria-hidden="true">→</span>
+            </button>
+            <button class="action-card tone-plum" data-action="explore">
               <span class="action-copy">
                 <strong>Utforsk landene</strong>
                 <small>Se flagg, land og hovedsteder i valgt område.</small>
@@ -181,7 +202,7 @@
     if (state.wrongAnswers.length === 0) return "";
 
     return `
-      <section class="result-review" aria-labelledby="review-heading">
+      <section class="result-review" id="result-review" aria-labelledby="review-heading">
         <p class="kicker">Gjennomgang</p>
         <h2 id="review-heading">Dette kan du øve mer på</h2>
         <p>${state.wrongAnswers.length} land å se nærmere på.</p>
@@ -205,6 +226,7 @@
   }
 
   function resultMarkup() {
+    const hasReview = state.wrongAnswers.length > 0;
     const percentage = Math.round((state.score / state.questions.length) * 100);
     const heading =
       percentage >= 90
@@ -216,7 +238,7 @@
             : "Verden venter.";
 
     return `
-      <main class="quiz-shell">
+      <main class="quiz-shell result-shell ${hasReview ? "has-review" : ""}">
         <header class="quiz-header">${brandMarkup(true)}</header>
         <section class="result-card">
           <p class="kicker">Øvelsen er fullført</p>
@@ -241,6 +263,16 @@
             Velg ny øvelse
             <span aria-hidden="true">→</span>
           </button>
+          ${
+            hasReview
+              ? `
+                <button class="review-jump" data-action="review">
+                  Se gjennom ${state.wrongAnswers.length} feil
+                  <span aria-hidden="true">↓</span>
+                </button>
+              `
+              : ""
+          }
         </section>
         ${reviewMarkup()}
       </main>
@@ -249,6 +281,9 @@
 
   function exploreMarkup() {
     const region = selectedRegion();
+    const modalCountry = countries.find(
+      (country) => country.code === state.modalCode,
+    );
     const sortedCountries = [...countriesInRegion(state.region)].sort((a, b) =>
       norwegianCollator.compare(a.name, b.name),
     );
@@ -289,7 +324,16 @@
                 .map(
                   (country) => `
                     <tr>
-                      <td>${flagMarkup(country, "table-flag", true)}</td>
+                      <td>
+                        <button
+                          class="table-flag-button"
+                          data-action="open-flag"
+                          data-code="${country.code}"
+                          aria-label="Vis flagget til ${escapeHtml(country.name)} stort"
+                        >
+                          ${flagMarkup(country, "table-flag", false)}
+                        </button>
+                      </td>
                       <th scope="row">${escapeHtml(country.name)}</th>
                       <td>${escapeHtml(country.capital)}</td>
                     </tr>
@@ -299,6 +343,96 @@
             </tbody>
           </table>
         </div>
+        ${
+          modalCountry
+            ? `
+              <div
+                class="flag-modal"
+                data-action="close-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Stort flagg: ${escapeHtml(modalCountry.name)}"
+                tabindex="-1"
+              >
+                <div class="flag-modal-card">
+                  ${flagMarkup(modalCountry, "modal-flag", true)}
+                  <strong>${escapeHtml(modalCountry.name)}</strong>
+                  <span>Trykk hvor som helst for å lukke</span>
+                </div>
+              </div>
+            `
+            : ""
+        }
+      </main>
+    `;
+  }
+
+  function flashcardMarkup() {
+    const region = selectedRegion();
+    const complete = state.flashcardIndex >= state.flashcards.length;
+
+    if (complete) {
+      return `
+        <main class="quiz-shell flashcard-shell">
+          <header class="quiz-header">${brandMarkup(true)}</header>
+          <section class="flashcard-complete">
+            <p class="kicker">Flashcards fullført</p>
+            <h1>Runden er ferdig.</h1>
+            <p>Du har gått gjennom ${state.flashcards.length} flagg fra ${region.label.toLowerCase()}.</p>
+            <div class="flashcard-actions">
+              <button class="primary-button" data-action="restart-flashcards">
+                Start på nytt <span aria-hidden="true">↻</span>
+              </button>
+              <button class="secondary-button" data-action="setup">Velg ny øvelse</button>
+            </div>
+          </section>
+        </main>
+      `;
+    }
+
+    const country = state.flashcards[state.flashcardIndex];
+    const progress = ((state.flashcardIndex + 1) / state.flashcards.length) * 100;
+    const instruction = state.flashcardRevealed
+      ? "Trykk igjen for neste flagg"
+      : "Tenk på landet og hovedstaden – trykk for å se svaret";
+
+    return `
+      <main class="quiz-shell flashcard-shell">
+        <header class="quiz-header">
+          ${brandMarkup(true)}
+          <div class="quiz-meta">
+            <span>${region.label}</span>
+            <strong>${state.flashcardIndex + 1} / ${state.flashcards.length}</strong>
+          </div>
+          <button class="quiet-button" data-action="setup">Avslutt</button>
+        </header>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="${
+          state.flashcards.length
+        }" aria-valuenow="${state.flashcardIndex + 1}">
+          <span style="width: ${progress}%"></span>
+        </div>
+        <button
+          class="flashcard-stage ${state.flashcardRevealed ? "is-revealed" : ""}"
+          data-action="flashcard-toggle"
+          aria-label="${
+            state.flashcardRevealed
+              ? `${escapeHtml(country.name)}, ${escapeHtml(country.capital)}. Trykk for neste flagg.`
+              : `Flashcard ${state.flashcardIndex + 1} av ${state.flashcards.length}. Trykk for å vise svaret.`
+          }"
+        >
+          ${flagMarkup(country, "flashcard-flag", state.flashcardRevealed)}
+          <span class="flashcard-answer" aria-hidden="${!state.flashcardRevealed}">
+            ${
+              state.flashcardRevealed
+                ? `
+                  <strong>${escapeHtml(country.name)}</strong>
+                  <span>${escapeHtml(country.capital)}</span>
+                `
+                : ""
+            }
+          </span>
+          <span class="flashcard-instruction">${instruction}</span>
+        </button>
       </main>
     `;
   }
@@ -329,45 +463,60 @@
     `;
   }
 
-  function answerMarkup(choice, index, question, answered) {
+  function answerMarkup(choice, index, question) {
     const isChosen = state.selectedCode === choice.code;
     const isAnswer = choice.code === question.country.code;
-    const stateClass = answered
-      ? isAnswer
-        ? "is-correct"
-        : isChosen
-          ? "is-wrong"
+    const answered = state.answerStatus !== "unanswered";
+    const awaitingCorrection = state.answerStatus === "correction";
+    const stateClass =
+      state.answerStatus === "correct"
+        ? isAnswer
+          ? "is-correct"
           : "is-muted"
-      : "";
+        : awaitingCorrection
+          ? isAnswer
+            ? "is-correction"
+            : isChosen
+              ? "is-wrong"
+              : "is-muted"
+          : "";
+    const disabled =
+      state.answerStatus === "correct" || (awaitingCorrection && !isAnswer);
     const label =
       state.mode === "country-capital"
         ? choice.capital
         : state.mode === "flag-country"
           ? choice.name
           : `Alternativ ${index + 1}`;
-    const accessibleLabel =
+    const baseAccessibleLabel =
       state.mode === "country-flag"
         ? answered
-          ? `${choice.name}${isAnswer ? ", riktig svar" : ""}`
+          ? choice.name
           : `Flaggalternativ ${index + 1}`
         : label;
+    const accessibleLabel =
+      awaitingCorrection && isAnswer
+        ? `${baseAccessibleLabel}, riktig svar. Trykk for å gå videre.`
+        : answered && isAnswer
+          ? `${baseAccessibleLabel}, riktig svar`
+          : baseAccessibleLabel;
 
     return `
       <button
         class="answer-card ${stateClass}"
         data-action="answer"
         data-code="${choice.code}"
-        ${answered ? "disabled" : ""}
+        ${disabled ? "disabled" : ""}
         aria-label="${escapeHtml(accessibleLabel)}"
       >
         <span class="answer-index">${index + 1}</span>
         ${
           state.mode === "country-flag"
-            ? flagMarkup(choice, "", answered)
+            ? flagMarkup(choice, "answer-flag", answered)
             : `<strong>${escapeHtml(label)}</strong>`
         }
         ${
-          answered && isAnswer
+          state.answerStatus === "correct" && isAnswer
             ? '<span class="answer-mark" aria-hidden="true">✓</span>'
             : ""
         }
@@ -376,52 +525,32 @@
             ? '<span class="answer-mark wrong-mark" aria-hidden="true">×</span>'
             : ""
         }
+        ${
+          awaitingCorrection && isAnswer
+            ? `
+              <span class="answer-mark correction-mark" aria-hidden="true">→</span>
+              <span class="correction-label">Riktig svar – trykk videre</span>
+            `
+            : ""
+        }
       </button>
     `;
   }
 
-  function feedbackMarkup(question, answered, isCorrect) {
-    if (!answered) {
-      return '<div class="feedback-bar feedback-placeholder" aria-hidden="true"></div>';
-    }
+  function answerAnnouncement(question) {
+    if (state.answerStatus === "correct") return "Riktig.";
+    if (state.answerStatus !== "correction") return "";
 
     const answer =
       state.mode === "country-capital"
-        ? `${question.country.name}: ${question.country.capital}`
+        ? question.country.capital
         : question.country.name;
-    if (isCorrect) {
-      return `
-        <div class="feedback-bar correct auto-feedback">
-          <div>
-            <span>Riktig!</span>
-            <strong>${escapeHtml(answer)}</strong>
-          </div>
-          <span class="auto-feedback-mark" aria-hidden="true">✓</span>
-        </div>
-      `;
-    }
-
-    const nextLabel =
-      state.questionIndex === state.questions.length - 1 ? "Se resultat" : "Neste";
-
-    return `
-      <div class="feedback-bar wrong">
-        <div>
-          <span>Ikke helt.</span>
-          <strong>${escapeHtml(answer)}</strong>
-        </div>
-        <button class="next-button" data-action="next">
-          ${nextLabel}
-          <span aria-hidden="true">→</span>
-        </button>
-      </div>
-    `;
+    return `Feil. Riktig svar er ${answer}. Aktiver det markerte alternativet for å gå videre.`;
   }
 
   function quizMarkup() {
     const question = state.questions[state.questionIndex];
-    const answered = state.selectedCode !== null;
-    const isCorrect = state.selectedCode === question.country.code;
+    const answered = state.answerStatus !== "unanswered";
     const progress = ((state.questionIndex + 1) / state.questions.length) * 100;
 
     const gridClass =
@@ -460,11 +589,13 @@
           <div class="answer-grid ${gridClass}">
             ${question.choices
               .map((choice, index) =>
-                answerMarkup(choice, index, question, answered),
+                answerMarkup(choice, index, question),
               )
               .join("")}
           </div>
-          ${feedbackMarkup(question, answered, isCorrect)}
+          <p class="sr-only" aria-live="assertive">${escapeHtml(
+            answerAnnouncement(question),
+          )}</p>
         </section>
       </main>
     `;
@@ -478,15 +609,28 @@
           ? resultMarkup()
           : state.screen === "explore"
             ? exploreMarkup()
-            : quizMarkup();
+            : state.screen === "flashcards"
+              ? flashcardMarkup()
+              : quizMarkup();
 
-    if (options.focusNext) {
-      app.querySelector('[data-action="next"]')?.focus();
+    document.body?.classList.toggle("modal-open", state.modalCode !== null);
+
+    if (options.focusCorrect) app.querySelector(".is-correction")?.focus();
+    if (options.focusModal) app.querySelector(".flag-modal")?.focus();
+    if (options.focusFlagCode) {
+      app
+        .querySelector(
+          `[data-action="open-flag"][data-code="${options.focusFlagCode}"]`,
+        )
+        ?.focus();
+    }
+    if (options.focusFlashcard) {
+      app.querySelector('[data-action="flashcard-toggle"]')?.focus();
     }
   }
 
-  function renderAtTop() {
-    render();
+  function renderAtTop(options = {}) {
+    render(options);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -504,6 +648,7 @@
     } else {
       state.questionIndex += 1;
       state.selectedCode = null;
+      state.answerStatus = "unanswered";
     }
     renderAtTop();
   }
@@ -514,6 +659,7 @@
     state.questions = createQuestions(countriesInRegion(state.region));
     state.questionIndex = 0;
     state.selectedCode = null;
+    state.answerStatus = "unanswered";
     state.score = 0;
     state.wrongAnswers = [];
     state.screen = "quiz";
@@ -525,8 +671,20 @@
     state.screen = "explore";
     state.questions = [];
     state.selectedCode = null;
+    state.answerStatus = "unanswered";
     state.wrongAnswers = [];
+    state.modalCode = null;
     renderAtTop();
+  }
+
+  function startFlashcards() {
+    clearAutoAdvance();
+    state.flashcards = shuffle(countriesInRegion(state.region));
+    state.flashcardIndex = 0;
+    state.flashcardRevealed = false;
+    state.modalCode = null;
+    state.screen = "flashcards";
+    renderAtTop({ focusFlashcard: true });
   }
 
   function returnToSetup() {
@@ -534,22 +692,35 @@
     state.screen = "setup";
     state.questions = [];
     state.selectedCode = null;
+    state.answerStatus = "unanswered";
     state.wrongAnswers = [];
+    state.flashcards = [];
+    state.flashcardIndex = 0;
+    state.flashcardRevealed = false;
+    state.modalCode = null;
     renderAtTop();
   }
 
   function selectAnswer(code) {
     const question = state.questions[state.questionIndex];
-    if (state.screen !== "quiz" || state.selectedCode || !question) return;
+    if (state.screen !== "quiz" || !question) return;
+
+    if (state.answerStatus === "correction") {
+      if (code === question.country.code) advanceQuestion();
+      return;
+    }
+    if (state.answerStatus !== "unanswered") return;
 
     state.selectedCode = code;
     const isCorrect = state.selectedCode === question.country.code;
     if (isCorrect) {
+      state.answerStatus = "correct";
       state.score += 1;
     } else {
+      state.answerStatus = "correction";
       state.wrongAnswers.push(question.country);
     }
-    render({ focusNext: !isCorrect });
+    render({ focusCorrect: !isCorrect });
     if (isCorrect) {
       autoAdvanceTimer = window.setTimeout(advanceQuestion, 650);
     }
@@ -571,6 +742,11 @@
       return;
     }
 
+    if (action === "flashcards" || action === "restart-flashcards") {
+      startFlashcards();
+      return;
+    }
+
     if (action === "region") {
       state.region = control.dataset.value;
       render();
@@ -582,8 +758,38 @@
       return;
     }
 
-    if (action === "next") {
-      advanceQuestion();
+    if (action === "flashcard-toggle") {
+      if (state.flashcardRevealed) {
+        state.flashcardIndex += 1;
+        state.flashcardRevealed = false;
+        renderAtTop({ focusFlashcard: true });
+      } else {
+        state.flashcardRevealed = true;
+        render({ focusFlashcard: true });
+      }
+      return;
+    }
+
+    if (action === "open-flag") {
+      state.exploreScrollTop = window.scrollY;
+      state.modalCode = control.dataset.code;
+      render({ focusModal: true });
+      window.scrollTo({ top: state.exploreScrollTop });
+      return;
+    }
+
+    if (action === "close-modal") {
+      const code = state.modalCode;
+      state.modalCode = null;
+      render({ focusFlagCode: code });
+      window.scrollTo({ top: state.exploreScrollTop });
+      return;
+    }
+
+    if (action === "review") {
+      document
+        .getElementById("result-review")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
 
@@ -595,7 +801,7 @@
   document.addEventListener("keydown", (event) => {
     if (
       state.screen !== "quiz" ||
-      state.selectedCode ||
+      state.answerStatus === "correct" ||
       event.repeat ||
       event.altKey ||
       event.ctrlKey ||
@@ -611,8 +817,24 @@
     ];
     if (!answer) return;
 
+    if (
+      state.answerStatus === "correction" &&
+      answer.dataset.code !== state.questions[state.questionIndex].country.code
+    ) {
+      return;
+    }
+
     event.preventDefault();
     selectAnswer(answer.dataset.code);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || state.modalCode === null) return;
+    event.preventDefault();
+    const code = state.modalCode;
+    state.modalCode = null;
+    render({ focusFlagCode: code });
+    window.scrollTo({ top: state.exploreScrollTop });
   });
 
   render();
