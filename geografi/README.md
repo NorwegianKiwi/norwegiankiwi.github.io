@@ -40,3 +40,9 @@ Norske landnavn, hovedsteder og regioninndeling vedlikeholdes lokalt i
 `countries.js`; de importeres ikke automatisk fra flaggkilden. Når et land,
 flagg eller en hovedstad endres, bør både landdataene og de tilhørende lokale
 SVG-filene kontrolleres.
+
+Hvert land tilhører én overordnet verdensdel etter FNs
+[M49-inndeling](https://unstats.un.org/unsd/methodology/m49/overview/). Det gir
+Russland plassering i Europa, mens Kypros og Tyrkia plasseres i Asia. De
+amerikanske landene har i tillegg en underregion og den samlede
+`americas`-kategorien.
