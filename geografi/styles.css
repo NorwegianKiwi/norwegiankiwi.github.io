@@ -831,6 +831,11 @@ footer a {
   vector-effect: non-scaling-stroke;
 }
 
+.country-silhouette-marker {
+  r: var(--silhouette-marker-radius);
+  transition: r 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .country-silhouette-shape {
   fill-rule: evenodd;
   stroke-linejoin: round;

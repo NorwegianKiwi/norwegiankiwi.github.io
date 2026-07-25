@@ -315,6 +315,11 @@
     const targetMarkers = view.markers.filter(
       (marker) => marker.code === targetCode,
     );
+    const hasSilhouettePath = Boolean(silhouette.path);
+    const expandedMarkerRadius = hasSilhouettePath ? 0.4 : 0.75;
+    const currentMarkerRadius = state.silhouetteExpanded
+      ? expandedMarkerRadius
+      : null;
 
     const pathMarkup = (features, className) =>
       features
@@ -333,7 +338,10 @@
             class="country-silhouette-marker"
             cx="${marker.x}"
             cy="${marker.y}"
-            r="${marker.r}"
+            r="${currentMarkerRadius ?? marker.r}"
+            data-base-radius="${marker.r}"
+            data-expanded-radius="${expandedMarkerRadius}"
+            style="--silhouette-marker-radius: ${currentMarkerRadius ?? marker.r}px"
           />
         `,
       )
@@ -369,7 +377,7 @@
         </svg>
         <button
           type="button"
-          class="country-silhouette-inset is-${silhouette.corner}${state.silhouetteExpanded ? " is-expanded" : ""}"
+          class="country-silhouette-inset is-${silhouette.corner} ${hasSilhouettePath ? "has-silhouette-path" : "is-marker-only"}${state.silhouetteExpanded ? " is-expanded" : ""}"
           data-action="toggle-silhouette"
           aria-expanded="${state.silhouetteExpanded}"
           aria-label="${state.silhouetteExpanded ? "Forminsk landformen" : "Forstørr landformen"}"
@@ -996,6 +1004,18 @@
       "aria-label",
       expanded ? "Forminsk landformen" : "Forstørr landformen",
     );
+    control
+      .querySelectorAll(".country-silhouette-marker")
+      .forEach((marker) => {
+        const radius = expanded
+          ? marker.dataset.expandedRadius
+          : marker.dataset.baseRadius;
+        marker.setAttribute("r", radius);
+        marker.style.setProperty(
+          "--silhouette-marker-radius",
+          `${radius}px`,
+        );
+      });
   }
 
   function advanceQuestion() {
