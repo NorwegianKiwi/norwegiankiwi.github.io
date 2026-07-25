@@ -33,6 +33,12 @@ stillehavssentrert slik at øystatene på begge sider av datolinjen vises
 samlet. Reprojiseringen skjer ikke i nettleseren og tilfører ingen
 runtime-avhengigheter.
 
+Kartquizen har i tillegg et lite formvindu med nordvendte landsilhuetter
+generert fra Natural Earth 1:10m Admin 0 Countries, versjon 5.1.1. Den høyere
+detaljgraden gir synlige konturer for blant annet mikrostater og små øystater.
+Silhuettene er skalert og komprimert på forhånd, og svært små øykomponenter
+beholdes som lokale punktmarkører.
+
 ## Jordklode
 
 Jordkloden er Twemojis

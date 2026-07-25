@@ -633,6 +633,7 @@ footer a {
 }
 
 .map-quiz-visual {
+  position: relative;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -697,6 +698,61 @@ footer a {
   fill: var(--coral);
   stroke: var(--ink);
   stroke-width: 2.5;
+}
+
+.country-silhouette-inset {
+  position: absolute;
+  z-index: 2;
+  width: clamp(96px, 17%, 118px);
+  aspect-ratio: 1;
+  padding: 9px;
+  pointer-events: none;
+  border: 1px solid rgba(24, 35, 29, 0.28);
+  border-radius: 15px;
+  background: rgba(255, 253, 247, 0.94);
+  box-shadow:
+    0 8px 22px rgba(24, 35, 29, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+
+.country-silhouette-inset.is-bottom-left,
+.country-silhouette-inset.is-bottom-right {
+  bottom: 14px;
+}
+
+.country-silhouette-inset.is-top-left,
+.country-silhouette-inset.is-top-right {
+  top: 14px;
+}
+
+.country-silhouette-inset.is-bottom-left,
+.country-silhouette-inset.is-top-left {
+  left: 14px;
+}
+
+.country-silhouette-inset.is-bottom-right,
+.country-silhouette-inset.is-top-right {
+  right: 14px;
+}
+
+.country-silhouette {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.country-silhouette-shape,
+.country-silhouette-marker {
+  fill: var(--coral);
+  stroke: var(--ink);
+  stroke-width: 1.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.country-silhouette-shape {
+  fill-rule: evenodd;
+  stroke-linejoin: round;
 }
 
 .map-answer-grid {
@@ -1822,6 +1878,32 @@ body.modal-open {
     height: min(58vw, 250px);
     min-height: 205px;
     border-radius: 12px;
+  }
+
+  .country-silhouette-inset {
+    width: 88px;
+    padding: 7px;
+    border-radius: 12px;
+  }
+
+  .country-silhouette-inset.is-bottom-left,
+  .country-silhouette-inset.is-bottom-right {
+    bottom: 8px;
+  }
+
+  .country-silhouette-inset.is-top-left,
+  .country-silhouette-inset.is-top-right {
+    top: 8px;
+  }
+
+  .country-silhouette-inset.is-bottom-left,
+  .country-silhouette-inset.is-top-left {
+    left: 8px;
+  }
+
+  .country-silhouette-inset.is-bottom-right,
+  .country-silhouette-inset.is-top-right {
+    right: 8px;
   }
 
   .mode-map-country .map-answer-grid {

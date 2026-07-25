@@ -291,6 +291,7 @@
 
   function regionalQuestionMapMarkup(regionId, targetCode) {
     const view = mapData.quizRegions[regionId];
+    const silhouette = mapData.silhouettes[targetCode];
     const region = regionOptions.find((option) => option.id === regionId);
     const [, , viewWidth] = view.viewBox.split(/\s+/).map(Number);
     const markerRadius = Math.min(3.8, Math.max(0.7, viewWidth * 0.0045));
@@ -324,6 +325,18 @@
           regionalMapMarkerMarkup(marker, className, radius),
         )
         .join("");
+    const silhouetteMarkers = silhouette.markers
+      .map(
+        (marker) => `
+          <circle
+            class="country-silhouette-marker"
+            cx="${marker.x}"
+            cy="${marker.y}"
+            r="${marker.r}"
+          />
+        `,
+      )
+      .join("");
 
     return `
       <div class="map-quiz-visual">
@@ -353,6 +366,24 @@
             )}
           </g>
         </svg>
+        <div
+          class="country-silhouette-inset is-${silhouette.corner}"
+          aria-hidden="true"
+        >
+          <svg
+            class="country-silhouette"
+            viewBox="${mapData.silhouetteViewBox}"
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            ${
+              silhouette.path
+                ? `<path class="country-silhouette-shape" d="${silhouette.path}" />`
+                : ""
+            }
+            ${silhouetteMarkers}
+          </svg>
+        </div>
       </div>
     `;
   }
