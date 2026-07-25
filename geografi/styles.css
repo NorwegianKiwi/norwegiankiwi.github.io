@@ -124,15 +124,12 @@ a:focus-visible {
 .hero::after {
   content: "";
   position: absolute;
-  width: 108px;
-  height: 108px;
+  width: 104px;
+  height: 104px;
   right: 20px;
   top: 18px;
-  border: 1px solid rgba(36, 93, 69, 0.18);
-  border-radius: 52% 48% 44% 56% / 44% 55% 45% 56%;
-  box-shadow:
-    0 0 0 12px var(--paper),
-    0 0 0 13px rgba(36, 93, 69, 0.09);
+  background: url("./favicon.svg") center / contain no-repeat;
+  filter: drop-shadow(0 9px 14px rgba(24, 35, 29, 0.13));
 }
 
 .kicker {
@@ -371,6 +368,12 @@ footer a {
   text-underline-offset: 3px;
 }
 
+.license-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
 /* Quiz */
 .quiz-shell {
   min-height: 100vh;
@@ -485,6 +488,10 @@ footer a {
   object-fit: contain;
 }
 
+.flag-code-np .flag {
+  transform: translateX(20.5%);
+}
+
 .featured-flag {
   width: 100%;
 }
@@ -502,9 +509,14 @@ footer a {
 }
 
 .answer-grid {
+  --answer-gap: 11px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 11px;
+  gap: var(--answer-gap);
+}
+
+.flag-grid {
+  --answer-gap: 12px;
 }
 
 .answer-card {
@@ -533,7 +545,15 @@ footer a {
 }
 
 .flag-grid .answer-card {
-  padding: 11px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  place-items: center;
+  gap: 0;
 }
 
 .flag-grid .flag-frame {
@@ -546,49 +566,30 @@ footer a {
 
 .text-grid .answer-card {
   min-height: 88px;
-  padding: 18px 45px 18px 42px;
+  padding: 18px 24px;
   display: grid;
   place-items: center;
 }
 
 .text-grid .answer-card strong {
+  position: relative;
+  z-index: 4;
   font-size: clamp(16px, 1.65vw, 19px);
   line-height: 1.35;
 }
 
-.answer-index {
-  position: absolute;
-  z-index: 2;
-  top: 9px;
-  left: 9px;
-  width: 23px;
-  height: 23px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(24, 35, 29, 0.78);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.text-grid .answer-index {
-  top: 50%;
-  transform: translateY(-50%);
-  background: #e8e6dd;
-  color: var(--muted);
-}
-
 .answer-card.is-correct {
   border-color: var(--green);
-  background: var(--green-soft);
-  box-shadow: inset 0 0 0 2px var(--green);
+  background: var(--card);
+  outline: 2px solid var(--green);
+  outline-offset: -3px;
 }
 
 .answer-card.is-wrong {
   border-color: var(--coral);
-  background: var(--coral-soft);
-  box-shadow: inset 0 0 0 2px var(--coral);
+  background: var(--card);
+  outline: 2px solid var(--coral);
+  outline-offset: -3px;
 }
 
 .answer-card.is-muted {
@@ -598,64 +599,92 @@ footer a {
 .answer-card.is-correction {
   border-color: var(--green);
   background: var(--card);
-  box-shadow: inset 0 0 0 3px var(--green);
+  outline: 5px double var(--green);
+  outline-offset: -5px;
+  box-shadow: none;
 }
 
 .answer-card.is-correction:hover {
   transform: translateY(-3px);
-  box-shadow:
-    inset 0 0 0 3px var(--green),
-    0 10px 24px rgba(41, 54, 45, 0.13);
+  border-color: var(--green);
+  box-shadow: 0 10px 24px rgba(36, 93, 69, 0.13);
 }
 
-.text-grid .answer-card.is-correction {
-  padding-bottom: 32px;
-}
-
-.answer-mark {
+.keyboard-hint-index {
   position: absolute;
-  z-index: 3;
-  top: 9px;
-  right: 9px;
-  width: 27px;
-  height: 27px;
+  z-index: 4;
+  top: 50%;
+  left: 50%;
+  width: clamp(54px, 7vw, 72px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(24, 35, 29, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 253, 247, 0.82);
+  color: rgba(24, 35, 29, 0.72);
+  box-shadow: 0 8px 24px rgba(24, 35, 29, 0.14);
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  background: var(--green);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 900;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(36px, 5vw, 54px);
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.94);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease,
+    visibility 0s linear 140ms;
 }
 
-.wrong-mark {
-  background: var(--coral);
-  font-size: 21px;
+.show-keyboard-hints .keyboard-hint-index {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+  transition-delay: 0s;
 }
 
-.correction-mark {
-  background: var(--green);
-  font-size: 18px;
+.flag-grid .answer-card:hover:not(:disabled),
+.flag-grid .answer-card.is-correction:hover {
+  transform: none;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-.correction-label {
-  position: absolute;
-  z-index: 3;
-  right: 9px;
-  bottom: 8px;
-  left: 9px;
-  width: max-content;
-  max-width: calc(100% - 18px);
-  margin: 0 auto;
-  padding: 5px 9px;
-  border-radius: 999px;
-  background: var(--green);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  line-height: 1.2;
-  text-align: center;
+.flag-grid .answer-card.is-correct,
+.flag-grid .answer-card.is-wrong,
+.flag-grid .answer-card.is-correction,
+.flag-grid .answer-card.is-correction:hover {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+.flag-grid .answer-card:focus-visible {
+  outline: none;
+}
+
+.flag-grid .answer-card.is-correct .answer-flag {
+  outline: 3px solid var(--green);
+  outline-offset: 0;
+}
+
+.flag-grid .answer-card.is-wrong .answer-flag {
+  outline: 3px solid var(--coral);
+  outline-offset: 0;
+}
+
+.flag-grid .answer-card.is-correction .answer-flag {
+  outline: 5px double var(--green);
+  outline-offset: 0;
+}
+
+.flag-grid .answer-card:not(.is-correct):not(.is-wrong):not(.is-correction):hover .answer-flag,
+.flag-grid .answer-card:not(.is-correct):not(.is-wrong):not(.is-correction):focus-visible .answer-flag {
+  box-shadow: 0 0 0 3px rgba(36, 93, 69, 0.5);
 }
 
 .sr-only {
@@ -1036,7 +1065,7 @@ body.modal-open {
   background: transparent;
   padding: clamp(20px, 4vh, 42px) 20px 24px;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-rows: minmax(0, 1fr) 112px auto;
   place-items: center;
   gap: clamp(12px, 2.5vh, 24px);
   cursor: pointer;
@@ -1053,17 +1082,22 @@ body.modal-open {
   max-width: 100%;
   align-self: center;
   box-shadow: 0 16px 42px rgba(24, 35, 29, 0.15);
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
+  transition: box-shadow 180ms ease;
 }
 
-.flashcard-stage.is-revealed .flashcard-flag {
-  transform: translateY(-4px);
+.flashcard-stage:focus-visible {
+  outline: none;
+}
+
+.flashcard-stage:focus-visible .flashcard-flag {
+  box-shadow:
+    0 0 0 4px rgba(36, 93, 69, 0.48),
+    0 18px 48px rgba(24, 35, 29, 0.18);
 }
 
 .flashcard-answer {
-  min-height: 76px;
+  width: 100%;
+  height: 112px;
   display: grid;
   align-content: center;
   gap: 5px;
@@ -1187,7 +1221,6 @@ body.modal-open {
   }
 
   .quiz-active .featured-flag-wrap {
-    width: min(230px, 28vh);
     margin-top: clamp(7px, 1.2vh, 12px);
     padding: 7px;
     border-radius: 10px;
@@ -1203,9 +1236,13 @@ body.modal-open {
   }
 
   .quiz-active .answer-grid {
+    --answer-gap: clamp(6px, 1.1vh, 10px);
     min-height: 0;
     grid-template-rows: repeat(3, minmax(0, 1fr));
-    gap: clamp(6px, 1.1vh, 10px);
+  }
+
+  .quiz-active .flag-grid {
+    --answer-gap: clamp(10px, 1.6vh, 12px);
   }
 
   .quiz-active .capital-grid {
@@ -1218,21 +1255,19 @@ body.modal-open {
   }
 
   .quiz-active .flag-grid .answer-card {
-    --flag-card-inset: clamp(5px, 1vh, 9px);
     display: grid;
-    place-items: center;
-    padding: var(--flag-card-inset);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 0;
+    padding: 0;
   }
 
   .quiz-active .flag-grid .answer-flag {
-    position: absolute;
-    top: var(--flag-card-inset);
-    bottom: var(--flag-card-inset);
-    left: 50%;
+    grid-column: 1;
     width: auto;
-    height: calc(100% - var(--flag-card-inset) - var(--flag-card-inset));
-    max-width: calc(100% - var(--flag-card-inset) - var(--flag-card-inset));
-    transform: translateX(-50%);
+    height: 100%;
+    max-width: 100%;
+    justify-self: center;
   }
 
   .quiz-active .text-grid .answer-card {
@@ -1240,8 +1275,47 @@ body.modal-open {
     padding-bottom: 8px;
   }
 
-  .quiz-active .text-grid .answer-card.is-correction {
-    padding-bottom: 32px;
+  .mode-flag-country .featured-flag-wrap {
+    width: min(334px, 43vh);
+  }
+
+  .mode-flag-country .country-grid {
+    grid-template-rows: repeat(3, minmax(58px, 72px));
+    align-content: center;
+  }
+
+  .mode-flag-country .country-grid .answer-card {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .mode-country-capital .country-with-flag {
+    flex-direction: column;
+    gap: clamp(6px, 1vh, 9px);
+  }
+
+  .mode-country-capital .prompt-flag {
+    width: clamp(160px, 26vh, 200px);
+  }
+
+  .mode-country-capital .question-prompt h1 {
+    font-size: clamp(32px, 5.2vh, 48px);
+  }
+
+  .mode-country-capital .capital-grid {
+    grid-template-rows: repeat(3, minmax(64px, 82px));
+    align-content: center;
+  }
+
+  .mode-country-capital .capital-grid .answer-card {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .mode-flag-country .answer-card strong,
+  .mode-country-capital .answer-card strong {
+    overflow-wrap: anywhere;
+    line-height: 1.2;
   }
 
 }
@@ -1268,8 +1342,8 @@ body.modal-open {
   }
 
   .text-grid .answer-card {
-    padding-left: 35px;
-    padding-right: 35px;
+    padding-left: 18px;
+    padding-right: 18px;
   }
 
 }
@@ -1368,27 +1442,20 @@ body.modal-open {
   }
 
   .answer-grid {
-    gap: 7px;
+    --answer-gap: 7px;
+  }
+
+  .flag-grid {
+    --answer-gap: 8px;
   }
 
   .flag-grid .answer-card {
-    padding: 6px;
-    border-radius: 9px;
+    padding: 0;
   }
 
-  .answer-index {
-    top: 5px;
-    left: 5px;
-    width: 19px;
-    height: 19px;
-    font-size: 9px;
-  }
-
-  .answer-mark {
-    top: 5px;
-    right: 5px;
-    width: 22px;
-    height: 22px;
+  .flag-grid .answer-card {
+    grid-template-rows: auto;
+    gap: 0;
   }
 
   .text-grid {
@@ -1479,6 +1546,7 @@ body.modal-open {
   .flashcard-stage {
     height: calc(100dvh - 75px);
     padding: 20px 6px;
+    grid-template-rows: minmax(0, 1fr) 116px auto;
   }
 
   .flashcard-flag {
@@ -1486,7 +1554,8 @@ body.modal-open {
   }
 
   .flashcard-answer {
-    min-height: 68px;
+    height: 116px;
+    min-height: 0;
   }
 
   .flashcard-complete {

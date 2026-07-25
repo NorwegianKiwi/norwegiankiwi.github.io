@@ -12,9 +12,18 @@ utviklingsserver, bygging eller tredjepakker.
 - `styles.css` – utforming og responsiv layout
 - `countries.js` – land- og regiondata
 - `app.js` – quizlogikk og rendering
+- `favicon.svg` – jordklode brukt som favicon og dekorasjon i heroen
 - `flags/` – de 196 flaggene quizen bruker, med
   [kilde- og oppdateringsinformasjon](flags/README.md)
-- `licenses/` – lisens for flaggfilene
+- `licenses/` – lisenser for flaggfilene og jordkloden
+
+## Jordklode
+
+Jordkloden er Twemojis
+[Globe showing Europe–Africa](https://github.com/twitter/twemoji/blob/master/assets/svg/1f30d.svg).
+Grafikken brukes uendret og er lisensiert under
+[CC BY 4.0](https://github.com/twitter/twemoji/blob/master/LICENSE-GRAPHICS).
+En lokal kopi av lisensen ligger i `licenses/twemoji-CC-BY-4.0.txt`.
 
 ## Vedlikehold av landdata
 

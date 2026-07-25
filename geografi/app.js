@@ -48,7 +48,21 @@
     exploreScrollTop: 0,
   };
   let autoAdvanceTimer = null;
+  let keyboardHintsVisible = false;
   const norwegianCollator = new Intl.Collator("nb", { sensitivity: "base" });
+  const keyboardHintIgnoredKeys = new Set([
+    "Tab",
+    "Escape",
+    "Shift",
+    "Control",
+    "Alt",
+    "AltGraph",
+    "Meta",
+    "CapsLock",
+    "NumLock",
+    "ScrollLock",
+    "ContextMenu",
+  ]);
 
   function escapeHtml(value) {
     return String(value)
@@ -99,7 +113,7 @@
     const alt = revealName ? `Flagget til ${name}` : "";
     const lazy = className === "table-flag" ? ' loading="lazy"' : "";
     return `
-      <span class="flag-frame ${className}">
+      <span class="flag-frame flag-code-${country.code} ${className}">
         <img class="flag" src="./flags/${country.code}.svg" alt="${alt}" draggable="false"${lazy} />
       </span>
     `;
@@ -192,7 +206,10 @@
 
         <footer>
           <span>Geografi-quiz · laget for nysgjerrige geografer</span>
-          <a href="./licenses/flag-icons-MIT.txt">Flagg fra flag-icons · MIT</a>
+          <span class="license-links">
+            <a href="./licenses/flag-icons-MIT.txt">Flagg fra flag-icons · MIT</a>
+            <a href="./licenses/twemoji-CC-BY-4.0.txt">Jordklode fra Twemoji · CC BY 4.0</a>
+          </span>
         </footer>
       </main>
     `;
@@ -500,7 +517,6 @@
         : answered && isAnswer
           ? `${baseAccessibleLabel}, riktig svar`
           : baseAccessibleLabel;
-
     return `
       <button
         class="answer-card ${stateClass}"
@@ -508,31 +524,14 @@
         data-code="${choice.code}"
         ${disabled ? "disabled" : ""}
         aria-label="${escapeHtml(accessibleLabel)}"
+        aria-keyshortcuts="${index + 1}"
       >
-        <span class="answer-index">${index + 1}</span>
         ${
           state.mode === "country-flag"
             ? flagMarkup(choice, "answer-flag", answered)
             : `<strong>${escapeHtml(label)}</strong>`
         }
-        ${
-          state.answerStatus === "correct" && isAnswer
-            ? '<span class="answer-mark" aria-hidden="true">✓</span>'
-            : ""
-        }
-        ${
-          answered && isChosen && !isAnswer
-            ? '<span class="answer-mark wrong-mark" aria-hidden="true">×</span>'
-            : ""
-        }
-        ${
-          awaitingCorrection && isAnswer
-            ? `
-              <span class="answer-mark correction-mark" aria-hidden="true">→</span>
-              <span class="correction-label">Riktig svar – trykk videre</span>
-            `
-            : ""
-        }
+        <span class="keyboard-hint-index" aria-hidden="true">${index + 1}</span>
       </button>
     `;
   }
@@ -561,7 +560,7 @@
           : "text-grid country-grid";
 
     return `
-      <main class="quiz-shell quiz-active">
+      <main class="quiz-shell quiz-active mode-${state.mode} ${keyboardHintsVisible ? "show-keyboard-hints" : ""}">
         <header class="quiz-header">
           ${brandMarkup(true)}
           <div class="quiz-meta">
@@ -641,8 +640,17 @@
     }
   }
 
+  function setKeyboardHintsVisible(visible) {
+    keyboardHintsVisible =
+      visible && state.screen === "quiz" && state.answerStatus === "unanswered";
+    app
+      .querySelector(".quiz-active")
+      ?.classList.toggle("show-keyboard-hints", keyboardHintsVisible);
+  }
+
   function advanceQuestion() {
     clearAutoAdvance();
+    setKeyboardHintsVisible(false);
     if (state.questionIndex === state.questions.length - 1) {
       state.screen = "result";
     } else {
@@ -655,6 +663,7 @@
 
   function startQuiz(mode) {
     clearAutoAdvance();
+    setKeyboardHintsVisible(false);
     state.mode = mode;
     state.questions = createQuestions(countriesInRegion(state.region));
     state.questionIndex = 0;
@@ -668,6 +677,7 @@
 
   function showExplore() {
     clearAutoAdvance();
+    setKeyboardHintsVisible(false);
     state.screen = "explore";
     state.questions = [];
     state.selectedCode = null;
@@ -679,6 +689,7 @@
 
   function startFlashcards() {
     clearAutoAdvance();
+    setKeyboardHintsVisible(false);
     state.flashcards = shuffle(countriesInRegion(state.region));
     state.flashcardIndex = 0;
     state.flashcardRevealed = false;
@@ -689,6 +700,7 @@
 
   function returnToSetup() {
     clearAutoAdvance();
+    setKeyboardHintsVisible(false);
     state.screen = "setup";
     state.questions = [];
     state.selectedCode = null;
@@ -711,6 +723,7 @@
     }
     if (state.answerStatus !== "unanswered") return;
 
+    setKeyboardHintsVisible(false);
     state.selectedCode = code;
     const isCorrect = state.selectedCode === question.country.code;
     if (isCorrect) {
@@ -826,6 +839,43 @@
 
     event.preventDefault();
     selectAnswer(answer.dataset.code);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (
+      state.screen !== "quiz" ||
+      state.answerStatus !== "unanswered" ||
+      event.repeat ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      /^[1-9]$/.test(event.key)
+    ) {
+      return;
+    }
+
+    if (
+      keyboardHintIgnoredKeys.has(event.key) ||
+      /^F\d{1,2}$/.test(event.key)
+    ) {
+      return;
+    }
+
+    const focusedControl = event.target?.closest?.(
+      "button, a, input, select, textarea, [contenteditable='true']",
+    );
+    if (
+      focusedControl &&
+      (event.key === "Enter" ||
+        event.key === " " ||
+        event.key === "Spacebar")
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    setKeyboardHintsVisible(true);
   });
 
   document.addEventListener("keydown", (event) => {
