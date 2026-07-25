@@ -1,11 +1,11 @@
 (function () {
   "use strict";
 
-  const data = window.ATLAS_DATA;
+  const data = window.GEOGRAFI_QUIZ_DATA;
   const app = document.getElementById("app");
 
   if (!data || !app) {
-    throw new Error("Atlas kunne ikke laste landdataene.");
+    throw new Error("Geografi-quiz kunne ikke laste landdataene.");
   }
 
   const { countries, regionOptions } = data;
@@ -14,20 +14,20 @@
     {
       id: "country-flag",
       number: "01",
-      label: "Land → flagg",
-      description: "Finn riktig flagg når du får navnet på landet.",
+      label: "Gjett flagget",
+      description: "Du får landet – finn riktig flagg.",
     },
     {
       id: "flag-country",
       number: "02",
-      label: "Flagg → land",
-      description: "Finn riktig land når du får se flagget.",
+      label: "Gjett landet",
+      description: "Du får flagget – finn riktig land.",
     },
     {
       id: "country-capital",
       number: "03",
-      label: "Land + flagg → hovedstad",
-      description: "Koble landet og flagget til riktig hovedstad.",
+      label: "Gjett hovedstaden",
+      description: "Du får landet og flagget – finn hovedstaden.",
     },
   ];
 
@@ -40,6 +40,7 @@
     selectedCode: null,
     score: 0,
   };
+  let autoAdvanceTimer = null;
 
   function escapeHtml(value) {
     return String(value)
@@ -95,26 +96,25 @@
     if (asButton) {
       return `
         <button class="brand brand-button" data-action="setup">
-          <span class="brand-mark" aria-hidden="true">A</span>
-          <span>Atlas</span>
+          <span class="brand-mark" aria-hidden="true">G</span>
+          <span>Geografi-quiz</span>
         </button>
       `;
     }
     return `
-      <a class="brand" href="#top" aria-label="Atlas – til toppen">
-        <span class="brand-mark" aria-hidden="true">A</span>
-        <span>Atlas</span>
+      <a class="brand" href="#top" aria-label="Geografi-quiz – til toppen">
+        <span class="brand-mark" aria-hidden="true">G</span>
+        <span>Geografi-quiz</span>
       </a>
     `;
   }
 
   function setupMarkup() {
-    const mode = selectedMode();
     const region = selectedRegion();
     const pool = countriesInRegion(state.region);
 
     return `
-      <main class="site-shell">
+      <main class="site-shell setup-shell">
         <header class="brand-bar">
           ${brandMarkup()}
           <span class="edition">Geografiøvelse · 196 land</span>
@@ -122,47 +122,13 @@
 
         <section class="hero" id="top">
           <p class="kicker">Lær verden, ett land om gangen</p>
-          <h1>Hvor godt kjenner<br />du <em>verden?</em></h1>
-          <p class="hero-copy">
-            Velg en øvelse og en del av verden. Du får ni svaralternativer og
-            møter hvert land i kategorien én gang.
-          </p>
+          <h1>Hvor godt kjenner du <em>verden?</em></h1>
+          <p class="hero-copy">Velg et område og deretter hva du vil gjette på.</p>
         </section>
 
-        <section class="setup-section" aria-labelledby="mode-heading">
+        <section class="setup-section region-section" aria-labelledby="region-heading">
           <div class="section-heading">
             <span>01</span>
-            <div>
-              <p>Velg øvelse</p>
-              <h2 id="mode-heading">Hva vil du trene på?</h2>
-            </div>
-          </div>
-          <div class="mode-grid">
-            ${modes
-              .map(
-                (option) => `
-                  <button
-                    class="mode-card ${state.mode === option.id ? "is-selected" : ""}"
-                    data-action="mode"
-                    data-value="${option.id}"
-                    aria-pressed="${state.mode === option.id}"
-                  >
-                    <span class="mode-number">${option.number}</span>
-                    <span class="mode-copy">
-                      <strong>${option.label}</strong>
-                      <small>${option.description}</small>
-                    </span>
-                    <span class="selection-dot" aria-hidden="true"></span>
-                  </button>
-                `,
-              )
-              .join("")}
-          </div>
-        </section>
-
-        <section class="setup-section" aria-labelledby="region-heading">
-          <div class="section-heading">
-            <span>02</span>
             <div>
               <p>Velg område</p>
               <h2 id="region-heading">Hvor i verden?</h2>
@@ -188,20 +154,38 @@
           </div>
         </section>
 
-        <section class="launch-panel">
-          <div>
-            <p>Din øvelse</p>
-            <h2>${mode.label}</h2>
-            <span>${region.label} · ${pool.length} spørsmål · 9 valg</span>
+        <section class="setup-section mode-section" aria-labelledby="mode-heading">
+          <div class="section-heading">
+            <span>02</span>
+            <div>
+              <p>Valgt: ${region.label} · ${pool.length} spørsmål</p>
+              <h2 id="mode-heading">Hva vil du gjette?</h2>
+            </div>
           </div>
-          <button class="primary-button" data-action="start">
-            Start øvelsen
-            <span aria-hidden="true">→</span>
-          </button>
+          <div class="mode-grid">
+            ${modes
+              .map(
+                (option) => `
+                  <button
+                    class="mode-card"
+                    data-action="mode"
+                    data-value="${option.id}"
+                  >
+                    <span class="mode-number">${option.number}</span>
+                    <span class="mode-copy">
+                      <strong>${option.label}</strong>
+                      <small>${option.description}</small>
+                    </span>
+                    <span class="mode-arrow" aria-hidden="true">→</span>
+                  </button>
+                `,
+              )
+              .join("")}
+          </div>
         </section>
 
         <footer>
-          <span>Atlas · laget for nysgjerrige geografer</span>
+          <span>Geografi-quiz · laget for nysgjerrige geografer</span>
           <a href="./licenses/flag-icons-MIT.txt">Flagg fra flag-icons · MIT</a>
         </footer>
       </main>
@@ -336,13 +320,25 @@
       state.mode === "country-capital"
         ? `${question.country.name}: ${question.country.capital}`
         : question.country.name;
+    if (isCorrect) {
+      return `
+        <div class="feedback-bar correct auto-feedback">
+          <div>
+            <span>Riktig!</span>
+            <strong>${escapeHtml(answer)}</strong>
+          </div>
+          <span class="auto-feedback-mark" aria-hidden="true">✓</span>
+        </div>
+      `;
+    }
+
     const nextLabel =
       state.questionIndex === state.questions.length - 1 ? "Se resultat" : "Neste";
 
     return `
-      <div class="feedback-bar ${isCorrect ? "correct" : "wrong"}">
+      <div class="feedback-bar wrong">
         <div>
-          <span>${isCorrect ? "Riktig!" : "Ikke helt."}</span>
+          <span>Ikke helt.</span>
           <strong>${escapeHtml(answer)}</strong>
         </div>
         <button class="next-button" data-action="next">
@@ -358,6 +354,13 @@
     const answered = state.selectedCode !== null;
     const isCorrect = state.selectedCode === question.country.code;
     const progress = ((state.questionIndex + 1) / state.questions.length) * 100;
+
+    const gridClass =
+      state.mode === "country-flag"
+        ? "flag-grid"
+        : state.mode === "country-capital"
+          ? "text-grid capital-grid"
+          : "text-grid country-grid";
 
     return `
       <main class="quiz-shell quiz-active">
@@ -385,9 +388,7 @@
             <p class="kicker">${selectedMode().label}</p>
             ${promptMarkup(question, answered)}
           </div>
-          <div class="answer-grid ${
-            state.mode === "country-flag" ? "flag-grid" : "text-grid"
-          }">
+          <div class="answer-grid ${gridClass}">
             ${question.choices
               .map((choice, index) =>
                 answerMarkup(choice, index, question, answered),
@@ -418,7 +419,37 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function clearAutoAdvance() {
+    if (autoAdvanceTimer !== null) {
+      window.clearTimeout(autoAdvanceTimer);
+      autoAdvanceTimer = null;
+    }
+  }
+
+  function advanceQuestion() {
+    clearAutoAdvance();
+    if (state.questionIndex === state.questions.length - 1) {
+      state.screen = "result";
+    } else {
+      state.questionIndex += 1;
+      state.selectedCode = null;
+    }
+    renderAtTop();
+  }
+
+  function startQuiz(mode) {
+    clearAutoAdvance();
+    state.mode = mode;
+    state.questions = createQuestions(countriesInRegion(state.region));
+    state.questionIndex = 0;
+    state.selectedCode = null;
+    state.score = 0;
+    state.screen = "quiz";
+    renderAtTop();
+  }
+
   function returnToSetup() {
+    clearAutoAdvance();
     state.screen = "setup";
     state.questions = [];
     state.selectedCode = null;
@@ -432,8 +463,7 @@
     const action = control.dataset.action;
 
     if (action === "mode") {
-      state.mode = control.dataset.value;
-      render();
+      startQuiz(control.dataset.value);
       return;
     }
 
@@ -443,36 +473,24 @@
       return;
     }
 
-    if (action === "start") {
-      state.questions = createQuestions(countriesInRegion(state.region));
-      state.questionIndex = 0;
-      state.selectedCode = null;
-      state.score = 0;
-      state.screen = "quiz";
-      renderAtTop();
-      return;
-    }
-
     if (action === "answer") {
       const question = state.questions[state.questionIndex];
       if (state.selectedCode || !question) return;
 
       state.selectedCode = control.dataset.code;
-      if (state.selectedCode === question.country.code) {
+      const isCorrect = state.selectedCode === question.country.code;
+      if (isCorrect) {
         state.score += 1;
       }
-      render({ focusNext: true });
+      render({ focusNext: !isCorrect });
+      if (isCorrect) {
+        autoAdvanceTimer = window.setTimeout(advanceQuestion, 650);
+      }
       return;
     }
 
     if (action === "next") {
-      if (state.questionIndex === state.questions.length - 1) {
-        state.screen = "result";
-      } else {
-        state.questionIndex += 1;
-        state.selectedCode = null;
-      }
-      renderAtTop();
+      advanceQuestion();
       return;
     }
 

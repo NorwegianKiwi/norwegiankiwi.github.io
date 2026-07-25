@@ -1,4 +1,4 @@
-# Atlas
+# Geografi-quiz
 
 En statisk geografi-quiz med 196 land, lokale SVG-flagg og tre quizmoduser.
 

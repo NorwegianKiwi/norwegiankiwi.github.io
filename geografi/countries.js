@@ -231,7 +231,7 @@ const regionOptions = [
   { id: "caribbean", label: "Karibia" },
 ];
 
-window.ATLAS_DATA = Object.freeze({
+window.GEOGRAFI_QUIZ_DATA = Object.freeze({
   countries: Object.freeze(countries),
   regionOptions: Object.freeze(regionOptions),
 });
