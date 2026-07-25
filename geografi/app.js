@@ -600,17 +600,23 @@
     `;
   }
 
+  function screenMarkup() {
+    switch (state.screen) {
+      case "setup":
+        return setupMarkup();
+      case "result":
+        return resultMarkup();
+      case "explore":
+        return exploreMarkup();
+      case "flashcards":
+        return flashcardMarkup();
+      default:
+        return quizMarkup();
+    }
+  }
+
   function render(options = {}) {
-    app.innerHTML =
-      state.screen === "setup"
-        ? setupMarkup()
-        : state.screen === "result"
-          ? resultMarkup()
-          : state.screen === "explore"
-            ? exploreMarkup()
-            : state.screen === "flashcards"
-              ? flashcardMarkup()
-              : quizMarkup();
+    app.innerHTML = screenMarkup();
 
     document.body?.classList.toggle("modal-open", state.modalCode !== null);
 
@@ -685,6 +691,13 @@
     state.wrongAnswers = [];
     state.modalCode = null;
     renderAtTop();
+  }
+
+  function closeFlagModal() {
+    const code = state.modalCode;
+    state.modalCode = null;
+    render({ focusFlagCode: code });
+    window.scrollTo({ top: state.exploreScrollTop });
   }
 
   function startFlashcards() {
@@ -792,10 +805,7 @@
     }
 
     if (action === "close-modal") {
-      const code = state.modalCode;
-      state.modalCode = null;
-      render({ focusFlagCode: code });
-      window.scrollTo({ top: state.exploreScrollTop });
+      closeFlagModal();
       return;
     }
 
@@ -881,10 +891,7 @@
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape" || state.modalCode === null) return;
     event.preventDefault();
-    const code = state.modalCode;
-    state.modalCode = null;
-    render({ focusFlagCode: code });
-    window.scrollTo({ top: state.exploreScrollTop });
+    closeFlagModal();
   });
 
   render();

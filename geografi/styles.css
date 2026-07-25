@@ -1451,9 +1451,6 @@ body.modal-open {
 
   .flag-grid .answer-card {
     padding: 0;
-  }
-
-  .flag-grid .answer-card {
     grid-template-rows: auto;
     gap: 0;
   }
