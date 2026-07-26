@@ -157,17 +157,27 @@
   function brandMarkup(asButton = false) {
     if (asButton) {
       return `
-        <button class="brand brand-button" data-action="setup">
-          <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-          <span>Geografi-quiz</span>
-        </button>
+        <div class="brand-group">
+          <button class="brand brand-button" data-action="setup">
+            <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
+            <span>Geografi-quiz</span>
+          </button>
+          <a class="site-home-link" href="../index.html" aria-label="Tilbake til lanceolav.com">
+            <span aria-hidden="true">←</span> lanceolav.com
+          </a>
+        </div>
       `;
     }
     return `
-      <a class="brand" href="#top" aria-label="Geografi-quiz – til toppen">
-        <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-        <span>Geografi-quiz</span>
-      </a>
+      <div class="brand-group">
+        <a class="brand" href="#top" aria-label="Geografi-quiz – til toppen">
+          <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
+          <span>Geografi-quiz</span>
+        </a>
+        <a class="site-home-link" href="../index.html" aria-label="Tilbake til lanceolav.com">
+          <span aria-hidden="true">←</span> lanceolav.com
+        </a>
+      </div>
     `;
   }
 

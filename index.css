@@ -1,41 +1,318 @@
 html,
 body {
-    height: 100%;
+    min-height: 100%;
 }
 
 body {
-    color: white;
-    background-color: black;
-    font-family: monospace;
-    margin: 0;
-    box-sizing: border-box;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 49%, rgba(101, 184, 189, 0.03), transparent 26rem),
+        radial-gradient(circle at 58% 43%, rgba(236, 235, 230, 0.014), transparent 18rem),
+        var(--page-bg);
+    color: var(--text);
+    font-family: var(--sans);
 }
 
-p {
-    margin: 0;
-}
-
-.container {
-    height: 100%;
+.page-shell {
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
 }
 
-main {
+.quiet-field {
+    min-height: 0;
+    flex: 1;
+    display: grid;
+    place-items: center;
+    position: relative;
+    isolation: isolate;
+}
+
+.orbit-stage {
+    position: relative;
+    width: min(72vmin, 520px);
+    aspect-ratio: 1;
+}
+
+.asteroid-belt {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 18deg,
+        transparent 0 7%,
+        rgba(142, 211, 214, 0.17) 11%,
+        rgba(142, 211, 214, 0.035) 36%,
+        transparent 44% 61%,
+        rgba(236, 235, 230, 0.025) 67%,
+        rgba(142, 211, 214, 0.12) 88%,
+        transparent 95% 100%
+    );
+    -webkit-mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 1px),
+        #000 calc(100% - 1px)
+    );
+    mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 1px),
+        #000 calc(100% - 1px)
+    );
+    opacity: 0.56;
+}
+
+.central-light {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 36% 33%,
+        #fff 0 3%,
+        #f3f3df 7%,
+        #c9ccc0 18%,
+        #888e89 32%,
+        rgba(70, 77, 75, 0.78) 45%,
+        rgba(39, 45, 44, 0.36) 58%,
+        transparent 72%
+    );
+    filter: saturate(0.45);
+    transform: translate(-50%, -50%);
+    animation: sun-breathe 9s ease-in-out infinite;
+}
+
+.central-light::after {
+    content: "";
+    position: absolute;
+    inset: -24px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(236, 235, 220, 0.1), transparent 67%);
+    filter: blur(7px);
+}
+
+.orbit-track {
+    --orbit-duration: 90s;
+    --orbit-delay: 0s;
+    --static-angle: 0deg;
+    --static-counter-angle: 0deg;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: orbit var(--orbit-duration) linear infinite;
+    animation-delay: var(--orbit-delay);
+}
+
+.orbit-cv {
+    --orbit-delay: 0s;
+    --static-angle: 0deg;
+    --static-counter-angle: 0deg;
+}
+
+.orbit-geography {
+    --orbit-delay: -30s;
+    --static-angle: -120deg;
+    --static-counter-angle: 120deg;
+}
+
+.orbit-brainteaser {
+    --orbit-delay: -60s;
+    --static-angle: -240deg;
+    --static-counter-angle: 240deg;
+}
+
+.discovery {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--accent-strong);
+    text-decoration: none;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+}
+
+.discovery::before {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(142, 211, 214, 0.2);
+    border-radius: 50%;
+    opacity: 0;
+    animation: signal-pulse 10s ease-out infinite;
+}
+
+.orbit-geography .discovery::before {
+    animation-delay: -3.3s;
+}
+
+.orbit-brainteaser .discovery::before {
+    animation-delay: -6.6s;
+}
+
+.discovery-orientation {
+    display: grid;
+    place-items: center;
+    animation: counter-orbit var(--orbit-duration) linear infinite;
+    animation-delay: var(--orbit-delay);
+}
+
+.discovery-mark {
+    display: block;
+    opacity: 0.25;
+    filter: grayscale(0.88) saturate(0.45);
+    transition:
+        opacity 350ms ease,
+        filter 350ms ease,
+        transform 350ms ease;
+}
+
+.portrait-mark {
+    width: 29px;
+    height: 29px;
+    border: 1px solid rgba(236, 235, 230, 0.16);
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 24%;
+}
+
+.globe-mark {
+    width: 31px;
+    height: 31px;
+    border-radius: 50%;
+}
+
+.puzzle-fragment {
+    color: var(--accent-strong);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 6px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    line-height: 1.35;
     text-align: center;
 }
 
-main .name {
-    font-family: 'Italianno', cursive;
-    font-size: 72px;
+.puzzle-fragment span {
+    display: block;
 }
-main .at {
-    font-family: monospace;
-    font-size: 16px;
+
+.discovery:hover .discovery-mark,
+.discovery:focus-visible .discovery-mark,
+.discovery:active .discovery-mark {
+    opacity: 0.9;
+    filter: grayscale(0.35) saturate(0.75);
+    transform: scale(1.16);
 }
-main .url {
-    font-family: monospace;
-    font-size: 20px;
+
+.discovery:hover::before,
+.discovery:focus-visible::before {
+    border-color: rgba(142, 211, 214, 0.42);
+}
+
+.orbit-stage:has(.discovery:hover) .orbit-track,
+.orbit-stage:focus-within .orbit-track,
+.orbit-stage:has(.discovery:hover) .discovery-orientation,
+.orbit-stage:focus-within .discovery-orientation {
+    animation-play-state: paused;
+}
+
+@keyframes orbit {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes counter-orbit {
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+@keyframes sun-breathe {
+    0%,
+    100% {
+        opacity: 0.74;
+        filter: saturate(0.4) brightness(0.92);
+    }
+
+    50% {
+        opacity: 0.96;
+        filter: saturate(0.5) brightness(1.08);
+    }
+}
+
+@keyframes signal-pulse {
+    0%,
+    72% {
+        opacity: 0;
+        transform: scale(0.45);
+    }
+
+    78% {
+        opacity: 0.2;
+    }
+
+    94%,
+    100% {
+        opacity: 0;
+        transform: scale(1.8);
+    }
+}
+
+@media (max-width: 640px) {
+    .orbit-stage {
+        width: min(72vmin, 520px);
+    }
+
+    .central-light {
+        width: 50px;
+        height: 50px;
+    }
+
+    .discovery {
+        width: 56px;
+        height: 56px;
+    }
+}
+
+@media (pointer: coarse) {
+    .discovery-mark {
+        opacity: 0.43;
+    }
+
+    .portrait-mark,
+    .globe-mark {
+        width: 33px;
+        height: 33px;
+    }
+
+    .puzzle-fragment {
+        font-size: 7px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .central-light,
+    .discovery::before {
+        animation: none !important;
+    }
+
+    .orbit-track {
+        animation: none !important;
+        transform: rotate(var(--static-angle));
+    }
+
+    .discovery-orientation {
+        animation: none !important;
+        transform: rotate(var(--static-counter-angle));
+    }
 }

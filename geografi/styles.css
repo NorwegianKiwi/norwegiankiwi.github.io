@@ -82,6 +82,13 @@ a:focus-visible {
   min-height: 64px;
 }
 
+.brand-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
 .brand {
   color: var(--ink);
   text-decoration: none;
@@ -92,6 +99,23 @@ a:focus-visible {
   font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.site-home-link {
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-home-link:hover {
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .brand-mark {
@@ -2239,6 +2263,19 @@ body.modal-open {
 
   .edition {
     display: none;
+  }
+
+  .brand-group {
+    gap: 10px;
+  }
+
+  .quiz-header .brand > span {
+    display: none;
+  }
+
+  .site-home-link {
+    padding-left: 10px;
+    font-size: 11px;
   }
 
   .hero {

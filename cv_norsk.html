@@ -3,37 +3,43 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>CV (Norsk)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Curriculum vitae for Lance Olav Eastgate.">
+  <title>CV (Norsk) · Lance Olav Eastgate</title>
   <link rel="stylesheet" type="text/css" href="nav.css">
   <link rel="stylesheet" type="text/css" href="cv.css">
-  <link href='https://fonts.googleapis.com/css?family=Italianno' rel='stylesheet'>
 </head>
 
 <body>
 
-<nav class="nav">
-  <a class="nav-text nav-link" href="index.html">Home</a>
-  <span class="nav-text">CV</span>
-  <a class="nav-text nav-link" href="brainteaser.html">Brain Teaser</a>
+<nav class="site-nav" aria-label="Hovednavigasjon">
+  <div class="nav-inner">
+    <a class="nav-symbol" href="index.html" aria-label="Home">
+      <span class="home-mark" aria-hidden="true"></span>
+    </a>
+    <a class="nav-symbol" href="contents.html" aria-label="Contents">
+      <span class="contents-mark" aria-hidden="true"></span>
+    </a>
+  </div>
 </nav>
 
-<nav class="subnav">
-  <a class="subnav-text subnav-link" href="cv_english.html">English</a>
-  <span class="subnav-text">Norsk</span>
+<nav class="language-nav" aria-label="Språk for CV">
+  <a class="language-item" href="cv_english.html" lang="en">English</a>
+  <a class="language-item" href="cv_norsk.html" lang="nb" aria-current="page">Norsk</a>
 </nav>
 
 <main>
 
-  <header>Curriculum Vitae</header>
+  <header class="cv-header"><h1>Curriculum Vitae</h1></header>
 
   <section class="personalia">
-    <div class="section-title">Personalia</div>
+    <h2 class="section-title">Personalia</h2>
     <table>
       <tbody>
       <tr>
         <th>Navn</th>
         <td>Lance Olav Eastgate</td>
-        <td rowspan="7" class="portrait"><img src="portrait_wedding.png"/></td>
+        <td rowspan="7" class="portrait"><img src="portrait_wedding.png" alt="Portrett av Lance Olav Eastgate"/></td>
       </tr>
       <tr>
         <th>Født</th>
@@ -53,7 +59,7 @@
       </tr>
       <tr>
         <th>E-post</th>
-        <td class="email"><img src="cv_email.png"/></td>
+        <td class="email"><img src="cv_email.png" alt="E-postadresse"/></td>
       </tr>
       <tr>
         <th>Github</th>
@@ -64,7 +70,7 @@
   </section>
 
   <section class="work">
-    <div class="section-title">Arbeidserfaring</div>
+    <h2 class="section-title">Arbeidserfaring</h2>
     <table>
       <tbody>
         <tr>
@@ -148,7 +154,7 @@
   </section>
 
   <section class="education">
-    <div class="section-title">Høyere utdanning</div>
+    <h2 class="section-title">Høyere utdanning</h2>
     <table>
       <tbody>
       <tr>
@@ -194,7 +200,7 @@
   </section>
 
   <section class="other">
-    <div class="section-title">Verv / Annen erfaring</div>
+    <h2 class="section-title">Verv / Annen erfaring</h2>
     <table>
       <tbody>
       <tr>
@@ -233,7 +239,7 @@
   </section>
 
   <section class="languages">
-    <div class="section-title">Språk</div>
+    <h2 class="section-title">Språk</h2>
     <ul>
       <li><span class="bold">Norsk og engelsk:</span> morsmål, flytende både skriftlig og muntlig (tospråklig).</li>
       <li><span class="bold">Fransk:</span> grunnleggende (6 års skolegang).</li>
@@ -242,7 +248,7 @@
   </section>
 
   <section class="prizes">
-    <div class="section-title">Priser / Æresbevisninger</div>
+    <h2 class="section-title">Priser / Æresbevisninger</h2>
     <table>
       <tbody>
       <tr>
@@ -270,7 +276,7 @@
   </section>
 
   <section class="publications">
-    <div class="section-title">Publikasjoner</div>
+    <h2 class="section-title">Publikasjoner</h2>
     <ul>
       <li>
         <p>L. O. Eastgate, J. P. Sethna, M. Rauscher, T. Cretegny, C.-S. Chen, and C. R. Myers</p>
@@ -286,7 +292,7 @@
   </section>
 
   <section class="references">
-    <div class="section-title">Referanser</div>
+    <h2 class="section-title">Referanser</h2>
     <p>Oppgis ved forespørsel.</p>
   </section>
 
