@@ -658,11 +658,6 @@
             cy="${marker.y}"
             r="${Math.max(11, markerRadius * 3.2)}"
           />
-          ${regionalMapMarkerMarkup(
-            marker,
-            "explore-map-country-marker",
-            markerRadius,
-          )}
         `,
       )
       .join("");
@@ -688,6 +683,48 @@
         ${markers}
       </g>
     `;
+  }
+
+  function exploreMapMarkerLayerMarkup(
+    sortedCountries,
+    view,
+    markerRadius,
+  ) {
+    const regionCodes = new Set(sortedCountries.map((country) => country.code));
+
+    return view.markers
+      .filter((marker) => regionCodes.has(marker.code))
+      .map((marker) => {
+        const classes = [
+          "explore-map-marker-control",
+          state.explorePinnedCode === marker.code ? "is-pinned" : "",
+          state.explorePreviewCode === marker.code ? "is-preview" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        return `
+          <g
+            class="${classes}"
+            data-action="explore-country"
+            data-explore-code="${marker.code}"
+            aria-hidden="true"
+          >
+            <circle
+              class="explore-map-marker-top-hit"
+              cx="${marker.x}"
+              cy="${marker.y}"
+              r="${Math.max(11, markerRadius * 3.2)}"
+            />
+            ${regionalMapMarkerMarkup(
+              marker,
+              "explore-map-country-marker",
+              markerRadius,
+            )}
+          </g>
+        `;
+      })
+      .join("");
   }
 
   function exploreRegionMapMarkup(sortedCountries) {
@@ -717,6 +754,11 @@
                 exploreMapCountryMarkup(country, view, markerRadius),
               )
               .join("")}
+            ${exploreMapMarkerLayerMarkup(
+              sortedCountries,
+              view,
+              markerRadius,
+            )}
           </svg>
           <div class="explore-silhouette-overlay">
             ${exploreSilhouetteOverlayMarkup()}
@@ -1296,10 +1338,12 @@
         "is-preview",
         code === state.explorePreviewCode,
       );
-      control.setAttribute(
-        "aria-pressed",
-        String(code === state.explorePinnedCode),
-      );
+      if (!control.hasAttribute("aria-hidden")) {
+        control.setAttribute(
+          "aria-pressed",
+          String(code === state.explorePinnedCode),
+        );
+      }
     });
 
     const status = app.querySelector(".explore-country-status-wrap");

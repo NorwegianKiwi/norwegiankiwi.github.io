@@ -1456,22 +1456,31 @@ footer a {
   pointer-events: all;
 }
 
+.explore-map-marker-control {
+  cursor: pointer;
+}
+
+.explore-map-marker-top-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+
 .explore-map-country.is-pinned .explore-map-country-shape,
-.explore-map-country.is-pinned .explore-map-country-marker {
+.explore-map-marker-control.is-pinned .explore-map-country-marker {
   fill: var(--green);
   stroke: var(--ink);
   filter: drop-shadow(0 0 4px rgba(33, 91, 66, 0.42));
 }
 
 .explore-map-country.is-preview .explore-map-country-shape,
-.explore-map-country.is-preview .explore-map-country-marker {
+.explore-map-marker-control.is-preview .explore-map-country-marker {
   fill: var(--coral);
   stroke: var(--ink);
   filter: drop-shadow(0 0 4px rgba(217, 111, 78, 0.48));
 }
 
-.explore-map-country:focus-visible .explore-map-country-shape,
-.explore-map-country:focus-visible .explore-map-country-marker {
+.explore-map-country:focus-visible .explore-map-country-shape {
   stroke: #8d5b00;
   stroke-width: 2.5;
 }
