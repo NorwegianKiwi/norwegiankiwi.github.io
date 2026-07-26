@@ -72,6 +72,9 @@
     flashcardRevealed: false,
     modalCode: null,
     exploreScrollTop: 0,
+    exploreView: "list",
+    explorePinnedCode: null,
+    explorePreviewCode: null,
   };
   let autoAdvanceTimer = null;
   let keyboardHintsVisible = false;
@@ -290,9 +293,75 @@
     `;
   }
 
+  function countrySilhouetteMarkup(
+    countryCode,
+    { interactive = true, expanded = state.silhouetteExpanded } = {},
+  ) {
+    const silhouette = mapData.silhouettes[countryCode];
+    const hasSilhouettePath = Boolean(silhouette.path);
+    const expandedMarkerRadius = hasSilhouettePath ? 0.4 : 0.75;
+    const currentMarkerRadius = expanded ? expandedMarkerRadius : null;
+    const silhouetteMarkers = silhouette.markers
+      .map(
+        (marker) => `
+          <circle
+            class="country-silhouette-marker"
+            cx="${marker.x}"
+            cy="${marker.y}"
+            r="${currentMarkerRadius ?? marker.r}"
+            data-base-radius="${marker.r}"
+            data-expanded-radius="${expandedMarkerRadius}"
+            style="--silhouette-marker-radius: ${currentMarkerRadius ?? marker.r}px"
+          />
+        `,
+      )
+      .join("");
+    const classes = [
+      "country-silhouette-inset",
+      `is-${silhouette.corner}`,
+      hasSilhouettePath ? "has-silhouette-path" : "is-marker-only",
+      interactive ? "is-interactive" : "is-preview-only",
+      interactive && expanded ? "is-expanded" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const contents = `
+      ${interactive ? '<span class="silhouette-toggle-icon" aria-hidden="true"></span>' : ""}
+      <svg
+        class="country-silhouette"
+        viewBox="${mapData.silhouetteViewBox}"
+        aria-hidden="true"
+        focusable="false"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        ${
+          silhouette.path
+            ? `<path class="country-silhouette-shape" d="${silhouette.path}" />`
+            : ""
+        }
+        ${silhouetteMarkers}
+      </svg>
+    `;
+
+    if (!interactive) {
+      return `<div class="${classes}" aria-hidden="true">${contents}</div>`;
+    }
+
+    return `
+      <button
+        type="button"
+        class="${classes}"
+        data-action="toggle-silhouette"
+        aria-expanded="${expanded}"
+        aria-label="${expanded ? "Forminsk landformen" : "Forstørr landformen"}"
+      >
+        ${contents}
+      </button>
+    `;
+  }
+
   function regionalQuestionMapMarkup(regionId, targetCode) {
     const view = mapData.quizRegions[regionId];
-    const silhouette = mapData.silhouettes[targetCode];
     const region = regionOptions.find((option) => option.id === regionId);
     const [, , viewWidth] = view.viewBox.split(/\s+/).map(Number);
     const markerRadius = Math.min(3.8, Math.max(0.7, viewWidth * 0.0045));
@@ -315,11 +384,6 @@
     const targetMarkers = view.markers.filter(
       (marker) => marker.code === targetCode,
     );
-    const hasSilhouettePath = Boolean(silhouette.path);
-    const expandedMarkerRadius = hasSilhouettePath ? 0.4 : 0.75;
-    const currentMarkerRadius = state.silhouetteExpanded
-      ? expandedMarkerRadius
-      : null;
 
     const pathMarkup = (features, className) =>
       features
@@ -331,22 +395,6 @@
           regionalMapMarkerMarkup(marker, className, radius),
         )
         .join("");
-    const silhouetteMarkers = silhouette.markers
-      .map(
-        (marker) => `
-          <circle
-            class="country-silhouette-marker"
-            cx="${marker.x}"
-            cy="${marker.y}"
-            r="${currentMarkerRadius ?? marker.r}"
-            data-base-radius="${marker.r}"
-            data-expanded-radius="${expandedMarkerRadius}"
-            style="--silhouette-marker-radius: ${currentMarkerRadius ?? marker.r}px"
-          />
-        `,
-      )
-      .join("");
-
     return `
       <div class="map-quiz-visual">
         <svg
@@ -375,29 +423,7 @@
             )}
           </g>
         </svg>
-        <button
-          type="button"
-          class="country-silhouette-inset is-${silhouette.corner} ${hasSilhouettePath ? "has-silhouette-path" : "is-marker-only"}${state.silhouetteExpanded ? " is-expanded" : ""}"
-          data-action="toggle-silhouette"
-          aria-expanded="${state.silhouetteExpanded}"
-          aria-label="${state.silhouetteExpanded ? "Forminsk landformen" : "Forstørr landformen"}"
-        >
-          <span class="silhouette-toggle-icon" aria-hidden="true"></span>
-          <svg
-            class="country-silhouette"
-            viewBox="${mapData.silhouetteViewBox}"
-            aria-hidden="true"
-            focusable="false"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            ${
-              silhouette.path
-                ? `<path class="country-silhouette-shape" d="${silhouette.path}" />`
-                : ""
-            }
-            ${silhouetteMarkers}
-          </svg>
-        </button>
+        ${countrySilhouetteMarkup(targetCode)}
       </div>
     `;
   }
@@ -578,6 +604,250 @@
     `;
   }
 
+  function activeExploreCountryCode() {
+    return state.explorePreviewCode ?? state.explorePinnedCode;
+  }
+
+  function exploreCountryStatusMarkup(countryCode) {
+    const country = countriesByCode.get(countryCode);
+    if (!country) {
+      return `
+        <div class="explore-country-status is-empty">
+          <strong>Velg et land</strong>
+          <span>Pek, fokuser eller trykk for å se plassering og form.</span>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="explore-country-status">
+        ${flagMarkup(country, "explore-status-flag", false)}
+        <span>
+          <strong>${escapeHtml(country.name)}</strong>
+          <small>${escapeHtml(country.capital)}</small>
+        </span>
+      </div>
+    `;
+  }
+
+  function exploreSilhouetteOverlayMarkup() {
+    const activeCode = activeExploreCountryCode();
+    if (!activeCode) return "";
+
+    const isPinned = activeCode === state.explorePinnedCode;
+    return countrySilhouetteMarkup(activeCode, {
+      interactive: isPinned,
+      expanded: isPinned && state.silhouetteExpanded,
+    });
+  }
+
+  function exploreMapCountryMarkup(country, view, markerRadius) {
+    const paths = view.features
+      .filter((feature) => feature.code === country.code)
+      .map((feature) =>
+        regionalMapPathMarkup(feature, "explore-map-country-shape"),
+      )
+      .join("");
+    const markers = view.markers
+      .filter((marker) => marker.code === country.code)
+      .map(
+        (marker) => `
+          <circle
+            class="explore-map-marker-hit"
+            cx="${marker.x}"
+            cy="${marker.y}"
+            r="${Math.max(11, markerRadius * 3.2)}"
+          />
+          ${regionalMapMarkerMarkup(
+            marker,
+            "explore-map-country-marker",
+            markerRadius,
+          )}
+        `,
+      )
+      .join("");
+    const classes = [
+      "explore-map-country",
+      state.explorePinnedCode === country.code ? "is-pinned" : "",
+      state.explorePreviewCode === country.code ? "is-preview" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return `
+      <g
+        class="${classes}"
+        data-action="explore-country"
+        data-explore-code="${country.code}"
+        role="button"
+        tabindex="0"
+        aria-label="${escapeHtml(country.name)}, hovedstad ${escapeHtml(country.capital)}"
+        aria-pressed="${state.explorePinnedCode === country.code}"
+      >
+        ${paths}
+        ${markers}
+      </g>
+    `;
+  }
+
+  function exploreRegionMapMarkup(sortedCountries) {
+    const view = mapData.quizRegions[state.region];
+    const [, , viewWidth] = view.viewBox.split(/\s+/).map(Number);
+    const markerRadius = Math.min(3.8, Math.max(1.4, viewWidth * 0.0045));
+    const contextPaths = view.features
+      .filter((feature) => mapRegionForCode(feature.code) !== state.region)
+      .map((feature) =>
+        regionalMapPathMarkup(feature, "explore-map-context-shape"),
+      )
+      .join("");
+
+    return `
+      <div class="explore-map-layout">
+        <div class="explore-region-map">
+          <svg
+            viewBox="${view.viewBox}"
+            role="group"
+            aria-label="Interaktivt kart over ${escapeHtml(selectedRegion().label)}"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <rect class="question-map-ocean" x="-1000" y="-500" width="3000" height="1500" />
+            <g aria-hidden="true">${contextPaths}</g>
+            ${sortedCountries
+              .map((country) =>
+                exploreMapCountryMarkup(country, view, markerRadius),
+              )
+              .join("")}
+          </svg>
+          <div class="explore-silhouette-overlay">
+            ${exploreSilhouetteOverlayMarkup()}
+          </div>
+        </div>
+
+        <aside class="explore-country-panel" aria-label="Land i regionen">
+          <div class="explore-country-status-wrap" aria-live="polite">
+            ${exploreCountryStatusMarkup(activeExploreCountryCode())}
+          </div>
+          <div class="explore-country-list">
+            ${sortedCountries
+              .map(
+                (country) => `
+                  <button
+                    class="explore-country-card${state.explorePinnedCode === country.code ? " is-pinned" : ""}${state.explorePreviewCode === country.code ? " is-preview" : ""}"
+                    data-action="explore-country"
+                    data-explore-code="${country.code}"
+                    aria-pressed="${state.explorePinnedCode === country.code}"
+                  >
+                    ${flagMarkup(country, "explore-country-flag", false)}
+                    <span>
+                      <strong>${escapeHtml(country.name)}</strong>
+                      <small>${escapeHtml(country.capital)}</small>
+                    </span>
+                  </button>
+                `,
+              )
+              .join("")}
+          </div>
+        </aside>
+      </div>
+    `;
+  }
+
+  function exploreMapRegionPromptMarkup() {
+    return `
+      <section class="explore-map-region-prompt" aria-labelledby="explore-map-region-heading">
+        <p class="kicker">Velg en enkelt region</p>
+        <h2 id="explore-map-region-heading">Hvilket kart vil du utforske?</h2>
+        <p>Regionkartet viser plasseringen og formen til hvert land.</p>
+        <div class="explore-map-region-grid">
+          ${mapSelectableRegions
+            .map((regionId) => {
+              const region = regionOptions.find(
+                (option) => option.id === regionId,
+              );
+              return `
+                <button
+                  data-action="explore-map-region"
+                  data-value="${regionId}"
+                >
+                  <strong>${escapeHtml(region.label)}</strong>
+                  <span>${countriesInRegion(regionId).length} land</span>
+                </button>
+              `;
+            })
+            .join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function exploreListMarkup(sortedCountries, modalCountry) {
+    return `
+      <div class="country-table-wrap">
+        <table class="country-table">
+          <colgroup>
+            <col class="flag-column" />
+            <col class="country-column" />
+            <col />
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Flagg</th>
+              <th scope="col">Land</th>
+              <th scope="col">Hovedstad</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedCountries
+              .map(
+                (country) => `
+                  <tr>
+                    <td>
+                      <button
+                        class="table-flag-button"
+                        data-action="open-flag"
+                        data-code="${country.code}"
+                        aria-label="Vis flagget til ${escapeHtml(country.name)} stort"
+                      >
+                        ${flagMarkup(country, "table-flag", false)}
+                      </button>
+                    </td>
+                    <th scope="row">${escapeHtml(country.name)}</th>
+                    <td>${escapeHtml(country.capital)}</td>
+                  </tr>
+                `,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>
+      ${
+        modalCountry
+          ? `
+            <div
+              class="flag-modal"
+              data-action="close-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Stort flagg: ${escapeHtml(modalCountry.name)}"
+              tabindex="-1"
+            >
+              <div class="flag-modal-card ${modalCountry.note ? "has-note" : ""}">
+                ${flagMarkup(modalCountry, "modal-flag", true)}
+                <strong>${escapeHtml(modalCountry.name)}</strong>
+                ${
+                  modalCountry.note
+                    ? `<p class="country-note">${escapeHtml(modalCountry.note)}</p>`
+                    : ""
+                }
+                <span class="modal-close-hint">Trykk hvor som helst for å lukke</span>
+              </div>
+            </div>
+          `
+          : ""
+      }
+    `;
+  }
+
   function exploreMarkup() {
     const region = selectedRegion();
     const modalCountry = countries.find(
@@ -586,6 +856,8 @@
     const sortedCountries = [...countriesInRegion(state.region)].sort((a, b) =>
       norwegianCollator.compare(a.name, b.name),
     );
+    const mapAvailable = mapSelectableRegions.includes(state.region);
+    const viewingMap = state.exploreView === "map";
 
     return `
       <main class="site-shell explore-shell">
@@ -599,74 +871,76 @@
         </header>
 
         <section class="explore-intro">
-          <p class="kicker">Utforsk landene</p>
-          <h1>${region.label}</h1>
-          <p>Flagg, land og hovedsteder i alfabetisk rekkefølge.</p>
-        </section>
-
-        <div class="country-table-wrap">
-          <table class="country-table">
-            <colgroup>
-              <col class="flag-column" />
-              <col class="country-column" />
-              <col />
-            </colgroup>
-            <thead>
-              <tr>
-                <th scope="col">Flagg</th>
-                <th scope="col">Land</th>
-                <th scope="col">Hovedstad</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${sortedCountries
+          <div>
+            <p class="kicker">Utforsk landene</p>
+            <h1>${region.label}</h1>
+            <p>
+              ${
+                viewingMap
+                  ? "Se hvor landene ligger, og sammenlign flagg og landformer."
+                  : "Flagg, land og hovedsteder i alfabetisk rekkefølge."
+              }
+            </p>
+          </div>
+          <label class="explore-region-select">
+            <span>Område</span>
+            <select data-action="explore-region">
+              ${regionOptions
                 .map(
-                  (country) => `
-                    <tr>
-                      <td>
-                        <button
-                          class="table-flag-button"
-                          data-action="open-flag"
-                          data-code="${country.code}"
-                          aria-label="Vis flagget til ${escapeHtml(country.name)} stort"
-                        >
-                          ${flagMarkup(country, "table-flag", false)}
-                        </button>
-                      </td>
-                      <th scope="row">${escapeHtml(country.name)}</th>
-                      <td>${escapeHtml(country.capital)}</td>
-                    </tr>
+                  (option) => `
+                    <option
+                      value="${option.id}"
+                      ${option.id === state.region ? "selected" : ""}
+                    >
+                      ${escapeHtml(option.label)} · ${countriesInRegion(option.id).length} land
+                    </option>
                   `,
                 )
                 .join("")}
-            </tbody>
-          </table>
+            </select>
+          </label>
+        </section>
+
+        <div class="explore-tabs" role="tablist" aria-label="Visning">
+          <button
+            id="explore-list-tab"
+            role="tab"
+            data-action="explore-tab"
+            data-value="list"
+            aria-selected="${!viewingMap}"
+            aria-controls="explore-list-panel"
+            tabindex="${viewingMap ? "-1" : "0"}"
+          >
+            Liste
+          </button>
+          <button
+            id="explore-map-tab"
+            role="tab"
+            data-action="explore-tab"
+            data-value="map"
+            aria-selected="${viewingMap}"
+            aria-controls="explore-map-panel"
+            tabindex="${viewingMap ? "0" : "-1"}"
+          >
+            Kart
+          </button>
         </div>
-        ${
-          modalCountry
-            ? `
-              <div
-                class="flag-modal"
-                data-action="close-modal"
-                role="dialog"
-                aria-modal="true"
-                aria-label="Stort flagg: ${escapeHtml(modalCountry.name)}"
-                tabindex="-1"
-              >
-                <div class="flag-modal-card ${modalCountry.note ? "has-note" : ""}">
-                  ${flagMarkup(modalCountry, "modal-flag", true)}
-                  <strong>${escapeHtml(modalCountry.name)}</strong>
-                  ${
-                    modalCountry.note
-                      ? `<p class="country-note">${escapeHtml(modalCountry.note)}</p>`
-                      : ""
-                  }
-                  <span class="modal-close-hint">Trykk hvor som helst for å lukke</span>
-                </div>
-              </div>
-            `
-            : ""
-        }
+
+        <section
+          id="explore-${state.exploreView}-panel"
+          class="explore-tab-panel"
+          role="tabpanel"
+          aria-labelledby="explore-${state.exploreView}-tab"
+          tabindex="0"
+        >
+          ${
+            viewingMap
+              ? mapAvailable
+                ? exploreRegionMapMarkup(sortedCountries)
+                : exploreMapRegionPromptMarkup()
+              : exploreListMarkup(sortedCountries, modalCountry)
+          }
+        </section>
       </main>
     `;
   }
@@ -953,6 +1227,16 @@
     if (options.focusFlashcard) {
       app.querySelector('[data-action="flashcard-toggle"]')?.focus();
     }
+    if (options.focusExploreTab) {
+      app
+        .querySelector(
+          `[data-action="explore-tab"][data-value="${options.focusExploreTab}"]`,
+        )
+        ?.focus();
+    }
+    if (options.focusExploreRegion) {
+      app.querySelector('[data-action="explore-region"]')?.focus();
+    }
   }
 
   function renderAtTop(options = {}) {
@@ -990,6 +1274,96 @@
       const matches =
         regionId !== null && regionMatches(region, regionId);
       shape.classList.toggle("is-preview", matches);
+    });
+  }
+
+  function resetExploreCountryState() {
+    state.explorePinnedCode = null;
+    state.explorePreviewCode = null;
+    state.silhouetteExpanded = false;
+  }
+
+  function syncExploreCountryUi() {
+    if (state.screen !== "explore" || state.exploreView !== "map") return;
+
+    app.querySelectorAll("[data-explore-code]").forEach((control) => {
+      const code = control.dataset.exploreCode;
+      control.classList.toggle(
+        "is-pinned",
+        code === state.explorePinnedCode,
+      );
+      control.classList.toggle(
+        "is-preview",
+        code === state.explorePreviewCode,
+      );
+      control.setAttribute(
+        "aria-pressed",
+        String(code === state.explorePinnedCode),
+      );
+    });
+
+    const status = app.querySelector(".explore-country-status-wrap");
+    if (status) {
+      status.innerHTML = exploreCountryStatusMarkup(
+        activeExploreCountryCode(),
+      );
+    }
+
+    const overlay = app.querySelector(".explore-silhouette-overlay");
+    if (overlay) {
+      overlay.innerHTML = exploreSilhouetteOverlayMarkup();
+    }
+  }
+
+  function setExplorePreview(code) {
+    if (
+      state.screen !== "explore" ||
+      state.exploreView !== "map" ||
+      !mapSelectableRegions.includes(state.region)
+    ) {
+      return;
+    }
+
+    const previewCode = code === state.explorePinnedCode ? null : code;
+    if (state.explorePreviewCode === previewCode) return;
+    state.explorePreviewCode = previewCode;
+    state.silhouetteExpanded = false;
+    syncExploreCountryUi();
+  }
+
+  function pinExploreCountry(code, { scrollCard = false } = {}) {
+    if (!countriesByCode.has(code)) return;
+    const changed = state.explorePinnedCode !== code;
+    state.explorePinnedCode = code;
+    state.explorePreviewCode = null;
+    if (changed) state.silhouetteExpanded = false;
+    syncExploreCountryUi();
+
+    if (scrollCard) {
+      app
+        .querySelector(`.explore-country-card[data-explore-code="${code}"]`)
+        ?.scrollIntoView({ block: "nearest" });
+    }
+  }
+
+  function setExploreView(view, { focusTab = false } = {}) {
+    if (view !== "list" && view !== "map") return;
+    state.exploreView = view;
+    state.explorePreviewCode = null;
+    state.silhouetteExpanded = false;
+    state.modalCode = null;
+    render({
+      focusExploreTab: focusTab ? view : null,
+    });
+  }
+
+  function setExploreRegion(regionId, { focusSelect = false } = {}) {
+    if (!regionOptions.some((region) => region.id === regionId)) return;
+    state.region = regionId;
+    resetExploreCountryState();
+    state.modalCode = null;
+    render({
+      focusExploreRegion: focusSelect,
     });
   }
 
@@ -1067,6 +1441,8 @@
     state.silhouetteExpanded = false;
     state.wrongAnswers = [];
     state.modalCode = null;
+    state.exploreView = "list";
+    resetExploreCountryState();
     renderAtTop();
   }
 
@@ -1102,6 +1478,7 @@
     state.flashcardIndex = 0;
     state.flashcardRevealed = false;
     state.modalCode = null;
+    resetExploreCountryState();
     renderAtTop();
   }
 
@@ -1144,6 +1521,25 @@
 
     if (action === "explore") {
       showExplore();
+      return;
+    }
+
+    if (action === "explore-tab") {
+      setExploreView(control.dataset.value, { focusTab: true });
+      return;
+    }
+
+    if (action === "explore-map-region") {
+      state.region = control.dataset.value;
+      resetExploreCountryState();
+      render({ focusExploreTab: "map" });
+      return;
+    }
+
+    if (action === "explore-country") {
+      pinExploreCountry(control.dataset.exploreCode, {
+        scrollCard: control.closest(".explore-region-map") !== null,
+      });
       return;
     }
 
@@ -1205,7 +1601,23 @@
     }
   });
 
+  app.addEventListener("change", (event) => {
+    const select = event.target.closest('[data-action="explore-region"]');
+    if (!select || !app.contains(select)) return;
+    setExploreRegion(select.value, { focusSelect: true });
+  });
+
   app.addEventListener("pointerover", (event) => {
+    const countryControl = event.target.closest("[data-explore-code]");
+    if (
+      countryControl &&
+      app.contains(countryControl) &&
+      !countryControl.contains(event.relatedTarget)
+    ) {
+      setExplorePreview(countryControl.dataset.exploreCode);
+      return;
+    }
+
     const control = event.target.closest("[data-map-region]");
     if (
       !control ||
@@ -1218,6 +1630,16 @@
   });
 
   app.addEventListener("pointerout", (event) => {
+    const countryControl = event.target.closest("[data-explore-code]");
+    if (
+      countryControl &&
+      app.contains(countryControl) &&
+      !countryControl.contains(event.relatedTarget)
+    ) {
+      setExplorePreview(null);
+      return;
+    }
+
     const control = event.target.closest("[data-map-region]");
     if (
       !control ||
@@ -1230,6 +1652,12 @@
   });
 
   app.addEventListener("focusin", (event) => {
+    const countryControl = event.target.closest("[data-explore-code]");
+    if (countryControl && app.contains(countryControl)) {
+      setExplorePreview(countryControl.dataset.exploreCode);
+      return;
+    }
+
     const control = event.target.closest("[data-map-region]");
     if (control && app.contains(control)) {
       setRegionPreview(control.dataset.mapRegion);
@@ -1237,6 +1665,16 @@
   });
 
   app.addEventListener("focusout", (event) => {
+    const countryControl = event.target.closest("[data-explore-code]");
+    if (
+      countryControl &&
+      app.contains(countryControl) &&
+      !countryControl.contains(event.relatedTarget)
+    ) {
+      setExplorePreview(null);
+      return;
+    }
+
     const control = event.target.closest("[data-map-region]");
     if (
       control &&
@@ -1248,6 +1686,41 @@
   });
 
   app.addEventListener("keydown", (event) => {
+    const tab = event.target.closest('[data-action="explore-tab"]');
+    if (tab && app.contains(tab)) {
+      const tabs = [...app.querySelectorAll('[data-action="explore-tab"]')];
+      const currentIndex = tabs.indexOf(tab);
+      let nextIndex = null;
+
+      if (event.key === "ArrowLeft") nextIndex = currentIndex - 1;
+      if (event.key === "ArrowRight") nextIndex = currentIndex + 1;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = tabs.length - 1;
+
+      if (nextIndex !== null) {
+        event.preventDefault();
+        const nextTab = tabs[(nextIndex + tabs.length) % tabs.length];
+        setExploreView(nextTab.dataset.value, { focusTab: true });
+      }
+      return;
+    }
+
+    const countryControl = event.target.closest(
+      '[data-action="explore-country"]',
+    );
+    if (
+      countryControl &&
+      app.contains(countryControl) &&
+      countryControl.tagName.toLowerCase() !== "button" &&
+      (event.key === "Enter" || event.key === " ")
+    ) {
+      event.preventDefault();
+      pinExploreCountry(countryControl.dataset.exploreCode, {
+        scrollCard: true,
+      });
+      return;
+    }
+
     const control = event.target.closest('[data-action="map-region"]');
     if (
       !control ||
@@ -1337,11 +1810,13 @@
       return;
     }
 
-    if (
-      state.screen === "quiz" &&
-      state.mode === "map-country" &&
-      state.silhouetteExpanded
-    ) {
+    const expandableSilhouetteVisible =
+      (state.screen === "quiz" && state.mode === "map-country") ||
+      (state.screen === "explore" &&
+        state.exploreView === "map" &&
+        state.explorePinnedCode !== null);
+
+    if (expandableSilhouetteVisible && state.silhouetteExpanded) {
       event.preventDefault();
       setSilhouetteExpanded(false);
     }

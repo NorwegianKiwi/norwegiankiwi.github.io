@@ -1,8 +1,9 @@
 # Geografi-quiz
 
 En statisk geografi-quiz med 196 land, lokale SVG-flagg, fire quizmoduser,
-flashcards og en alfabetisk landoversikt. Kartquizen viser ett uthevet land på
-et regionkart og gir seks landnavn å velge mellom.
+flashcards og en Utforsk-del med alfabetisk liste og interaktive regionkart.
+Kartquizen viser ett uthevet land på et regionkart og gir seks landnavn å
+velge mellom.
 
 Åpne `index.html` direkte i en nettleser. Siden krever ingen installasjon,
 utviklingsserver, bygging eller tredjepakker.
@@ -49,6 +50,11 @@ generert fra Natural Earth 1:10m Admin 0 Countries, versjon 5.1.1. Den høyere
 detaljgraden gir synlige konturer for blant annet mikrostater og små øystater.
 Silhuettene er skalert og komprimert på forhånd, og svært små øykomponenter
 beholdes som lokale punktmarkører.
+
+Utforsk-delens Kart-fane gjenbruker de samme regionale Mercator-kartene og
+silhuettene. Kartet er tilgjengelig for de sju enkeltregionene; Hele verden og
+Amerika viser i stedet et valg av enkeltregion. Kartdataene dupliserer ikke
+regiontilhørighet, men kobles til `countries.js` gjennom landkoden.
 
 ## Jordklode
 
