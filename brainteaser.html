@@ -2,24 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Brain Teaser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A number-grid brain teaser by Lance Olav Eastgate, first published in 1998.">
+  <title>Brain Teaser · Lance Olav Eastgate</title>
   <link rel="stylesheet" type="text/css" href="nav.css">
   <link rel="stylesheet" type="text/css" href="brainteaser.css">
-  <link href='https://fonts.googleapis.com/css?family=Italianno' rel='stylesheet'>
 </head>
 <body>
-  <nav class="nav">
-    <a class="nav-text nav-link" href="index.html">Home</a>
-    <a class="nav-text nav-link" href="cv_english.html">CV</a>
-    <span class="nav-text" >Brain Teaser</span>
-  </nav>
-  <main>
-    <div class="title">Brain Teaser</div>
-    <div class="subtitle">&copy; 1998 Lance Olav Eastgate</div>
-    <div class="digits">
-      <span class="blue">297466662125242552225161542325242532421125225210262108279282892621092525158448529</span>
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-symbol" href="index.html" aria-label="Home">
+        <span class="home-mark" aria-hidden="true"></span>
+      </a>
+      <a class="nav-symbol" href="contents.html" aria-label="Contents">
+        <span class="contents-mark" aria-hidden="true"></span>
+      </a>
     </div>
-    <div class="instructions">
+  </nav>
+  <main class="teaser-main">
+    <header class="teaser-header">
+      <h1>Brain Teaser</h1>
+      <p class="subtitle">&copy; 1998 Lance Olav Eastgate</p>
+    </header>
+    <div class="digits">
+      <code>297466662125242552225161542325242532421125225210262108279282892621092525158448529</code>
+    </div>
+    <section class="instructions" aria-labelledby="instructions-heading">
+      <h2 id="instructions-heading">The puzzle</h2>
       <ul>
         <li>The solution can be read out of a rectangular grid, where some positions are filled, and some are empty.</li>
         <li>The width of the grid is greater than the height.</li>
@@ -34,13 +43,13 @@
         <li>As long as you stay on the same line, the numbers alternately represent the number of full and empty positions.</li>
         <li>If you name the 6 two-digit numbers A, B, C, D, E and F from left to right, A=F, C=D=E and A+B+C+D+E+F=99.</li>
       </ul>
-    </div>
-    <div class="solution">
-      <p>Send the solution to <img class="email" src="brainteaser_email.png"/> and if your answer is correct, I will place you on the list below.</p>
-      <p class="blue luck">Good luck!</p>
-    </div>
-    <div class="congratulations">
-      <p class="blue bigger">Those who have found the answer:</p>
+    </section>
+    <section class="solution" aria-label="How to submit a solution">
+      <p>Send the solution to <img class="email" src="brainteaser_email.png" alt="Email address"> and if your answer is correct, I will place you on the list below.</p>
+      <p class="luck">Good luck!</p>
+    </section>
+    <section class="congratulations" aria-labelledby="solvers-heading">
+      <h2 id="solvers-heading">Those who have found the answer</h2>
       <ul>
         <li>Tore August Kro</li>
         <li>Johannes Kleppe assisted by Espen Nicolaysen</li>
@@ -74,8 +83,8 @@
         <li>Sven Thorkildsen</li>
         <li>Amos Onn</li>
       </ul>
-      <p class="blue bigger center">Congratulations!</p>
-    </div>
+      <p class="closing">Congratulations!</p>
+    </section>
   </main>
 </body>
 </html>
