@@ -3,8 +3,6 @@ body {
     background:
         radial-gradient(circle at 85% 0%, rgba(101, 184, 189, 0.07), transparent 30rem),
         var(--page-bg);
-    color: var(--text);
-    font-family: var(--sans);
     font-size: 1rem;
     line-height: 1.65;
 }
@@ -117,10 +115,6 @@ li::marker {
     font-style: italic;
 }
 
-.mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
-
 .portrait {
     width: 210px;
     padding: 16px 8px 16px 26px;
@@ -199,10 +193,6 @@ li::marker {
         min-width: 0;
         padding: 12px 2px;
         overflow-wrap: anywhere;
-    }
-
-    .personalia tr:first-child {
-        grid-template-columns: minmax(88px, 0.32fr) 1fr;
     }
 
     .portrait {

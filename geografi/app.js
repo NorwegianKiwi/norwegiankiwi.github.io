@@ -155,25 +155,17 @@
   }
 
   function brandMarkup(asButton = false) {
-    if (asButton) {
-      return `
-        <div class="brand-group">
-          <button class="brand brand-button" data-action="setup">
-            <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-            <span>Geografi-quiz</span>
-          </button>
-          <a class="site-home-link" href="../index.html" aria-label="Tilbake til lanceolav.com">
-            <span aria-hidden="true">←</span> lanceolav.com
-          </a>
-        </div>
-      `;
-    }
+    const brandContent = `
+      <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
+      <span>Geografi-quiz</span>
+    `;
+    const brandControl = asButton
+      ? `<button class="brand brand-button" data-action="setup">${brandContent}</button>`
+      : `<a class="brand" href="#top" aria-label="Geografi-quiz – til toppen">${brandContent}</a>`;
+
     return `
       <div class="brand-group">
-        <a class="brand" href="#top" aria-label="Geografi-quiz – til toppen">
-          <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-          <span>Geografi-quiz</span>
-        </a>
+        ${brandControl}
         <a class="site-home-link" href="../index.html" aria-label="Tilbake til lanceolav.com">
           <span aria-hidden="true">←</span> lanceolav.com
         </a>

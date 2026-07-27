@@ -4,8 +4,6 @@ body {
     background:
         radial-gradient(circle at 15% 5%, rgba(101, 184, 189, 0.08), transparent 25rem),
         var(--page-bg);
-    color: var(--text);
-    font-family: var(--sans);
 }
 
 .contents-main {
@@ -71,7 +69,7 @@ body {
 }
 
 .puzzle-fragment {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: var(--mono);
     font-size: 7px;
     font-weight: 600;
     letter-spacing: 0.18em;

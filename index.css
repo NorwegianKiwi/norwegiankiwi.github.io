@@ -11,8 +11,6 @@ body {
         radial-gradient(circle at 50% 49%, rgba(101, 184, 189, 0.03), transparent 26rem),
         radial-gradient(circle at 58% 43%, rgba(236, 235, 230, 0.014), transparent 18rem),
         var(--page-bg);
-    color: var(--text);
-    font-family: var(--sans);
 }
 
 .page-shell {
@@ -193,7 +191,7 @@ body {
 
 .puzzle-fragment {
     color: var(--accent-strong);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: var(--mono);
     font-size: 6px;
     font-weight: 600;
     letter-spacing: 0.18em;
@@ -269,10 +267,6 @@ body {
 }
 
 @media (max-width: 640px) {
-    .orbit-stage {
-        width: min(72vmin, 520px);
-    }
-
     .central-light {
         width: 50px;
         height: 50px;

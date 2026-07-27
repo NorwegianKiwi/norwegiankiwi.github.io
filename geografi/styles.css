@@ -729,7 +729,6 @@ footer a {
   --silhouette-size: clamp(96px, 16vw, 118px);
   position: absolute;
   z-index: 2;
-  box-sizing: border-box;
   padding: 9px;
   color: var(--ink);
   font: inherit;
