@@ -1666,7 +1666,9 @@
       app.contains(countryControl) &&
       !countryControl.contains(event.relatedTarget)
     ) {
-      setExplorePreview(countryControl.dataset.exploreCode);
+      if (event.pointerType !== "touch") {
+        setExplorePreview(countryControl.dataset.exploreCode);
+      }
       return;
     }
 
@@ -1688,7 +1690,9 @@
       app.contains(countryControl) &&
       !countryControl.contains(event.relatedTarget)
     ) {
-      setExplorePreview(null);
+      if (event.pointerType !== "touch") {
+        setExplorePreview(null);
+      }
       return;
     }
 

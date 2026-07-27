@@ -1608,10 +1608,16 @@ footer a {
     transform 150ms ease;
 }
 
-.explore-country-card:hover,
 .explore-country-card.is-preview {
   border-color: var(--coral);
   background: var(--coral-soft);
+}
+
+@media (hover: hover) {
+  .explore-country-card:hover {
+    border-color: var(--coral);
+    background: var(--coral-soft);
+  }
 }
 
 .explore-country-card.is-pinned {
