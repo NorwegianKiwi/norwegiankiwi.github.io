@@ -143,6 +143,10 @@
     return regionOptions.find((region) => region.id === state.region);
   }
 
+  function regionLabelInSentence(region) {
+    return region.id === "world" ? "hele verden" : region.label;
+  }
+
   function flagMarkup(country, className = "", revealName = false) {
     const name = escapeHtml(country.name);
     const alt = revealName ? `Flagget til ${name}` : "";
@@ -582,7 +586,7 @@
           <p>
             Du fikk <strong>${state.score}</strong> av
             <strong>${state.questions.length}</strong> riktige i
-            ${selectedRegion().label.toLowerCase()}.
+            ${regionLabelInSentence(selectedRegion())}.
           </p>
           <div class="result-stats">
             <div><span>Riktige</span><strong>${state.score}</strong></div>
@@ -1006,7 +1010,10 @@
           <section class="flashcard-complete">
             <p class="kicker">Flashcards fullført</p>
             <h1>Runden er ferdig.</h1>
-            <p>Du har gått gjennom ${state.flashcards.length} flagg fra ${region.label.toLowerCase()}.</p>
+            <p>
+              Du har gått gjennom ${state.flashcards.length} flagg fra
+              ${regionLabelInSentence(region)}.
+            </p>
             <div class="flashcard-actions">
               <button class="primary-button" data-action="restart-flashcards">
                 Start på nytt <span aria-hidden="true">↻</span>
