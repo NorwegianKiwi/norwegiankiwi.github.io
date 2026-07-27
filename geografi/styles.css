@@ -118,6 +118,11 @@ a:focus-visible {
   text-underline-offset: 3px;
 }
 
+.setup-shell .site-home-link {
+  padding-left: 0;
+  border-left: 0;
+}
+
 .brand-mark {
   width: 35px;
   height: 35px;
@@ -125,14 +130,6 @@ a:focus-visible {
   border-radius: 50%;
   object-fit: contain;
   filter: drop-shadow(0 4px 7px rgba(24, 35, 29, 0.18));
-}
-
-.edition {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
 }
 
 .hero {
@@ -2258,10 +2255,6 @@ body.modal-open {
   .brand-bar,
   .quiz-header {
     min-height: 72px;
-  }
-
-  .edition {
-    display: none;
   }
 
   .brand-group {

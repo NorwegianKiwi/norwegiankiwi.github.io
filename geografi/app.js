@@ -154,7 +154,15 @@
     `;
   }
 
-  function brandMarkup(asButton = false) {
+  function siteHomeLinkMarkup() {
+    return `
+      <a class="site-home-link" href="../index.html" aria-label="Tilbake til lanceolav.com">
+        <span aria-hidden="true">←</span> lanceolav.com
+      </a>
+    `;
+  }
+
+  function brandMarkup(asButton = false, includeHomeLink = true) {
     const brandContent = `
       <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
       <span>Geografi-quiz</span>
@@ -166,9 +174,7 @@
     return `
       <div class="brand-group">
         ${brandControl}
-        <a class="site-home-link" href="../index.html" aria-label="Tilbake til lanceolav.com">
-          <span aria-hidden="true">←</span> lanceolav.com
-        </a>
+        ${includeHomeLink ? siteHomeLinkMarkup() : ""}
       </div>
     `;
   }
@@ -434,8 +440,8 @@
     return `
       <main class="site-shell setup-shell">
         <header class="brand-bar">
-          ${brandMarkup()}
-          <span class="edition">Geografiøvelse · 196 land</span>
+          ${brandMarkup(false, false)}
+          ${siteHomeLinkMarkup()}
         </header>
 
         <section class="hero" id="top">
@@ -514,7 +520,7 @@
         </section>
 
         <footer>
-          <span>Geografi-quiz · laget for nysgjerrige geografer</span>
+          <span>&copy; 2026 Lance Olav Eastgate</span>
           <span class="license-links">
             <a href="./licenses/flag-icons-MIT.txt">Flagg fra flag-icons · MIT</a>
             <a href="./licenses/twemoji-CC-BY-4.0.txt">Jordklode fra Twemoji · CC BY 4.0</a>
