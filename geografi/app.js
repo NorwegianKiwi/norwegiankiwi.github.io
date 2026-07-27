@@ -32,25 +32,25 @@
     {
       id: "country-flag",
       label: "Gjett flagget",
-      description: "Du får landet – finn riktig flagg.",
+      shortLabel: "Flagg",
       tone: "coral",
     },
     {
       id: "flag-country",
       label: "Gjett landet",
-      description: "Du får flagget – finn riktig land.",
+      shortLabel: "Land",
       tone: "green",
     },
     {
       id: "country-capital",
       label: "Gjett hovedstaden",
-      description: "Du får landet og flagget – finn hovedstaden.",
+      shortLabel: "Hovedstad",
       tone: "gold",
     },
     {
       id: "map-country",
       label: "Kartquiz",
-      description: "Se et uthevet land – velg riktig navn.",
+      shortLabel: "Kart",
       tone: "map",
       choiceCount: 6,
     },
@@ -481,45 +481,66 @@
         </section>
 
         <section class="action-section" aria-label="Velg aktivitet">
-          <div class="action-grid">
-            ${modes
-              .map((option) => {
-                const unavailable =
-                  option.id === "map-country" &&
-                  !mapSelectableRegions.includes(state.region);
-                const description = unavailable
-                  ? "Velg en enkelt region"
-                  : option.description;
-                return `
-                  <button
-                    class="action-card tone-${option.tone}"
-                    data-action="mode"
-                    data-value="${option.id}"
-                    ${unavailable ? "disabled" : ""}
-                  >
-                    <span class="action-copy">
-                      <strong>${option.label}</strong>
-                      <small>${description}</small>
-                    </span>
-                    <span class="action-arrow" aria-hidden="true">→</span>
-                  </button>
-                `;
-              })
-              .join("")}
-            <button class="action-card tone-blue" data-action="flashcards">
-              <span class="action-copy">
-                <strong>Flashcards</strong>
-                <small>Se flagget, tenk selv og avslør svaret.</small>
-              </span>
-              <span class="action-arrow" aria-hidden="true">→</span>
-            </button>
-            <button class="action-card tone-plum" data-action="explore">
-              <span class="action-copy">
-                <strong>Utforsk landene</strong>
-                <small>Se flagg, land og hovedsteder i valgt område.</small>
-              </span>
-              <span class="action-arrow" aria-hidden="true">→</span>
-            </button>
+          <div class="activity-panels">
+            <section
+              class="activity-panel guess-panel"
+              aria-labelledby="guess-panel-heading"
+            >
+              <h2 id="guess-panel-heading">Gjett</h2>
+              <div class="activity-grid guess-actions">
+                ${modes
+                  .map((option) => {
+                    const unavailable =
+                      option.id === "map-country" &&
+                      !mapSelectableRegions.includes(state.region);
+                    return `
+                      <button
+                        class="activity-button tone-${option.tone}"
+                        data-action="mode"
+                        data-value="${option.id}"
+                        ${unavailable ? "disabled" : ""}
+                      >
+                        <strong>${option.shortLabel}</strong>
+                        ${
+                          unavailable
+                            ? "<small>Velg en enkelt region</small>"
+                            : ""
+                        }
+                      </button>
+                    `;
+                  })
+                  .join("")}
+                <button
+                  class="activity-button tone-blue"
+                  data-action="flashcards"
+                >
+                  <strong>Flashcards</strong>
+                </button>
+              </div>
+            </section>
+
+            <section
+              class="activity-panel explore-panel"
+              aria-labelledby="explore-panel-heading"
+            >
+              <h2 id="explore-panel-heading">Utforsk land</h2>
+              <div class="activity-grid explore-actions">
+                <button
+                  class="activity-button tone-plum"
+                  data-action="explore"
+                  data-value="list"
+                >
+                  <strong>Liste</strong>
+                </button>
+                <button
+                  class="activity-button tone-map"
+                  data-action="explore"
+                  data-value="map"
+                >
+                  <strong>Kart</strong>
+                </button>
+              </div>
+            </section>
           </div>
         </section>
 
@@ -1490,7 +1511,7 @@
     renderAtTop();
   }
 
-  function showExplore() {
+  function showExplore(initialView = "list") {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
     state.screen = "explore";
@@ -1500,7 +1521,7 @@
     state.silhouetteExpanded = false;
     state.wrongAnswers = [];
     state.modalCode = null;
-    state.exploreView = "list";
+    state.exploreView = initialView === "map" ? "map" : "list";
     resetExploreCountryState();
     renderAtTop();
   }
@@ -1579,7 +1600,7 @@
     }
 
     if (action === "explore") {
-      showExplore();
+      showExplore(control.dataset.value);
       return;
     }
 
