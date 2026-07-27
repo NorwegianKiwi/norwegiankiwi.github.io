@@ -15,17 +15,10 @@ body {
 }
 
 .page-heading {
-    max-width: 650px;
-    margin-bottom: clamp(48px, 8vw, 76px);
-}
-
-.eyebrow {
-    margin: 0 0 18px;
-    color: var(--accent);
-    font-size: 0.72rem;
-    font-weight: 750;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    margin-bottom: clamp(38px, 6vw, 56px);
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 3vw, 28px);
 }
 
 .page-heading h1 {
@@ -37,12 +30,31 @@ body {
     line-height: 0.95;
 }
 
-.page-heading > p:last-child {
-    max-width: 570px;
-    margin: 24px 0 0;
-    color: var(--muted);
-    font-size: clamp(1rem, 2vw, 1.13rem);
-    line-height: 1.7;
+.heading-cluster {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    color: var(--accent-strong);
+}
+
+.heading-cluster::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow:
+        -14px -9px 0 -0.5px currentColor,
+        14px -8px 0 -0.7px currentColor,
+        -12px 13px 0 -1px currentColor,
+        13px 12px 0 -0.6px currentColor,
+        0 0 18px rgba(142, 211, 214, 0.22);
+    transform: translate(-50%, -50%) rotate(-7deg);
+    opacity: 0.72;
 }
 
 .content-list {
@@ -70,12 +82,55 @@ body {
     background: rgba(101, 184, 189, 0.06);
 }
 
-.card-number {
-    align-self: start;
-    padding-top: 6px;
-    color: var(--muted);
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
+.card-mark {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    color: var(--accent-strong);
+    opacity: 0.42;
+    filter: grayscale(0.8) saturate(0.5);
+    transition:
+        opacity 180ms ease,
+        filter 180ms ease,
+        transform 180ms ease;
+}
+
+.card-mark-image {
+    display: block;
+    width: 34px;
+    height: 34px;
+}
+
+.portrait-mark {
+    border: 1px solid rgba(236, 235, 230, 0.16);
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 24%;
+}
+
+.globe-mark {
+    border-radius: 50%;
+}
+
+.puzzle-fragment {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 7px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.puzzle-fragment span {
+    display: block;
+}
+
+.content-card:hover .card-mark,
+.content-card:focus-visible .card-mark {
+    opacity: 0.88;
+    filter: grayscale(0.3) saturate(0.8);
+    transform: scale(1.06);
 }
 
 .card-copy,
@@ -120,7 +175,8 @@ body {
     transition: transform 160ms ease;
 }
 
-.content-card:hover .card-arrow {
+.content-card:hover .card-arrow,
+.content-card:focus-visible .card-arrow {
     transform: translateX(4px);
 }
 
@@ -130,8 +186,22 @@ body {
         padding-top: 56px;
     }
 
+    .page-heading {
+        gap: 16px;
+    }
+
+    .heading-cluster {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+    }
+
+    .heading-cluster::before {
+        transform: translate(-50%, -50%) rotate(-7deg) scale(0.85);
+    }
+
     .content-card {
-        grid-template-columns: 30px 1fr auto;
+        grid-template-columns: 38px 1fr auto;
         gap: 12px;
         padding-right: 2px;
         padding-left: 2px;
