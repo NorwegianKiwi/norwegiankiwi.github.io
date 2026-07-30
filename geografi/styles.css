@@ -2971,6 +2971,62 @@ body.modal-open {
   }
 }
 
+@media (orientation: landscape) and (min-width: 650px) and (max-height: 599px) {
+  .explore-map-shell {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .explore-map-shell .explore-content {
+    height: calc(100dvh - var(--explore-header-height));
+    min-height: 0;
+    margin: 0;
+    padding: 10px 0;
+  }
+
+  .explore-map-shell .explore-map-layout {
+    height: 100%;
+    min-height: 0;
+    grid-template-columns:
+      minmax(0, 1fr)
+      clamp(240px, 32vw, 280px);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .explore-map-shell .explore-country-panel {
+    height: auto;
+    min-height: 0;
+  }
+
+  .explore-map-shell .map-region-prompt {
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+@media (orientation: landscape) and (max-width: 649px) and (max-height: 599px) {
+  .explore-map-shell .explore-map-layout {
+    grid-template-rows:
+      minmax(
+        180px,
+        min(
+          280px,
+          calc(100dvh - var(--explore-header-height) - 20px)
+        )
+      )
+      340px;
+  }
+
+  .explore-map-shell .map-region-prompt {
+    max-height: calc(100dvh - var(--explore-header-height) - 20px);
+    overflow-y: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
