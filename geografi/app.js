@@ -265,11 +265,13 @@
       id: "flag-country",
       shortLabelKey: "modeFlagCountryShort",
       tone: "green",
+      choiceCount: 6,
     },
     {
       id: "country-capital",
       shortLabelKey: "modeCountryCapitalShort",
       tone: "gold",
+      choiceCount: 6,
     },
     {
       id: "map-country",

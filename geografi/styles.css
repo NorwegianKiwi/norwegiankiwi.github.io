@@ -2361,9 +2361,22 @@ body.modal-open {
     width: min(100% - 24px, 1180px);
   }
 
+  .quiz-active,
+  .flashcard-shell {
+    --phone-quiz-header-height: 66px;
+    --phone-quiz-header-height: clamp(58px, 8.5dvh, 72px);
+    --phone-quiz-bottom-buffer: 18px;
+    --phone-quiz-bottom-buffer: max(18px, env(safe-area-inset-bottom));
+  }
+
   .brand-bar,
   .quiz-header {
     min-height: 72px;
+  }
+
+  .quiz-active .quiz-header,
+  .flashcard-shell .quiz-header {
+    min-height: var(--phone-quiz-header-height);
   }
 
   .brand-group {
@@ -2435,12 +2448,22 @@ body.modal-open {
     display: none;
   }
 
-  .question-area {
-    padding: 36px 0 28px;
+  .quiz-active {
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
-  .question-prompt {
-    margin-bottom: 30px;
+  .quiz-active .question-area {
+    min-height: calc(100vh - var(--phone-quiz-header-height) - 3px);
+    min-height: calc(100dvh - var(--phone-quiz-header-height) - 3px);
+    padding: clamp(12px, 2.25dvh, 20px) 0 var(--phone-quiz-bottom-buffer);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(10px, 1.8dvh, 16px);
+  }
+
+  .quiz-active .question-prompt {
+    margin-bottom: 0;
   }
 
   .question-instruction {
@@ -2470,11 +2493,29 @@ body.modal-open {
   }
 
   .answer-grid {
-    --answer-gap: 7px;
+    --answer-gap: clamp(5px, 0.8dvh, 7px);
   }
 
   .flag-grid {
     --answer-gap: 12px;
+  }
+
+  .quiz-active .answer-grid-stage {
+    min-height: 0;
+    display: grid;
+    align-items: center;
+  }
+
+  .mode-country-flag .answer-grid-stage {
+    place-items: center;
+    container-type: size;
+  }
+
+  .quiz-active .flag-grid {
+    width: min(100cqw, calc(133.333cqh - 10.667px));
+    max-width: 100%;
+    grid-template-rows: repeat(3, auto);
+    align-content: center;
   }
 
   .flag-grid .answer-card {
@@ -2483,26 +2524,54 @@ body.modal-open {
     gap: 0;
   }
 
+  .mode-flag-country .featured-flag-wrap {
+    width: min(334px, 72vw);
+    width: min(334px, 72vw, 32dvh);
+    margin-top: clamp(8px, 1.5dvh, 14px);
+    padding: 8px;
+  }
+
   .text-grid {
     grid-template-columns: 1fr;
   }
 
+  .quiz-active .text-grid {
+    grid-template-rows: repeat(
+      6,
+      minmax(clamp(52px, 7.5dvh, 60px), auto)
+    );
+    align-content: center;
+  }
+
+  .quiz-active .text-grid .answer-card {
+    min-height: clamp(52px, 7.5dvh, 60px);
+    padding-top: clamp(8px, 1.2dvh, 12px);
+    padding-bottom: clamp(8px, 1.2dvh, 12px);
+  }
+
+  .mode-country-capital .prompt-flag {
+    width: clamp(76px, 12dvh, 96px);
+  }
+
   .mode-map-country .question-area {
-    padding-top: 24px;
+    padding-top: clamp(10px, 1.8dvh, 16px);
   }
 
   .mode-map-country .question-prompt {
-    margin-bottom: 16px;
+    margin-bottom: 0;
   }
 
   .map-quiz-layout {
     display: grid;
     grid-template-rows: auto auto;
+    align-content: center;
+    gap: clamp(8px, 1.3dvh, 12px);
   }
 
   .map-quiz-visual {
     height: min(58vw, 250px);
-    min-height: 205px;
+    height: clamp(180px, min(58vw, 28dvh), 250px);
+    min-height: 0;
     border-radius: 12px;
   }
 
@@ -2519,12 +2588,14 @@ body.modal-open {
 
   .mode-map-country .map-answer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, minmax(70px, auto));
+    grid-template-rows: repeat(3, minmax(56px, auto));
+    grid-template-rows: repeat(3, minmax(clamp(56px, 8.2dvh, 70px), auto));
     padding: 8px 10px;
   }
 
   .mode-map-country .map-answer-grid .answer-card {
-    min-height: 70px;
+    min-height: 56px;
+    min-height: clamp(56px, 8.2dvh, 70px);
     padding: 8px;
   }
 
@@ -2708,8 +2779,9 @@ body.modal-open {
   }
 
   .flashcard-stage {
-    height: calc(100dvh - 75px);
-    padding: 20px 6px;
+    height: calc(100vh - var(--phone-quiz-header-height) - 3px);
+    height: calc(100dvh - var(--phone-quiz-header-height) - 3px);
+    padding: 20px 6px max(20px, var(--phone-quiz-bottom-buffer));
     grid-template-rows: minmax(0, 1fr) 116px auto;
   }
 
