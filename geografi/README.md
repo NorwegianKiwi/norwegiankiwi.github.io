@@ -9,6 +9,14 @@ selected, the user chooses a single region before starting the map quiz.
 Open `index.html` directly in a browser. The site requires no installation,
 development server, build process, or third-party packages.
 
+## Install as an app
+
+The hosted site can be installed as an online-only web app. On iPhone or iPad,
+open the site in Safari, use Share → Add to Home Screen, enable Open as Web
+App, and tap Add. On Android, use the browser menu and choose Install app or
+Add to Home screen. The installed app is named “Hello World!” on every
+platform and still requires a network connection.
+
 The site is available in Norwegian and English. The language and selected
 region are stored in the URL, while quiz progress is retained only in the
 open tab. Norwegian and Whole world are the defaults and are omitted from the
@@ -42,6 +50,7 @@ not private or secure functionality.
 ## Files
 
 - `index.html` – document shell and default metadata
+- `manifest.webmanifest` and `icons/` – installable web-app metadata and icons
 - `styles.css` – presentation and responsive layout
 - `countries.js` – bilingual country and region data
 - `world-map.js` – local projected map data derived from Natural Earth
