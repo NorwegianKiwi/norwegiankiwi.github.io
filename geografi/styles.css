@@ -560,6 +560,7 @@ footer {
 .setup-shell footer {
   min-height: 52px;
   margin-top: auto;
+  gap: 8px 16px;
 }
 
 footer a {
@@ -568,11 +569,48 @@ footer a {
 }
 
 .license-links {
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 5px 16px;
+}
+
+.copyright {
+  white-space: nowrap;
+}
+
+.install-app-button {
+  min-height: 34px;
+  padding: 5px 11px 5px 8px;
+  border: 1px solid rgba(36, 93, 69, 0.32);
+  border-radius: 999px;
+  background: rgba(223, 236, 227, 0.62);
+  color: var(--green);
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.install-app-button img {
+  width: 20px;
+  height: 20px;
+}
+
+.install-app-button:hover {
+  border-color: var(--green);
+  background: rgba(223, 236, 227, 0.95);
+}
+
+.install-app-button:focus-visible,
+.install-help-close:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
 }
 
 /* Quiz */
@@ -1905,6 +1943,67 @@ body.modal-open {
   overflow: hidden;
 }
 
+.install-help-overlay {
+  position: fixed;
+  z-index: 110;
+  inset: 0;
+  padding: 24px;
+  background: rgba(17, 26, 21, 0.72);
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+}
+
+.install-help-dialog {
+  width: min(430px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  padding: 28px;
+  border: 1px solid rgba(36, 93, 69, 0.25);
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 0 22px 70px rgba(17, 26, 21, 0.3);
+  text-align: center;
+}
+
+.install-help-icon {
+  width: 62px;
+  height: 62px;
+  margin-bottom: 12px;
+}
+
+.install-help-dialog h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 7vw, 38px);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.install-help-dialog p {
+  margin: 16px 0 22px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.install-help-close {
+  min-width: 112px;
+  min-height: 44px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.install-help-close:hover {
+  background: #194a37;
+}
+
 .flag-modal {
   position: fixed;
   z-index: 100;
@@ -2267,14 +2366,6 @@ body.modal-open {
 }
 
 @media (max-width: 979px) {
-  .activity-panels {
-    grid-template-columns: 1fr;
-  }
-
-  .activity-panel {
-    min-height: 0;
-  }
-
   .activity-button {
     min-height: 64px;
   }
@@ -2289,6 +2380,16 @@ body.modal-open {
 
   .region-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .activity-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-panel {
+    min-height: 0;
   }
 }
 

@@ -59,6 +59,11 @@
       flagsLicence: "Flagg fra flag-icons · MIT",
       globeLicence: "Jordklode fra Twemoji · CC BY 4.0",
       mapLicence: "Kart fra Natural Earth · public domain",
+      installApp: "Installer app",
+      installHelpTitle: "Legg til på Hjem-skjermen",
+      installHelpText:
+        "Trykk på Del i nettleseren, velg «Legg til på Hjem-skjermen», slå på «Åpne som webapp», og trykk «Legg til».",
+      closeInstallHelp: "Lukk",
       review: "Gjennomgang",
       reviewHeading: "Dette kan du øve mer på",
       reviewCount: "{count} land å se nærmere på.",
@@ -162,6 +167,11 @@
       flagsLicence: "Flags from flag-icons · MIT",
       globeLicence: "Globe from Twemoji · CC BY 4.0",
       mapLicence: "Maps from Natural Earth · public domain",
+      installApp: "Install app",
+      installHelpTitle: "Add to Home Screen",
+      installHelpText:
+        "Tap Share in the browser, choose “Add to Home Screen”, turn on “Open as Web App”, and tap “Add”.",
+      closeInstallHelp: "Close",
       review: "Review",
       reviewHeading: "Here is what you can practise",
       reviewCount:
@@ -301,11 +311,13 @@
     flashcardIndex: 0,
     flashcardRevealed: false,
     modalCode: null,
+    installHelpOpen: false,
     exploreScrollTop: 0,
     exploreView: "list",
     explorePinnedCode: null,
     explorePreviewCode: null,
   };
+  let deferredInstallPrompt = null;
   let autoAdvanceTimer = null;
   let keyboardHintsVisible = false;
   const keyboardHintIgnoredKeys = new Set([
@@ -776,7 +788,74 @@
     `;
   }
 
+  function isStandalone() {
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true
+    );
+  }
+
+  function isIosDevice() {
+    return (
+      /iPad|iPhone|iPod/.test(window.navigator.userAgent) ||
+      (window.navigator.platform === "MacIntel" &&
+        window.navigator.maxTouchPoints > 1)
+    );
+  }
+
+  function installActionMarkup() {
+    if (
+      isStandalone() ||
+      (!isIosDevice() && deferredInstallPrompt === null)
+    ) {
+      return "";
+    }
+
+    return `
+      <button
+        class="install-app-button"
+        type="button"
+        data-action="install-app"
+      >
+        <img src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
+        <span>${t("installApp")}</span>
+      </button>
+    `;
+  }
+
+  function installHelpMarkup() {
+    if (!state.installHelpOpen || !isIosDevice() || isStandalone()) return "";
+
+    return `
+      <div
+        class="install-help-overlay"
+        data-action="close-install-help"
+      >
+        <section
+          class="install-help-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="install-help-title"
+          aria-describedby="install-help-description"
+          tabindex="-1"
+        >
+          <img class="install-help-icon" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
+          <h2 id="install-help-title">${t("installHelpTitle")}</h2>
+          <p id="install-help-description">${t("installHelpText")}</p>
+          <button
+            class="install-help-close"
+            type="button"
+            data-action="close-install-help-button"
+          >
+            ${t("closeInstallHelp")}
+          </button>
+        </section>
+      </div>
+    `;
+  }
+
   function setupMarkup() {
+    const installAction = installActionMarkup();
     return `
       <main class="site-shell setup-shell">
         <header class="brand-bar">
@@ -874,13 +953,15 @@
         </section>
 
         <footer>
-          <span>&copy; 2026 Lance Olav Eastgate</span>
+          <span class="copyright">&copy; 2026 Lance Olav Eastgate</span>
+          ${installAction}
           <span class="license-links">
             <a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a>
             <a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a>
             <a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a>
           </span>
         </footer>
+        ${installHelpMarkup()}
       </main>
     `;
   }
@@ -1685,10 +1766,19 @@
     updateDocumentMetadata();
     app.innerHTML = screenMarkup();
 
-    document.body?.classList.toggle("modal-open", state.modalCode !== null);
+    document.body?.classList.toggle(
+      "modal-open",
+      state.modalCode !== null || state.installHelpOpen,
+    );
 
     if (options.focusCorrect) app.querySelector(".is-correction")?.focus();
     if (options.focusModal) app.querySelector(".flag-modal")?.focus();
+    if (options.focusInstallHelp) {
+      app.querySelector(".install-help-close")?.focus();
+    }
+    if (options.focusInstallButton) {
+      app.querySelector('[data-action="install-app"]')?.focus();
+    }
     if (options.focusFlagCode) {
       app
         .querySelector(
@@ -1968,6 +2058,33 @@
     window.scrollTo({ top: state.exploreScrollTop });
   }
 
+  function closeInstallHelp() {
+    if (!state.installHelpOpen) return;
+    state.installHelpOpen = false;
+    render({ focusInstallButton: true });
+  }
+
+  async function requestInstall() {
+    if (isIosDevice()) {
+      state.installHelpOpen = true;
+      render({ focusInstallHelp: true });
+      return;
+    }
+
+    const installPrompt = deferredInstallPrompt;
+    if (!installPrompt) return;
+
+    deferredInstallPrompt = null;
+    try {
+      await installPrompt.prompt();
+      await installPrompt.userChoice;
+    } catch {
+      // The browser owns the prompt and may withdraw it while it is opening.
+    } finally {
+      if (state.screen === "setup") render();
+    }
+  }
+
   function startFlashcards() {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
@@ -1993,6 +2110,7 @@
     state.flashcardIndex = 0;
     state.flashcardRevealed = false;
     state.modalCode = null;
+    state.installHelpOpen = false;
     resetExploreCountryState();
     renderAtTop({ focusSetupMap: focusMapQuiz });
   }
@@ -2028,6 +2146,21 @@
     if (!control || !app.contains(control)) return;
 
     const action = control.dataset.action;
+
+    if (action === "install-app") {
+      void requestInstall();
+      return;
+    }
+
+    if (action === "close-install-help") {
+      if (event.target === control) closeInstallHelp();
+      return;
+    }
+
+    if (action === "close-install-help-button") {
+      closeInstallHelp();
+      return;
+    }
 
     if (action === "mode") {
       startQuiz(control.dataset.value);
@@ -2337,7 +2470,41 @@
   });
 
   document.addEventListener("keydown", (event) => {
+    if (state.installHelpOpen && event.key === "Tab") {
+      const dialog = app.querySelector(".install-help-dialog");
+      const focusable = dialog
+        ? [
+            ...dialog.querySelectorAll(
+              "button, a[href], [tabindex]:not([tabindex='-1'])",
+            ),
+          ]
+        : [];
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (
+        !dialog.contains(document.activeElement) ||
+        (event.shiftKey && document.activeElement === first) ||
+        (!event.shiftKey && document.activeElement === last)
+      ) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      }
+      return;
+    }
+
     if (event.key !== "Escape") return;
+
+    if (state.installHelpOpen) {
+      event.preventDefault();
+      closeInstallHelp();
+      return;
+    }
 
     if (state.modalCode !== null) {
       event.preventDefault();
@@ -2380,6 +2547,18 @@
     state.score = score;
     state.wrongAnswers = previewCountries.slice(score);
   }
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    if (state.screen === "setup" && !isStandalone()) render();
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    state.installHelpOpen = false;
+    if (state.screen === "setup") render();
+  });
 
   applyResultPreviewFromUrl();
   syncUrlState();
