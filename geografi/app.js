@@ -85,6 +85,10 @@
       countryCapital: "{name}, hovedstad {capital}",
       interactiveRegionMap: "Interaktivt kart over {region}",
       countriesInRegion: "Land i regionen",
+      mapZoomControls: "Kartzoom",
+      zoomOutMap: "Zoom ut på kartet",
+      zoomInMap: "Zoom inn på kartet",
+      resetMapZoom: "Tilbakestill kartzoom, {percent} prosent",
       exploreMapDescription:
         "Regionkartet viser plasseringen og formen til hvert land.",
       exploreMapHeading: "Hvilket kart vil du utforske?",
@@ -191,6 +195,10 @@
       countryCapital: "{name}, capital {capital}",
       interactiveRegionMap: "Interactive map of {region}",
       countriesInRegion: "Countries in the region",
+      mapZoomControls: "Map zoom",
+      zoomOutMap: "Zoom out of the map",
+      zoomInMap: "Zoom into the map",
+      resetMapZoom: "Reset map zoom, {percent} per cent",
       exploreMapDescription:
         "The regional map shows the location and shape of each country.",
       exploreMapHeading: "Which map would you like to explore?",
@@ -308,10 +316,16 @@
     exploreView: "list",
     explorePinnedCode: null,
     explorePreviewCode: null,
+    exploreMapViewport: null,
   };
   let deferredInstallPrompt = null;
   let autoAdvanceTimer = null;
   let keyboardHintsVisible = false;
+  const exploreMapPointers = new Map();
+  let exploreMapGesture = null;
+  let exploreMapDrag = null;
+  let suppressExploreMapClickUntil = 0;
+  const exploreMapZoomLevels = [1, 1.5, 2, 3, 4];
   const keyboardHintIgnoredKeys = new Set([
     "Tab",
     "Escape",
@@ -1167,8 +1181,323 @@
       .join("");
   }
 
+  function clamp(value, minimum, maximum) {
+    return Math.min(maximum, Math.max(minimum, value));
+  }
+
+  function parseMapViewBox(viewBox) {
+    const [x, y, width, height] = viewBox.split(/\s+/).map(Number);
+    return { x, y, width, height };
+  }
+
+  function serializeMapViewBox(viewBox) {
+    return [viewBox.x, viewBox.y, viewBox.width, viewBox.height].join(" ");
+  }
+
+  function getExploreMapViewport(baseViewBox) {
+    const base = parseMapViewBox(baseViewBox);
+    if (
+      state.exploreMapViewport?.region !== state.region ||
+      state.exploreMapViewport.base.width !== base.width ||
+      state.exploreMapViewport.base.height !== base.height
+    ) {
+      state.exploreMapViewport = {
+        region: state.region,
+        base,
+        view: { ...base },
+      };
+    }
+    return state.exploreMapViewport;
+  }
+
+  function exploreMapZoom(viewport = state.exploreMapViewport) {
+    return viewport ? viewport.base.width / viewport.view.width : 1;
+  }
+
+  function clampExploreMapView(view, base) {
+    const width = clamp(view.width, base.width / 4, base.width);
+    const height = clamp(view.height, base.height / 4, base.height);
+    return {
+      x: clamp(view.x, base.x, base.x + base.width - width),
+      y: clamp(view.y, base.y, base.y + base.height - height),
+      width,
+      height,
+    };
+  }
+
+  function syncExploreMapZoomUi() {
+    const viewport = state.exploreMapViewport;
+    const svg = app.querySelector("[data-explore-map-svg]");
+    if (!viewport || !svg) return;
+
+    svg.setAttribute("viewBox", serializeMapViewBox(viewport.view));
+    const zoom = exploreMapZoom(viewport);
+    const percent = Math.round(zoom * 100);
+    const zoomOut = app.querySelector('[data-action="explore-map-zoom-out"]');
+    const zoomIn = app.querySelector('[data-action="explore-map-zoom-in"]');
+    const reset = app.querySelector('[data-action="explore-map-zoom-reset"]');
+    const map = app.querySelector(".explore-region-map");
+
+    if (zoomOut) zoomOut.disabled = zoom <= 1.001;
+    if (zoomIn) zoomIn.disabled = zoom >= 3.999;
+    map?.classList.toggle("is-zoomed", zoom > 1.001);
+    if (reset) {
+      reset.textContent = `${percent}%`;
+      const label = t("resetMapZoom", { percent });
+      reset.setAttribute("aria-label", label);
+      reset.title = label;
+    }
+  }
+
+  function setExploreMapZoom(nextZoom, clientPoint = null) {
+    const viewport = state.exploreMapViewport;
+    if (!viewport) return;
+
+    const zoom = clamp(nextZoom, 1, 4);
+    let anchorX = viewport.view.x + viewport.view.width / 2;
+    let anchorY = viewport.view.y + viewport.view.height / 2;
+    let positionX = 0.5;
+    let positionY = 0.5;
+
+    if (clientPoint) {
+      const svg = app.querySelector("[data-explore-map-svg]");
+      const matrix = svg?.getScreenCTM();
+      if (matrix) {
+        const anchor = screenPointToMap(clientPoint, matrix.inverse());
+        anchorX = anchor.x;
+        anchorY = anchor.y;
+        positionX = (anchorX - viewport.view.x) / viewport.view.width;
+        positionY = (anchorY - viewport.view.y) / viewport.view.height;
+      }
+    }
+
+    const width = viewport.base.width / zoom;
+    const height = viewport.base.height / zoom;
+    viewport.view = clampExploreMapView(
+      {
+        x: anchorX - positionX * width,
+        y: anchorY - positionY * height,
+        width,
+        height,
+      },
+      viewport.base,
+    );
+    syncExploreMapZoomUi();
+  }
+
+  function normalizedExploreMapWheelDelta(event) {
+    const unit =
+      event.deltaMode === WheelEvent.DOM_DELTA_LINE
+        ? 16
+        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+          ? window.innerHeight
+          : 1;
+    return clamp(event.deltaY * unit, -100, 100);
+  }
+
+  function zoomExploreMapFromWheel(event) {
+    const delta = normalizedExploreMapWheelDelta(event);
+    if (Math.abs(delta) < 0.01) return;
+    const nextZoom = exploreMapZoom() * Math.exp(-delta * 0.005);
+    setExploreMapZoom(nextZoom, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+  }
+
+  function stepExploreMapZoom(direction) {
+    const zoom = exploreMapZoom();
+    const nextZoom =
+      direction > 0
+        ? exploreMapZoomLevels.find((level) => level > zoom + 0.01) ?? 4
+        : [...exploreMapZoomLevels]
+            .reverse()
+            .find((level) => level < zoom - 0.01) ?? 1;
+    setExploreMapZoom(nextZoom);
+  }
+
+  function resetExploreMapZoom() {
+    const viewport = state.exploreMapViewport;
+    if (!viewport) return;
+    viewport.view = { ...viewport.base };
+    syncExploreMapZoomUi();
+  }
+
+  function mapPointerMidpoint(first, second) {
+    return {
+      x: (first.x + second.x) / 2,
+      y: (first.y + second.y) / 2,
+    };
+  }
+
+  function mapPointerDistance(first, second) {
+    return Math.hypot(second.x - first.x, second.y - first.y);
+  }
+
+  function screenPointToMap(point, inverseMatrix) {
+    const svgPoint = new DOMPoint(point.x, point.y);
+    return svgPoint.matrixTransform(inverseMatrix);
+  }
+
+  function startExploreMapGesture(map) {
+    const points = [...exploreMapPointers.entries()].filter(
+      ([, point]) => point.map === map,
+    );
+    if (points.length < 2) return;
+
+    const svg = map.querySelector("[data-explore-map-svg]");
+    const matrix = svg?.getScreenCTM();
+    const viewport = state.exploreMapViewport;
+    if (!svg || !matrix || !viewport) return;
+
+    const [[firstId, first], [secondId, second]] = points;
+    const midpoint = mapPointerMidpoint(first, second);
+    const inverseMatrix = matrix.inverse();
+    const midpointInMap = screenPointToMap(midpoint, inverseMatrix);
+    exploreMapGesture = {
+      pointerIds: [firstId, secondId],
+      startDistance: Math.max(1, mapPointerDistance(first, second)),
+      startMidpointInMap: midpointInMap,
+      inverseMatrix,
+      startView: { ...viewport.view },
+      startZoom: exploreMapZoom(viewport),
+    };
+
+    for (const pointerId of exploreMapGesture.pointerIds) {
+      try {
+        map.setPointerCapture(pointerId);
+      } catch {
+        // Safari can release a pointer before the second touch is registered.
+      }
+    }
+  }
+
+  function updateExploreMapGesture() {
+    const gesture = exploreMapGesture;
+    const viewport = state.exploreMapViewport;
+    if (!gesture || !viewport) return;
+
+    const [first, second] = gesture.pointerIds.map((pointerId) =>
+      exploreMapPointers.get(pointerId),
+    );
+    if (!first || !second) return;
+
+    const midpoint = mapPointerMidpoint(first, second);
+    const distance = Math.max(1, mapPointerDistance(first, second));
+    const zoom = clamp(
+      gesture.startZoom * (distance / gesture.startDistance),
+      1,
+      4,
+    );
+    const width = viewport.base.width / zoom;
+    const height = viewport.base.height / zoom;
+    const midpointInStartSpace = screenPointToMap(
+      midpoint,
+      gesture.inverseMatrix,
+    );
+    const deltaX =
+      midpointInStartSpace.x - gesture.startMidpointInMap.x;
+    const deltaY =
+      midpointInStartSpace.y - gesture.startMidpointInMap.y;
+    const anchorX =
+      (gesture.startMidpointInMap.x - gesture.startView.x) /
+      gesture.startView.width;
+    const anchorY =
+      (gesture.startMidpointInMap.y - gesture.startView.y) /
+      gesture.startView.height;
+    const scaleFromStart = width / gesture.startView.width;
+
+    viewport.view = clampExploreMapView(
+      {
+        x:
+          gesture.startMidpointInMap.x -
+          anchorX * width -
+          deltaX * scaleFromStart,
+        y:
+          gesture.startMidpointInMap.y -
+          anchorY * height -
+          deltaY * scaleFromStart,
+        width,
+        height,
+      },
+      viewport.base,
+    );
+    syncExploreMapZoomUi();
+  }
+
+  function startExploreMapDrag(event, map) {
+    const svg = map.querySelector("[data-explore-map-svg]");
+    const matrix = svg?.getScreenCTM();
+    const viewport = state.exploreMapViewport;
+    if (!svg || !matrix || !viewport || exploreMapZoom(viewport) <= 1.001) {
+      return;
+    }
+
+    const startPoint = { x: event.clientX, y: event.clientY };
+    const inverseMatrix = matrix.inverse();
+    exploreMapDrag = {
+      pointerId: event.pointerId,
+      map,
+      startPoint,
+      startPointInMap: screenPointToMap(startPoint, inverseMatrix),
+      inverseMatrix,
+      startView: { ...viewport.view },
+      dragging: false,
+    };
+  }
+
+  function updateExploreMapDrag(event) {
+    const drag = exploreMapDrag;
+    const viewport = state.exploreMapViewport;
+    if (!drag || drag.pointerId !== event.pointerId || !viewport) return;
+
+    const clientPoint = { x: event.clientX, y: event.clientY };
+    if (
+      !drag.dragging &&
+      Math.hypot(
+        clientPoint.x - drag.startPoint.x,
+        clientPoint.y - drag.startPoint.y,
+      ) < 5
+    ) {
+      return;
+    }
+
+    if (!drag.dragging) {
+      drag.dragging = true;
+      drag.map.classList.add("is-dragging");
+      try {
+        drag.map.setPointerCapture(event.pointerId);
+      } catch {
+        // The pointer may already have been released outside the map.
+      }
+    }
+
+    const pointInStartSpace = screenPointToMap(
+      clientPoint,
+      drag.inverseMatrix,
+    );
+    viewport.view = clampExploreMapView(
+      {
+        x:
+          drag.startView.x -
+          (pointInStartSpace.x - drag.startPointInMap.x),
+        y:
+          drag.startView.y -
+          (pointInStartSpace.y - drag.startPointInMap.y),
+        width: drag.startView.width,
+        height: drag.startView.height,
+      },
+      viewport.base,
+    );
+    event.preventDefault();
+    syncExploreMapZoomUi();
+  }
+
   function exploreRegionMapMarkup(sortedCountries) {
     const view = mapData.quizRegions[state.region];
+    const mapViewport = getExploreMapViewport(view.viewBox);
+    const zoom = exploreMapZoom(mapViewport);
+    const zoomPercent = Math.round(zoom * 100);
     const [, , viewWidth] = view.viewBox.split(/\s+/).map(Number);
     const markerRadius = Math.min(3.8, Math.max(1.4, viewWidth * 0.0045));
     const contextPaths = view.features
@@ -1180,9 +1509,10 @@
 
     return `
       <div class="explore-map-layout">
-        <div class="explore-region-map">
+        <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}">
           <svg
-            viewBox="${view.viewBox}"
+            data-explore-map-svg
+            viewBox="${serializeMapViewBox(mapViewport.view)}"
             role="group"
             aria-label="${escapeHtml(t("interactiveRegionMap", {
               region: regionLabel(selectedRegion()),
@@ -1202,6 +1532,33 @@
               markerRadius,
             )}
           </svg>
+          <div
+            class="explore-map-zoom-controls"
+            role="group"
+            aria-label="${escapeHtml(t("mapZoomControls"))}"
+          >
+            <button
+              type="button"
+              data-action="explore-map-zoom-out"
+              aria-label="${escapeHtml(t("zoomOutMap"))}"
+              title="${escapeHtml(t("zoomOutMap"))}"
+              ${zoom <= 1.001 ? "disabled" : ""}
+            >−</button>
+            <button
+              type="button"
+              class="explore-map-zoom-reset"
+              data-action="explore-map-zoom-reset"
+              aria-label="${escapeHtml(t("resetMapZoom", { percent: zoomPercent }))}"
+              title="${escapeHtml(t("resetMapZoom", { percent: zoomPercent }))}"
+            >${zoomPercent}%</button>
+            <button
+              type="button"
+              data-action="explore-map-zoom-in"
+              aria-label="${escapeHtml(t("zoomInMap"))}"
+              title="${escapeHtml(t("zoomInMap"))}"
+              ${zoom >= 3.999 ? "disabled" : ""}
+            >+</button>
+          </div>
           <div class="explore-silhouette-overlay">
             ${exploreSilhouetteOverlayMarkup()}
           </div>
@@ -1796,7 +2153,11 @@
   function resetExploreCountryState() {
     state.explorePinnedCode = null;
     state.explorePreviewCode = null;
+    state.exploreMapViewport = null;
     state.silhouetteExpanded = false;
+    exploreMapPointers.clear();
+    exploreMapGesture = null;
+    exploreMapDrag = null;
   }
 
   function syncExploreCountryUi() {
@@ -1866,6 +2227,12 @@
 
   function updateRegion(regionId) {
     if (!regionOptions.some((region) => region.id === regionId)) return false;
+    if (state.region !== regionId) {
+      state.exploreMapViewport = null;
+      exploreMapPointers.clear();
+      exploreMapGesture = null;
+      exploreMapDrag = null;
+    }
     state.region = regionId;
     syncUrlState();
     return true;
@@ -2096,6 +2463,21 @@
       return;
     }
 
+    if (action === "explore-map-zoom-out") {
+      stepExploreMapZoom(-1);
+      return;
+    }
+
+    if (action === "explore-map-zoom-reset") {
+      resetExploreMapZoom();
+      return;
+    }
+
+    if (action === "explore-map-zoom-in") {
+      stepExploreMapZoom(1);
+      return;
+    }
+
     if (action === "quiz-map-region") {
       if (!updateRegion(control.dataset.value)) return;
       startQuiz("map-country");
@@ -2108,6 +2490,13 @@
     }
 
     if (action === "explore-country") {
+      if (
+        control.closest(".explore-region-map") &&
+        Date.now() < suppressExploreMapClickUntil
+      ) {
+        event.preventDefault();
+        return;
+      }
       pinExploreCountry(control.dataset.exploreCode, {
         scrollCard: control.closest(".explore-region-map") !== null,
       });
@@ -2171,6 +2560,98 @@
       returnToSetup();
     }
   });
+
+  app.addEventListener(
+    "wheel",
+    (event) => {
+      if (!event.ctrlKey || !event.cancelable) return;
+      const map = event.target.closest(".explore-region-map");
+      if (!map || !app.contains(map) || !state.exploreMapViewport) return;
+      event.preventDefault();
+      zoomExploreMapFromWheel(event);
+    },
+    { passive: false },
+  );
+
+  app.addEventListener("pointerdown", (event) => {
+    const map = event.target.closest(".explore-region-map");
+    if (
+      !map ||
+      !app.contains(map) ||
+      event.target.closest(
+        ".explore-map-zoom-controls, .country-silhouette-inset",
+      )
+    ) {
+      return;
+    }
+
+    if (
+      event.pointerType !== "touch" &&
+      (event.pointerType === "mouse" || event.pointerType === "pen") &&
+      event.button === 0
+    ) {
+      startExploreMapDrag(event, map);
+      return;
+    }
+    if (event.pointerType !== "touch") return;
+
+    const activeMap = exploreMapPointers.values().next().value?.map;
+    if (activeMap && activeMap !== map) {
+      exploreMapPointers.clear();
+      exploreMapGesture = null;
+    }
+    if (exploreMapPointers.size >= 2) return;
+
+    exploreMapPointers.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+      map,
+    });
+    if (exploreMapPointers.size === 2) {
+      startExploreMapGesture(map);
+    }
+  });
+
+  app.addEventListener("pointermove", (event) => {
+    if (exploreMapDrag?.pointerId === event.pointerId) {
+      updateExploreMapDrag(event);
+      return;
+    }
+
+    const pointer = exploreMapPointers.get(event.pointerId);
+    if (!pointer) return;
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+    if (!exploreMapGesture?.pointerIds.includes(event.pointerId)) return;
+    event.preventDefault();
+    updateExploreMapGesture();
+  });
+
+  function finishExploreMapPointer(event) {
+    if (exploreMapDrag?.pointerId === event.pointerId) {
+      if (exploreMapDrag.dragging) {
+        suppressExploreMapClickUntil = Date.now() + 500;
+        exploreMapDrag.map.classList.remove("is-dragging");
+      }
+      exploreMapDrag = null;
+    }
+
+    if (!exploreMapPointers.has(event.pointerId)) return;
+    const completedGesture =
+      exploreMapGesture?.pointerIds.includes(event.pointerId);
+    exploreMapPointers.delete(event.pointerId);
+    if (completedGesture) {
+      suppressExploreMapClickUntil = Date.now() + 500;
+      exploreMapGesture = null;
+    }
+    if (exploreMapPointers.size === 0) {
+      exploreMapGesture = null;
+    }
+  }
+
+  app.addEventListener("pointerup", finishExploreMapPointer);
+  app.addEventListener("pointercancel", finishExploreMapPointer);
+  app.addEventListener("lostpointercapture", finishExploreMapPointer);
 
   app.addEventListener("pointerover", (event) => {
     const countryControl = event.target.closest("[data-explore-code]");

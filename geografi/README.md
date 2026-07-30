@@ -95,6 +95,10 @@ The Maps view in Explore reuses the same regional Mercator maps and
 silhouettes. A map is available for each of the seven individual regions;
 Whole world instead presents a region choice. The map data does not duplicate
 region membership, but connects to `countries.js` through country codes.
+Explore maps support map-local touchscreen and trackpad pinch zoom,
+touchscreen two-finger panning, and desktop press-and-drag panning, with
+keyboard-accessible controls from 100% to 400%; the surrounding page remains
+at its normal scale.
 
 ## Globe
 

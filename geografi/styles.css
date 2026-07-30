@@ -1520,6 +1520,7 @@ footer a {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  touch-action: pan-y;
   border: 1px solid var(--line);
   border-radius: 15px;
   background: var(--blue-soft);
@@ -1530,12 +1531,15 @@ footer a {
   display: block;
   width: 100%;
   height: 100%;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .explore-map-context-shape {
   fill: rgba(112, 129, 118, 0.14);
   stroke: rgba(73, 91, 80, 0.16);
   stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
 }
 
 .explore-map-country {
@@ -1543,10 +1547,23 @@ footer a {
   outline: none;
 }
 
+.explore-region-map.is-zoomed > svg,
+.explore-region-map.is-zoomed .explore-map-country,
+.explore-region-map.is-zoomed .explore-map-marker-control {
+  cursor: grab;
+}
+
+.explore-region-map.is-dragging > svg,
+.explore-region-map.is-dragging .explore-map-country,
+.explore-region-map.is-dragging .explore-map-marker-control {
+  cursor: grabbing;
+}
+
 .explore-map-country-shape {
   fill: #d9ded5;
   stroke: #6e7c72;
   stroke-width: 0.85;
+  vector-effect: non-scaling-stroke;
   transition:
     fill 150ms ease,
     stroke 150ms ease,
@@ -1596,6 +1613,50 @@ footer a {
 .explore-map-country:focus-visible .explore-map-country-shape {
   stroke: #8d5b00;
   stroke-width: 2.5;
+}
+
+.explore-map-zoom-controls {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  left: 50%;
+  padding: 3px;
+  border: 1px solid rgba(24, 35, 29, 0.24);
+  border-radius: 10px;
+  background: rgba(255, 253, 247, 0.94);
+  box-shadow: 0 5px 14px rgba(24, 35, 29, 0.14);
+  display: flex;
+  gap: 2px;
+  transform: translateX(-50%);
+}
+
+.explore-map-zoom-controls button {
+  min-width: 34px;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--ink);
+  background: transparent;
+  font-size: 18px;
+  font-weight: 750;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.explore-map-zoom-controls button:hover:not(:disabled) {
+  background: var(--green-soft);
+}
+
+.explore-map-zoom-controls button:disabled {
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.42;
+}
+
+.explore-map-zoom-controls .explore-map-zoom-reset {
+  min-width: 58px;
+  font-size: 12px;
 }
 
 .explore-silhouette-overlay {
@@ -2760,6 +2821,19 @@ body.modal-open {
   .explore-region-map,
   .explore-country-panel {
     border-radius: 12px;
+  }
+
+  .explore-map-zoom-controls {
+    top: 7px;
+  }
+
+  .explore-map-zoom-controls button {
+    min-width: 32px;
+    height: 30px;
+  }
+
+  .explore-map-zoom-controls .explore-map-zoom-reset {
+    min-width: 54px;
   }
 
   .explore-country-panel {
