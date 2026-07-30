@@ -325,6 +325,7 @@
   let exploreMapGesture = null;
   let exploreMapDrag = null;
   let exploreMapUiFrame = null;
+  let scrollAffordanceFrame = null;
   let suppressExploreMapClickUntil = 0;
   const exploreMapMaxZoom = 8;
   const exploreMapZoomLevels = [1, 1.5, 2, 3, 4, 6, 8];
@@ -1650,25 +1651,27 @@
           <div class="explore-country-status-wrap" aria-live="polite">
             ${exploreCountryStatusMarkup(activeExploreCountryCode())}
           </div>
-          <div class="explore-country-list">
-            ${sortedCountries
-              .map(
-                (country) => `
-                  <button
-                    class="explore-country-card${state.explorePinnedCode === country.code ? " is-pinned" : ""}${state.explorePreviewCode === country.code ? " is-preview" : ""}"
-                    data-action="explore-country"
-                    data-explore-code="${country.code}"
-                    aria-pressed="${state.explorePinnedCode === country.code}"
-                  >
-                    ${flagMarkup(country, "explore-country-flag", false)}
-                    <span>
-                      <strong>${escapeHtml(countryName(country))}</strong>
-                      <small>${escapeHtml(countryCapital(country))}</small>
-                    </span>
-                  </button>
-                `,
-              )
-              .join("")}
+          <div class="scroll-affordance-frame" data-scroll-affordance-frame>
+            <div class="explore-country-list" data-scroll-affordance>
+              ${sortedCountries
+                .map(
+                  (country) => `
+                    <button
+                      class="explore-country-card${state.explorePinnedCode === country.code ? " is-pinned" : ""}${state.explorePreviewCode === country.code ? " is-preview" : ""}"
+                      data-action="explore-country"
+                      data-explore-code="${country.code}"
+                      aria-pressed="${state.explorePinnedCode === country.code}"
+                    >
+                      ${flagMarkup(country, "explore-country-flag", false)}
+                      <span>
+                        <strong>${escapeHtml(countryName(country))}</strong>
+                        <small>${escapeHtml(countryCapital(country))}</small>
+                      </span>
+                    </button>
+                  `,
+                )
+                .join("")}
+            </div>
           </div>
         </aside>
       </div>
@@ -2140,9 +2143,48 @@
     }
   }
 
+  function updateScrollAffordance(scroller) {
+    const frame = scroller.closest("[data-scroll-affordance-frame]");
+    if (!frame) return;
+
+    const scrollBounds = scroller.getBoundingClientRect();
+    const firstItemBounds =
+      scroller.firstElementChild?.getBoundingClientRect();
+    const lastItemBounds = scroller.lastElementChild?.getBoundingClientRect();
+    frame.classList.toggle(
+      "can-scroll-up",
+      firstItemBounds
+        ? firstItemBounds.top < scrollBounds.top - 1
+        : scroller.scrollTop > 1,
+    );
+    frame.classList.toggle(
+      "can-scroll-down",
+      lastItemBounds
+        ? lastItemBounds.bottom > scrollBounds.bottom + 1
+        : scroller.scrollHeight -
+            scroller.clientHeight -
+            scroller.scrollTop >
+          1,
+    );
+  }
+
+  function updateScrollAffordances() {
+    scrollAffordanceFrame = null;
+    app
+      .querySelectorAll("[data-scroll-affordance]")
+      .forEach(updateScrollAffordance);
+  }
+
+  function scheduleScrollAffordanceUpdate() {
+    if (scrollAffordanceFrame !== null) return;
+    scrollAffordanceFrame = requestAnimationFrame(updateScrollAffordances);
+  }
+
   function render(options = {}) {
     updateDocumentMetadata();
     app.innerHTML = screenMarkup();
+    document.body?.classList.toggle("standalone-mode", isStandalone());
+    scheduleScrollAffordanceUpdate();
     if (state.screen === "explore" && state.exploreView === "map") {
       scheduleExploreMapZoomUi();
     }
@@ -2304,9 +2346,11 @@
     syncExploreCountryUi();
 
     if (scrollCard) {
-      app
-        .querySelector(`.explore-country-card[data-explore-code="${code}"]`)
-        ?.scrollIntoView({ block: "nearest" });
+      const card = app.querySelector(
+        `.explore-country-card[data-explore-code="${code}"]`,
+      );
+      card?.scrollIntoView({ block: "nearest" });
+      scheduleScrollAffordanceUpdate();
     }
   }
 
@@ -2749,10 +2793,21 @@
   window.addEventListener("pointerup", finishExploreMapPointer);
   window.addEventListener("pointercancel", finishExploreMapPointer);
   window.addEventListener("resize", () => {
+    scheduleScrollAffordanceUpdate();
     if (state.screen === "explore" && state.exploreView === "map") {
       scheduleExploreMapZoomUi();
     }
   });
+
+  app.addEventListener(
+    "scroll",
+    (event) => {
+      if (event.target.matches?.("[data-scroll-affordance]")) {
+        updateScrollAffordance(event.target);
+      }
+    },
+    true,
+  );
 
   app.addEventListener("pointerover", (event) => {
     const countryControl = event.target.closest("[data-explore-code]");
