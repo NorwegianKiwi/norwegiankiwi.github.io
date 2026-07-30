@@ -16,27 +16,25 @@
     throw new Error(
       initialLocale === "en"
         ? "Hello World! could not load the country data."
-        : "Hello World! kunne ikke laste landdataene.",
+        : "Hei verden! kunne ikke laste landdataene.",
     );
   }
 
   const { countries, regionOptions } = data;
   const messages = Object.freeze({
     nb: Object.freeze({
-      loadError: "Hello World! kunne ikke laste landdataene.",
-      modeCountryFlag: "Gjett flagget",
+      loadError: "Hei verden! kunne ikke laste landdataene.",
       modeCountryFlagShort: "Flagg",
-      modeFlagCountry: "Gjett landet",
       modeFlagCountryShort: "Land",
-      modeCountryCapital: "Gjett hovedstaden",
       modeCountryCapitalShort: "Hovedsteder",
       modeMapCountry: "Kartquiz",
       modeMapCountryShort: "Kart",
       maps: "Kart",
+      brandName: "Hei verden!",
       flagOf: "Flagget til {name}",
       homeLink: "Tilbake til lanceolav.com",
-      brandTop: "Hello World! – til toppen",
-      brandHome: "Hello World! – gå til forsiden",
+      brandTop: "Hei verden! – til toppen",
+      brandHome: "Hei verden! – gå til forsiden",
       home: "Forsiden",
       languageGroup: "Velg språk",
       languageNb: "Norsk",
@@ -52,7 +50,6 @@
       heroKicker: "Utforsk land, flagg og kart",
       heroTitleBefore: "Hvor godt kjenner du",
       heroTitleEmphasis: "verden?",
-      heroCopy: "Velg et område og deretter hvordan du vil øve.",
       chooseArea: "Velg område",
       chooseActivity: "Velg aktivitet",
       testYourself: "Test deg selv",
@@ -76,7 +73,6 @@
       scoreAfter: "riktige i",
       correctPlural: "Riktige",
       wrong: "Feil",
-      mode: "Modus",
       chooseNewActivity: "Velg ny øvelse",
       reviewErrors: "Se gjennom {count} feil",
       chooseCountry: "Velg et land",
@@ -97,10 +93,6 @@
       closeModalHint: "Trykk hvor som helst for å lukke",
       back: "Tilbake",
       exploreKicker: "Utforsk landene",
-      exploreMapCopy:
-        "Se hvor landene ligger, og sammenlign flagg og landformer.",
-      exploreListCopy:
-        "Flagg, land og hovedsteder i alfabetisk rekkefølge.",
       area: "Område",
       view: "Visning",
       flashcardsComplete: "Flashcards fullført",
@@ -117,9 +109,8 @@
       hiddenFlashcard:
         "Flashcard {current} av {total}. Trykk for å vise svaret.",
       findFlag: "Finn flagget til",
-      whichCountryFlag: "Hvilket land har dette flagget?",
-      whichCountryHighlighted: "Hvilket land er uthevet?",
-      capitalQuestion: "Hva er hovedstaden i",
+      whichCountry: "Hvilket land?",
+      findCapital: "Finn hovedstaden til",
       option: "Alternativ {number}",
       flagOption: "Flaggalternativ {number}",
       correctContinue:
@@ -130,21 +121,19 @@
         "Feil. Riktig svar er {answer}. Aktiver det markerte alternativet for å gå videre.",
       mapQuizDescription: "Kartquizen bruker ett regionkart om gangen.",
       chooseRegion: "Velg region",
-      metaTitle: "Hello World! – lær land, flagg, hovedsteder og kart",
+      metaTitle: "Hei verden! – lær land, flagg, hovedsteder og kart",
       metaDescription:
         "Utforsk og test deg selv på 196 land, flagg, hovedsteder og regionale kart.",
     }),
     en: Object.freeze({
       loadError: "Hello World! could not load the country data.",
-      modeCountryFlag: "Guess the flag",
       modeCountryFlagShort: "Flags",
-      modeFlagCountry: "Guess the country",
       modeFlagCountryShort: "Countries",
-      modeCountryCapital: "Guess the capital",
       modeCountryCapitalShort: "Capitals",
       modeMapCountry: "Map quiz",
       modeMapCountryShort: "Maps",
       maps: "Maps",
+      brandName: "Hello World!",
       flagOf: "Flag of {name}",
       homeLink: "Back to lanceolav.com",
       brandTop: "Hello World! – back to top",
@@ -164,7 +153,6 @@
       heroKicker: "Explore countries, flags and maps",
       heroTitleBefore: "How well do you know the",
       heroTitleEmphasis: "world?",
-      heroCopy: "Choose an area and then how you would like to practise.",
       chooseArea: "Choose area",
       chooseActivity: "Choose activity",
       testYourself: "Test yourself",
@@ -189,7 +177,6 @@
       scoreAfter: "correct in",
       correctPlural: "Correct",
       wrong: "Wrong",
-      mode: "Mode",
       chooseNewActivity: "Choose another activity",
       reviewErrors:
         "Review {count} {count, plural, one {mistake} other {mistakes}}",
@@ -211,10 +198,6 @@
       closeModalHint: "Press anywhere to close",
       back: "Back",
       exploreKicker: "Explore the countries",
-      exploreMapCopy:
-        "See where countries are located and compare flags and country shapes.",
-      exploreListCopy:
-        "Flags, countries and capitals in alphabetical order.",
       area: "Area",
       view: "View",
       flashcardsComplete: "Flashcards complete",
@@ -231,9 +214,8 @@
       hiddenFlashcard:
         "Flashcard {current} of {total}. Press to reveal the answer.",
       findFlag: "Find the flag of",
-      whichCountryFlag: "Which country has this flag?",
-      whichCountryHighlighted: "Which country is highlighted?",
-      capitalQuestion: "What is the capital of",
+      whichCountry: "Which country?",
+      findCapital: "Find the capital of",
       option: "Option {number}",
       flagOption: "Flag option {number}",
       correctContinue:
@@ -276,25 +258,21 @@
   const modes = [
     {
       id: "country-flag",
-      labelKey: "modeCountryFlag",
       shortLabelKey: "modeCountryFlagShort",
       tone: "coral",
     },
     {
       id: "flag-country",
-      labelKey: "modeFlagCountry",
       shortLabelKey: "modeFlagCountryShort",
       tone: "green",
     },
     {
       id: "country-capital",
-      labelKey: "modeCountryCapital",
       shortLabelKey: "modeCountryCapitalShort",
       tone: "gold",
     },
     {
       id: "map-country",
-      labelKey: "modeMapCountry",
       shortLabelKey: "modeMapCountryShort",
       tone: "map",
       choiceCount: 6,
@@ -370,10 +348,6 @@
 
   function regionLabel(region) {
     return region.label[state.locale];
-  }
-
-  function modeLabel(mode) {
-    return t(mode.labelKey);
   }
 
   function countryCount(count) {
@@ -484,7 +458,7 @@
   function brandMarkup(asButton = false, includeHomeLink = true) {
     const brandContent = `
       <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-      <span>Hello World!</span>
+      <span>${t("brandName")}</span>
     `;
     const brandControl = asButton
       ? `<button class="brand brand-button" data-action="setup" aria-label="${escapeHtml(t("brandHome"))}">${brandContent}</button>`
@@ -812,7 +786,6 @@
           <div class="hero-content">
             <p class="kicker">${t("heroKicker")}</p>
             <h1>${t("heroTitleBefore")} <em>${t("heroTitleEmphasis")}</em></h1>
-            <p class="hero-copy">${t("heroCopy")}</p>
           </div>
           <img class="hero-globe" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
         </section>
@@ -972,7 +945,7 @@
               <span>${t("wrong")}</span>
               <strong>${state.questions.length - state.score}</strong>
             </div>
-            <div><span>${t("mode")}</span><strong>${modeLabel(selectedMode())}</strong></div>
+            <div><span>${t("testYourself")}</span><strong>${t(selectedMode().shortLabelKey)}</strong></div>
           </div>
           <button class="primary-button" data-action="setup">
             ${t("chooseNewActivity")}
@@ -1335,13 +1308,6 @@
           <div>
             <p class="kicker">${t("exploreKicker")}</p>
             <h1>${regionLabel(region)}</h1>
-            <p>
-              ${
-                viewingMap
-                  ? t("exploreMapCopy")
-                  : t("exploreListCopy")
-              }
-            </p>
           </div>
           <label class="explore-region-select">
             <span>${t("area")}</span>
@@ -1492,14 +1458,16 @@
   function promptMarkup(question, answered) {
     if (state.mode === "country-flag") {
       return `
-        <span class="question-label">${t("findFlag")}</span>
-        <h1>${escapeHtml(countryName(question.country))}</h1>
+        <h1 class="question-heading question-with-clue">
+          <span class="question-instruction">${t("findFlag")}</span>
+          <em class="question-clue">${escapeHtml(countryName(question.country))}</em>
+        </h1>
       `;
     }
 
     if (state.mode === "flag-country") {
       return `
-        <span class="question-label">${t("whichCountryFlag")}</span>
+        <h1 class="question-heading question-compact">${t("whichCountry")}</h1>
         <div class="featured-flag-wrap">
           ${flagMarkup(question.country, "featured-flag", answered)}
         </div>
@@ -1508,16 +1476,22 @@
 
     if (state.mode === "map-country") {
       return `
-        <span class="question-label">${t("whichCountryHighlighted")}</span>
+        <h1 class="question-heading question-compact">${t("whichCountry")}</h1>
       `;
     }
 
+    const name = escapeHtml(countryName(question.country));
     return `
-      <span class="question-label">${t("capitalQuestion")}</span>
-      <div class="country-with-flag">
-        ${flagMarkup(question.country, "prompt-flag", true)}
-        <h1>${escapeHtml(countryName(question.country))}</h1>
-      </div>
+      <h1
+        class="question-heading question-with-clue question-capital"
+        aria-label="${escapeHtml(`${t("findCapital")} ${countryName(question.country)}`)}"
+      >
+        <span class="question-instruction">${t("findCapital")}</span>
+        <span class="capital-clue" aria-hidden="true">
+          ${flagMarkup(question.country, "prompt-flag", false)}
+          <em class="question-clue">${name}</em>
+        </span>
+      </h1>
     `;
   }
 
@@ -1657,7 +1631,6 @@
 
         <section class="question-area" aria-live="polite">
           <div class="question-prompt">
-            <p class="kicker">${modeLabel(selectedMode())}</p>
             ${promptMarkup(question, answered)}
           </div>
           ${questionBody}
