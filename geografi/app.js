@@ -1551,9 +1551,7 @@
     if (state.mode === "flag-country") {
       return `
         <h1 class="question-heading question-compact">${t("whichCountry")}</h1>
-        <div class="featured-flag-wrap">
-          ${flagMarkup(question.country, "featured-flag", answered)}
-        </div>
+        ${flagMarkup(question.country, "featured-flag", answered)}
       `;
     }
 
