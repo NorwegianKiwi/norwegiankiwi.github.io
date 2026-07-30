@@ -324,6 +324,7 @@
   const exploreMapPointers = new Map();
   let exploreMapGesture = null;
   let exploreMapDrag = null;
+  let exploreMapUiFrame = null;
   let suppressExploreMapClickUntil = 0;
   const exploreMapZoomLevels = [1, 1.5, 2, 3, 4];
   const keyboardHintIgnoredKeys = new Set([
@@ -1226,6 +1227,7 @@
   }
 
   function syncExploreMapZoomUi() {
+    exploreMapUiFrame = null;
     const viewport = state.exploreMapViewport;
     const svg = app.querySelector("[data-explore-map-svg]");
     if (!viewport || !svg) return;
@@ -1247,6 +1249,18 @@
       reset.setAttribute("aria-label", label);
       reset.title = label;
     }
+  }
+
+  function scheduleExploreMapZoomUi() {
+    if (exploreMapUiFrame !== null) return;
+    exploreMapUiFrame = requestAnimationFrame(syncExploreMapZoomUi);
+  }
+
+  function flushExploreMapZoomUi() {
+    if (exploreMapUiFrame !== null) {
+      cancelAnimationFrame(exploreMapUiFrame);
+    }
+    syncExploreMapZoomUi();
   }
 
   function setExploreMapZoom(nextZoom, clientPoint = null) {
@@ -1282,7 +1296,7 @@
       },
       viewport.base,
     );
-    syncExploreMapZoomUi();
+    flushExploreMapZoomUi();
   }
 
   function normalizedExploreMapWheelDelta(event) {
@@ -1320,7 +1334,7 @@
     const viewport = state.exploreMapViewport;
     if (!viewport) return;
     viewport.view = { ...viewport.base };
-    syncExploreMapZoomUi();
+    flushExploreMapZoomUi();
   }
 
   function mapPointerMidpoint(first, second) {
@@ -1345,6 +1359,7 @@
     );
     if (points.length < 2) return;
 
+    flushExploreMapZoomUi();
     const svg = map.querySelector("[data-explore-map-svg]");
     const matrix = svg?.getScreenCTM();
     const viewport = state.exploreMapViewport;
@@ -1422,14 +1437,20 @@
       },
       viewport.base,
     );
-    syncExploreMapZoomUi();
+    scheduleExploreMapZoomUi();
   }
 
-  function startExploreMapDrag(event, map) {
+  function startExploreMapDrag(event, map, { allowAtBase = false } = {}) {
+    flushExploreMapZoomUi();
     const svg = map.querySelector("[data-explore-map-svg]");
     const matrix = svg?.getScreenCTM();
     const viewport = state.exploreMapViewport;
-    if (!svg || !matrix || !viewport || exploreMapZoom(viewport) <= 1.001) {
+    if (
+      !svg ||
+      !matrix ||
+      !viewport ||
+      (!allowAtBase && exploreMapZoom(viewport) <= 1.001)
+    ) {
       return;
     }
 
@@ -1490,7 +1511,7 @@
       viewport.base,
     );
     event.preventDefault();
-    syncExploreMapZoomUi();
+    scheduleExploreMapZoomUi();
   }
 
   function exploreRegionMapMarkup(sortedCountries) {
@@ -2608,20 +2629,29 @@
       map,
     });
     if (exploreMapPointers.size === 2) {
+      if (exploreMapDrag) {
+        exploreMapDrag.map.classList.remove("is-dragging");
+        exploreMapDrag = null;
+      }
       startExploreMapGesture(map);
+    } else {
+      startExploreMapDrag(event, map, { allowAtBase: true });
     }
   });
 
-  app.addEventListener("pointermove", (event) => {
+  window.addEventListener("pointermove", (event) => {
+    const pointer = exploreMapPointers.get(event.pointerId);
+    if (pointer) {
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+    }
+
     if (exploreMapDrag?.pointerId === event.pointerId) {
       updateExploreMapDrag(event);
       return;
     }
 
-    const pointer = exploreMapPointers.get(event.pointerId);
     if (!pointer) return;
-    pointer.x = event.clientX;
-    pointer.y = event.clientY;
     if (!exploreMapGesture?.pointerIds.includes(event.pointerId)) return;
     event.preventDefault();
     updateExploreMapGesture();
@@ -2649,9 +2679,8 @@
     }
   }
 
-  app.addEventListener("pointerup", finishExploreMapPointer);
-  app.addEventListener("pointercancel", finishExploreMapPointer);
-  app.addEventListener("lostpointercapture", finishExploreMapPointer);
+  window.addEventListener("pointerup", finishExploreMapPointer);
+  window.addEventListener("pointercancel", finishExploreMapPointer);
 
   app.addEventListener("pointerover", (event) => {
     const countryControl = event.target.closest("[data-explore-code]");
