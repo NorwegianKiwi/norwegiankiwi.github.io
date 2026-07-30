@@ -91,7 +91,7 @@ silhouettes generated from Natural Earth 1:10m Admin 0 Countries, version
 and small island states. Silhouettes are scaled and compressed in advance,
 and very small island components are retained as local point markers.
 
-The Map tab in Explore reuses the same regional Mercator maps and
+The Maps view in Explore reuses the same regional Mercator maps and
 silhouettes. A map is available for each of the seven individual regions;
 Whole world instead presents a region choice. The map data does not duplicate
 region membership, but connects to `countries.js` through country codes.

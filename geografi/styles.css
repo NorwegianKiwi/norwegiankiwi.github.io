@@ -1389,8 +1389,7 @@ footer a {
   margin-bottom: 12px;
 }
 
-.result-review h2,
-.explore-intro h1 {
+.result-review h2 {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(36px, 5vw, 56px);
@@ -1449,90 +1448,63 @@ footer a {
 
 /* Explore */
 .explore-shell {
+  --explore-header-height: 64px;
   min-height: 100vh;
   min-height: 100dvh;
 }
 
-.explore-intro {
-  padding: 36px 0 24px;
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 30px;
-}
-
-.explore-intro > div {
-  min-width: 0;
-}
-
-.explore-region-select {
-  flex: 0 1 330px;
+.explore-header {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  height: var(--explore-header-height);
+  min-height: var(--explore-header-height);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  background: var(--paper);
   display: grid;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
-.explore-region-select select {
-  width: 100%;
-  min-height: 42px;
-  padding: 8px 36px 8px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--ink);
-  background: var(--card);
-  font: 600 15px/1.2 system-ui, sans-serif;
-  letter-spacing: 0;
-  text-transform: none;
+.explore-header .brand-group {
+  min-width: 0;
+  justify-self: start;
 }
 
-.explore-region-select select:focus-visible {
-  outline: 3px solid var(--green);
-  outline-offset: 2px;
+.explore-header .home-button {
+  justify-self: end;
 }
 
-.explore-tabs {
-  width: fit-content;
-  margin-bottom: 16px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(255, 253, 247, 0.72);
+.explore-context {
+  min-width: 0;
+  max-width: 42vw;
+  margin: 0;
+  overflow: hidden;
   display: flex;
-  gap: 4px;
+  justify-content: center;
+  gap: 0.35em;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
-.explore-tabs button {
-  min-width: 88px;
-  padding: 8px 18px;
-  border: 0;
-  border-radius: 8px;
-  color: var(--muted);
-  background: transparent;
-  font: 750 14px/1.2 system-ui, sans-serif;
-  cursor: pointer;
-}
-
-.explore-tabs button[aria-selected="true"] {
-  color: #fff;
-  background: var(--green);
-  box-shadow: 0 3px 9px rgba(33, 91, 66, 0.2);
-}
-
-.explore-tabs button:focus-visible {
-  outline: 3px solid var(--coral);
-  outline-offset: 2px;
-}
-
-.explore-tab-panel {
-  margin-bottom: 70px;
-}
-
-.explore-tab-panel:focus {
+.explore-context:focus {
   outline: none;
+}
+
+.explore-context-prefix {
+  color: var(--muted);
+}
+
+.explore-context-region {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.explore-content {
+  padding-top: 14px;
+  margin-bottom: 70px;
 }
 
 .explore-map-layout {
@@ -1654,7 +1626,7 @@ footer a {
 }
 
 .explore-country-status-wrap {
-  min-height: 82px;
+  height: 82px;
   padding: 12px 14px;
   border-bottom: 1px solid var(--line);
   background: var(--green-soft);
@@ -1879,7 +1851,7 @@ footer a {
 .country-table thead th {
   position: sticky;
   z-index: 2;
-  top: 0;
+  top: var(--explore-header-height);
   background: var(--green-soft);
   color: var(--muted);
   font-size: 11px;
@@ -2422,6 +2394,32 @@ body.modal-open {
   }
 }
 
+@media (min-width: 900px) and (min-height: 600px) {
+  .explore-map-shell {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .explore-map-shell .explore-content {
+    height: calc(100dvh - var(--explore-header-height));
+    min-height: 0;
+    margin: 0;
+    padding: 14px 0;
+  }
+
+  .explore-map-shell .explore-map-layout {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .explore-map-shell .map-region-prompt {
+    height: 100%;
+    min-height: 0;
+  }
+}
+
 @media (max-width: 820px) {
   .hero {
     grid-template-columns: minmax(0, 1fr) 78px;
@@ -2737,26 +2735,20 @@ body.modal-open {
     grid-template-columns: 1fr;
   }
 
-  .explore-intro {
-    padding: 28px 0 20px;
-    align-items: stretch;
-    flex-direction: column;
-    gap: 18px;
+  .explore-shell {
+    --explore-header-height: 72px;
   }
 
-  .explore-region-select {
-    flex-basis: auto;
+  .explore-context {
+    max-width: 30vw;
   }
 
-  .explore-tabs {
-    width: 100%;
+  .explore-context-prefix {
+    display: none;
   }
 
-  .explore-tabs button {
-    flex: 1;
-  }
-
-  .explore-tab-panel {
+  .explore-content {
+    padding-top: 10px;
     margin-bottom: 50px;
   }
 
@@ -2775,7 +2767,7 @@ body.modal-open {
   }
 
   .explore-country-status-wrap {
-    min-height: 70px;
+    height: 82px;
     padding: 9px 11px;
   }
 

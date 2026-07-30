@@ -53,6 +53,7 @@
       chooseArea: "Velg område",
       chooseActivity: "Velg aktivitet",
       testYourself: "Test deg selv",
+      explore: "Utforsk",
       exploreCountries: "Utforsk land",
       list: "Liste",
       map: "Kart",
@@ -81,8 +82,6 @@
       chooseNewActivity: "Velg ny øvelse",
       reviewErrors: "Se gjennom {count} feil",
       chooseCountry: "Velg et land",
-      chooseCountryHelp:
-        "Pek, fokuser eller trykk for å se plassering og form.",
       countryCapital: "{name}, hovedstad {capital}",
       interactiveRegionMap: "Interaktivt kart over {region}",
       countriesInRegion: "Land i regionen",
@@ -97,9 +96,6 @@
       largeFlag: "Stort flagg: {name}",
       closeModalHint: "Trykk hvor som helst for å lukke",
       back: "Tilbake",
-      exploreKicker: "Utforsk landene",
-      area: "Område",
-      view: "Visning",
       flashcardsComplete: "Flashcards fullført",
       roundComplete: "Runden er ferdig.",
       flashcardsSummaryBefore: "Du har gått gjennom",
@@ -161,6 +157,7 @@
       chooseArea: "Choose area",
       chooseActivity: "Choose activity",
       testYourself: "Test yourself",
+      explore: "Explore",
       exploreCountries: "Explore countries",
       list: "List",
       map: "Map",
@@ -191,8 +188,6 @@
       reviewErrors:
         "Review {count} {count, plural, one {mistake} other {mistakes}}",
       chooseCountry: "Choose a country",
-      chooseCountryHelp:
-        "Point, focus or press to see its location and shape.",
       countryCapital: "{name}, capital {capital}",
       interactiveRegionMap: "Interactive map of {region}",
       countriesInRegion: "Countries in the region",
@@ -207,9 +202,6 @@
       largeFlag: "Large flag: {name}",
       closeModalHint: "Press anywhere to close",
       back: "Back",
-      exploreKicker: "Explore the countries",
-      area: "Area",
-      view: "View",
       flashcardsComplete: "Flashcards complete",
       roundComplete: "The round is complete.",
       flashcardsSummaryBefore: "You have reviewed",
@@ -1060,7 +1052,6 @@
       return `
         <div class="explore-country-status is-empty">
           <strong>${t("chooseCountry")}</strong>
-          <span>${t("chooseCountryHelp")}</span>
         </div>
       `;
     }
@@ -1375,74 +1366,24 @@
     );
     const mapAvailable = mapSelectableRegions.includes(state.region);
     const viewingMap = state.exploreView === "map";
+    const exploreLabel = `${t("explore")} · ${regionLabel(region)}`;
 
     return `
-      <main class="site-shell explore-shell">
-        <header class="quiz-header">
+      <main class="site-shell explore-shell explore-${state.exploreView}-shell">
+        <header class="quiz-header explore-header">
           ${brandMarkup(true, false)}
-          <div class="quiz-meta">
-            <span>${regionLabel(region)}</span>
-            <strong>${countryCount(sortedCountries.length)}</strong>
-          </div>
+          <h1
+            class="explore-context"
+            aria-label="${escapeHtml(exploreLabel)}"
+            tabindex="-1"
+          >
+            <span class="explore-context-prefix">${t("explore")} <span aria-hidden="true">·</span></span>
+            <span class="explore-context-region">${regionLabel(region)}</span>
+          </h1>
           ${homeButtonMarkup()}
         </header>
 
-        <section class="explore-intro">
-          <div>
-            <p class="kicker">${t("exploreKicker")}</p>
-            <h1>${regionLabel(region)}</h1>
-          </div>
-          <label class="explore-region-select">
-            <span>${t("area")}</span>
-            <select data-action="explore-region">
-              ${regionOptions
-                .map(
-                  (option) => `
-                    <option
-                      value="${option.id}"
-                      ${option.id === state.region ? "selected" : ""}
-                    >
-                      ${escapeHtml(regionLabel(option))} · ${countryCount(countriesInRegion(option.id).length)}
-                    </option>
-                  `,
-                )
-                .join("")}
-            </select>
-          </label>
-        </section>
-
-        <div class="explore-tabs" role="tablist" aria-label="${escapeHtml(t("view"))}">
-          <button
-            id="explore-list-tab"
-            role="tab"
-            data-action="explore-tab"
-            data-value="list"
-            aria-selected="${!viewingMap}"
-            aria-controls="explore-list-panel"
-            tabindex="${viewingMap ? "-1" : "0"}"
-          >
-            ${t("list")}
-          </button>
-          <button
-            id="explore-map-tab"
-            role="tab"
-            data-action="explore-tab"
-            data-value="map"
-            aria-selected="${viewingMap}"
-            aria-controls="explore-map-panel"
-            tabindex="${viewingMap ? "0" : "-1"}"
-          >
-            ${t("map")}
-          </button>
-        </div>
-
-        <section
-          id="explore-${state.exploreView}-panel"
-          class="explore-tab-panel"
-          role="tabpanel"
-          aria-labelledby="explore-${state.exploreView}-tab"
-          tabindex="0"
-        >
+        <div class="explore-content">
           ${
             viewingMap
               ? mapAvailable
@@ -1450,7 +1391,7 @@
                 : exploreMapRegionPromptMarkup()
               : exploreListMarkup(sortedCountries, modalCountry)
           }
-        </section>
+        </div>
       </main>
     `;
   }
@@ -1787,15 +1728,8 @@
     if (options.focusFlashcard) {
       app.querySelector('[data-action="flashcard-toggle"]')?.focus();
     }
-    if (options.focusExploreTab) {
-      app
-        .querySelector(
-          `[data-action="explore-tab"][data-value="${options.focusExploreTab}"]`,
-        )
-        ?.focus();
-    }
-    if (options.focusExploreRegion) {
-      app.querySelector('[data-action="explore-region"]')?.focus();
+    if (options.focusExploreHeading) {
+      app.querySelector(".explore-context")?.focus({ preventScroll: true });
     }
     if (options.focusMapRegion) {
       app.querySelector('[data-action="quiz-map-region"]')?.focus();
@@ -1930,31 +1864,11 @@
     }
   }
 
-  function setExploreView(view, { focusTab = false } = {}) {
-    if (view !== "list" && view !== "map") return;
-    state.exploreView = view;
-    state.explorePreviewCode = null;
-    state.silhouetteExpanded = false;
-    state.modalCode = null;
-    render({
-      focusExploreTab: focusTab ? view : null,
-    });
-  }
-
   function updateRegion(regionId) {
     if (!regionOptions.some((region) => region.id === regionId)) return false;
     state.region = regionId;
     syncUrlState();
     return true;
-  }
-
-  function setExploreRegion(regionId, { focusSelect = false } = {}) {
-    if (!updateRegion(regionId)) return;
-    resetExploreCountryState();
-    state.modalCode = null;
-    render({
-      focusExploreRegion: focusSelect,
-    });
   }
 
   function setLocale(locale) {
@@ -2175,15 +2089,10 @@
       return;
     }
 
-    if (action === "explore-tab") {
-      setExploreView(control.dataset.value, { focusTab: true });
-      return;
-    }
-
     if (action === "explore-map-region") {
       if (!updateRegion(control.dataset.value)) return;
       resetExploreCountryState();
-      render({ focusExploreTab: "map" });
+      render({ focusExploreHeading: true });
       return;
     }
 
@@ -2261,12 +2170,6 @@
     if (action === "setup") {
       returnToSetup();
     }
-  });
-
-  app.addEventListener("change", (event) => {
-    const select = event.target.closest('[data-action="explore-region"]');
-    if (!select || !app.contains(select)) return;
-    setExploreRegion(select.value, { focusSelect: true });
   });
 
   app.addEventListener("pointerover", (event) => {
@@ -2352,25 +2255,6 @@
   });
 
   app.addEventListener("keydown", (event) => {
-    const tab = event.target.closest('[data-action="explore-tab"]');
-    if (tab && app.contains(tab)) {
-      const tabs = [...app.querySelectorAll('[data-action="explore-tab"]')];
-      const currentIndex = tabs.indexOf(tab);
-      let nextIndex = null;
-
-      if (event.key === "ArrowLeft") nextIndex = currentIndex - 1;
-      if (event.key === "ArrowRight") nextIndex = currentIndex + 1;
-      if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = tabs.length - 1;
-
-      if (nextIndex !== null) {
-        event.preventDefault();
-        const nextTab = tabs[(nextIndex + tabs.length) % tabs.length];
-        setExploreView(nextTab.dataset.value, { focusTab: true });
-      }
-      return;
-    }
-
     const countryControl = event.target.closest(
       '[data-action="explore-country"]',
     );
