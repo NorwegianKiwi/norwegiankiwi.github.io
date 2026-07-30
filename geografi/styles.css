@@ -1590,6 +1590,12 @@ footer a {
   cursor: pointer;
 }
 
+.explore-map-marker-control.is-geometry-readable,
+.explore-map-country.is-geometry-readable .explore-map-marker-hit {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .explore-map-marker-top-hit {
   fill: transparent;
   stroke: none;
@@ -1628,6 +1634,15 @@ footer a {
   display: flex;
   gap: 2px;
   transform: translateX(-50%);
+  transition:
+    opacity 150ms ease,
+    visibility 150ms ease;
+}
+
+.explore-region-map.has-expanded-silhouette .explore-map-zoom-controls {
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
 }
 
 .explore-map-zoom-controls button {

@@ -326,7 +326,10 @@
   let exploreMapDrag = null;
   let exploreMapUiFrame = null;
   let suppressExploreMapClickUntil = 0;
-  const exploreMapZoomLevels = [1, 1.5, 2, 3, 4];
+  const exploreMapMaxZoom = 8;
+  const exploreMapZoomLevels = [1, 1.5, 2, 3, 4, 6, 8];
+  const exploreMapGeometryShowSize = 12;
+  const exploreMapGeometryHideSize = 10;
   const keyboardHintIgnoredKeys = new Set([
     "Tab",
     "Escape",
@@ -1093,13 +1096,14 @@
     });
   }
 
-  function exploreMapCountryMarkup(country, view, markerRadius) {
+  function exploreMapCountryMarkup(country, view, markerRadius, zoom) {
     const paths = view.features
       .filter((feature) => feature.code === country.code)
       .map((feature) =>
         regionalMapPathMarkup(feature, "explore-map-country-shape"),
       )
       .join("");
+    const markerHitRadius = Math.max(11, markerRadius * 3.2);
     const markers = view.markers
       .filter((marker) => marker.code === country.code)
       .map(
@@ -1108,7 +1112,9 @@
             class="explore-map-marker-hit"
             cx="${marker.x}"
             cy="${marker.y}"
-            r="${Math.max(11, markerRadius * 3.2)}"
+            r="${markerHitRadius / zoom}"
+            data-explore-marker-radius
+            data-base-radius="${markerHitRadius}"
           />
         `,
       )
@@ -1144,8 +1150,10 @@
     sortedCountries,
     view,
     markerRadius,
+    zoom,
   ) {
     const regionCodes = new Set(sortedCountries.map((country) => country.code));
+    const markerHitRadius = Math.max(11, markerRadius * 3.2);
 
     return view.markers
       .filter((marker) => regionCodes.has(marker.code))
@@ -1169,13 +1177,19 @@
               class="explore-map-marker-top-hit"
               cx="${marker.x}"
               cy="${marker.y}"
-              r="${Math.max(11, markerRadius * 3.2)}"
+              r="${markerHitRadius / zoom}"
+              data-explore-marker-radius
+              data-base-radius="${markerHitRadius}"
             />
-            ${regionalMapMarkerMarkup(
-              marker,
-              "explore-map-country-marker",
-              markerRadius,
-            )}
+            <circle
+              class="explore-map-country-marker"
+              cx="${marker.x}"
+              cy="${marker.y}"
+              r="${markerRadius / zoom}"
+              data-explore-marker-radius
+              data-base-radius="${markerRadius}"
+              vector-effect="non-scaling-stroke"
+            />
           </g>
         `;
       })
@@ -1216,8 +1230,16 @@
   }
 
   function clampExploreMapView(view, base) {
-    const width = clamp(view.width, base.width / 4, base.width);
-    const height = clamp(view.height, base.height / 4, base.height);
+    const width = clamp(
+      view.width,
+      base.width / exploreMapMaxZoom,
+      base.width,
+    );
+    const height = clamp(
+      view.height,
+      base.height / exploreMapMaxZoom,
+      base.height,
+    );
     return {
       x: clamp(view.x, base.x, base.x + base.width - width),
       y: clamp(view.y, base.y, base.y + base.height - height),
@@ -1241,8 +1263,45 @@
     const map = app.querySelector(".explore-region-map");
 
     if (zoomOut) zoomOut.disabled = zoom <= 1.001;
-    if (zoomIn) zoomIn.disabled = zoom >= 3.999;
+    if (zoomIn) zoomIn.disabled = zoom >= exploreMapMaxZoom - 0.001;
     map?.classList.toggle("is-zoomed", zoom > 1.001);
+    svg.querySelectorAll("[data-explore-marker-radius]").forEach((marker) => {
+      marker.setAttribute("r", Number(marker.dataset.baseRadius) / zoom);
+    });
+    const countryControls = new Map(
+      [...svg.querySelectorAll(".explore-map-country[data-explore-code]")].map(
+        (control) => [control.dataset.exploreCode, control],
+      ),
+    );
+    svg
+      .querySelectorAll(".explore-map-marker-control[data-explore-code]")
+      .forEach((markerControl) => {
+        const countryControl = countryControls.get(
+          markerControl.dataset.exploreCode,
+        );
+        if (!countryControl) return;
+
+        const threshold = markerControl.classList.contains(
+          "is-geometry-readable",
+        )
+          ? exploreMapGeometryHideSize
+          : exploreMapGeometryShowSize;
+        const geometryReadable = [
+          ...countryControl.querySelectorAll(".explore-map-country-shape"),
+        ].some((shape) => {
+          const bounds = shape.getBoundingClientRect();
+          return bounds.width >= threshold && bounds.height >= threshold;
+        });
+
+        markerControl.classList.toggle(
+          "is-geometry-readable",
+          geometryReadable,
+        );
+        countryControl.classList.toggle(
+          "is-geometry-readable",
+          geometryReadable,
+        );
+      });
     if (reset) {
       reset.textContent = `${percent}%`;
       const label = t("resetMapZoom", { percent });
@@ -1267,7 +1326,7 @@
     const viewport = state.exploreMapViewport;
     if (!viewport) return;
 
-    const zoom = clamp(nextZoom, 1, 4);
+    const zoom = clamp(nextZoom, 1, exploreMapMaxZoom);
     let anchorX = viewport.view.x + viewport.view.width / 2;
     let anchorY = viewport.view.y + viewport.view.height / 2;
     let positionX = 0.5;
@@ -1323,7 +1382,8 @@
     const zoom = exploreMapZoom();
     const nextZoom =
       direction > 0
-        ? exploreMapZoomLevels.find((level) => level > zoom + 0.01) ?? 4
+        ? exploreMapZoomLevels.find((level) => level > zoom + 0.01) ??
+          exploreMapMaxZoom
         : [...exploreMapZoomLevels]
             .reverse()
             .find((level) => level < zoom - 0.01) ?? 1;
@@ -1402,7 +1462,7 @@
     const zoom = clamp(
       gesture.startZoom * (distance / gesture.startDistance),
       1,
-      4,
+      exploreMapMaxZoom,
     );
     const width = viewport.base.width / zoom;
     const height = viewport.base.height / zoom;
@@ -1530,7 +1590,7 @@
 
     return `
       <div class="explore-map-layout">
-        <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}">
+        <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
           <svg
             data-explore-map-svg
             viewBox="${serializeMapViewBox(mapViewport.view)}"
@@ -1544,13 +1604,14 @@
             <g aria-hidden="true">${contextPaths}</g>
             ${sortedCountries
               .map((country) =>
-                exploreMapCountryMarkup(country, view, markerRadius),
+                exploreMapCountryMarkup(country, view, markerRadius, zoom),
               )
               .join("")}
             ${exploreMapMarkerLayerMarkup(
               sortedCountries,
               view,
               markerRadius,
+              zoom,
             )}
           </svg>
           <div
@@ -1577,7 +1638,7 @@
               data-action="explore-map-zoom-in"
               aria-label="${escapeHtml(t("zoomInMap"))}"
               title="${escapeHtml(t("zoomInMap"))}"
-              ${zoom >= 3.999 ? "disabled" : ""}
+              ${zoom >= exploreMapMaxZoom - 0.001 ? "disabled" : ""}
             >+</button>
           </div>
           <div class="explore-silhouette-overlay">
@@ -2082,6 +2143,9 @@
   function render(options = {}) {
     updateDocumentMetadata();
     app.innerHTML = screenMarkup();
+    if (state.screen === "explore" && state.exploreView === "map") {
+      scheduleExploreMapZoomUi();
+    }
 
     document.body?.classList.toggle(
       "modal-open",
@@ -2273,6 +2337,9 @@
     const control = app.querySelector('[data-action="toggle-silhouette"]');
     if (!control) return;
 
+    app
+      .querySelector(".explore-region-map")
+      ?.classList.toggle("has-expanded-silhouette", expanded);
     control.classList.toggle("is-expanded", expanded);
     control.setAttribute("aria-expanded", String(expanded));
     control.setAttribute(
@@ -2681,6 +2748,11 @@
 
   window.addEventListener("pointerup", finishExploreMapPointer);
   window.addEventListener("pointercancel", finishExploreMapPointer);
+  window.addEventListener("resize", () => {
+    if (state.screen === "explore" && state.exploreView === "map") {
+      scheduleExploreMapZoomUi();
+    }
+  });
 
   app.addEventListener("pointerover", (event) => {
     const countryControl = event.target.closest("[data-explore-code]");
