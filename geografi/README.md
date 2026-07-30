@@ -21,6 +21,24 @@ URL:
 The language can be changed from anywhere on the site without resetting an
 active quiz, flashcard round, or Explore view.
 
+## Result-screen previews
+
+Internal query parameters can open deterministic result screens for visual
+testing:
+
+- `?_result=perfect` – every answer correct, without a review section
+- `?_result=mixed` – approximately two-thirds correct
+- `?_result=wrong` – every answer wrong
+
+An optional `_mode` parameter accepts `country-flag`, `flag-country`,
+`country-capital`, or `map-country`; it defaults to `country-flag`. Existing
+`lang` and `region` parameters can be combined with the previews, for example
+`?_result=wrong&_mode=country-capital&lang=en&region=caribbean`.
+
+Previews use every country from the selected region, so the all-wrong case
+shows the complete review list. These parameters are testing conveniences,
+not private or secure functionality.
+
 ## Files
 
 - `index.html` – document shell and default metadata

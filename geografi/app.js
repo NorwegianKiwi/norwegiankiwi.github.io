@@ -2355,6 +2355,31 @@
     }
   });
 
+  function applyResultPreviewFromUrl() {
+    const scenario = initialUrl.searchParams.get("_result");
+    if (!["perfect", "mixed", "wrong"].includes(scenario)) return;
+
+    const requestedMode = initialUrl.searchParams.get("_mode");
+    const previewMode = modes.some((mode) => mode.id === requestedMode)
+      ? requestedMode
+      : "country-flag";
+    const previewCountries = countriesInRegion(state.region);
+    const total = previewCountries.length;
+    const score =
+      scenario === "perfect"
+        ? total
+        : scenario === "mixed"
+          ? Math.ceil((total * 2) / 3)
+          : 0;
+
+    state.screen = "result";
+    state.mode = previewMode;
+    state.questions = previewCountries.map((country) => ({ country }));
+    state.score = score;
+    state.wrongAnswers = previewCountries.slice(score);
+  }
+
+  applyResultPreviewFromUrl();
   syncUrlState();
   render();
 })();
