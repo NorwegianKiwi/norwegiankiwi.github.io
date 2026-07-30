@@ -1688,7 +1688,7 @@ footer a {
   border-radius: 3px;
 }
 
-.explore-map-region-prompt {
+.map-region-prompt {
   min-height: 440px;
   padding: clamp(28px, 6vw, 70px);
   border: 1px solid var(--line);
@@ -1700,26 +1700,26 @@ footer a {
   text-align: center;
 }
 
-.explore-map-region-prompt h2 {
+.map-region-prompt h2 {
   margin: 5px 0 8px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(28px, 4vw, 42px);
   font-weight: 400;
 }
 
-.explore-map-region-prompt > p:not(.kicker) {
+.map-region-prompt > p:not(.kicker) {
   margin: 0 0 22px;
   color: var(--muted);
 }
 
-.explore-map-region-grid {
+.map-region-grid {
   width: min(760px, 100%);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 9px;
 }
 
-.explore-map-region-grid button {
+.map-region-grid button {
   min-height: 70px;
   padding: 10px;
   border: 1px solid var(--line);
@@ -1732,25 +1732,29 @@ footer a {
   cursor: pointer;
 }
 
-.explore-map-region-grid button:hover {
+.map-region-grid button:hover {
   border-color: var(--coral);
   background: var(--coral-soft);
 }
 
-.explore-map-region-grid button:focus-visible {
+.map-region-grid button:focus-visible {
   outline: 3px solid var(--coral);
   outline-offset: 2px;
 }
 
-.explore-map-region-grid button strong {
+.map-region-grid button strong {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 17px;
   font-weight: 400;
 }
 
-.explore-map-region-grid button span {
+.map-region-grid button span {
   color: var(--muted);
   font-size: 11px;
+}
+
+.map-region-step {
+  padding: clamp(28px, 7vh, 72px) 0 50px;
 }
 
 .country-table-wrap {
@@ -2551,16 +2555,16 @@ body.modal-open {
     width: 40px;
   }
 
-  .explore-map-region-prompt {
+  .map-region-prompt {
     min-height: 0;
     padding: 28px 15px;
   }
 
-  .explore-map-region-grid {
+  .map-region-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .explore-map-region-grid button {
+  .map-region-grid button {
     min-height: 64px;
   }
 

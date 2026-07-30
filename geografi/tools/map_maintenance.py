@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit and fetch the source data used by Geografi-quiz maps.
+"""Audit and fetch the source data used by Hello World! maps.
 
 This tool intentionally uses only the Python standard library. It does not run
 in the website and does not add a runtime or build dependency.
@@ -337,7 +337,7 @@ def audit_sources(directory):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Kontroller og hent kartkilder for Geografi-quiz."
+        description="Kontroller og hent kartkilder for Hello World!"
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     validate = subparsers.add_parser(

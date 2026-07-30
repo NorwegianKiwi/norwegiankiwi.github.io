@@ -6,7 +6,7 @@
   const app = document.getElementById("app");
 
   if (!data || !mapData || !app) {
-    throw new Error("Geografi-quiz kunne ikke laste landdataene.");
+    throw new Error("Hello World! kunne ikke laste landdataene.");
   }
 
   const { countries, regionOptions } = data;
@@ -19,11 +19,6 @@
     "south-america",
     "caribbean",
   ];
-  const americanRegions = new Set([
-    "north-central-america",
-    "south-america",
-    "caribbean",
-  ]);
   const countriesByCode = new Map(
     countries.map((country) => [country.code, country]),
   );
@@ -44,7 +39,7 @@
     {
       id: "country-capital",
       label: "Gjett hovedstaden",
-      shortLabel: "Hovedstad",
+      shortLabel: "Hovedsteder",
       tone: "gold",
     },
     {
@@ -114,8 +109,7 @@
   function regionMatches(countryRegion, selectedRegion) {
     return (
       selectedRegion === "world" ||
-      countryRegion === selectedRegion ||
-      (selectedRegion === "americas" && americanRegions.has(countryRegion))
+      countryRegion === selectedRegion
     );
   }
 
@@ -169,11 +163,11 @@
   function brandMarkup(asButton = false, includeHomeLink = true) {
     const brandContent = `
       <img class="brand-mark" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-      <span>Geografi-quiz</span>
+      <span>Hello World!</span>
     `;
     const brandControl = asButton
       ? `<button class="brand brand-button" data-action="setup">${brandContent}</button>`
-      : `<a class="brand" href="#top" aria-label="Geografi-quiz – til toppen">${brandContent}</a>`;
+      : `<a class="brand" href="#top" aria-label="Hello World! – til toppen">${brandContent}</a>`;
 
     return `
       <div class="brand-group">
@@ -486,26 +480,17 @@
               class="activity-panel guess-panel"
               aria-labelledby="guess-panel-heading"
             >
-              <h2 id="guess-panel-heading">Gjett</h2>
+              <h2 id="guess-panel-heading">Test deg selv</h2>
               <div class="activity-grid guess-actions">
                 ${modes
                   .map((option) => {
-                    const unavailable =
-                      option.id === "map-country" &&
-                      !mapSelectableRegions.includes(state.region);
                     return `
                       <button
                         class="activity-button tone-${option.tone}"
                         data-action="mode"
                         data-value="${option.id}"
-                        ${unavailable ? "disabled" : ""}
                       >
                         <strong>${option.shortLabel}</strong>
-                        ${
-                          unavailable
-                            ? "<small>Velg en enkelt region</small>"
-                            : ""
-                        }
                       </button>
                     `;
                   })
@@ -827,13 +812,19 @@
     `;
   }
 
-  function exploreMapRegionPromptMarkup() {
+  function mapRegionPromptMarkup({
+    action,
+    description,
+    heading,
+    headingId,
+    kicker,
+  }) {
     return `
-      <section class="explore-map-region-prompt" aria-labelledby="explore-map-region-heading">
-        <p class="kicker">Velg en enkelt region</p>
-        <h2 id="explore-map-region-heading">Hvilket kart vil du utforske?</h2>
-        <p>Regionkartet viser plasseringen og formen til hvert land.</p>
-        <div class="explore-map-region-grid">
+      <section class="map-region-prompt" aria-labelledby="${headingId}">
+        <p class="kicker">${escapeHtml(kicker)}</p>
+        <h2 id="${headingId}">${escapeHtml(heading)}</h2>
+        <p>${escapeHtml(description)}</p>
+        <div class="map-region-grid">
           ${mapSelectableRegions
             .map((regionId) => {
               const region = regionOptions.find(
@@ -841,7 +832,7 @@
               );
               return `
                 <button
-                  data-action="explore-map-region"
+                  data-action="${action}"
                   data-value="${regionId}"
                 >
                   <strong>${escapeHtml(region.label)}</strong>
@@ -853,6 +844,16 @@
         </div>
       </section>
     `;
+  }
+
+  function exploreMapRegionPromptMarkup() {
+    return mapRegionPromptMarkup({
+      action: "explore-map-region",
+      description: "Regionkartet viser plasseringen og formen til hvert land.",
+      heading: "Hvilket kart vil du utforske?",
+      headingId: "explore-map-region-heading",
+      kicker: "Velg en enkelt region",
+    });
   }
 
   function exploreListMarkup(sortedCountries, modalCountry) {
@@ -1273,6 +1274,26 @@
     `;
   }
 
+  function mapQuizRegionMarkup() {
+    return `
+      <main class="quiz-shell map-region-shell">
+        <header class="quiz-header">
+          ${brandMarkup(true)}
+          <button class="quiet-button" data-action="cancel-map-region">Tilbake</button>
+        </header>
+        <div class="map-region-step">
+          ${mapRegionPromptMarkup({
+            action: "quiz-map-region",
+            description: "Kartquizen bruker ett regionkart om gangen.",
+            heading: "Velg region",
+            headingId: "quiz-map-region-heading",
+            kicker: "Kartquiz",
+          })}
+        </div>
+      </main>
+    `;
+  }
+
   function screenMarkup() {
     switch (state.screen) {
       case "setup":
@@ -1283,6 +1304,8 @@
         return exploreMarkup();
       case "flashcards":
         return flashcardMarkup();
+      case "map-region":
+        return mapQuizRegionMarkup();
       default:
         return quizMarkup();
     }
@@ -1314,6 +1337,14 @@
     }
     if (options.focusExploreRegion) {
       app.querySelector('[data-action="explore-region"]')?.focus();
+    }
+    if (options.focusMapRegion) {
+      app.querySelector('[data-action="quiz-map-region"]')?.focus();
+    }
+    if (options.focusSetupMap) {
+      app
+        .querySelector('[data-action="mode"][data-value="map-country"]')
+        ?.focus();
     }
   }
 
@@ -1493,6 +1524,10 @@
       mode === "map-country" &&
       !mapSelectableRegions.includes(state.region)
     ) {
+      state.mode = mode;
+      state.questions = [];
+      state.screen = "map-region";
+      renderAtTop({ focusMapRegion: true });
       return;
     }
     state.mode = mode;
@@ -1545,7 +1580,7 @@
     renderAtTop({ focusFlashcard: true });
   }
 
-  function returnToSetup() {
+  function returnToSetup({ focusMapQuiz = false } = {}) {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
     state.screen = "setup";
@@ -1559,7 +1594,7 @@
     state.flashcardRevealed = false;
     state.modalCode = null;
     resetExploreCountryState();
-    renderAtTop();
+    renderAtTop({ focusSetupMap: focusMapQuiz });
   }
 
   function selectAnswer(code) {
@@ -1613,6 +1648,17 @@
       state.region = control.dataset.value;
       resetExploreCountryState();
       render({ focusExploreTab: "map" });
+      return;
+    }
+
+    if (action === "quiz-map-region") {
+      state.region = control.dataset.value;
+      startQuiz("map-country");
+      return;
+    }
+
+    if (action === "cancel-map-region") {
+      returnToSetup({ focusMapQuiz: true });
       return;
     }
 

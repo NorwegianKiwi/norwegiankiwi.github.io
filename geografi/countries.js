@@ -261,7 +261,6 @@ const regionOptions = [
   { id: "africa", label: "Afrika" },
   { id: "asia", label: "Asia" },
   { id: "oceania", label: "Oseania" },
-  { id: "americas", label: "Amerika" },
   {
     id: "north-central-america",
     label: "Nord- og Mellom-Amerika",

@@ -12,4 +12,4 @@ Boundary viewpoint: Natural Earth's default de facto view
 Natural Earth states that all raster and vector map data distributed through
 its website is in the public domain and may be used and modified without
 permission. The local map geometry consists of Equal Earth and Mercator
-derivatives plus simplified country silhouettes prepared for Geografi-quiz.
+derivatives plus simplified country silhouettes prepared for Hello World!

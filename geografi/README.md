@@ -1,9 +1,10 @@
-# Geografi-quiz
+# Hello World!
 
-En statisk geografi-quiz med 196 land, lokale SVG-flagg, fire quizmoduser,
+En statisk geografiside med 196 land, lokale SVG-flagg, fire quizmoduser,
 flashcards og en Utforsk-del med alfabetisk liste og interaktive regionkart.
 Kartquizen viser ett uthevet land på et regionkart og gir seks landnavn å
-velge mellom.
+velge mellom. Når Hele verden er valgt, velges en enkelt region før
+kartquizen starter.
 
 Åpne `index.html` direkte i en nettleser. Siden krever ingen installasjon,
 utviklingsserver, bygging eller tredjepakker.
@@ -52,8 +53,8 @@ Silhuettene er skalert og komprimert på forhånd, og svært små øykomponenter
 beholdes som lokale punktmarkører.
 
 Utforsk-delens Kart-fane gjenbruker de samme regionale Mercator-kartene og
-silhuettene. Kartet er tilgjengelig for de sju enkeltregionene; Hele verden og
-Amerika viser i stedet et valg av enkeltregion. Kartdataene dupliserer ikke
+silhuettene. Kartet er tilgjengelig for de sju enkeltregionene; Hele verden
+viser i stedet et valg av enkeltregion. Kartdataene dupliserer ikke
 regiontilhørighet, men kobles til `countries.js` gjennom landkoden.
 
 ## Jordklode
@@ -77,8 +78,7 @@ utgangspunkt. Russland er et bevisst pedagogisk unntak: Landet plasseres i
 Asia for å gi én tydelig regioninndeling og lesbare regionkart. Kypros og
 Tyrkia plasseres også i Asia.
 Amerikanske land lagrer den mest spesifikke regionen
-(`north-central-america`, `south-america` eller `caribbean`); den samlede
-`americas`-kategorien utledes i applikasjonen.
+(`north-central-america`, `south-america` eller `caribbean`).
 
 Et land kan også ha et valgfritt, kort `note`-felt. De første notatene forklarer
 verdensdelstilhørigheten til Russland og Tyrkia med støtte i
