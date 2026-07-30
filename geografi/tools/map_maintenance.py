@@ -37,16 +37,14 @@ def load_manifest():
 def load_countries():
     text = (ROOT / "countries.js").read_text(encoding="utf-8")
     pattern = re.compile(
-        r'^\s*\["([a-z]{2})",\s*"((?:[^"\\]|\\.)*)",\s*'
-        r'"((?:[^"\\]|\\.)*)",\s*"([^"]+)"\],?\s*$',
+        r'^\s*\{\s*code:\s*"([a-z]{2})",\s*'
+        r'region:\s*"([^"]+)",\s*name:\s*\{',
         re.MULTILINE,
     )
     rows = [
         {
             "code": match.group(1),
-            "name": json.loads(f'"{match.group(2)}"'),
-            "capital": json.loads(f'"{match.group(3)}"'),
-            "region": match.group(4),
+            "region": match.group(2),
         }
         for match in pattern.finditer(text)
     ]

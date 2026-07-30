@@ -1,15 +1,265 @@
 (function () {
   "use strict";
 
+  const supportedLocales = ["nb", "en"];
+  const initialUrl = new URL(window.location.href);
+  const initialLocale = supportedLocales.includes(
+    initialUrl.searchParams.get("lang"),
+  )
+    ? initialUrl.searchParams.get("lang")
+    : "nb";
   const data = window.GEOGRAFI_QUIZ_DATA;
   const mapData = window.GEOGRAFI_QUIZ_MAP_DATA;
   const app = document.getElementById("app");
 
   if (!data || !mapData || !app) {
-    throw new Error("Hello World! kunne ikke laste landdataene.");
+    throw new Error(
+      initialLocale === "en"
+        ? "Hello World! could not load the country data."
+        : "Hello World! kunne ikke laste landdataene.",
+    );
   }
 
   const { countries, regionOptions } = data;
+  const messages = Object.freeze({
+    nb: Object.freeze({
+      loadError: "Hello World! kunne ikke laste landdataene.",
+      modeCountryFlag: "Gjett flagget",
+      modeCountryFlagShort: "Flagg",
+      modeFlagCountry: "Gjett landet",
+      modeFlagCountryShort: "Land",
+      modeCountryCapital: "Gjett hovedstaden",
+      modeCountryCapitalShort: "Hovedsteder",
+      modeMapCountry: "Kartquiz",
+      modeMapCountryShort: "Kart",
+      maps: "Kart",
+      flagOf: "Flagget til {name}",
+      homeLink: "Tilbake til lanceolav.com",
+      brandTop: "Hello World! – til toppen",
+      brandHome: "Hello World! – gå til forsiden",
+      home: "Forsiden",
+      languageGroup: "Velg språk",
+      languageNb: "Norsk",
+      languageEn: "English",
+      worldSentence: "hele verden",
+      countries: "{count} land",
+      regionMapDescription:
+        "Velg et område på kartet, eller bruk områdeknappene ved siden av.",
+      interactiveWorldMap: "Interaktivt verdenskart",
+      shrinkShape: "Forminsk landformen",
+      enlargeShape: "Forstørr landformen",
+      highlightedMap: "Kart over {region} med ett land uthevet",
+      heroKicker: "Utforsk land, flagg og kart",
+      heroTitleBefore: "Hvor godt kjenner du",
+      heroTitleEmphasis: "verden?",
+      heroCopy: "Velg et område og deretter hvordan du vil øve.",
+      chooseArea: "Velg område",
+      chooseActivity: "Velg aktivitet",
+      testYourself: "Test deg selv",
+      exploreCountries: "Utforsk land",
+      list: "Liste",
+      map: "Kart",
+      flagsLicence: "Flagg fra flag-icons · MIT",
+      globeLicence: "Jordklode fra Twemoji · CC BY 4.0",
+      mapLicence: "Kart fra Natural Earth · public domain",
+      review: "Gjennomgang",
+      reviewHeading: "Dette kan du øve mer på",
+      reviewCount: "{count} land å se nærmere på.",
+      resultComplete: "Øvelsen er fullført",
+      percentCorrect: "{percentage} prosent riktig",
+      resultExcellent: "Imponerende!",
+      resultGreat: "Godt jobbet!",
+      resultGood: "Du er på god vei.",
+      resultTryAgain: "Verden venter.",
+      scoreBefore: "Du fikk",
+      scoreOf: "av",
+      scoreAfter: "riktige i",
+      correctPlural: "Riktige",
+      wrong: "Feil",
+      mode: "Modus",
+      chooseNewActivity: "Velg ny øvelse",
+      reviewErrors: "Se gjennom {count} feil",
+      chooseCountry: "Velg et land",
+      chooseCountryHelp:
+        "Pek, fokuser eller trykk for å se plassering og form.",
+      countryCapital: "{name}, hovedstad {capital}",
+      interactiveRegionMap: "Interaktivt kart over {region}",
+      countriesInRegion: "Land i regionen",
+      exploreMapDescription:
+        "Regionkartet viser plasseringen og formen til hvert land.",
+      exploreMapHeading: "Hvilket kart vil du utforske?",
+      chooseSingleRegion: "Velg en enkelt region",
+      tableFlag: "Flagg",
+      tableCountry: "Land",
+      tableCapital: "Hovedstad",
+      showLargeFlag: "Vis flagget til {name} stort",
+      largeFlag: "Stort flagg: {name}",
+      closeModalHint: "Trykk hvor som helst for å lukke",
+      back: "Tilbake",
+      exploreKicker: "Utforsk landene",
+      exploreMapCopy:
+        "Se hvor landene ligger, og sammenlign flagg og landformer.",
+      exploreListCopy:
+        "Flagg, land og hovedsteder i alfabetisk rekkefølge.",
+      area: "Område",
+      view: "Visning",
+      flashcardsComplete: "Flashcards fullført",
+      roundComplete: "Runden er ferdig.",
+      flashcardsSummaryBefore: "Du har gått gjennom",
+      flashcardsSummaryAfter: "flagg fra",
+      restart: "Start på nytt",
+      finish: "Avslutt",
+      nextFlag: "Trykk igjen for neste flagg",
+      revealInstruction:
+        "Tenk på landet og hovedstaden – trykk for å se svaret",
+      revealedFlashcard:
+        "{name}, {capital}. Trykk for neste flagg.",
+      hiddenFlashcard:
+        "Flashcard {current} av {total}. Trykk for å vise svaret.",
+      findFlag: "Finn flagget til",
+      whichCountryFlag: "Hvilket land har dette flagget?",
+      whichCountryHighlighted: "Hvilket land er uthevet?",
+      capitalQuestion: "Hva er hovedstaden i",
+      option: "Alternativ {number}",
+      flagOption: "Flaggalternativ {number}",
+      correctContinue:
+        "{label}, riktig svar. Trykk for å gå videre.",
+      correctAnswer: "{label}, riktig svar",
+      correctAnnouncement: "Riktig.",
+      wrongAnnouncement:
+        "Feil. Riktig svar er {answer}. Aktiver det markerte alternativet for å gå videre.",
+      mapQuizDescription: "Kartquizen bruker ett regionkart om gangen.",
+      chooseRegion: "Velg region",
+      metaTitle: "Hello World! – lær land, flagg, hovedsteder og kart",
+      metaDescription:
+        "Utforsk og test deg selv på 196 land, flagg, hovedsteder og regionale kart.",
+    }),
+    en: Object.freeze({
+      loadError: "Hello World! could not load the country data.",
+      modeCountryFlag: "Guess the flag",
+      modeCountryFlagShort: "Flags",
+      modeFlagCountry: "Guess the country",
+      modeFlagCountryShort: "Countries",
+      modeCountryCapital: "Guess the capital",
+      modeCountryCapitalShort: "Capitals",
+      modeMapCountry: "Map quiz",
+      modeMapCountryShort: "Maps",
+      maps: "Maps",
+      flagOf: "Flag of {name}",
+      homeLink: "Back to lanceolav.com",
+      brandTop: "Hello World! – back to top",
+      brandHome: "Hello World! – go to the home page",
+      home: "Home",
+      languageGroup: "Choose language",
+      languageNb: "Norsk",
+      languageEn: "English",
+      worldSentence: "the whole world",
+      countries: "{count} {count, plural, one {country} other {countries}}",
+      regionMapDescription:
+        "Choose an area on the map, or use the area buttons beside it.",
+      interactiveWorldMap: "Interactive world map",
+      shrinkShape: "Shrink the country shape",
+      enlargeShape: "Enlarge the country shape",
+      highlightedMap: "Map of {region} with one country highlighted",
+      heroKicker: "Explore countries, flags and maps",
+      heroTitleBefore: "How well do you know the",
+      heroTitleEmphasis: "world?",
+      heroCopy: "Choose an area and then how you would like to practise.",
+      chooseArea: "Choose area",
+      chooseActivity: "Choose activity",
+      testYourself: "Test yourself",
+      exploreCountries: "Explore countries",
+      list: "List",
+      map: "Map",
+      flagsLicence: "Flags from flag-icons · MIT",
+      globeLicence: "Globe from Twemoji · CC BY 4.0",
+      mapLicence: "Maps from Natural Earth · public domain",
+      review: "Review",
+      reviewHeading: "Here is what you can practise",
+      reviewCount:
+        "{count} {count, plural, one {country} other {countries}} to revisit.",
+      resultComplete: "Practice complete",
+      percentCorrect: "{percentage} per cent correct",
+      resultExcellent: "Impressive!",
+      resultGreat: "Well done!",
+      resultGood: "You’re on your way.",
+      resultTryAgain: "The world awaits.",
+      scoreBefore: "You got",
+      scoreOf: "out of",
+      scoreAfter: "correct in",
+      correctPlural: "Correct",
+      wrong: "Wrong",
+      mode: "Mode",
+      chooseNewActivity: "Choose another activity",
+      reviewErrors:
+        "Review {count} {count, plural, one {mistake} other {mistakes}}",
+      chooseCountry: "Choose a country",
+      chooseCountryHelp:
+        "Point, focus or press to see its location and shape.",
+      countryCapital: "{name}, capital {capital}",
+      interactiveRegionMap: "Interactive map of {region}",
+      countriesInRegion: "Countries in the region",
+      exploreMapDescription:
+        "The regional map shows the location and shape of each country.",
+      exploreMapHeading: "Which map would you like to explore?",
+      chooseSingleRegion: "Choose a single region",
+      tableFlag: "Flag",
+      tableCountry: "Country",
+      tableCapital: "Capital",
+      showLargeFlag: "Show a large flag of {name}",
+      largeFlag: "Large flag: {name}",
+      closeModalHint: "Press anywhere to close",
+      back: "Back",
+      exploreKicker: "Explore the countries",
+      exploreMapCopy:
+        "See where countries are located and compare flags and country shapes.",
+      exploreListCopy:
+        "Flags, countries and capitals in alphabetical order.",
+      area: "Area",
+      view: "View",
+      flashcardsComplete: "Flashcards complete",
+      roundComplete: "The round is complete.",
+      flashcardsSummaryBefore: "You have reviewed",
+      flashcardsSummaryAfter: "flags from",
+      restart: "Start again",
+      finish: "Finish",
+      nextFlag: "Press again for the next flag",
+      revealInstruction:
+        "Think of the country and its capital – press to reveal the answer",
+      revealedFlashcard:
+        "{name}, {capital}. Press for the next flag.",
+      hiddenFlashcard:
+        "Flashcard {current} of {total}. Press to reveal the answer.",
+      findFlag: "Find the flag of",
+      whichCountryFlag: "Which country has this flag?",
+      whichCountryHighlighted: "Which country is highlighted?",
+      capitalQuestion: "What is the capital of",
+      option: "Option {number}",
+      flagOption: "Flag option {number}",
+      correctContinue:
+        "{label}, correct answer. Press to continue.",
+      correctAnswer: "{label}, correct answer",
+      correctAnnouncement: "Correct.",
+      wrongAnnouncement:
+        "Incorrect. The correct answer is {answer}. Activate the highlighted option to continue.",
+      mapQuizDescription: "The map quiz uses one regional map at a time.",
+      chooseRegion: "Choose region",
+      metaTitle: "Hello World! – learn countries, flags, capitals and maps",
+      metaDescription:
+        "Explore and test yourself on 196 countries, flags, capitals and regional maps.",
+    }),
+  });
+  const messageKeys = Object.keys(messages.nb);
+  supportedLocales.forEach((locale) => {
+    if (Object.keys(messages[locale]).length !== messageKeys.length) {
+      throw new Error(`Unexpected ${locale} translation key`);
+    }
+    messageKeys.forEach((key) => {
+      if (!messages[locale][key]) {
+        throw new Error(`Missing ${locale} translation: ${key}`);
+      }
+    });
+  });
   const mapSelectableRegions = [
     "europe",
     "africa",
@@ -26,35 +276,40 @@
   const modes = [
     {
       id: "country-flag",
-      label: "Gjett flagget",
-      shortLabel: "Flagg",
+      labelKey: "modeCountryFlag",
+      shortLabelKey: "modeCountryFlagShort",
       tone: "coral",
     },
     {
       id: "flag-country",
-      label: "Gjett landet",
-      shortLabel: "Land",
+      labelKey: "modeFlagCountry",
+      shortLabelKey: "modeFlagCountryShort",
       tone: "green",
     },
     {
       id: "country-capital",
-      label: "Gjett hovedstaden",
-      shortLabel: "Hovedsteder",
+      labelKey: "modeCountryCapital",
+      shortLabelKey: "modeCountryCapitalShort",
       tone: "gold",
     },
     {
       id: "map-country",
-      label: "Kartquiz",
-      shortLabel: "Kart",
+      labelKey: "modeMapCountry",
+      shortLabelKey: "modeMapCountryShort",
       tone: "map",
       choiceCount: 6,
     },
   ];
 
   const state = {
+    locale: initialLocale,
     screen: "setup",
     mode: "country-flag",
-    region: "world",
+    region: regionOptions.some(
+      (region) => region.id === initialUrl.searchParams.get("region"),
+    )
+      ? initialUrl.searchParams.get("region")
+      : "world",
     questions: [],
     questionIndex: 0,
     selectedCode: null,
@@ -73,7 +328,6 @@
   };
   let autoAdvanceTimer = null;
   let keyboardHintsVisible = false;
-  const norwegianCollator = new Intl.Collator("nb", { sensitivity: "base" });
   const keyboardHintIgnoredKeys = new Set([
     "Tab",
     "Escape",
@@ -87,6 +341,44 @@
     "ScrollLock",
     "ContextMenu",
   ]);
+
+  function t(key, values = {}) {
+    let value = messages[state.locale][key];
+    if (!value) throw new Error(`Missing ${state.locale} translation: ${key}`);
+
+    value = value.replace(
+      /\{(\w+), plural, one \{([^{}]+)\} other \{([^{}]+)\}\}/g,
+      (_match, variable, singular, plural) =>
+        Number(values[variable]) === 1 ? singular : plural,
+    );
+    return value.replace(/\{(\w+)\}/g, (_match, variable) =>
+      String(values[variable] ?? ""),
+    );
+  }
+
+  function countryName(country) {
+    return country.name[state.locale];
+  }
+
+  function countryCapital(country) {
+    return country.capital[state.locale];
+  }
+
+  function countryNote(country) {
+    return country.note?.[state.locale] ?? null;
+  }
+
+  function regionLabel(region) {
+    return region.label[state.locale];
+  }
+
+  function modeLabel(mode) {
+    return t(mode.labelKey);
+  }
+
+  function countryCount(count) {
+    return t("countries", { count });
+  }
 
   function escapeHtml(value) {
     return String(value)
@@ -138,12 +430,12 @@
   }
 
   function regionLabelInSentence(region) {
-    return region.id === "world" ? "hele verden" : region.label;
+    return region.id === "world" ? t("worldSentence") : regionLabel(region);
   }
 
   function flagMarkup(country, className = "", revealName = false) {
-    const name = escapeHtml(country.name);
-    const alt = revealName ? `Flagget til ${name}` : "";
+    const name = escapeHtml(countryName(country));
+    const alt = revealName ? escapeHtml(t("flagOf", { name })) : "";
     const lazy = className === "table-flag" ? ' loading="lazy"' : "";
     return `
       <span class="flag-frame flag-code-${country.code} ${className}">
@@ -154,9 +446,38 @@
 
   function siteHomeLinkMarkup() {
     return `
-      <a class="site-home-link" href="../index.html" aria-label="Tilbake til lanceolav.com">
+      <a class="site-home-link" href="../index.html" aria-label="${escapeHtml(t("homeLink"))}">
         <span aria-hidden="true">←</span> lanceolav.com
       </a>
+    `;
+  }
+
+  function languageSwitcherMarkup() {
+    return `
+      <div class="language-switcher" role="group" aria-label="${escapeHtml(t("languageGroup"))}">
+        ${[
+          { locale: "nb", flag: "no", labelKey: "languageNb" },
+          { locale: "en", flag: "gb", labelKey: "languageEn" },
+        ]
+          .map(({ locale, flag, labelKey }) => {
+            const label = t(labelKey);
+            return `
+              <button
+                type="button"
+                class="language-button ${state.locale === locale ? "is-selected" : ""}"
+                data-action="language"
+                data-value="${locale}"
+                lang="${locale}"
+                aria-label="${escapeHtml(label)}"
+                aria-pressed="${state.locale === locale}"
+                title="${escapeHtml(label)}"
+              >
+                <img src="./flags/${flag}.svg" alt="" aria-hidden="true" draggable="false" />
+              </button>
+            `;
+          })
+          .join("")}
+      </div>
     `;
   }
 
@@ -166,15 +487,60 @@
       <span>Hello World!</span>
     `;
     const brandControl = asButton
-      ? `<button class="brand brand-button" data-action="setup">${brandContent}</button>`
-      : `<a class="brand" href="#top" aria-label="Hello World! – til toppen">${brandContent}</a>`;
+      ? `<button class="brand brand-button" data-action="setup" aria-label="${escapeHtml(t("brandHome"))}">${brandContent}</button>`
+      : `<a class="brand" href="#top" aria-label="${escapeHtml(t("brandTop"))}">${brandContent}</a>`;
 
     return `
       <div class="brand-group">
         ${brandControl}
         ${includeHomeLink ? siteHomeLinkMarkup() : ""}
+        ${languageSwitcherMarkup()}
       </div>
     `;
+  }
+
+  function homeButtonMarkup(action = "setup") {
+    return `
+      <button class="quiet-button home-button" data-action="${action}">
+        <span aria-hidden="true">←</span>
+        ${t("home")}
+      </button>
+    `;
+  }
+
+  function syncUrlState() {
+    const url = new URL(window.location.href);
+    if (state.locale === "nb") {
+      url.searchParams.delete("lang");
+    } else {
+      url.searchParams.set("lang", state.locale);
+    }
+    if (state.region === "world") {
+      url.searchParams.delete("region");
+    } else {
+      url.searchParams.set("region", state.region);
+    }
+    try {
+      window.history.replaceState(null, "", url.href);
+    } catch (error) {
+      console.warn("Could not update the language and region URL.", error);
+    }
+  }
+
+  function updateDocumentMetadata() {
+    document.documentElement.lang = state.locale;
+    document.title = t("metaTitle");
+    const metadata = {
+      'meta[name="description"]': t("metaDescription"),
+      'meta[property="og:title"]': t("metaTitle"),
+      'meta[property="og:description"]': t("metaDescription"),
+      'meta[property="og:locale"]': state.locale === "nb" ? "nb_NO" : "en_GB",
+      'meta[name="twitter:title"]': t("metaTitle"),
+      'meta[name="twitter:description"]': t("metaDescription"),
+    };
+    Object.entries(metadata).forEach(([selector, content]) => {
+      document.querySelector(selector)?.setAttribute("content", content);
+    });
   }
 
   function mapRegionForCode(code) {
@@ -238,7 +604,7 @@
         data-map-region="${regionId}"
         role="button"
         tabindex="0"
-        aria-label="${escapeHtml(region.label)}, ${count} land"
+        aria-label="${escapeHtml(`${regionLabel(region)}, ${countryCount(count)}`)}"
       >
         ${paths}
         ${markers}
@@ -255,13 +621,13 @@
     return `
       <div class="region-map-card">
         <p class="sr-only" id="region-map-description">
-          Velg et område på kartet, eller bruk områdeknappene ved siden av.
+          ${t("regionMapDescription")}
         </p>
         <svg
           class="region-map"
           viewBox="${mapData.viewBox}"
           role="group"
-          aria-label="Interaktivt verdenskart"
+          aria-label="${escapeHtml(t("interactiveWorldMap"))}"
           aria-describedby="region-map-description"
           preserveAspectRatio="xMidYMid meet"
         >
@@ -359,7 +725,7 @@
         class="${classes}"
         data-action="toggle-silhouette"
         aria-expanded="${expanded}"
-        aria-label="${expanded ? "Forminsk landformen" : "Forstørr landformen"}"
+        aria-label="${escapeHtml(expanded ? t("shrinkShape") : t("enlargeShape"))}"
       >
         ${contents}
       </button>
@@ -407,7 +773,7 @@
           class="question-map"
           viewBox="${view.viewBox}"
           role="img"
-          aria-label="Kart over ${escapeHtml(region.label)} med ett land uthevet"
+          aria-label="${escapeHtml(t("highlightedMap", { region: regionLabel(region) }))}"
           preserveAspectRatio="xMidYMid meet"
         >
           <rect class="question-map-ocean" x="-1000" y="-500" width="3000" height="1500" />
@@ -443,13 +809,16 @@
         </header>
 
         <section class="hero" id="top">
-          <p class="kicker">Lær verden, ett land om gangen</p>
-          <h1>Hvor godt kjenner du <em>verden?</em></h1>
-          <p class="hero-copy">Velg et område og deretter hvordan du vil øve.</p>
+          <div class="hero-content">
+            <p class="kicker">${t("heroKicker")}</p>
+            <h1>${t("heroTitleBefore")} <em>${t("heroTitleEmphasis")}</em></h1>
+            <p class="hero-copy">${t("heroCopy")}</p>
+          </div>
+          <img class="hero-globe" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
         </section>
 
         <section class="region-panel" aria-labelledby="region-heading">
-          <h2 id="region-heading">Velg område</h2>
+          <h2 id="region-heading">${t("chooseArea")}</h2>
           <div class="region-picker-layout">
             ${worldMapMarkup()}
             <div class="region-grid">
@@ -464,8 +833,8 @@
                       data-map-region="${option.id}"
                       aria-pressed="${state.region === option.id}"
                     >
-                      <span>${option.label}</span>
-                      <small>${count} land</small>
+                      <span>${regionLabel(option)}</span>
+                      <small>${countryCount(count)}</small>
                     </button>
                   `;
                 })
@@ -474,13 +843,13 @@
           </div>
         </section>
 
-        <section class="action-section" aria-label="Velg aktivitet">
+        <section class="action-section" aria-label="${escapeHtml(t("chooseActivity"))}">
           <div class="activity-panels">
             <section
               class="activity-panel guess-panel"
               aria-labelledby="guess-panel-heading"
             >
-              <h2 id="guess-panel-heading">Test deg selv</h2>
+              <h2 id="guess-panel-heading">${t("testYourself")}</h2>
               <div class="activity-grid guess-actions">
                 ${modes
                   .map((option) => {
@@ -490,7 +859,7 @@
                         data-action="mode"
                         data-value="${option.id}"
                       >
-                        <strong>${option.shortLabel}</strong>
+                        <strong>${t(option.shortLabelKey)}</strong>
                       </button>
                     `;
                   })
@@ -508,21 +877,21 @@
               class="activity-panel explore-panel"
               aria-labelledby="explore-panel-heading"
             >
-              <h2 id="explore-panel-heading">Utforsk land</h2>
+              <h2 id="explore-panel-heading">${t("exploreCountries")}</h2>
               <div class="activity-grid explore-actions">
                 <button
                   class="activity-button tone-plum"
                   data-action="explore"
                   data-value="list"
                 >
-                  <strong>Liste</strong>
+                  <strong>${t("list")}</strong>
                 </button>
                 <button
                   class="activity-button tone-map"
                   data-action="explore"
                   data-value="map"
                 >
-                  <strong>Kart</strong>
+                  <strong>${t("maps")}</strong>
                 </button>
               </div>
             </section>
@@ -532,9 +901,9 @@
         <footer>
           <span>&copy; 2026 Lance Olav Eastgate</span>
           <span class="license-links">
-            <a href="./licenses/flag-icons-MIT.txt">Flagg fra flag-icons · MIT</a>
-            <a href="./licenses/twemoji-CC-BY-4.0.txt">Jordklode fra Twemoji · CC BY 4.0</a>
-            <a href="./licenses/natural-earth-public-domain.txt">Kart fra Natural Earth · public domain</a>
+            <a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a>
+            <a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a>
+            <a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a>
           </span>
         </footer>
       </main>
@@ -546,9 +915,9 @@
 
     return `
       <section class="result-review" id="result-review" aria-labelledby="review-heading">
-        <p class="kicker">Gjennomgang</p>
-        <h2 id="review-heading">Dette kan du øve mer på</h2>
-        <p>${state.wrongAnswers.length} land å se nærmere på.</p>
+        <p class="kicker">${t("review")}</p>
+        <h2 id="review-heading">${t("reviewHeading")}</h2>
+        <p>${t("reviewCount", { count: state.wrongAnswers.length })}</p>
         <div class="review-list">
           ${state.wrongAnswers
             .map(
@@ -556,8 +925,8 @@
                 <article class="review-row">
                   ${flagMarkup(country, "review-flag", true)}
                   <div>
-                    <strong>${escapeHtml(country.name)}</strong>
-                    <span>${escapeHtml(country.capital)}</span>
+                    <strong>${escapeHtml(countryName(country))}</strong>
+                    <span>${escapeHtml(countryCapital(country))}</span>
                   </div>
                 </article>
               `,
@@ -573,44 +942,47 @@
     const percentage = Math.round((state.score / state.questions.length) * 100);
     const heading =
       percentage >= 90
-        ? "Imponerende!"
+        ? t("resultExcellent")
         : percentage >= 70
-          ? "Godt jobbet!"
+          ? t("resultGreat")
           : percentage >= 50
-            ? "Du er på god vei."
-            : "Verden venter.";
+            ? t("resultGood")
+            : t("resultTryAgain");
 
     return `
       <main class="quiz-shell result-shell ${hasReview ? "has-review" : ""}">
-        <header class="quiz-header">${brandMarkup(true)}</header>
+        <header class="quiz-header">
+          ${brandMarkup(true, false)}
+          ${homeButtonMarkup()}
+        </header>
         <section class="result-card">
-          <p class="kicker">Øvelsen er fullført</p>
-          <div class="result-score" aria-label="${percentage} prosent riktig">
+          <p class="kicker">${t("resultComplete")}</p>
+          <div class="result-score" aria-label="${escapeHtml(t("percentCorrect", { percentage }))}">
             <strong>${percentage}</strong><span>%</span>
           </div>
           <h1>${heading}</h1>
           <p>
-            Du fikk <strong>${state.score}</strong> av
-            <strong>${state.questions.length}</strong> riktige i
+            ${t("scoreBefore")} <strong>${state.score}</strong> ${t("scoreOf")}
+            <strong>${state.questions.length}</strong> ${t("scoreAfter")}
             ${regionLabelInSentence(selectedRegion())}.
           </p>
           <div class="result-stats">
-            <div><span>Riktige</span><strong>${state.score}</strong></div>
+            <div><span>${t("correctPlural")}</span><strong>${state.score}</strong></div>
             <div>
-              <span>Feil</span>
+              <span>${t("wrong")}</span>
               <strong>${state.questions.length - state.score}</strong>
             </div>
-            <div><span>Modus</span><strong>${selectedMode().label}</strong></div>
+            <div><span>${t("mode")}</span><strong>${modeLabel(selectedMode())}</strong></div>
           </div>
           <button class="primary-button" data-action="setup">
-            Velg ny øvelse
+            ${t("chooseNewActivity")}
             <span aria-hidden="true">→</span>
           </button>
           ${
             hasReview
               ? `
                 <button class="review-jump" data-action="review">
-                  Se gjennom ${state.wrongAnswers.length} feil
+                  ${t("reviewErrors", { count: state.wrongAnswers.length })}
                   <span aria-hidden="true">↓</span>
                 </button>
               `
@@ -631,8 +1003,8 @@
     if (!country) {
       return `
         <div class="explore-country-status is-empty">
-          <strong>Velg et land</strong>
-          <span>Pek, fokuser eller trykk for å se plassering og form.</span>
+          <strong>${t("chooseCountry")}</strong>
+          <span>${t("chooseCountryHelp")}</span>
         </div>
       `;
     }
@@ -641,8 +1013,8 @@
       <div class="explore-country-status">
         ${flagMarkup(country, "explore-status-flag", false)}
         <span>
-          <strong>${escapeHtml(country.name)}</strong>
-          <small>${escapeHtml(country.capital)}</small>
+          <strong>${escapeHtml(countryName(country))}</strong>
+          <small>${escapeHtml(countryCapital(country))}</small>
         </span>
       </div>
     `;
@@ -694,7 +1066,10 @@
         data-explore-code="${country.code}"
         role="button"
         tabindex="0"
-        aria-label="${escapeHtml(country.name)}, hovedstad ${escapeHtml(country.capital)}"
+        aria-label="${escapeHtml(t("countryCapital", {
+          name: countryName(country),
+          capital: countryCapital(country),
+        }))}"
         aria-pressed="${state.explorePinnedCode === country.code}"
       >
         ${paths}
@@ -762,7 +1137,9 @@
           <svg
             viewBox="${view.viewBox}"
             role="group"
-            aria-label="Interaktivt kart over ${escapeHtml(selectedRegion().label)}"
+            aria-label="${escapeHtml(t("interactiveRegionMap", {
+              region: regionLabel(selectedRegion()),
+            }))}"
             preserveAspectRatio="xMidYMid meet"
           >
             <rect class="question-map-ocean" x="-1000" y="-500" width="3000" height="1500" />
@@ -783,7 +1160,7 @@
           </div>
         </div>
 
-        <aside class="explore-country-panel" aria-label="Land i regionen">
+        <aside class="explore-country-panel" aria-label="${escapeHtml(t("countriesInRegion"))}">
           <div class="explore-country-status-wrap" aria-live="polite">
             ${exploreCountryStatusMarkup(activeExploreCountryCode())}
           </div>
@@ -799,8 +1176,8 @@
                   >
                     ${flagMarkup(country, "explore-country-flag", false)}
                     <span>
-                      <strong>${escapeHtml(country.name)}</strong>
-                      <small>${escapeHtml(country.capital)}</small>
+                      <strong>${escapeHtml(countryName(country))}</strong>
+                      <small>${escapeHtml(countryCapital(country))}</small>
                     </span>
                   </button>
                 `,
@@ -835,8 +1212,8 @@
                   data-action="${action}"
                   data-value="${regionId}"
                 >
-                  <strong>${escapeHtml(region.label)}</strong>
-                  <span>${countriesInRegion(regionId).length} land</span>
+                  <strong>${escapeHtml(regionLabel(region))}</strong>
+                  <span>${countryCount(countriesInRegion(regionId).length)}</span>
                 </button>
               `;
             })
@@ -849,10 +1226,10 @@
   function exploreMapRegionPromptMarkup() {
     return mapRegionPromptMarkup({
       action: "explore-map-region",
-      description: "Regionkartet viser plasseringen og formen til hvert land.",
-      heading: "Hvilket kart vil du utforske?",
+      description: t("exploreMapDescription"),
+      heading: t("exploreMapHeading"),
       headingId: "explore-map-region-heading",
-      kicker: "Velg en enkelt region",
+      kicker: t("chooseSingleRegion"),
     });
   }
 
@@ -867,9 +1244,9 @@
           </colgroup>
           <thead>
             <tr>
-              <th scope="col">Flagg</th>
-              <th scope="col">Land</th>
-              <th scope="col">Hovedstad</th>
+              <th scope="col">${t("tableFlag")}</th>
+              <th scope="col">${t("tableCountry")}</th>
+              <th scope="col">${t("tableCapital")}</th>
             </tr>
           </thead>
           <tbody>
@@ -882,13 +1259,15 @@
                         class="table-flag-button"
                         data-action="open-flag"
                         data-code="${country.code}"
-                        aria-label="Vis flagget til ${escapeHtml(country.name)} stort"
+                        aria-label="${escapeHtml(t("showLargeFlag", {
+                          name: countryName(country),
+                        }))}"
                       >
                         ${flagMarkup(country, "table-flag", false)}
                       </button>
                     </td>
-                    <th scope="row">${escapeHtml(country.name)}</th>
-                    <td>${escapeHtml(country.capital)}</td>
+                    <th scope="row">${escapeHtml(countryName(country))}</th>
+                    <td>${escapeHtml(countryCapital(country))}</td>
                   </tr>
                 `,
               )
@@ -904,18 +1283,23 @@
               data-action="close-modal"
               role="dialog"
               aria-modal="true"
-              aria-label="Stort flagg: ${escapeHtml(modalCountry.name)}"
+              aria-label="${escapeHtml(t("largeFlag", {
+                name: countryName(modalCountry),
+              }))}"
               tabindex="-1"
             >
-              <div class="flag-modal-card ${modalCountry.note ? "has-note" : ""}">
+              <div class="flag-modal-toolbar">
+                ${languageSwitcherMarkup()}
+              </div>
+              <div class="flag-modal-card ${countryNote(modalCountry) ? "has-note" : ""}">
                 ${flagMarkup(modalCountry, "modal-flag", true)}
-                <strong>${escapeHtml(modalCountry.name)}</strong>
+                <strong>${escapeHtml(countryName(modalCountry))}</strong>
                 ${
-                  modalCountry.note
-                    ? `<p class="country-note">${escapeHtml(modalCountry.note)}</p>`
+                  countryNote(modalCountry)
+                    ? `<p class="country-note">${escapeHtml(countryNote(modalCountry))}</p>`
                     : ""
                 }
-                <span class="modal-close-hint">Trykk hvor som helst for å lukke</span>
+                <span class="modal-close-hint">${t("closeModalHint")}</span>
               </div>
             </div>
           `
@@ -929,8 +1313,9 @@
     const modalCountry = countries.find(
       (country) => country.code === state.modalCode,
     );
+    const collator = new Intl.Collator(state.locale, { sensitivity: "base" });
     const sortedCountries = [...countriesInRegion(state.region)].sort((a, b) =>
-      norwegianCollator.compare(a.name, b.name),
+      collator.compare(countryName(a), countryName(b)),
     );
     const mapAvailable = mapSelectableRegions.includes(state.region);
     const viewingMap = state.exploreView === "map";
@@ -938,28 +1323,28 @@
     return `
       <main class="site-shell explore-shell">
         <header class="quiz-header">
-          ${brandMarkup(true)}
+          ${brandMarkup(true, false)}
           <div class="quiz-meta">
-            <span>${region.label}</span>
-            <strong>${sortedCountries.length} land</strong>
+            <span>${regionLabel(region)}</span>
+            <strong>${countryCount(sortedCountries.length)}</strong>
           </div>
-          <button class="quiet-button" data-action="setup">Tilbake</button>
+          ${homeButtonMarkup()}
         </header>
 
         <section class="explore-intro">
           <div>
-            <p class="kicker">Utforsk landene</p>
-            <h1>${region.label}</h1>
+            <p class="kicker">${t("exploreKicker")}</p>
+            <h1>${regionLabel(region)}</h1>
             <p>
               ${
                 viewingMap
-                  ? "Se hvor landene ligger, og sammenlign flagg og landformer."
-                  : "Flagg, land og hovedsteder i alfabetisk rekkefølge."
+                  ? t("exploreMapCopy")
+                  : t("exploreListCopy")
               }
             </p>
           </div>
           <label class="explore-region-select">
-            <span>Område</span>
+            <span>${t("area")}</span>
             <select data-action="explore-region">
               ${regionOptions
                 .map(
@@ -968,7 +1353,7 @@
                       value="${option.id}"
                       ${option.id === state.region ? "selected" : ""}
                     >
-                      ${escapeHtml(option.label)} · ${countriesInRegion(option.id).length} land
+                      ${escapeHtml(regionLabel(option))} · ${countryCount(countriesInRegion(option.id).length)}
                     </option>
                   `,
                 )
@@ -977,7 +1362,7 @@
           </label>
         </section>
 
-        <div class="explore-tabs" role="tablist" aria-label="Visning">
+        <div class="explore-tabs" role="tablist" aria-label="${escapeHtml(t("view"))}">
           <button
             id="explore-list-tab"
             role="tab"
@@ -987,7 +1372,7 @@
             aria-controls="explore-list-panel"
             tabindex="${viewingMap ? "-1" : "0"}"
           >
-            Liste
+            ${t("list")}
           </button>
           <button
             id="explore-map-tab"
@@ -998,7 +1383,7 @@
             aria-controls="explore-map-panel"
             tabindex="${viewingMap ? "0" : "-1"}"
           >
-            Kart
+            ${t("map")}
           </button>
         </div>
 
@@ -1028,19 +1413,23 @@
     if (complete) {
       return `
         <main class="quiz-shell flashcard-shell">
-          <header class="quiz-header">${brandMarkup(true)}</header>
+          <header class="quiz-header">
+            ${brandMarkup(true, false)}
+            ${homeButtonMarkup()}
+          </header>
           <section class="flashcard-complete">
-            <p class="kicker">Flashcards fullført</p>
-            <h1>Runden er ferdig.</h1>
+            <p class="kicker">${t("flashcardsComplete")}</p>
+            <h1>${t("roundComplete")}</h1>
             <p>
-              Du har gått gjennom ${state.flashcards.length} flagg fra
+              ${t("flashcardsSummaryBefore")} ${state.flashcards.length}
+              ${t("flashcardsSummaryAfter")}
               ${regionLabelInSentence(region)}.
             </p>
             <div class="flashcard-actions">
               <button class="primary-button" data-action="restart-flashcards">
-                Start på nytt <span aria-hidden="true">↻</span>
+                ${t("restart")} <span aria-hidden="true">↻</span>
               </button>
-              <button class="secondary-button" data-action="setup">Velg ny øvelse</button>
+              <button class="secondary-button" data-action="setup">${t("chooseNewActivity")}</button>
             </div>
           </section>
         </main>
@@ -1050,18 +1439,18 @@
     const country = state.flashcards[state.flashcardIndex];
     const progress = ((state.flashcardIndex + 1) / state.flashcards.length) * 100;
     const instruction = state.flashcardRevealed
-      ? "Trykk igjen for neste flagg"
-      : "Tenk på landet og hovedstaden – trykk for å se svaret";
+      ? t("nextFlag")
+      : t("revealInstruction");
 
     return `
       <main class="quiz-shell flashcard-shell">
         <header class="quiz-header">
-          ${brandMarkup(true)}
+          ${brandMarkup(true, false)}
           <div class="quiz-meta">
-            <span>${region.label}</span>
+            <span>${regionLabel(region)}</span>
             <strong>${state.flashcardIndex + 1} / ${state.flashcards.length}</strong>
           </div>
-          <button class="quiet-button" data-action="setup">Avslutt</button>
+          ${homeButtonMarkup()}
         </header>
         <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="${
           state.flashcards.length
@@ -1073,8 +1462,14 @@
           data-action="flashcard-toggle"
           aria-label="${
             state.flashcardRevealed
-              ? `${escapeHtml(country.name)}, ${escapeHtml(country.capital)}. Trykk for neste flagg.`
-              : `Flashcard ${state.flashcardIndex + 1} av ${state.flashcards.length}. Trykk for å vise svaret.`
+              ? escapeHtml(t("revealedFlashcard", {
+                  name: countryName(country),
+                  capital: countryCapital(country),
+                }))
+              : escapeHtml(t("hiddenFlashcard", {
+                  current: state.flashcardIndex + 1,
+                  total: state.flashcards.length,
+                }))
           }"
         >
           ${flagMarkup(country, "flashcard-flag", state.flashcardRevealed)}
@@ -1082,8 +1477,8 @@
             ${
               state.flashcardRevealed
                 ? `
-                  <strong>${escapeHtml(country.name)}</strong>
-                  <span>${escapeHtml(country.capital)}</span>
+                  <strong>${escapeHtml(countryName(country))}</strong>
+                  <span>${escapeHtml(countryCapital(country))}</span>
                 `
                 : ""
             }
@@ -1097,14 +1492,14 @@
   function promptMarkup(question, answered) {
     if (state.mode === "country-flag") {
       return `
-        <span class="question-label">Finn flagget til</span>
-        <h1>${escapeHtml(question.country.name)}</h1>
+        <span class="question-label">${t("findFlag")}</span>
+        <h1>${escapeHtml(countryName(question.country))}</h1>
       `;
     }
 
     if (state.mode === "flag-country") {
       return `
-        <span class="question-label">Hvilket land har dette flagget?</span>
+        <span class="question-label">${t("whichCountryFlag")}</span>
         <div class="featured-flag-wrap">
           ${flagMarkup(question.country, "featured-flag", answered)}
         </div>
@@ -1113,15 +1508,15 @@
 
     if (state.mode === "map-country") {
       return `
-        <span class="question-label">Hvilket land er uthevet?</span>
+        <span class="question-label">${t("whichCountryHighlighted")}</span>
       `;
     }
 
     return `
-      <span class="question-label">Hva er hovedstaden i</span>
+      <span class="question-label">${t("capitalQuestion")}</span>
       <div class="country-with-flag">
         ${flagMarkup(question.country, "prompt-flag", true)}
-        <h1>${escapeHtml(question.country.name)}</h1>
+        <h1>${escapeHtml(countryName(question.country))}</h1>
       </div>
     `;
   }
@@ -1147,21 +1542,21 @@
       state.answerStatus === "correct" || (awaitingCorrection && !isAnswer);
     const label =
       state.mode === "country-capital"
-        ? choice.capital
+        ? countryCapital(choice)
         : state.mode === "flag-country" || state.mode === "map-country"
-          ? choice.name
-          : `Alternativ ${index + 1}`;
+          ? countryName(choice)
+          : t("option", { number: index + 1 });
     const baseAccessibleLabel =
       state.mode === "country-flag"
         ? answered
-          ? choice.name
-          : `Flaggalternativ ${index + 1}`
+          ? countryName(choice)
+          : t("flagOption", { number: index + 1 })
         : label;
     const accessibleLabel =
       awaitingCorrection && isAnswer
-        ? `${baseAccessibleLabel}, riktig svar. Trykk for å gå videre.`
+        ? t("correctContinue", { label: baseAccessibleLabel })
         : answered && isAnswer
-          ? `${baseAccessibleLabel}, riktig svar`
+          ? t("correctAnswer", { label: baseAccessibleLabel })
           : baseAccessibleLabel;
     return `
       <button
@@ -1190,14 +1585,14 @@
   }
 
   function answerAnnouncement(question) {
-    if (state.answerStatus === "correct") return "Riktig.";
+    if (state.answerStatus === "correct") return t("correctAnnouncement");
     if (state.answerStatus !== "correction") return "";
 
     const answer =
       state.mode === "country-capital"
-        ? question.country.capital
-        : question.country.name;
-    return `Feil. Riktig svar er ${answer}. Aktiver det markerte alternativet for å gå videre.`;
+        ? countryCapital(question.country)
+        : countryName(question.country);
+    return t("wrongAnnouncement", { answer });
   }
 
   function quizMarkup() {
@@ -1242,12 +1637,12 @@
     return `
       <main class="quiz-shell quiz-active mode-${state.mode} ${keyboardHintsVisible ? "show-keyboard-hints" : ""}">
         <header class="quiz-header">
-          ${brandMarkup(true)}
+          ${brandMarkup(true, false)}
           <div class="quiz-meta">
-            <span>${selectedRegion().label}</span>
+            <span>${regionLabel(selectedRegion())}</span>
             <strong>${state.questionIndex + 1} / ${state.questions.length}</strong>
           </div>
-          <button class="quiet-button" data-action="setup">Avslutt</button>
+          ${homeButtonMarkup()}
         </header>
 
         <div
@@ -1262,7 +1657,7 @@
 
         <section class="question-area" aria-live="polite">
           <div class="question-prompt">
-            <p class="kicker">${selectedMode().label}</p>
+            <p class="kicker">${modeLabel(selectedMode())}</p>
             ${promptMarkup(question, answered)}
           </div>
           ${questionBody}
@@ -1278,16 +1673,16 @@
     return `
       <main class="quiz-shell map-region-shell">
         <header class="quiz-header">
-          ${brandMarkup(true)}
-          <button class="quiet-button" data-action="cancel-map-region">Tilbake</button>
+          ${brandMarkup(true, false)}
+          ${homeButtonMarkup("cancel-map-region")}
         </header>
         <div class="map-region-step">
           ${mapRegionPromptMarkup({
             action: "quiz-map-region",
-            description: "Kartquizen bruker ett regionkart om gangen.",
-            heading: "Velg region",
+            description: t("mapQuizDescription"),
+            heading: t("chooseRegion"),
             headingId: "quiz-map-region-heading",
-            kicker: "Kartquiz",
+            kicker: t("modeMapCountry"),
           })}
         </div>
       </main>
@@ -1312,6 +1707,7 @@
   }
 
   function render(options = {}) {
+    updateDocumentMetadata();
     app.innerHTML = screenMarkup();
 
     document.body?.classList.toggle("modal-open", state.modalCode !== null);
@@ -1345,6 +1741,20 @@
       app
         .querySelector('[data-action="mode"][data-value="map-country"]')
         ?.focus();
+    }
+    if (options.focusLanguage) {
+      const modalLanguageControl = app.querySelector(
+        `.flag-modal [data-action="language"][data-value="${options.focusLanguage}"]`,
+      );
+      if (modalLanguageControl) {
+        modalLanguageControl.focus({ preventScroll: true });
+        return;
+      }
+      app
+        .querySelector(
+          `[data-action="language"][data-value="${options.focusLanguage}"]`,
+        )
+        ?.focus({ preventScroll: true });
     }
   }
 
@@ -1468,14 +1878,29 @@
     });
   }
 
-  function setExploreRegion(regionId, { focusSelect = false } = {}) {
-    if (!regionOptions.some((region) => region.id === regionId)) return;
+  function updateRegion(regionId) {
+    if (!regionOptions.some((region) => region.id === regionId)) return false;
     state.region = regionId;
+    syncUrlState();
+    return true;
+  }
+
+  function setExploreRegion(regionId, { focusSelect = false } = {}) {
+    if (!updateRegion(regionId)) return;
     resetExploreCountryState();
     state.modalCode = null;
     render({
       focusExploreRegion: focusSelect,
     });
+  }
+
+  function setLocale(locale) {
+    if (!supportedLocales.includes(locale) || locale === state.locale) return;
+    const scrollTop = window.scrollY;
+    state.locale = locale;
+    syncUrlState();
+    render({ focusLanguage: locale });
+    window.scrollTo({ top: scrollTop });
   }
 
   function setSilhouetteExpanded(expanded) {
@@ -1487,7 +1912,7 @@
     control.setAttribute("aria-expanded", String(expanded));
     control.setAttribute(
       "aria-label",
-      expanded ? "Forminsk landformen" : "Forstørr landformen",
+      expanded ? t("shrinkShape") : t("enlargeShape"),
     );
     control
       .querySelectorAll(".country-silhouette-marker")
@@ -1634,6 +2059,11 @@
       return;
     }
 
+    if (action === "language") {
+      setLocale(control.dataset.value);
+      return;
+    }
+
     if (action === "explore") {
       showExplore(control.dataset.value);
       return;
@@ -1645,14 +2075,14 @@
     }
 
     if (action === "explore-map-region") {
-      state.region = control.dataset.value;
+      if (!updateRegion(control.dataset.value)) return;
       resetExploreCountryState();
       render({ focusExploreTab: "map" });
       return;
     }
 
     if (action === "quiz-map-region") {
-      state.region = control.dataset.value;
+      if (!updateRegion(control.dataset.value)) return;
       startQuiz("map-country");
       return;
     }
@@ -1675,7 +2105,7 @@
     }
 
     if (action === "region" || action === "map-region") {
-      state.region = control.dataset.value;
+      if (!updateRegion(control.dataset.value)) return;
       render();
       return;
     }
@@ -1860,7 +2290,7 @@
       return;
     }
     event.preventDefault();
-    state.region = control.dataset.value;
+    if (!updateRegion(control.dataset.value)) return;
     render();
   });
 
@@ -1952,5 +2382,6 @@
     }
   });
 
+  syncUrlState();
   render();
 })();
