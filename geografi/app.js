@@ -2358,14 +2358,18 @@
     });
   }
 
-  function resetExploreCountryState() {
-    state.explorePinnedCode = null;
-    state.explorePreviewCode = null;
+  function resetExploreMapInteraction() {
     state.exploreMapViewport = null;
-    state.silhouetteExpanded = false;
     exploreMapPointers.clear();
     exploreMapGesture = null;
     exploreMapDrag = null;
+  }
+
+  function resetExploreCountryState() {
+    state.explorePinnedCode = null;
+    state.explorePreviewCode = null;
+    state.silhouetteExpanded = false;
+    resetExploreMapInteraction();
   }
 
   function syncExploreCountryUi() {
@@ -2438,10 +2442,7 @@
   function updateRegion(regionId) {
     if (!regionOptions.some((region) => region.id === regionId)) return false;
     if (state.region !== regionId) {
-      state.exploreMapViewport = null;
-      exploreMapPointers.clear();
-      exploreMapGesture = null;
-      exploreMapDrag = null;
+      resetExploreMapInteraction();
     }
     state.region = regionId;
     syncUrlState();

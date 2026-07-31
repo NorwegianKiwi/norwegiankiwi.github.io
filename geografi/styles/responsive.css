@@ -1,0 +1,1362 @@
+/*
+ * Keep the active quiz within one tablet/laptop viewport. Phones retain the
+ * naturally scrolling layout below.
+ */
+@media (min-width: 601px) and (min-height: 600px) {
+  .quiz-active {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .quiz-active .quiz-header {
+    min-height: 58px;
+    height: 58px;
+  }
+
+  .quiz-active .brand {
+    font-size: 21px;
+  }
+
+  .quiz-active .brand-mark {
+    width: 31px;
+    height: 31px;
+  }
+
+  .quiz-active .question-area {
+    height: calc(100dvh - 61px);
+    padding: clamp(10px, 1.8vh, 17px) 0 clamp(9px, 1.5vh, 14px);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(8px, 1.4vh, 13px);
+  }
+
+  .quiz-active .question-prompt {
+    margin: 0;
+    min-height: 0;
+  }
+
+  .quiz-active .question-prompt h1 {
+    font-size: clamp(28px, 5.4vh, 46px);
+    line-height: 0.96;
+  }
+
+  .quiz-active .featured-flag {
+    margin-top: clamp(7px, 1.2vh, 12px);
+  }
+
+  .quiz-active .question-instruction {
+    font-size: clamp(19px, 3.4vh, 28px);
+  }
+
+  .quiz-active .question-clue {
+    margin-top: clamp(3px, 0.8vh, 7px);
+    font-size: clamp(32px, 6vh, 52px);
+  }
+
+  .quiz-active .question-compact {
+    font-size: clamp(22px, 4.4vh, 34px) !important;
+  }
+
+  .quiz-active .answer-grid {
+    --answer-gap: clamp(6px, 1.1vh, 10px);
+    min-height: 0;
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+
+  .mode-country-flag .answer-grid-stage {
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    container-type: size;
+  }
+
+  .quiz-active .flag-grid {
+    --answer-gap: 16px;
+    width: min(100cqw, calc(133.333cqh - 10.667px));
+    grid-template-rows: repeat(3, auto);
+    align-content: center;
+  }
+
+  .quiz-active .capital-grid {
+    grid-template-rows: repeat(3, minmax(72px, 96px));
+    align-content: center;
+  }
+
+  .quiz-active .answer-card {
+    min-height: 0;
+  }
+
+  .quiz-active .flag-grid .answer-card {
+    aspect-ratio: 4 / 3;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 0;
+    padding: 0;
+  }
+
+  .quiz-active .flag-grid .answer-flag {
+    grid-column: 1;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    justify-self: center;
+  }
+
+  .quiz-active .text-grid .answer-card {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .mode-flag-country .featured-flag {
+    width: min(318px, calc(43vh - 16px));
+  }
+
+  .mode-flag-country .country-grid {
+    grid-template-rows: repeat(3, minmax(58px, 72px));
+    align-content: center;
+  }
+
+  .mode-flag-country .country-grid .answer-card {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .mode-country-capital .capital-clue {
+    margin-top: clamp(3px, 0.7vh, 6px);
+    gap: clamp(3px, 0.7vh, 6px);
+  }
+
+  .mode-country-capital .prompt-flag {
+    width: clamp(110px, 18vh, 145px);
+  }
+
+  .mode-country-capital .question-instruction {
+    font-size: clamp(18px, 3.2vh, 25px);
+  }
+
+  .mode-country-capital .question-clue {
+    font-size: clamp(28px, 4.8vh, 40px);
+  }
+
+  .mode-country-capital .capital-grid {
+    grid-template-rows: repeat(3, minmax(64px, 82px));
+    align-content: center;
+  }
+
+  .mode-country-capital .capital-grid .answer-card {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .mode-map-country .question-area {
+    width: min(1120px, calc(100% - 24px));
+  }
+
+  .mode-map-country .map-answer-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+  }
+
+  .mode-map-country .map-answer-grid .answer-card {
+    padding: 6px 12px;
+  }
+
+  .mode-flag-country .answer-card strong,
+  .mode-country-capital .answer-card strong,
+  .mode-map-country .answer-card strong {
+    overflow-wrap: anywhere;
+    line-height: 1.2;
+  }
+
+}
+
+@media (max-width: 979px) {
+  .activity-button {
+    min-height: 64px;
+  }
+
+  .region-picker-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .region-map-card {
+    width: min(100%, 680px);
+  }
+
+  .region-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .activity-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-panel {
+    min-height: 0;
+  }
+}
+
+@media (min-width: 980px) and (max-width: 1100px) {
+  .activity-button strong {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 700px) {
+  .guess-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .guess-actions .activity-button:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 899px) {
+  .map-quiz-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+
+  .mode-map-country .map-answer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(64px, 74px));
+    padding: 10px 14px;
+  }
+
+  .explore-map-layout {
+    height: auto;
+    min-height: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(300px, min(58vw, 430px)) 330px;
+  }
+
+  .explore-country-panel {
+    height: 330px;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  .explore-map-shell {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .explore-map-shell .explore-content {
+    height: calc(100dvh - var(--explore-header-height));
+    min-height: 0;
+    margin: 0;
+    padding: 14px 0;
+  }
+
+  .explore-map-shell .explore-map-layout {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .explore-map-shell .map-region-prompt {
+    height: 100%;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 820px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) 78px;
+    gap: 16px;
+  }
+
+  .hero-globe {
+    width: 78px;
+    height: 78px;
+  }
+
+  .question-area {
+    padding-top: 45px;
+  }
+
+  .text-grid .answer-card {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+}
+
+@media (max-width: 600px) {
+  .site-shell,
+  .quiz-shell {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .quiz-active,
+  .flashcard-shell {
+    --phone-quiz-header-height: 66px;
+    --phone-quiz-header-height: clamp(58px, 8.5dvh, 72px);
+    --phone-quiz-bottom-buffer: 18px;
+    --phone-quiz-bottom-buffer: max(18px, env(safe-area-inset-bottom));
+  }
+
+  .brand-bar,
+  .quiz-header {
+    min-height: 72px;
+  }
+
+  .quiz-active .quiz-header,
+  .flashcard-shell .quiz-header {
+    min-height: var(--phone-quiz-header-height);
+  }
+
+  .brand-group {
+    gap: 10px;
+  }
+
+  .language-switcher {
+    gap: 2px;
+    padding: 2px;
+  }
+
+  .language-button {
+    width: 31px;
+    height: 24px;
+  }
+
+  .quiz-header .brand > span {
+    display: none;
+  }
+
+  .site-home-link {
+    padding-left: 10px;
+    font-size: 11px;
+  }
+
+  .hero {
+    padding: 30px 0 26px;
+    grid-template-columns: minmax(0, 1fr) 64px;
+    gap: 10px;
+  }
+
+  .hero-globe {
+    width: 64px;
+    height: 64px;
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 13vw, 58px);
+  }
+
+  .region-panel {
+    padding: 20px 14px;
+  }
+
+  .region-panel h2 {
+    margin-bottom: 16px;
+  }
+
+  .action-section {
+    padding: 18px 0 30px;
+  }
+
+  .region-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .region-card {
+    min-height: 56px;
+  }
+
+  footer {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .quiz-meta span {
+    display: none;
+  }
+
+  .quiz-active {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .quiz-active .question-area {
+    min-height: calc(100vh - var(--phone-quiz-header-height) - 3px);
+    min-height: calc(100dvh - var(--phone-quiz-header-height) - 3px);
+    padding: clamp(12px, 2.25dvh, 20px) 0 var(--phone-quiz-bottom-buffer);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(10px, 1.8dvh, 16px);
+  }
+
+  .quiz-active .question-prompt {
+    margin-bottom: 0;
+  }
+
+  .question-instruction {
+    font-size: clamp(21px, 6.5vw, 27px);
+  }
+
+  .question-clue {
+    margin-top: 6px;
+    font-size: clamp(34px, 10.5vw, 48px);
+  }
+
+  .question-compact {
+    font-size: clamp(25px, 7.5vw, 32px) !important;
+  }
+
+  .capital-clue {
+    margin-top: 8px;
+    gap: 6px;
+  }
+
+  .prompt-flag {
+    width: 96px;
+  }
+
+  .mode-country-capital .question-clue {
+    font-size: clamp(32px, 9.5vw, 42px);
+  }
+
+  .answer-grid {
+    --answer-gap: clamp(5px, 0.8dvh, 7px);
+  }
+
+  .flag-grid {
+    --answer-gap: 12px;
+  }
+
+  .quiz-active .answer-grid-stage {
+    min-height: 0;
+    display: grid;
+    align-items: center;
+  }
+
+  .mode-country-flag .answer-grid-stage {
+    place-items: center;
+    container-type: size;
+  }
+
+  .quiz-active .flag-grid {
+    width: min(100cqw, calc(133.333cqh - 10.667px));
+    max-width: 100%;
+    grid-template-rows: repeat(3, auto);
+    align-content: center;
+  }
+
+  .flag-grid .answer-card {
+    padding: 0;
+    grid-template-rows: auto;
+    gap: 0;
+  }
+
+  .mode-flag-country .featured-flag {
+    width: min(
+      316px,
+      calc(72vw - 18px),
+      calc(32dvh - 18px)
+    );
+    margin-top: clamp(8px, 1.5dvh, 14px);
+  }
+
+  .text-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quiz-active .text-grid {
+    grid-template-rows: repeat(
+      6,
+      minmax(clamp(52px, 7.5dvh, 60px), auto)
+    );
+    align-content: center;
+  }
+
+  .quiz-active .text-grid .answer-card {
+    min-height: clamp(52px, 7.5dvh, 60px);
+    padding-top: clamp(8px, 1.2dvh, 12px);
+    padding-bottom: clamp(8px, 1.2dvh, 12px);
+  }
+
+  .mode-country-capital .prompt-flag {
+    width: clamp(76px, 12dvh, 96px);
+  }
+
+  .mode-map-country .question-area {
+    padding-top: clamp(10px, 1.8dvh, 16px);
+  }
+
+  .mode-map-country .question-prompt {
+    margin-bottom: 0;
+  }
+
+  .map-quiz-layout {
+    display: grid;
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: clamp(8px, 1.3dvh, 12px);
+  }
+
+  .map-quiz-visual {
+    height: min(58vw, 250px);
+    height: clamp(180px, min(58vw, 28dvh), 250px);
+    min-height: 0;
+    border-radius: 12px;
+  }
+
+  .country-silhouette-inset {
+    --silhouette-edge: 8px;
+    --silhouette-size: 88px;
+    padding: 7px;
+    border-radius: 12px;
+  }
+
+  .country-silhouette-inset.is-expanded {
+    padding: 13px;
+  }
+
+  .mode-map-country .map-answer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(56px, auto));
+    grid-template-rows: repeat(3, minmax(clamp(56px, 8.2dvh, 70px), auto));
+    padding: 8px 10px;
+  }
+
+  .mode-map-country .map-answer-grid .answer-card {
+    min-height: 56px;
+    min-height: clamp(56px, 8.2dvh, 70px);
+    padding: 8px;
+  }
+
+  .map-answer-content {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .map-answer-flag {
+    width: 34px;
+  }
+
+  .mode-map-country .map-answer-grid .answer-card strong {
+    font-size: 14px;
+  }
+
+  .text-grid .answer-card {
+    min-height: 58px;
+  }
+
+  .text-grid .answer-card strong {
+    font-size: 16px;
+  }
+
+  .result-card {
+    padding-top: 60px;
+  }
+
+  .result-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .result-stats div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .result-stats div:last-child {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--line);
+  }
+
+  .result-review {
+    padding-top: 42px;
+    margin-bottom: 50px;
+  }
+
+  .review-list {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-shell {
+    --explore-header-height: 72px;
+  }
+
+  .explore-context {
+    max-width: 30vw;
+  }
+
+  .explore-context-prefix {
+    display: none;
+  }
+
+  .explore-content {
+    padding-top: 10px;
+    margin-bottom: 50px;
+  }
+
+  .explore-map-layout {
+    grid-template-rows: minmax(220px, min(66vw, 280px)) 340px;
+    gap: 10px;
+  }
+
+  .explore-region-map,
+  .explore-country-panel {
+    border-radius: 12px;
+  }
+
+  .explore-map-zoom-controls {
+    top: 7px;
+  }
+
+  .explore-map-zoom-controls button {
+    min-width: 32px;
+    height: 30px;
+  }
+
+  .explore-map-zoom-controls .explore-map-zoom-reset {
+    min-width: 54px;
+  }
+
+  .explore-country-panel {
+    height: 340px;
+  }
+
+  .explore-country-status-wrap {
+    height: 82px;
+    padding: 9px 11px;
+  }
+
+  .explore-country-status {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .explore-status-flag {
+    width: 44px;
+  }
+
+  .explore-country-list {
+    padding: 7px;
+    gap: 6px;
+  }
+
+  .explore-country-card {
+    min-height: 54px;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .explore-country-flag {
+    width: 40px;
+  }
+
+  .map-region-prompt {
+    min-height: 0;
+    padding: 28px 15px;
+  }
+
+  .map-region-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .map-region-grid button {
+    min-height: 64px;
+  }
+
+  .country-table-wrap {
+    margin-right: -4px;
+    margin-left: -4px;
+  }
+
+  .country-table {
+    font-size: 14px;
+  }
+
+  .country-table .flag-column {
+    width: 68px;
+  }
+
+  .country-table .country-column {
+    width: 41%;
+  }
+
+  .country-table th,
+  .country-table td {
+    padding: 10px 8px;
+  }
+
+  .country-table tbody th {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  .table-flag {
+    width: 50px;
+  }
+
+  .table-flag-button {
+    width: 50px;
+  }
+
+  .flag-modal {
+    padding: 16px;
+  }
+
+  .modal-flag {
+    width: min(90vw, 82vh);
+  }
+
+  .flag-modal-card.has-note .modal-flag {
+    width: min(90vw, 60vh);
+  }
+
+  .country-note {
+    width: min(100%, 90vw);
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .flashcard-stage {
+    height: calc(100vh - var(--phone-quiz-header-height) - 3px);
+    height: calc(100dvh - var(--phone-quiz-header-height) - 3px);
+    padding: 20px 6px max(20px, var(--phone-quiz-bottom-buffer));
+    grid-template-rows: minmax(0, 1fr) 116px auto;
+  }
+
+  .flashcard-flag {
+    width: min(90vw, 64vh);
+  }
+
+  .flashcard-answer {
+    height: 116px;
+    min-height: 0;
+  }
+
+  .flashcard-complete {
+    padding: 70px 0 50px;
+  }
+}
+
+@media (orientation: landscape) and (min-width: 650px) and (max-height: 599px) {
+  .explore-map-shell {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .explore-map-shell .explore-content {
+    height: calc(100dvh - var(--explore-header-height));
+    min-height: 0;
+    margin: 0;
+    padding: 10px 0;
+  }
+
+  .explore-map-shell .explore-map-layout {
+    height: 100%;
+    min-height: 0;
+    grid-template-columns:
+      minmax(0, 1fr)
+      clamp(240px, 32vw, 280px);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .explore-map-shell .explore-country-panel {
+    height: auto;
+    min-height: 0;
+  }
+
+  .explore-map-shell .map-region-prompt {
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+@media (orientation: landscape) and (max-width: 649px) and (max-height: 599px) {
+  .explore-map-shell .explore-map-layout {
+    grid-template-rows:
+      minmax(
+        180px,
+        min(
+          280px,
+          calc(100dvh - var(--explore-header-height) - 20px)
+        )
+      )
+      340px;
+  }
+
+  .explore-map-shell .map-region-prompt {
+    max-height: calc(100dvh - var(--explore-header-height) - 20px);
+    overflow-y: auto;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 600px) {
+  body.standalone-mode .explore-map-shell .explore-content {
+    --explore-standalone-bottom-space: max(
+      10px,
+      env(safe-area-inset-bottom)
+    );
+    margin-bottom: var(--explore-standalone-bottom-space);
+  }
+
+  body.standalone-mode .explore-map-shell .explore-country-panel {
+    height: max(
+      340px,
+      calc(
+        100dvh -
+        var(--explore-header-height) -
+        max(220px, min(66vw, 280px)) -
+        20px -
+        var(--explore-standalone-bottom-space)
+      )
+    );
+  }
+}
+
+/*
+ * Portrait tablets have enough width for each activity group to remain a
+ * single row, but not enough width for both groups to share that row.
+ */
+@media (orientation: portrait) and (min-width: 601px) and (max-width: 820px) {
+  .activity-panels {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .activity-panel {
+    min-height: 0;
+    padding: 7px;
+    gap: 5px;
+  }
+
+  .activity-button {
+    min-height: 48px;
+  }
+
+  .activity-button strong {
+    overflow-wrap: normal;
+  }
+
+  .action-section {
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+}
+
+/*
+ * In the stacked portrait-tablet Explore layout, use the space below the map
+ * for the country rail. Browser tabs retain a small visual buffer; installed
+ * apps can extend to the safe-area edge.
+ */
+@media (orientation: portrait) and (min-width: 601px) and (max-width: 899px) {
+  .explore-map-shell .explore-content {
+    --explore-tablet-bottom-space: 24px;
+    margin-bottom: var(--explore-tablet-bottom-space);
+  }
+
+  .explore-map-shell .explore-map-layout {
+    height: max(
+      774px,
+      calc(
+        100dvh -
+        var(--explore-header-height) -
+        14px -
+        var(--explore-tablet-bottom-space)
+      )
+    );
+    min-height: 0;
+    grid-template-rows:
+      minmax(300px, min(58vw, 430px))
+      minmax(330px, 1fr);
+  }
+
+  .explore-map-shell .explore-country-panel {
+    height: auto;
+  }
+
+  body.standalone-mode .explore-map-shell .explore-content {
+    --explore-tablet-bottom-space: max(
+      10px,
+      env(safe-area-inset-bottom)
+    );
+  }
+}
+
+/*
+ * Short landscape screens need a height-first layout. This covers modern
+ * landscape phones (which are often wider than the phone breakpoint) without
+ * changing portrait phones or regular-height tablets.
+ */
+@media (orientation: landscape) and (max-height: 599px) {
+  .quiz-active,
+  .flashcard-shell,
+  .map-region-shell {
+    --short-header-height: 52px;
+    --short-bottom-space: max(7px, env(safe-area-inset-bottom));
+    width: min(100% - 24px, 1180px);
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body.standalone-mode .quiz-active,
+  body.standalone-mode .flashcard-shell,
+  body.standalone-mode .map-region-shell {
+    --short-bottom-space: max(4px, env(safe-area-inset-bottom));
+  }
+
+  .quiz-active .quiz-header,
+  .flashcard-shell .quiz-header,
+  .map-region-shell .quiz-header,
+  .result-shell .quiz-header {
+    height: var(--short-header-height, 52px);
+    min-height: var(--short-header-height, 52px);
+  }
+
+  .quiz-active .brand,
+  .flashcard-shell .brand,
+  .map-region-shell .brand,
+  .result-shell .brand {
+    font-size: 19px;
+  }
+
+  .quiz-active .brand-mark,
+  .flashcard-shell .brand-mark,
+  .map-region-shell .brand-mark,
+  .result-shell .brand-mark {
+    width: 29px;
+    height: 29px;
+  }
+
+  .quiz-active .quiz-header .brand > span,
+  .flashcard-shell .quiz-header .brand > span,
+  .map-region-shell .quiz-header .brand > span,
+  .result-shell .quiz-header .brand > span {
+    display: none;
+  }
+
+  .quiz-active .quiz-meta span {
+    display: none;
+  }
+
+  .quiz-active .question-area {
+    width: min(1120px, 100%);
+    height: calc(100dvh - var(--short-header-height) - 3px);
+    min-height: 0;
+    padding: 6px 0 var(--short-bottom-space);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .quiz-active .question-prompt {
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    align-self: center;
+  }
+
+  .quiz-active .question-prompt h1 {
+    font-size: clamp(22px, 6.8dvh, 30px);
+    line-height: 0.98;
+  }
+
+  .quiz-active .question-instruction {
+    font-size: clamp(17px, 5.4dvh, 23px);
+  }
+
+  .quiz-active .question-clue {
+    margin-top: 2px;
+    font-size: clamp(25px, 8dvh, 36px);
+  }
+
+  .quiz-active .question-compact {
+    font-size: clamp(20px, 6.2dvh, 27px) !important;
+  }
+
+  .quiz-active .answer-grid-stage {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    align-items: stretch;
+  }
+
+  .mode-country-flag .answer-grid-stage {
+    place-items: center;
+    container-type: size;
+  }
+
+  .quiz-active .answer-grid {
+    --answer-gap: clamp(5px, 1.7dvh, 8px);
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .quiz-active .flag-grid {
+    --answer-gap: clamp(7px, 2.5dvh, 12px);
+    width: min(100cqw, calc(133.333cqh - 10.667px));
+    grid-template-rows: repeat(3, auto);
+    align-content: center;
+  }
+
+  .quiz-active .flag-grid .answer-card {
+    min-height: 0;
+    padding: 0;
+    grid-template-rows: auto;
+    gap: 0;
+  }
+
+  .quiz-active .flag-grid .answer-flag {
+    width: 100%;
+    height: auto;
+  }
+
+  .mode-flag-country .question-area,
+  .mode-country-capital .question-area {
+    grid-template-columns: minmax(180px, 0.82fr) minmax(0, 1.45fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: clamp(9px, 2.2vw, 22px);
+  }
+
+  .mode-flag-country .question-prompt,
+  .mode-country-capital .question-prompt {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+  }
+
+  .mode-flag-country .featured-flag {
+    width: min(235px, 31vw, 55dvh);
+    margin-top: 7px;
+  }
+
+  .mode-country-capital .capital-clue {
+    margin-top: 5px;
+    gap: 4px;
+  }
+
+  .mode-country-capital .prompt-flag {
+    width: min(105px, 17vw, 29dvh);
+  }
+
+  .mode-flag-country .text-grid,
+  .mode-country-capital .text-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    align-content: stretch;
+  }
+
+  .mode-flag-country .text-grid .answer-card,
+  .mode-country-capital .text-grid .answer-card {
+    min-height: 0;
+    padding: 5px 9px;
+  }
+
+  .mode-flag-country .answer-card strong,
+  .mode-country-capital .answer-card strong,
+  .mode-map-country .answer-card strong {
+    overflow-wrap: anywhere;
+    font-size: clamp(13px, 2vw, 17px);
+    line-height: 1.15;
+  }
+
+  .mode-map-country .question-area {
+    width: min(1160px, 100%);
+  }
+
+  .mode-map-country .question-prompt {
+    max-height: 32px;
+  }
+
+  .mode-map-country .map-quiz-layout {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1.25fr) minmax(230px, 0.9fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .mode-map-country .map-quiz-visual {
+    height: auto;
+    min-height: 0;
+    border-radius: 11px;
+  }
+
+  .mode-map-country .map-answer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    padding: 5px;
+  }
+
+  .mode-map-country .map-answer-grid .answer-card {
+    min-height: 0;
+    padding: 4px 6px;
+  }
+
+  .mode-map-country .map-answer-content {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .mode-map-country .map-answer-flag {
+    width: 30px;
+  }
+
+  .country-silhouette-inset {
+    --silhouette-edge: 7px;
+    --silhouette-size: min(78px, 25dvh);
+    padding: 6px;
+    border-radius: 10px;
+  }
+
+  .flashcard-stage {
+    width: min(1050px, 100%);
+    height: calc(100dvh - var(--short-header-height) - 3px);
+    padding: 9px 8px var(--short-bottom-space);
+    grid-template-columns: minmax(0, 1.35fr) minmax(190px, 0.85fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 6px clamp(14px, 3vw, 32px);
+  }
+
+  .flashcard-flag {
+    width: min(100%, 72dvh);
+    max-height: 100%;
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+
+  .flashcard-answer {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .flashcard-answer strong {
+    font-size: clamp(27px, 8.5dvh, 42px);
+  }
+
+  .flashcard-answer span {
+    font-size: clamp(14px, 4dvh, 18px);
+  }
+
+  .flashcard-instruction {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    padding-bottom: 5px;
+    text-align: center;
+  }
+
+  .flashcard-complete {
+    height: calc(100dvh - var(--short-header-height));
+    padding: 18px 0 var(--short-bottom-space);
+    display: grid;
+    place-content: center;
+  }
+
+  .flashcard-complete .kicker {
+    margin-bottom: 7px;
+  }
+
+  .flashcard-complete h1 {
+    font-size: clamp(34px, 11dvh, 52px);
+  }
+
+  .flashcard-complete > p:not(.kicker) {
+    margin: 10px auto 14px;
+    font-size: 15px;
+  }
+
+  .flashcard-complete .primary-button,
+  .flashcard-complete .secondary-button {
+    min-height: 44px;
+  }
+
+  .map-region-shell .map-region-step {
+    height: calc(100dvh - var(--short-header-height));
+    padding: 6px 0 var(--short-bottom-space);
+  }
+
+  .map-region-shell .map-region-prompt,
+  .explore-map-shell .map-region-prompt {
+    height: 100%;
+    min-height: 0;
+    padding: 7px 12px;
+    align-content: center;
+  }
+
+  .map-region-shell .map-region-prompt .kicker,
+  .explore-map-shell .map-region-prompt .kicker {
+    margin-bottom: 2px;
+  }
+
+  .map-region-shell .map-region-prompt h2,
+  .explore-map-shell .map-region-prompt h2 {
+    margin: 1px 0 3px;
+    font-size: clamp(22px, 7dvh, 30px);
+  }
+
+  .map-region-shell .map-region-prompt > p:not(.kicker),
+  .explore-map-shell .map-region-prompt > p:not(.kicker) {
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  .map-region-shell .map-region-grid,
+  .explore-map-shell .map-region-grid {
+    width: min(900px, 100%);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .map-region-shell .map-region-grid button,
+  .explore-map-shell .map-region-grid button {
+    min-height: clamp(45px, 15dvh, 58px);
+    padding: 4px 6px;
+  }
+
+  .map-region-shell .map-region-grid button strong,
+  .explore-map-shell .map-region-grid button strong {
+    font-size: clamp(13px, 2vw, 16px);
+  }
+}
+
+/*
+ * Result summaries use one landscape viewport. Reviews deliberately remain
+ * below that first screen so users can scroll through missed countries.
+ */
+@media (orientation: landscape) and (max-height: 599px) {
+  .result-shell {
+    --short-header-height: 52px;
+    width: min(100% - 24px, 1180px);
+    min-height: 100dvh;
+  }
+
+  .result-card,
+  .has-review .result-card {
+    width: min(980px, 100%);
+    height: calc(100dvh - var(--short-header-height));
+    min-height: 268px;
+    padding: 9px 0 max(7px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    column-gap: clamp(18px, 4vw, 54px);
+    row-gap: 4px;
+    align-items: center;
+    text-align: left;
+  }
+
+  .result-card > .kicker {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .result-card .result-score,
+  .has-review .result-card .result-score {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    justify-content: flex-start;
+    margin: 0;
+  }
+
+  .result-score strong,
+  .has-review .result-score strong {
+    font-size: clamp(60px, 23dvh, 92px);
+  }
+
+  .result-score span {
+    margin-top: 5px;
+    font-size: 23px;
+  }
+
+  .result-card h1,
+  .has-review .result-card h1 {
+    grid-column: 1;
+    grid-row: 3;
+    font-size: clamp(29px, 9dvh, 42px);
+    line-height: 0.95;
+  }
+
+  .result-card > p:not(.kicker),
+  .has-review .result-card > p:not(.kicker) {
+    grid-column: 1;
+    grid-row: 4;
+    margin: 2px 0 0;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .result-stats,
+  .has-review .result-stats {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    width: 100%;
+    margin: 0;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .result-stats div,
+  .has-review .result-stats div {
+    min-height: 54px;
+    padding: 7px 11px;
+    gap: 2px;
+  }
+
+  .result-stats div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .result-stats div:last-child {
+    grid-column: 1 / -1;
+    min-height: 58px;
+    border-top: 1px solid var(--line);
+  }
+
+  .result-stats strong {
+    font-size: 19px;
+  }
+
+  .result-card > .primary-button,
+  .has-review .result-card > .primary-button {
+    grid-column: 2;
+    grid-row: 3;
+    width: 100%;
+    min-height: 43px;
+  }
+
+  .result-card > .review-jump {
+    grid-column: 2;
+    grid-row: 4;
+    margin: 0 auto;
+    padding: 5px 9px;
+  }
+
+  .has-review .result-review {
+    padding-top: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}

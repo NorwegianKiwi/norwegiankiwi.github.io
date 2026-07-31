@@ -51,7 +51,8 @@ not private or secure functionality.
 
 - `index.html` – document shell and default metadata
 - `manifest.webmanifest` and `icons/` – installable web-app metadata and icons
-- `styles.css` – presentation and responsive layout
+- `styles/` – presentation split into base, quiz, Explore, flashcard, and
+  responsive stylesheets
 - `countries.js` – bilingual country and region data
 - `distractors.js` – curated relationships used by the two flag quizzes
 - `world-map.js` – local projected map data derived from Natural Earth
