@@ -2407,6 +2407,7 @@
   function advanceQuestion() {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
+    app.querySelector(".answer-card:focus")?.blur();
     state.silhouetteExpanded = false;
     if (state.questionIndex === state.questions.length - 1) {
       state.screen = "result";

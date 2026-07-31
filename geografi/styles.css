@@ -1035,12 +1035,6 @@ footer a {
     opacity 160ms ease;
 }
 
-.answer-card:hover:not(:disabled) {
-  transform: translateY(-3px);
-  border-color: var(--green);
-  box-shadow: 0 10px 24px rgba(41, 54, 45, 0.09);
-}
-
 .answer-card:disabled {
   cursor: default;
 }
@@ -1105,12 +1099,6 @@ footer a {
   box-shadow: none;
 }
 
-.answer-card.is-correction:hover {
-  transform: translateY(-3px);
-  border-color: var(--green);
-  box-shadow: 0 10px 24px rgba(36, 93, 69, 0.13);
-}
-
 .text-grid .answer-card.is-wrong strong {
   opacity: 0.45;
 }
@@ -1156,14 +1144,6 @@ footer a {
   transition-delay: 0s;
 }
 
-.flag-grid .answer-card:hover:not(:disabled),
-.flag-grid .answer-card.is-correction:hover {
-  transform: none;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
 .flag-grid .answer-card.is-correct,
 .flag-grid .answer-card.is-wrong,
 .flag-grid .answer-card.is-correction,
@@ -1205,9 +1185,34 @@ footer a {
   z-index: 2;
 }
 
-.flag-grid .answer-card:not(.is-correct):not(.is-wrong):not(.is-correction):hover .answer-flag,
 .flag-grid .answer-card:not(.is-correct):not(.is-wrong):not(.is-correction):focus-visible .answer-flag {
   box-shadow: 0 0 0 3px rgba(36, 93, 69, 0.5);
+}
+
+@media (hover: hover) {
+  .answer-card:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: var(--green);
+    box-shadow: 0 10px 24px rgba(41, 54, 45, 0.09);
+  }
+
+  .answer-card.is-correction:hover {
+    transform: translateY(-3px);
+    border-color: var(--green);
+    box-shadow: 0 10px 24px rgba(36, 93, 69, 0.13);
+  }
+
+  .flag-grid .answer-card:hover:not(:disabled),
+  .flag-grid .answer-card.is-correction:hover {
+    transform: none;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .flag-grid .answer-card:not(.is-correct):not(.is-wrong):not(.is-correction):hover .answer-flag {
+    box-shadow: 0 0 0 3px rgba(36, 93, 69, 0.5);
+  }
 }
 
 @keyframes correction-flag-pulse {
