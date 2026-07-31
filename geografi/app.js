@@ -266,16 +266,21 @@
   const countriesByCode = new Map(
     countries.map((country) => [country.code, country]),
   );
-  const flagDistractorCodesByCountry = new Map();
+  const primaryFlagDistractorCodesByCountry = new Map();
+  const secondaryFlagDistractorCodesByCountry = new Map();
   const flagConflictCodesByCountry = new Map();
 
   flagDistractorGroups.forEach((group) => {
+    const distractorCodesByCountry =
+      group.strength === "primary"
+        ? primaryFlagDistractorCodesByCountry
+        : secondaryFlagDistractorCodesByCountry;
     group.codes.forEach((code) => {
-      const relatedCodes = flagDistractorCodesByCountry.get(code) ?? new Set();
+      const relatedCodes = distractorCodesByCountry.get(code) ?? new Set();
       group.codes.forEach((relatedCode) => {
         if (relatedCode !== code) relatedCodes.add(relatedCode);
       });
-      flagDistractorCodesByCountry.set(code, relatedCodes);
+      distractorCodesByCountry.set(code, relatedCodes);
     });
   });
 
@@ -434,6 +439,7 @@
   }
 
   function selectCompatibleFlagDistractors(candidates, count, selectedCodes) {
+    if (count <= 0) return [];
     const selected = [];
     for (const candidate of shuffle(candidates)) {
       const conflicts = flagConflictCodesByCountry.get(candidate.code);
@@ -458,14 +464,25 @@
       let distractors;
       if (usesFlagDistractors) {
         const selectedCodes = new Set([country.code]);
-        const relatedCandidates = [
-          ...(flagDistractorCodesByCountry.get(country.code) ?? []),
-        ].map((code) => countriesByCode.get(code));
-        const relatedDistractors = selectCompatibleFlagDistractors(
-          relatedCandidates,
-          Math.min(2, choiceCount - 1),
+        const primaryCodes =
+          primaryFlagDistractorCodesByCountry.get(country.code) ?? [];
+        const secondaryCodes =
+          secondaryFlagDistractorCodesByCountry.get(country.code) ?? [];
+        const primaryDistractors = selectCompatibleFlagDistractors(
+          [...primaryCodes].map((code) => countriesByCode.get(code)),
+          Math.min(1, choiceCount - 1),
           selectedCodes,
         );
+        const relatedCodes = new Set([...primaryCodes, ...secondaryCodes]);
+        const otherRelatedDistractors = selectCompatibleFlagDistractors(
+          [...relatedCodes].map((code) => countriesByCode.get(code)),
+          Math.min(2, choiceCount - 1) - primaryDistractors.length,
+          selectedCodes,
+        );
+        const relatedDistractors = [
+          ...primaryDistractors,
+          ...otherRelatedDistractors,
+        ];
         const randomDistractors = selectCompatibleFlagDistractors(
           pool,
           choiceCount - 1 - relatedDistractors.length,
