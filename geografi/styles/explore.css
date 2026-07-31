@@ -213,7 +213,7 @@
   position: absolute;
   z-index: 3;
   top: 10px;
-  left: 50%;
+  right: 10px;
   padding: 3px;
   border: 1px solid rgba(24, 35, 29, 0.24);
   border-radius: 10px;
@@ -221,7 +221,6 @@
   box-shadow: 0 5px 14px rgba(24, 35, 29, 0.14);
   display: flex;
   gap: 2px;
-  transform: translateX(-50%);
   transition:
     opacity 150ms ease,
     visibility 150ms ease;
