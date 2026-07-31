@@ -1207,11 +1207,12 @@
   }
 
   function exploreSilhouetteOverlayMarkup() {
-    const activeCode = activeExploreCountryCode();
-    if (!activeCode) return "";
+    const silhouetteCode =
+      state.explorePinnedCode ?? state.explorePreviewCode;
+    if (!silhouetteCode) return "";
 
-    const isPinned = activeCode === state.explorePinnedCode;
-    return countrySilhouetteMarkup(activeCode, {
+    const isPinned = silhouetteCode === state.explorePinnedCode;
+    return countrySilhouetteMarkup(silhouetteCode, {
       interactive: isPinned,
       expanded: isPinned && state.silhouetteExpanded,
     });
@@ -2608,12 +2609,25 @@
     const previewCode = code === state.explorePinnedCode ? null : code;
     if (state.explorePreviewCode === previewCode) return;
     state.explorePreviewCode = previewCode;
+    if (!state.explorePinnedCode) state.silhouetteExpanded = false;
+    syncExploreCountryUi();
+  }
+
+  function clearExploreCountrySelection() {
+    if (state.explorePinnedCode === null) return;
+    state.explorePinnedCode = null;
+    state.explorePreviewCode = null;
     state.silhouetteExpanded = false;
     syncExploreCountryUi();
   }
 
   function pinExploreCountry(code, { scrollCard = false } = {}) {
     if (!countriesByCode.has(code)) return;
+    if (state.explorePinnedCode === code) {
+      clearExploreCountrySelection();
+      return;
+    }
+
     const changed = state.explorePinnedCode !== code;
     state.explorePinnedCode = code;
     state.explorePreviewCode = null;
@@ -2830,7 +2844,17 @@
 
   app.addEventListener("click", (event) => {
     const control = event.target.closest("[data-action]");
-    if (!control || !app.contains(control)) return;
+    if (!control || !app.contains(control)) {
+      const exploreMap = event.target.closest("[data-explore-map-svg]");
+      if (
+        exploreMap &&
+        app.contains(exploreMap) &&
+        Date.now() >= suppressExploreMapClickUntil
+      ) {
+        clearExploreCountrySelection();
+      }
+      return;
+    }
 
     const action = control.dataset.action;
 
@@ -3331,11 +3355,18 @@
       return;
     }
 
+    if (
+      state.screen === "explore" &&
+      state.exploreView === "map" &&
+      state.explorePinnedCode !== null
+    ) {
+      event.preventDefault();
+      clearExploreCountrySelection();
+      return;
+    }
+
     const expandableSilhouetteVisible =
-      (state.screen === "quiz" && state.mode === "map-country") ||
-      (state.screen === "explore" &&
-        state.exploreView === "map" &&
-        state.explorePinnedCode !== null);
+      state.screen === "quiz" && state.mode === "map-country";
 
     if (expandableSilhouetteVisible && state.silhouetteExpanded) {
       event.preventDefault();

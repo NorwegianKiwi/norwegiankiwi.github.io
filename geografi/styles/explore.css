@@ -268,7 +268,6 @@
 
 .country-silhouette-inset.is-preview-only {
   cursor: default;
-  pointer-events: none;
 }
 
 .country-silhouette-inset.is-preview-only:hover {
