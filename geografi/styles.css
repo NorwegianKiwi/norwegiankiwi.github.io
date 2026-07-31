@@ -3093,6 +3093,535 @@ body.modal-open {
   }
 }
 
+/*
+ * Portrait tablets have enough width for each activity group to remain a
+ * single row, but not enough width for both groups to share that row.
+ */
+@media (orientation: portrait) and (min-width: 601px) and (max-width: 820px) {
+  .activity-panels {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .activity-panel {
+    min-height: 0;
+    padding: 7px;
+    gap: 5px;
+  }
+
+  .activity-button {
+    min-height: 48px;
+  }
+
+  .activity-button strong {
+    overflow-wrap: normal;
+  }
+
+  .action-section {
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+}
+
+/*
+ * In the stacked portrait-tablet Explore layout, use the space below the map
+ * for the country rail. Browser tabs retain a small visual buffer; installed
+ * apps can extend to the safe-area edge.
+ */
+@media (orientation: portrait) and (min-width: 601px) and (max-width: 899px) {
+  .explore-map-shell .explore-content {
+    --explore-tablet-bottom-space: 24px;
+    margin-bottom: var(--explore-tablet-bottom-space);
+  }
+
+  .explore-map-shell .explore-map-layout {
+    height: max(
+      774px,
+      calc(
+        100dvh -
+        var(--explore-header-height) -
+        14px -
+        var(--explore-tablet-bottom-space)
+      )
+    );
+    min-height: 0;
+    grid-template-rows:
+      minmax(300px, min(58vw, 430px))
+      minmax(330px, 1fr);
+  }
+
+  .explore-map-shell .explore-country-panel {
+    height: auto;
+  }
+
+  body.standalone-mode .explore-map-shell .explore-content {
+    --explore-tablet-bottom-space: max(
+      10px,
+      env(safe-area-inset-bottom)
+    );
+  }
+}
+
+/*
+ * Short landscape screens need a height-first layout. This covers modern
+ * landscape phones (which are often wider than the phone breakpoint) without
+ * changing portrait phones or regular-height tablets.
+ */
+@media (orientation: landscape) and (max-height: 599px) {
+  .quiz-active,
+  .flashcard-shell,
+  .map-region-shell {
+    --short-header-height: 52px;
+    --short-bottom-space: max(7px, env(safe-area-inset-bottom));
+    width: min(100% - 24px, 1180px);
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body.standalone-mode .quiz-active,
+  body.standalone-mode .flashcard-shell,
+  body.standalone-mode .map-region-shell {
+    --short-bottom-space: max(4px, env(safe-area-inset-bottom));
+  }
+
+  .quiz-active .quiz-header,
+  .flashcard-shell .quiz-header,
+  .map-region-shell .quiz-header,
+  .result-shell .quiz-header {
+    height: var(--short-header-height, 52px);
+    min-height: var(--short-header-height, 52px);
+  }
+
+  .quiz-active .brand,
+  .flashcard-shell .brand,
+  .map-region-shell .brand,
+  .result-shell .brand {
+    font-size: 19px;
+  }
+
+  .quiz-active .brand-mark,
+  .flashcard-shell .brand-mark,
+  .map-region-shell .brand-mark,
+  .result-shell .brand-mark {
+    width: 29px;
+    height: 29px;
+  }
+
+  .quiz-active .quiz-header .brand > span,
+  .flashcard-shell .quiz-header .brand > span,
+  .map-region-shell .quiz-header .brand > span,
+  .result-shell .quiz-header .brand > span {
+    display: none;
+  }
+
+  .quiz-active .quiz-meta span {
+    display: none;
+  }
+
+  .quiz-active .question-area {
+    width: min(1120px, 100%);
+    height: calc(100dvh - var(--short-header-height) - 3px);
+    min-height: 0;
+    padding: 6px 0 var(--short-bottom-space);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .quiz-active .question-prompt {
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    align-self: center;
+  }
+
+  .quiz-active .question-prompt h1 {
+    font-size: clamp(22px, 6.8dvh, 30px);
+    line-height: 0.98;
+  }
+
+  .quiz-active .question-instruction {
+    font-size: clamp(17px, 5.4dvh, 23px);
+  }
+
+  .quiz-active .question-clue {
+    margin-top: 2px;
+    font-size: clamp(25px, 8dvh, 36px);
+  }
+
+  .quiz-active .question-compact {
+    font-size: clamp(20px, 6.2dvh, 27px) !important;
+  }
+
+  .quiz-active .answer-grid-stage {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    align-items: stretch;
+  }
+
+  .mode-country-flag .answer-grid-stage {
+    place-items: center;
+    container-type: size;
+  }
+
+  .quiz-active .answer-grid {
+    --answer-gap: clamp(5px, 1.7dvh, 8px);
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .quiz-active .flag-grid {
+    --answer-gap: clamp(7px, 2.5dvh, 12px);
+    width: min(100cqw, calc(133.333cqh - 10.667px));
+    grid-template-rows: repeat(3, auto);
+    align-content: center;
+  }
+
+  .quiz-active .flag-grid .answer-card {
+    min-height: 0;
+    padding: 0;
+    grid-template-rows: auto;
+    gap: 0;
+  }
+
+  .quiz-active .flag-grid .answer-flag {
+    width: 100%;
+    height: auto;
+  }
+
+  .mode-flag-country .question-area,
+  .mode-country-capital .question-area {
+    grid-template-columns: minmax(180px, 0.82fr) minmax(0, 1.45fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: clamp(9px, 2.2vw, 22px);
+  }
+
+  .mode-flag-country .question-prompt,
+  .mode-country-capital .question-prompt {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+  }
+
+  .mode-flag-country .featured-flag {
+    width: min(235px, 31vw, 55dvh);
+    margin-top: 7px;
+  }
+
+  .mode-country-capital .capital-clue {
+    margin-top: 5px;
+    gap: 4px;
+  }
+
+  .mode-country-capital .prompt-flag {
+    width: min(105px, 17vw, 29dvh);
+  }
+
+  .mode-flag-country .text-grid,
+  .mode-country-capital .text-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    align-content: stretch;
+  }
+
+  .mode-flag-country .text-grid .answer-card,
+  .mode-country-capital .text-grid .answer-card {
+    min-height: 0;
+    padding: 5px 9px;
+  }
+
+  .mode-flag-country .answer-card strong,
+  .mode-country-capital .answer-card strong,
+  .mode-map-country .answer-card strong {
+    overflow-wrap: anywhere;
+    font-size: clamp(13px, 2vw, 17px);
+    line-height: 1.15;
+  }
+
+  .mode-map-country .question-area {
+    width: min(1160px, 100%);
+  }
+
+  .mode-map-country .question-prompt {
+    max-height: 32px;
+  }
+
+  .mode-map-country .map-quiz-layout {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1.25fr) minmax(230px, 0.9fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .mode-map-country .map-quiz-visual {
+    height: auto;
+    min-height: 0;
+    border-radius: 11px;
+  }
+
+  .mode-map-country .map-answer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    padding: 5px;
+  }
+
+  .mode-map-country .map-answer-grid .answer-card {
+    min-height: 0;
+    padding: 4px 6px;
+  }
+
+  .mode-map-country .map-answer-content {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .mode-map-country .map-answer-flag {
+    width: 30px;
+  }
+
+  .country-silhouette-inset {
+    --silhouette-edge: 7px;
+    --silhouette-size: min(78px, 25dvh);
+    padding: 6px;
+    border-radius: 10px;
+  }
+
+  .flashcard-stage {
+    width: min(1050px, 100%);
+    height: calc(100dvh - var(--short-header-height) - 3px);
+    padding: 9px 8px var(--short-bottom-space);
+    grid-template-columns: minmax(0, 1.35fr) minmax(190px, 0.85fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 6px clamp(14px, 3vw, 32px);
+  }
+
+  .flashcard-flag {
+    width: min(100%, 72dvh);
+    max-height: 100%;
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+
+  .flashcard-answer {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .flashcard-answer strong {
+    font-size: clamp(27px, 8.5dvh, 42px);
+  }
+
+  .flashcard-answer span {
+    font-size: clamp(14px, 4dvh, 18px);
+  }
+
+  .flashcard-instruction {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    padding-bottom: 5px;
+    text-align: center;
+  }
+
+  .flashcard-complete {
+    height: calc(100dvh - var(--short-header-height));
+    padding: 18px 0 var(--short-bottom-space);
+    display: grid;
+    place-content: center;
+  }
+
+  .flashcard-complete .kicker {
+    margin-bottom: 7px;
+  }
+
+  .flashcard-complete h1 {
+    font-size: clamp(34px, 11dvh, 52px);
+  }
+
+  .flashcard-complete > p:not(.kicker) {
+    margin: 10px auto 14px;
+    font-size: 15px;
+  }
+
+  .flashcard-complete .primary-button,
+  .flashcard-complete .secondary-button {
+    min-height: 44px;
+  }
+
+  .map-region-shell .map-region-step {
+    height: calc(100dvh - var(--short-header-height));
+    padding: 6px 0 var(--short-bottom-space);
+  }
+
+  .map-region-shell .map-region-prompt,
+  .explore-map-shell .map-region-prompt {
+    height: 100%;
+    min-height: 0;
+    padding: 7px 12px;
+    align-content: center;
+  }
+
+  .map-region-shell .map-region-prompt .kicker,
+  .explore-map-shell .map-region-prompt .kicker {
+    margin-bottom: 2px;
+  }
+
+  .map-region-shell .map-region-prompt h2,
+  .explore-map-shell .map-region-prompt h2 {
+    margin: 1px 0 3px;
+    font-size: clamp(22px, 7dvh, 30px);
+  }
+
+  .map-region-shell .map-region-prompt > p:not(.kicker),
+  .explore-map-shell .map-region-prompt > p:not(.kicker) {
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  .map-region-shell .map-region-grid,
+  .explore-map-shell .map-region-grid {
+    width: min(900px, 100%);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .map-region-shell .map-region-grid button,
+  .explore-map-shell .map-region-grid button {
+    min-height: clamp(45px, 15dvh, 58px);
+    padding: 4px 6px;
+  }
+
+  .map-region-shell .map-region-grid button strong,
+  .explore-map-shell .map-region-grid button strong {
+    font-size: clamp(13px, 2vw, 16px);
+  }
+}
+
+/*
+ * Result summaries use one landscape viewport. Reviews deliberately remain
+ * below that first screen so users can scroll through missed countries.
+ */
+@media (orientation: landscape) and (max-height: 599px) {
+  .result-shell {
+    --short-header-height: 52px;
+    width: min(100% - 24px, 1180px);
+    min-height: 100dvh;
+  }
+
+  .result-card,
+  .has-review .result-card {
+    width: min(980px, 100%);
+    height: calc(100dvh - var(--short-header-height));
+    min-height: 268px;
+    padding: 9px 0 max(7px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    column-gap: clamp(18px, 4vw, 54px);
+    row-gap: 4px;
+    align-items: center;
+    text-align: left;
+  }
+
+  .result-card > .kicker {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .result-card .result-score,
+  .has-review .result-card .result-score {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    justify-content: flex-start;
+    margin: 0;
+  }
+
+  .result-score strong,
+  .has-review .result-score strong {
+    font-size: clamp(60px, 23dvh, 92px);
+  }
+
+  .result-score span {
+    margin-top: 5px;
+    font-size: 23px;
+  }
+
+  .result-card h1,
+  .has-review .result-card h1 {
+    grid-column: 1;
+    grid-row: 3;
+    font-size: clamp(29px, 9dvh, 42px);
+    line-height: 0.95;
+  }
+
+  .result-card > p:not(.kicker),
+  .has-review .result-card > p:not(.kicker) {
+    grid-column: 1;
+    grid-row: 4;
+    margin: 2px 0 0;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .result-stats,
+  .has-review .result-stats {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    width: 100%;
+    margin: 0;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .result-stats div,
+  .has-review .result-stats div {
+    min-height: 54px;
+    padding: 7px 11px;
+    gap: 2px;
+  }
+
+  .result-stats div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .result-stats div:last-child {
+    grid-column: 1 / -1;
+    min-height: 58px;
+    border-top: 1px solid var(--line);
+  }
+
+  .result-stats strong {
+    font-size: 19px;
+  }
+
+  .result-card > .primary-button,
+  .has-review .result-card > .primary-button {
+    grid-column: 2;
+    grid-row: 3;
+    width: 100%;
+    min-height: 43px;
+  }
+
+  .result-card > .review-jump {
+    grid-column: 2;
+    grid-row: 4;
+    margin: 0 auto;
+    padding: 5px 9px;
+  }
+
+  .has-review .result-review {
+    padding-top: 18px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
