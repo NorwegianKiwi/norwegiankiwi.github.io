@@ -53,6 +53,7 @@ not private or secure functionality.
 - `manifest.webmanifest` and `icons/` – installable web-app metadata and icons
 - `styles.css` – presentation and responsive layout
 - `countries.js` – bilingual country and region data
+- `distractors.js` – curated relationships used by the two flag quizzes
 - `world-map.js` – local projected map data derived from Natural Earth
 - `MAP-DATA.md` – map-data verification and update procedure
 - `tools/` – machine-readable map manifest and dependency-free maintenance tools
@@ -117,6 +118,13 @@ automatically from the flag source. Every country record keeps both locales
 together and must contain non-empty names and capitals for each language.
 Optional notes must also be complete in both languages. The file validates
 these requirements when loaded.
+
+Flag quizzes reserve up to two answer slots for useful distractors from the
+curated groups in `distractors.js`, then fill the remaining slots randomly
+from the selected region. Curated distractors may cross region boundaries.
+Pairs listed as flag conflicts are never shown together because their flags
+are not reliably distinguishable at quiz size. Capital and map quizzes keep
+their uniform regional answer selection.
 
 When a country, flag, or capital changes, check both language variants and
 the corresponding local SVG. Interface translations are collected in

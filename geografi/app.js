@@ -9,10 +9,11 @@
     ? initialUrl.searchParams.get("lang")
     : "nb";
   const data = window.GEOGRAFI_QUIZ_DATA;
+  const distractorData = window.GEOGRAFI_QUIZ_DISTRACTOR_DATA;
   const mapData = window.GEOGRAFI_QUIZ_MAP_DATA;
   const app = document.getElementById("app");
 
-  if (!data || !mapData || !app) {
+  if (!data || !distractorData || !mapData || !app) {
     throw new Error(
       initialLocale === "en"
         ? "Hello World! could not load the country data."
@@ -21,6 +22,7 @@
   }
 
   const { countries, regionOptions } = data;
+  const { flagDistractorGroups, flagConflictPairs } = distractorData;
   const messages = Object.freeze({
     nb: Object.freeze({
       loadError: "Hei verden! kunne ikke laste landdataene.",
@@ -264,6 +266,29 @@
   const countriesByCode = new Map(
     countries.map((country) => [country.code, country]),
   );
+  const flagDistractorCodesByCountry = new Map();
+  const flagConflictCodesByCountry = new Map();
+
+  flagDistractorGroups.forEach((group) => {
+    group.codes.forEach((code) => {
+      const relatedCodes = flagDistractorCodesByCountry.get(code) ?? new Set();
+      group.codes.forEach((relatedCode) => {
+        if (relatedCode !== code) relatedCodes.add(relatedCode);
+      });
+      flagDistractorCodesByCountry.set(code, relatedCodes);
+    });
+  });
+
+  flagConflictPairs.forEach(([firstCode, secondCode]) => {
+    const firstConflicts =
+      flagConflictCodesByCountry.get(firstCode) ?? new Set();
+    const secondConflicts =
+      flagConflictCodesByCountry.get(secondCode) ?? new Set();
+    firstConflicts.add(secondCode);
+    secondConflicts.add(firstCode);
+    flagConflictCodesByCountry.set(firstCode, firstConflicts);
+    flagConflictCodesByCountry.set(secondCode, secondConflicts);
+  });
 
   const modes = [
     {
@@ -408,11 +433,50 @@
     return countries.filter((country) => regionMatches(country.region, region));
   }
 
-  function createQuestions(pool, choiceCount = 9) {
+  function selectCompatibleFlagDistractors(candidates, count, selectedCodes) {
+    const selected = [];
+    for (const candidate of shuffle(candidates)) {
+      const conflicts = flagConflictCodesByCountry.get(candidate.code);
+      if (
+        selectedCodes.has(candidate.code) ||
+        [...(conflicts ?? [])].some((code) => selectedCodes.has(code))
+      ) {
+        continue;
+      }
+      selected.push(candidate);
+      selectedCodes.add(candidate.code);
+      if (selected.length === count) break;
+    }
+    return selected;
+  }
+
+  function createQuestions(pool, choiceCount = 9, mode = null) {
+    const usesFlagDistractors =
+      mode === "country-flag" || mode === "flag-country";
+
     return shuffle(pool).map((country) => {
-      const distractors = shuffle(
-        pool.filter((item) => item.code !== country.code),
-      ).slice(0, choiceCount - 1);
+      let distractors;
+      if (usesFlagDistractors) {
+        const selectedCodes = new Set([country.code]);
+        const relatedCandidates = [
+          ...(flagDistractorCodesByCountry.get(country.code) ?? []),
+        ].map((code) => countriesByCode.get(code));
+        const relatedDistractors = selectCompatibleFlagDistractors(
+          relatedCandidates,
+          Math.min(2, choiceCount - 1),
+          selectedCodes,
+        );
+        const randomDistractors = selectCompatibleFlagDistractors(
+          pool,
+          choiceCount - 1 - relatedDistractors.length,
+          selectedCodes,
+        );
+        distractors = [...relatedDistractors, ...randomDistractors];
+      } else {
+        distractors = shuffle(
+          pool.filter((item) => item.code !== country.code),
+        ).slice(0, choiceCount - 1);
+      }
       return {
         country,
         choices: shuffle([country, ...distractors]),
@@ -2437,6 +2501,7 @@
     state.questions = createQuestions(
       countriesInRegion(state.region),
       modeConfig?.choiceCount,
+      mode,
     );
     state.questionIndex = 0;
     state.selectedCode = null;
