@@ -46,7 +46,7 @@ Kontrollen krever bare Python 3-standardbiblioteket og verifiserer blant annet:
 - ett lokalt SVG-flagg per land
 - kartgeometri eller markør for alle quizland
 - én silhuett per land
-- full dekning i hvert av de sju regionkartene
+- full dekning i hvert av de ni quizregionkartene og oversiktskartet for Afrika
 - forventet Natural Earth-versjon og projeksjoner
 
 Kontrollen avgjør ikke om politiske grenser eller landlisten er faglig
@@ -92,8 +92,9 @@ dokumenterte forventningstall samlet.
 Den innsjekkede geometrien består av tre separate produkter:
 
 1. Verdenskart: 1:50m, Equal Earth, `0 0 1000 500`.
-2. Kartquiz: 1:50m, nordvendt Mercator, `0 0 1000 650`, med faste utsnitt fra
-   `quizRegions` i manifestet. Oseania vikles rundt 180°.
+2. Regionkart: 1:50m, nordvendt, regionsentrert azimutal ekvidistant
+   projeksjon med automatisk kamera fra aktive land. Oseania vikles rundt
+   180°.
 3. Formvindu: 1:10m, nordvendt silhuett, `0 0 100 100`, med synlige
    erstatningsmarkører for svært små komponenter.
 
@@ -102,6 +103,9 @@ fra Natural Earth brukes når polygonet er for lite til å være lesbart.
 Landtilhørighet i regionkart må alltid slås opp i `countries.js`; feltene
 `CONTINENT`, `REGION_UN` og `SUBREGION` i Natural Earth er bare
 sammenligningsgrunnlag.
+
+Afrikaoversikten er et eget kartutsnitt under `overviewRegions` og kombinerer
+de to afrikanske quizregionene. Det er ikke en overlappende quizregion.
 
 Den avhengighetsfrie referansegeneratoren lager en separat kandidat:
 
@@ -112,6 +116,49 @@ python3 tools/generate_map_data.py \
 python3 tools/map_maintenance.py validate \
   --map-file /tmp/world-map.candidate.js
 ```
+
+Ved endringer i regionkart skal eksisterende Equal Earth-verdenskart og
+formvinduer bevares med `--base-map`. Alle regionkart og Afrikaoversikten
+regenereres alltid gjennom den samme azimutal-ekvidistante pipelinen:
+
+```sh
+python3 tools/generate_map_data.py \
+  /tmp/geografi-map-sources \
+  /tmp/world-map.candidate.js \
+  --base-map world-map.js
+```
+
+Hvert regionkart har aktive land i `features` og `markers`, mens
+`backgroundFeatures` bare inneholder ikke-aktiv geografi. Alle tre samlingene
+bruker samme sentralmeridian, projeksjon og forenklingstoleranse.
+Projeksjonens breddegradssentrum er alltid midtpunktet i den geografiske
+utvalgsrammen; dette er samme regel for alle regioner.
+Aktive polygonkomponenter som treffer den geografiske utvalgsrammen med 10 %
+sikkerhetsmargin beholdes hele. Kameraet beregnes fra aktive objekter med 6 %
+luft. Bakgrunnen velges deretter rent romlig: alle ikke-aktive polygonbiter
+som treffer `bleedViewBox` beholdes, uten relevans- eller avstandsfilter. Bare
+den synlige delen av en fjern komponent tas med. Bakgrunnen genereres ut til
+`bleedViewBox`, slik
+at grensesnittet kan utvide kartets viewBox til kortets faktiske sideforhold.
+Dermed treffer bakgrunnsgeografien den synlige rammen i stedet for å slutte i
+et innfelt rektangel. Kunstige kanter finnes bare ytterst i bleed-området og
+dekkes med havfargen dersom en ekstrem skjermform når dem. Et aktivt quizland
+skal aldri ha `cropPath`; valideringen avviser kandidaten dersom det
+kanoniske utsnittet skjærer et land som tilhører regionen.
+
+Azimutalprojeksjonens antipode har ingen entydig retning. Den samme generelle
+sømbeskyttelsen brukes derfor i alle kart: en fjern bakgrunnsring som hopper
+over antipoden utelates i stedet for å lukkes med en kunstig linje gjennom det
+synlige kartet. Aktive land ligger alltid utenfor denne beskyttelsessonen.
+
+`bleedViewBox` dekker sideforhold fra 0,75 til 2,4. Grensesnittet kan gå utenfor
+dette området ved ekstreme kortformer; da vises mer hav i stedet for
+forvrengning eller letterboxing.
+
+`east-south-asia` har i tillegg `focusViewBox`, et Explore-only
+kameraalternativ beregnet med samme regel etter de 24 andre landene. Det kan
+skjære Russland, men ikke noe annet aktivt land.
+`viewBox` er fortsatt den komplette regionen og brukes alltid i kartquizen.
 
 Generatoren leser SHP/DBF direkte, projiserer og forenkler geometrien og
 beholder eksisterende `corner`-valg for formvinduene. Den nekter å skrive
@@ -127,7 +174,8 @@ window.GEOGRAFI_QUIZ_MAP_DATA = {
   features,
   markers,
   quizProjection,
-  quizRegions,
+  quizRegions: { [id]: { viewBox, bleedViewBox, backgroundFeatures, features, markers } },
+  overviewRegions: { [id]: { viewBox, bleedViewBox, backgroundFeatures, features, markers } },
   silhouetteViewBox,
   silhouettes
 };
@@ -137,9 +185,10 @@ Ingen av disse verktøyene skal bli runtime-avhengigheter. Behold
 `corner`-verdien for hvert eksisterende formvindu med mindre en visuell
 kontroll viser at landet skjules.
 
-Manifestet inneholder de faste geografiske utsnittene. Et nytt utsnitt er en
-designendring og skal vurderes visuelt; det skal ikke beregnes automatisk fra
-alle oversjøiske territorier, fordi det kan gjøre hovedregionen uleselig.
+Manifestets geografiske rammer velger relevante polygonkomponenter og gir
+projeksjonen en stabil målestokk; de er ikke synlige kameraer. Hele komponenter
+som treffer rammen beholdes, mens fjerne oversjøiske komponenter ikke automatisk
+gjør hovedregionen uleselig.
 
 ## Godkjenningsliste for en kandidat
 
@@ -148,12 +197,15 @@ Før `world-map.js` erstattes:
 - Kjør lokal validering med kandidatdataene koblet inn.
 - Bekreft 196 land, 196 flagg og 196 silhuetter.
 - Bekreft at utilgjengelige territorier er kartkontekst og ikke kan velges.
-- Kontroller Russland kun i Asia, og Kypros og Tyrkia i Asia.
+- Kontroller Russland kun i Øst- og Sør-Asia, og Kypros og Tyrkia i Vest- og
+  Sentral-Asia. Både regionkartet og formvinduet skal vise hele Russland,
+  inkludert Kaliningrad og geometrien ved datolinjen.
 - Inspiser Kosovo, Palestina og alle nye kodeavvik særskilt.
 - Inspiser datolinjen for Russland, USA, Fiji, Kiribati og Oseania.
 - Inspiser mikrostater og øystater, særlig Vatikanstaten, Monaco, Bahrain,
   Maldivene, Nauru, Tuvalu og Karibia.
-- Kontroller alle sju regionkart og formvinduets fire mulige hjørner.
+- Kontroller alle ni quizregionkart, Afrikaoversikten og formvinduets fire
+  mulige hjørner.
 - Test forsidekartets mus, tastatur, hover, fokus og valgte region.
 - Test Kartquiz med riktig, feil og korrigering i alle regioner.
 - Test 1440×900, 1024×768, 768×768 og 390×844.

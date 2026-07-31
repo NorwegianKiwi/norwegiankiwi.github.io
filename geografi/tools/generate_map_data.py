@@ -27,6 +27,13 @@ WORLD_SIZE = (1000, 500)
 QUIZ_SIZE = (1000, 650)
 SILHOUETTE_SIZE = (100, 100)
 PADDING = 8
+REGION_COMPONENT_MARGIN_RATIO = 0.10
+REGION_CAMERA_PADDING_RATIO = 0.06
+REGION_MIN_CONTEXT_ASPECT = 0.75
+REGION_MAX_CONTEXT_ASPECT = 2.4
+REGION_SIMPLIFY_TOLERANCE = 0.28
+REGION_ANTIPODE_GUARD_RADIUS = math.radians(150)
+REGION_ANTIPODE_JUMP_DISTANCE = math.radians(30)
 
 
 def read_shapefile(path):
@@ -172,6 +179,16 @@ def path_from_rings(rings, precision=1):
     return "".join(commands)
 
 
+def path_from_segments(segments, precision=1):
+    return "".join(
+        "M"
+        + f"{format_number(start[0], precision)},{format_number(start[1], precision)}"
+        + "L"
+        + f"{format_number(end[0], precision)},{format_number(end[1], precision)}"
+        for start, end in segments
+    )
+
+
 def equal_earth(longitude, latitude):
     a1, a2, a3, a4 = 1.340264, -0.081106, 0.000893, 0.003796
     radians = math.pi / 180
@@ -189,13 +206,71 @@ def equal_earth(longitude, latitude):
     return x, -y
 
 
-def mercator(longitude, latitude):
-    latitude = max(-85, min(85, latitude))
+def azimuthal_equidistant(
+    longitude, latitude, center_longitude, center_latitude
+):
+    """Project a spherical point around a regional map centre.
+
+    Radial distance from the projection centre equals angular distance on the
+    globe. This avoids Mercator's polar area inflation while retaining a
+    familiar north-up local view for every region.
+    """
     radians = math.pi / 180
-    return (
-        longitude * radians,
-        -math.log(math.tan(math.pi / 4 + latitude * radians / 2)),
+    longitude_delta = math.radians(
+        wrap_longitude(longitude, center_longitude) - center_longitude
     )
+    phi = max(-89.999, min(89.999, latitude)) * radians
+    phi_zero = center_latitude * radians
+    sin_phi = math.sin(phi)
+    cos_phi = math.cos(phi)
+    sin_phi_zero = math.sin(phi_zero)
+    cos_phi_zero = math.cos(phi_zero)
+    cosine_distance = max(
+        -1.0,
+        min(
+            1.0,
+            sin_phi_zero * sin_phi
+            + cos_phi_zero * cos_phi * math.cos(longitude_delta),
+        ),
+    )
+    distance = math.acos(cosine_distance)
+    if distance < 1e-12:
+        return 0.0, 0.0
+    bearing = math.atan2(
+        math.sin(longitude_delta) * cos_phi,
+        cos_phi_zero * sin_phi
+        - sin_phi_zero * cos_phi * math.cos(longitude_delta),
+    )
+    return distance * math.sin(bearing), -distance * math.cos(bearing)
+
+
+def regional_projection(center_longitude, center_latitude):
+    return lambda longitude, latitude: azimuthal_equidistant(
+        longitude,
+        latitude,
+        center_longitude,
+        center_latitude,
+    )
+
+
+def crosses_azimuthal_antipode(points):
+    """Return true when a ring jumps across the azimuthal antipode seam.
+
+    The antipode has no unique bearing in an azimuthal projection. A polygon
+    crossing that point can otherwise be closed through the visible map
+    centre. Such rings are necessarily remote background for these regional
+    views and are omitted instead of drawing an artificial chord.
+    """
+    if len(points) < 2:
+        return False
+    for start, end in zip(points, points[1:] + points[:1]):
+        if (
+            math.hypot(*start) >= REGION_ANTIPODE_GUARD_RADIUS
+            and math.hypot(*end) >= REGION_ANTIPODE_GUARD_RADIUS
+            and math.dist(start, end) >= REGION_ANTIPODE_JUMP_DISTANCE
+        ):
+            return True
+    return False
 
 
 def wrap_longitude(longitude, center):
@@ -232,9 +307,19 @@ def project_feature_rings(features, projection, transform, tolerance):
             rings.append(simplify(projected, tolerance))
         path = path_from_rings(rings)
         if path:
-            output.append(
-                {"code": feature["code"], "name": feature["name"], "path": path}
-            )
+            item = {
+                "code": feature["code"],
+                "name": feature["name"],
+                "path": path,
+            }
+            crop_segments = [
+                (transform(projection(*start)), transform(projection(*end)))
+                for start, end in feature.get("cropSegments", [])
+            ]
+            crop_path = path_from_segments(crop_segments)
+            if crop_path:
+                item["cropPath"] = crop_path
+            output.append(item)
     return output
 
 
@@ -268,99 +353,430 @@ def build_world(features, tiny_features, local_names):
     return output_features, markers
 
 
-def bounds_transform(bounds, center, width, height):
+def bounds_transform(bounds, center, projection, width, height):
     west, south, east, north = bounds
     west = wrap_longitude(west, center)
     east = wrap_longitude(east, center)
     while east <= west:
         east += 360
-    top_left = mercator(west, north)
-    bottom_right = mercator(east, south)
-    scale = min(
-        (width - 2 * PADDING) / (bottom_right[0] - top_left[0]),
-        (height - 2 * PADDING) / (bottom_right[1] - top_left[1]),
+
+    longitude_steps = max(16, math.ceil((east - west) / 2))
+    latitude_steps = max(16, math.ceil((north - south) / 2))
+    points = []
+    for index in range(longitude_steps + 1):
+        longitude = west + (east - west) * index / longitude_steps
+        points.append(projection(longitude, south))
+        points.append(projection(longitude, north))
+    for index in range(latitude_steps + 1):
+        latitude = south + (north - south) * index / latitude_steps
+        points.append(projection(west, latitude))
+        points.append(projection(east, latitude))
+    return fitted_transform(points, width, height)
+
+
+def unwrap_ring(ring, center):
+    unwrapped = []
+    for longitude, latitude in ring:
+        longitude = wrap_longitude(longitude, center)
+        if unwrapped:
+            previous = unwrapped[-1][0]
+            while longitude - previous > 180:
+                longitude -= 360
+            while longitude - previous < -180:
+                longitude += 360
+        unwrapped.append((longitude, latitude))
+    if not unwrapped:
+        return []
+    midpoint = sum(longitude for longitude, _ in unwrapped) / len(unwrapped)
+    shift = round((center - midpoint) / 360) * 360
+    return [(longitude + shift, latitude) for longitude, latitude in unwrapped]
+
+
+def clip_polygon_edge(points, inside, intersect):
+    if not points:
+        return []
+    output = []
+    previous = points[-1]
+    previous_inside = inside(previous)
+    for current in points:
+        current_inside = inside(current)
+        if current_inside:
+            if not previous_inside:
+                output.append(intersect(previous, current))
+            output.append(current)
+        elif previous_inside:
+            output.append(intersect(previous, current))
+        previous = current
+        previous_inside = current_inside
+    return output
+
+
+def clip_ring_to_bounds(ring, bounds, center):
+    west, south, east, north = bounds
+    west = wrap_longitude(west, center)
+    east = wrap_longitude(east, center)
+    while east <= west:
+        east += 360
+    points = unwrap_ring(ring, center)
+    if len(points) > 1 and points[0] == points[-1]:
+        points = points[:-1]
+
+    def vertical_intersection(boundary):
+        def intersect(start, end):
+            denominator = end[0] - start[0]
+            ratio = 0 if denominator == 0 else (boundary - start[0]) / denominator
+            return (boundary, start[1] + ratio * (end[1] - start[1]))
+
+        return intersect
+
+    def horizontal_intersection(boundary):
+        def intersect(start, end):
+            denominator = end[1] - start[1]
+            ratio = 0 if denominator == 0 else (boundary - start[1]) / denominator
+            return (start[0] + ratio * (end[0] - start[0]), boundary)
+
+        return intersect
+
+    points = clip_polygon_edge(
+        points, lambda point: point[0] >= west, vertical_intersection(west)
     )
-    used_width = (bottom_right[0] - top_left[0]) * scale
-    used_height = (bottom_right[1] - top_left[1]) * scale
-    offset_x = (width - used_width) / 2 - top_left[0] * scale
-    offset_y = (height - used_height) / 2 - top_left[1] * scale
-    return lambda point: (
-        point[0] * scale + offset_x,
-        point[1] * scale + offset_y,
+    points = clip_polygon_edge(
+        points, lambda point: point[0] <= east, vertical_intersection(east)
+    )
+    points = clip_polygon_edge(
+        points, lambda point: point[1] >= south, horizontal_intersection(south)
+    )
+    points = clip_polygon_edge(
+        points, lambda point: point[1] <= north, horizontal_intersection(north)
+    )
+    return points if len(points) >= 3 else []
+
+
+def clip_projected_ring_to_rectangle(points, rectangle):
+    x, y, width, height = rectangle
+    left, top, right, bottom = x, y, x + width, y + height
+    if len(points) > 1 and points[0] == points[-1]:
+        points = points[:-1]
+
+    def vertical_intersection(boundary):
+        def intersect(start, end):
+            denominator = end[0] - start[0]
+            ratio = 0 if denominator == 0 else (boundary - start[0]) / denominator
+            return (boundary, start[1] + ratio * (end[1] - start[1]))
+
+        return intersect
+
+    def horizontal_intersection(boundary):
+        def intersect(start, end):
+            denominator = end[1] - start[1]
+            ratio = 0 if denominator == 0 else (boundary - start[1]) / denominator
+            return (start[0] + ratio * (end[0] - start[0]), boundary)
+
+        return intersect
+
+    points = clip_polygon_edge(
+        points, lambda point: point[0] >= left, vertical_intersection(left)
+    )
+    points = clip_polygon_edge(
+        points, lambda point: point[0] <= right, vertical_intersection(right)
+    )
+    points = clip_polygon_edge(
+        points, lambda point: point[1] >= top, horizontal_intersection(top)
+    )
+    points = clip_polygon_edge(
+        points, lambda point: point[1] <= bottom, horizontal_intersection(bottom)
+    )
+    return points if len(points) >= 3 else []
+
+
+def rectangle_crop_segments(points, rectangle):
+    x, y, width, height = rectangle
+    boundaries = ((0, x), (0, x + width), (1, y), (1, y + height))
+    tolerance = 1e-7
+    return [
+        (start, end)
+        for start, end in zip(points, points[1:] + points[:1])
+        if any(
+            abs(start[index] - boundary) < tolerance
+            and abs(end[index] - boundary) < tolerance
+            for index, boundary in boundaries
+        )
+    ]
+
+
+def format_view_box(values):
+    return " ".join(format_number(value, 1) for value in values)
+
+
+def normalized_bounds(bounds, center):
+    west, south, east, north = bounds
+    west = wrap_longitude(west, center)
+    east = wrap_longitude(east, center)
+    while east <= west:
+        east += 360
+    return west, south, east, north
+
+
+def expanded_selection_bounds(bounds, center):
+    west, south, east, north = normalized_bounds(bounds, center)
+    longitude_margin = (east - west) * REGION_COMPONENT_MARGIN_RATIO
+    latitude_margin = (north - south) * REGION_COMPONENT_MARGIN_RATIO
+    return (
+        west - longitude_margin,
+        max(-85, south - latitude_margin),
+        east + longitude_margin,
+        min(85, north + latitude_margin),
     )
 
 
 def ring_intersects_bounds(ring, bounds, center):
+    points = unwrap_ring(ring, center)
+    if not points:
+        return False
     west, south, east, north = bounds
-    wrapped_west = wrap_longitude(west, center)
-    wrapped_east = wrap_longitude(east, center)
-    while wrapped_east <= wrapped_west:
-        wrapped_east += 360
-    longitudes = [wrap_longitude(point[0], center) for point in ring]
-    latitudes = [point[1] for point in ring]
-    return not (
-        max(longitudes) < wrapped_west
-        or min(longitudes) > wrapped_east
-        or max(latitudes) < south
-        or min(latitudes) > north
+    min_x = min(longitude for longitude, _ in points)
+    max_x = max(longitude for longitude, _ in points)
+    min_y = min(latitude for _, latitude in points)
+    max_y = max(latitude for _, latitude in points)
+    return max_x >= west and min_x <= east and max_y >= south and min_y <= north
+
+
+def point_in_bounds(point, bounds, center):
+    longitude, latitude = point
+    longitude = wrap_longitude(longitude, center)
+    west, south, east, north = bounds
+    return west <= longitude <= east and south <= latitude <= north
+
+
+def build_active_features(
+    features,
+    local_names,
+    active_codes,
+    selection_bounds,
+    center,
+    projection,
+    transform,
+):
+    output = []
+    points_by_code = {}
+    for feature in features:
+        code = feature["code"]
+        if code not in active_codes:
+            continue
+        projected_rings = []
+        for ring in feature["rings"]:
+            if not ring_intersects_bounds(ring, selection_bounds, center):
+                continue
+            projected = [
+                transform(projection(*point))
+                for point in unwrap_ring(ring, center)
+            ]
+            simplified = simplify(projected, REGION_SIMPLIFY_TOLERANCE)
+            projected_rings.append(simplified)
+            points_by_code.setdefault(code, []).extend(simplified)
+        path = path_from_rings(projected_rings)
+        if path:
+            output.append(
+                {
+                    "code": code,
+                    "name": local_names.get(code, feature["name"]),
+                    "path": path,
+                }
+            )
+    return output, points_by_code
+
+
+def build_active_markers(
+    tiny_features,
+    local_names,
+    active_codes,
+    selection_bounds,
+    center,
+    projection,
+    transform,
+):
+    markers = []
+    points_by_code = {}
+    for feature in tiny_features:
+        code = feature["code"]
+        if (
+            code not in active_codes
+            or not feature["point"]
+            or not point_in_bounds(feature["point"], selection_bounds, center)
+        ):
+            continue
+        longitude, latitude = feature["point"]
+        longitude = wrap_longitude(longitude, center)
+        x, y = transform(projection(longitude, latitude))
+        point = (round(x, 1), round(y, 1))
+        markers.append(
+            {
+                "code": code,
+                "name": local_names.get(code, feature["name"]),
+                "x": point[0],
+                "y": point[1],
+            }
+        )
+        points_by_code.setdefault(code, []).append(point)
+    return markers, points_by_code
+
+
+def camera_view_box(feature_points, marker_points, excluded_codes=None):
+    excluded_codes = excluded_codes or set()
+    points = [
+        point
+        for code, code_points in feature_points.items()
+        if code not in excluded_codes
+        for point in code_points
+    ]
+    points.extend(
+        point
+        for code, code_points in marker_points.items()
+        if code not in excluded_codes
+        for point in code_points
+    )
+    if not points:
+        raise ValueError("Kan ikke beregne regionkamera uten aktive punkter")
+    min_x = min(x for x, _ in points)
+    max_x = max(x for x, _ in points)
+    min_y = min(y for _, y in points)
+    max_y = max(y for _, y in points)
+    span_x = max(max_x - min_x, 1)
+    span_y = max(max_y - min_y, 1)
+    padding = max(span_x, span_y) * REGION_CAMERA_PADDING_RATIO
+    return (
+        min_x - padding,
+        min_y - padding,
+        span_x + padding * 2,
+        span_y + padding * 2,
     )
 
 
-def build_quiz_regions(features, tiny_features, local_names, manifest):
+def bleed_view_box(camera):
+    x, y, width, height = camera
+    bleed_width = max(width, height * REGION_MAX_CONTEXT_ASPECT)
+    bleed_height = max(height, width / REGION_MIN_CONTEXT_ASPECT)
+    center_x = x + width / 2
+    center_y = y + height / 2
+    return (
+        center_x - bleed_width / 2,
+        center_y - bleed_height / 2,
+        bleed_width,
+        bleed_height,
+    )
+
+
+def build_background_features(
+    features,
+    local_names,
+    active_codes,
+    center,
+    projection,
+    transform,
+    bleed,
+):
+    output = []
+    longitude_window = (center - 180, -85, center + 180, 85)
+    for feature in features:
+        code = feature["code"]
+        if code in active_codes:
+            continue
+        rings = []
+        crop_segments = []
+        for ring in feature["rings"]:
+            geographically_clipped = clip_ring_to_bounds(
+                ring, longitude_window, center
+            )
+            if not geographically_clipped:
+                continue
+            raw_projected = [
+                projection(*point) for point in geographically_clipped
+            ]
+            if crosses_azimuthal_antipode(raw_projected):
+                continue
+            projected = [transform(point) for point in raw_projected]
+            clipped = clip_projected_ring_to_rectangle(projected, bleed)
+            if not clipped:
+                continue
+            simplified = simplify(clipped, REGION_SIMPLIFY_TOLERANCE)
+            rings.append(simplified)
+            crop_segments.extend(rectangle_crop_segments(simplified, bleed))
+        path = path_from_rings(rings)
+        if not path:
+            continue
+        item = {
+            "code": code,
+            "name": local_names.get(code, feature["name"]),
+            "path": path,
+        }
+        crop_path = path_from_segments(crop_segments)
+        if crop_path:
+            item["cropPath"] = crop_path
+        output.append(item)
+    return output
+
+
+def build_region_views(
+    features,
+    tiny_features,
+    local_names,
+    region_settings,
+    active_codes_by_scope,
+):
     regions = {}
-    for region, settings in manifest["quizRegions"].items():
+    for region, settings in region_settings.items():
         center = settings["centerLongitude"]
         bounds = settings["bounds"]
-        transform = bounds_transform(bounds, center, *QUIZ_SIZE)
-
-        selected_features = []
-        for feature in features:
-            rings = [
-                ring
-                for ring in feature["rings"]
-                if ring_intersects_bounds(ring, bounds, center)
-            ]
-            if rings:
-                selected_features.append({**feature, "rings": rings})
-
-        def projection(longitude, latitude):
-            return mercator(wrap_longitude(longitude, center), latitude)
-
-        output_features = project_feature_rings(
-            selected_features, projection, transform, tolerance=0.28
+        center_latitude = (bounds[1] + bounds[3]) / 2
+        projection = regional_projection(center, center_latitude)
+        transform = bounds_transform(
+            bounds, center, projection, *QUIZ_SIZE
         )
-        for feature in output_features:
-            if feature["code"] in local_names:
-                feature["name"] = local_names[feature["code"]]
-
-        markers = []
-        for feature in tiny_features:
-            if not feature["point"]:
-                continue
-            longitude, latitude = feature["point"]
-            wrapped = wrap_longitude(longitude, center)
-            west, south, east, north = bounds
-            west = wrap_longitude(west, center)
-            east = wrap_longitude(east, center)
-            while east <= west:
-                east += 360
-            if west <= wrapped <= east and south <= latitude <= north:
-                x, y = transform(mercator(wrapped, latitude))
-                markers.append(
-                    {
-                        "code": feature["code"],
-                        "name": local_names.get(
-                            feature["code"], feature["name"]
-                        ),
-                        "x": round(x, 1),
-                        "y": round(y, 1),
-                    }
-                )
-        regions[region] = {
-            "viewBox": manifest["generatedOutput"]["quizViewBox"],
+        active_codes = active_codes_by_scope[region]
+        selection_bounds = expanded_selection_bounds(bounds, center)
+        output_features, feature_points = build_active_features(
+            features,
+            local_names,
+            active_codes,
+            selection_bounds,
+            center,
+            projection,
+            transform,
+        )
+        markers, marker_points = build_active_markers(
+            tiny_features,
+            local_names,
+            active_codes,
+            selection_bounds,
+            center,
+            projection,
+            transform,
+        )
+        camera = camera_view_box(feature_points, marker_points)
+        bleed = bleed_view_box(camera)
+        view = {
+            "viewBox": format_view_box(camera),
+            "bleedViewBox": format_view_box(bleed),
             "features": output_features,
             "markers": markers,
+            "backgroundFeatures": build_background_features(
+                features,
+                local_names,
+                active_codes,
+                center,
+                projection,
+                transform,
+                bleed,
+            ),
         }
+        focus_exclusions = set(settings.get("focusExcludeCodes", []))
+        if focus_exclusions:
+            view["focusViewBox"] = format_view_box(
+                camera_view_box(
+                    feature_points, marker_points, focus_exclusions
+                )
+            )
+        regions[region] = view
     return regions
 
 
@@ -439,14 +855,23 @@ def write_candidate(path, data):
   const data = {compact_json(data["base"])};
   data.quizProjection = {compact_json(data["quizProjection"])};
   data.quizRegions = {compact_json(data["quizRegions"])};
+  data.overviewRegions = {compact_json(data["overviewRegions"])};
   data.silhouetteViewBox = {compact_json(data["silhouetteViewBox"])};
   data.silhouettes = {compact_json(data["silhouettes"])};
   Object.values(data.quizRegions).forEach((view) => {{
     Object.freeze(view.features);
     Object.freeze(view.markers);
+    Object.freeze(view.backgroundFeatures);
     Object.freeze(view);
   }});
   Object.freeze(data.quizRegions);
+  Object.values(data.overviewRegions).forEach((view) => {{
+    Object.freeze(view.features);
+    Object.freeze(view.markers);
+    Object.freeze(view.backgroundFeatures);
+    Object.freeze(view);
+  }});
+  Object.freeze(data.overviewRegions);
   Object.values(data.silhouettes).forEach((silhouette) => {{
     Object.freeze(silhouette.markers);
     Object.freeze(silhouette);
@@ -466,6 +891,14 @@ def main():
     )
     parser.add_argument("source_directory", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument(
+        "--base-map",
+        type=Path,
+        help=(
+            "Preserve the world geometry and silhouettes from this existing "
+            "map while regenerating regional views."
+        ),
+    )
     args = parser.parse_args()
     if args.output.resolve() == (ROOT / "world-map.js").resolve():
         parser.error(
@@ -479,43 +912,101 @@ def main():
         local_names = {
             country["code"]: country["name"] for country in countries
         }
+        region_for_code = {
+            country["code"]: country["region"] for country in countries
+        }
         country_codes = set(local_names)
         countries50 = load_source_features(args.source_directory, "countries50m")
         tiny50 = load_source_features(
             args.source_directory, "tinyCountries50m"
         )
-        countries10 = load_source_features(args.source_directory, "countries10m")
-        existing = load_generated_map()
+        existing = (
+            load_generated_map(args.base_map)
+            if args.base_map
+            else load_generated_map()
+        )
         existing_corners = {
             code: silhouette.get("corner", "bottom-left")
             for code, silhouette in existing["silhouettes"].items()
         }
 
-        world_features, world_markers = build_world(
-            countries50, tiny50, local_names
+        if args.base_map:
+            world_features = existing["features"]
+            world_markers = existing["markers"]
+        else:
+            world_features, world_markers = build_world(
+                countries50, tiny50, local_names
+            )
+        quiz_active_codes = {
+            region: {
+                code
+                for code, country_region in region_for_code.items()
+                if country_region == region
+            }
+            for region in manifest["quizRegions"]
+        }
+        overview_active_codes = {
+            overview: {
+                code
+                for code, country_region in region_for_code.items()
+                if country_region in set(settings["memberRegions"])
+            }
+            for overview, settings in manifest.get("overviewRegions", {}).items()
+        }
+        quiz_regions = build_region_views(
+            countries50,
+            tiny50,
+            local_names,
+            manifest["quizRegions"],
+            quiz_active_codes,
         )
-        quiz_regions = build_quiz_regions(
-            countries50, tiny50, local_names, manifest
+        overview_regions = build_region_views(
+            countries50,
+            tiny50,
+            local_names,
+            manifest.get("overviewRegions", {}),
+            overview_active_codes,
         )
-        silhouettes = build_silhouettes(
-            countries10, country_codes, existing_corners
-        )
+        if args.base_map:
+            silhouettes = existing["silhouettes"]
+        else:
+            countries10 = load_source_features(
+                args.source_directory, "countries10m"
+            )
+            silhouettes = build_silhouettes(
+                countries10, country_codes, existing_corners
+            )
         data = {
             "base": {
-                "viewBox": manifest["generatedOutput"]["worldViewBox"],
-                "source": (
-                    "Natural Earth 1:50m Admin 0, version "
-                    + manifest["naturalEarthVersion"]
+                "viewBox": (
+                    existing["viewBox"]
+                    if args.base_map
+                    else manifest["generatedOutput"]["worldViewBox"]
                 ),
-                "projection": manifest["generatedOutput"]["worldProjection"],
+                "source": (
+                    existing["source"]
+                    if args.base_map
+                    else (
+                        "Natural Earth 1:50m Admin 0, version "
+                        + manifest["naturalEarthVersion"]
+                    )
+                ),
+                "projection": (
+                    existing["projection"]
+                    if args.base_map
+                    else manifest["generatedOutput"]["worldProjection"]
+                ),
                 "features": world_features,
                 "markers": world_markers,
             },
             "quizProjection": manifest["generatedOutput"]["quizProjection"],
             "quizRegions": quiz_regions,
-            "silhouetteViewBox": manifest["generatedOutput"][
-                "silhouetteViewBox"
-            ],
+            "overviewRegions": overview_regions,
+            "silhouetteViewBox": (
+                existing["silhouetteViewBox"]
+                if args.base_map
+                else manifest["generatedOutput"]["silhouetteViewBox"]
+            ),
             "silhouettes": silhouettes,
         }
         args.output.parent.mkdir(parents=True, exist_ok=True)

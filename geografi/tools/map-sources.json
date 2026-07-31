@@ -27,13 +27,22 @@
       "centerLongitude": 15,
       "bounds": [-25, 34, 45, 72]
     },
-    "africa": {
-      "centerLongitude": 17,
-      "bounds": [-25, -38, 58, 40]
+    "north-west-africa": {
+      "centerLongitude": 10,
+      "bounds": [-26, 0, 39, 38]
     },
-    "asia": {
-      "centerLongitude": 100,
-      "bounds": [20, -12, 180, 82]
+    "east-south-africa": {
+      "centerLongitude": 30,
+      "bounds": [7, -36, 60, 24]
+    },
+    "west-central-asia": {
+      "centerLongitude": 52,
+      "bounds": [20, 8, 89, 58]
+    },
+    "east-south-asia": {
+      "centerLongitude": 115,
+      "bounds": [18, -12, 192, 83],
+      "focusExcludeCodes": ["ru"]
     },
     "oceania": {
       "centerLongitude": 180,
@@ -52,18 +61,24 @@
       "bounds": [-90, 5, -58, 30]
     }
   },
+  "overviewRegions": {
+    "africa": {
+      "centerLongitude": 17,
+      "bounds": [-25, -38, 58, 40],
+      "memberRegions": ["north-west-africa", "east-south-africa"]
+    }
+  },
   "generatedOutput": {
     "worldViewBox": "0 0 1000 500",
     "worldProjection": "Equal Earth",
-    "quizViewBox": "0 0 1000 650",
-    "quizProjection": "Mercator",
+    "quizProjection": "Azimuthal equidistant",
     "silhouetteViewBox": "0 0 100 100",
     "coordinatePrecision": 1
   },
   "policy": {
     "quizCountryList": "countries.js is authoritative; Natural Earth does not decide which entities are quiz countries",
     "quizRegionMembership": "countries.js is the only source of region membership",
-    "russia": "Pedagogical exception: Russia belongs to Asia in this quiz",
+    "russia": "Pedagogical exception: Russia belongs to East and South Asia; both its regional map and silhouette show the complete country",
     "transcontinentalCountries": "Each quiz country has exactly one canonical region",
     "territories": "Natural Earth features not present in countries.js are non-selectable context",
     "disputedBoundaries": "Use the unmodified Natural Earth default de facto viewpoint, not a country-specific POV download",

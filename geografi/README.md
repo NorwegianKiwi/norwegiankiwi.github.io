@@ -72,14 +72,16 @@ projection and is simplified for browser display. Natural Earth data is
 public domain; its source and terms are documented in
 `licenses/natural-earth-public-domain.txt`.
 
-`world-map.js` also contains pregenerated Mercator geometry with manually
-adjusted extents for the seven individual regions used by the map quiz.
+`world-map.js` also contains pregenerated region-centred azimuthal equidistant
+geometry with automatically fitted cameras for the nine individual regions
+used by the map quiz, plus an Explore-only overview of all 54 African
+countries.
 Oceania is Pacific-centred so that island states on both sides of the date
 line appear together. Reprojection does not run in the browser and adds no
 runtime dependencies.
 
-Source versions, exact archive URLs, checksums, code overrides, projections,
-fixed extents, and editorial rules are stored in `tools/map-sources.json`.
+Source versions, exact archive URLs, checksums, code overrides, projection
+seeds, and editorial rules are stored in `tools/map-sources.json`.
 Read `MAP-DATA.md` before verifying or updating map data. Run the quick,
 offline consistency check with:
 
@@ -93,10 +95,21 @@ silhouettes generated from Natural Earth 1:10m Admin 0 Countries, version
 and small island states. Silhouettes are scaled and compressed in advance,
 and very small island components are retained as local point markers.
 
-The Maps view in Explore reuses the same regional Mercator maps and
-silhouettes. A map is available for each of the seven individual regions;
-Whole world instead presents a region choice. The map data does not duplicate
-region membership, but connects to `countries.js` through country codes.
+The Maps view in Explore reuses the same regional azimuthal equidistant maps and
+silhouettes. A map is available for each of the nine individual regions;
+Whole world instead presents a region choice. From either African region,
+Explore can temporarily show a full-Africa overview without changing the
+selected quiz region. East and South Asia opens with a closer Asia-focused
+camera and can temporarily reveal the complete Russia view. Both controls are
+Explore-only and do not change the selected region or URL. Regional maps use
+an independent background layer generated with the same transform as its
+active countries. Every non-active country polygon intersecting the responsive
+frame is retained, without a relevance or proximity filter. The camera expands
+to the rendered card shape without mismatched borders, distortion, or cropped
+active countries.
+Tiny-country dots retain a constant on-screen size. The map data connects to
+`countries.js` through
+country codes rather than duplicating region membership.
 Explore maps support map-local touchscreen and trackpad pinch zoom,
 touchscreen two-finger panning, and desktop press-and-drag panning, with
 keyboard-accessible controls from 100% to 400%; the surrounding page remains
@@ -137,12 +150,15 @@ the corresponding local SVG. Interface translations are collected in
 `app.js`. Both languages must expose the same translation keys; missing keys
 produce a clear loading error.
 
-Each country has one `region`, based on the UN
-[M49 classification](https://unstats.un.org/unsd/methodology/m49/overview/).
-Russia is a deliberate educational exception: it is placed in Asia to
-provide one clear region assignment and legible regional maps. Cyprus and
-Türkiye are also placed in Asia. Countries in the Americas store the most
-specific region (`north-central-america`, `south-america`, or `caribbean`).
+Each country has one `region`. The project uses the UN
+[M49 classification](https://unstats.un.org/unsd/methodology/m49/overview/)
+as a starting point, with balanced educational macro-regions for Africa and
+Asia: North and West Africa (26), East and South Africa (28), West and Central
+Asia (24), and East and South Asia (25). Russia is a deliberate exception: it
+belongs to East and South Asia, and both the regional map and silhouette show
+the complete country. Cyprus and Türkiye belong
+to West and Central Asia. Countries in the Americas store the most specific
+region (`north-central-america`, `south-america`, or `caribbean`).
 
 The initial country notes explain Russia and Türkiye's continental placement
 with support from

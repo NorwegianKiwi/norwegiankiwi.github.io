@@ -743,6 +743,18 @@
   }
 }
 
+@media (max-width: 440px) {
+  .explore-map-scope-controls {
+    top: 50px;
+  }
+
+  .explore-map-scope-button {
+    min-height: 38px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
 @media (orientation: landscape) and (min-width: 650px) and (max-height: 599px) {
   .explore-map-shell {
     height: 100vh;

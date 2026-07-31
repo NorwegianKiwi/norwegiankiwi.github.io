@@ -91,6 +91,11 @@
       zoomOutMap: "Zoom ut på kartet",
       zoomInMap: "Zoom inn på kartet",
       resetMapZoom: "Tilbakestill kartzoom, {percent} prosent",
+      africaOverview: "Afrika",
+      viewAllAfrica: "Vis hele Afrika",
+      showSelectedRegion: "Vis {region}",
+      showAllRussia: "Vis hele Russland",
+      focusOnAsia: "Fokuser på Asia",
       exploreMapDescription:
         "Regionkartet viser plasseringen og formen til hvert land.",
       exploreMapHeading: "Hvilket kart vil du utforske?",
@@ -201,6 +206,11 @@
       zoomOutMap: "Zoom out of the map",
       zoomInMap: "Zoom into the map",
       resetMapZoom: "Reset map zoom, {percent} per cent",
+      africaOverview: "Africa",
+      viewAllAfrica: "View all Africa",
+      showSelectedRegion: "Show {region}",
+      showAllRussia: "Show all Russia",
+      focusOnAsia: "Focus on Asia",
       exploreMapDescription:
         "The regional map shows the location and shape of each country.",
       exploreMapHeading: "Which map would you like to explore?",
@@ -256,13 +266,19 @@
   });
   const mapSelectableRegions = [
     "europe",
-    "africa",
-    "asia",
+    "north-west-africa",
+    "east-south-africa",
+    "west-central-asia",
+    "east-south-asia",
     "oceania",
     "north-central-america",
     "south-america",
     "caribbean",
   ];
+  const africaRegionIds = new Set([
+    "north-west-africa",
+    "east-south-africa",
+  ]);
   const countriesByCode = new Map(
     countries.map((country) => [country.code, country]),
   );
@@ -347,6 +363,8 @@
     explorePinnedCode: null,
     explorePreviewCode: null,
     exploreMapViewport: null,
+    exploreMapOverview: null,
+    exploreAsiaFull: false,
   };
   let deferredInstallPrompt = null;
   let autoAdvanceTimer = null;
@@ -355,6 +373,7 @@
   let exploreMapGesture = null;
   let exploreMapDrag = null;
   let exploreMapUiFrame = null;
+  let responsiveMapFrame = null;
   let scrollAffordanceFrame = null;
   let suppressExploreMapClickUntil = 0;
   const exploreMapMaxZoom = 8;
@@ -436,6 +455,13 @@
 
   function countriesInRegion(region) {
     return countries.filter((country) => regionMatches(country.region, region));
+  }
+
+  function countriesInExploreMapScope() {
+    if (state.exploreMapOverview === "africa") {
+      return countries.filter((country) => africaRegionIds.has(country.region));
+    }
+    return countriesInRegion(state.region);
   }
 
   function selectCompatibleFlagDistractors(candidates, count, selectedCodes) {
@@ -726,20 +752,31 @@
         d="${feature.path}"
         vector-effect="non-scaling-stroke"
       />
+      ${
+        feature.cropPath
+          ? `<path
+              class="${className} is-crop-edge"
+              d="${feature.cropPath}"
+              vector-effect="non-scaling-stroke"
+              aria-hidden="true"
+            />`
+          : ""
+      }
     `;
   }
 
   function regionalMapMarkerMarkup(
     marker,
     className,
-    radius,
+    screenRadius,
   ) {
     return `
       <circle
         class="${className}"
         cx="${marker.x}"
         cy="${marker.y}"
-        r="${radius}"
+        r="${screenRadius}"
+        data-map-marker-screen-radius="${screenRadius}"
         vector-effect="non-scaling-stroke"
       />
     `;
@@ -815,9 +852,8 @@
   function regionalQuestionMapMarkup(regionId, targetCode) {
     const view = mapData.quizRegions[regionId];
     const region = regionOptions.find((option) => option.id === regionId);
-    const [, , viewWidth] = view.viewBox.split(/\s+/).map(Number);
-    const markerRadius = Math.min(3.8, Math.max(0.7, viewWidth * 0.0045));
-    const contextFeatures = view.features.filter(
+    const markerRadius = 3;
+    const contextFeatures = view.backgroundFeatures ?? view.features.filter(
       (feature) => mapRegionForCode(feature.code) !== regionId,
     );
     const regionFeatures = view.features.filter(
@@ -851,12 +887,15 @@
       <div class="map-quiz-visual">
         <svg
           class="question-map"
+          data-responsive-region-map
+          data-base-view-box="${view.viewBox}"
+          data-bleed-view-box="${view.bleedViewBox ?? view.viewBox}"
           viewBox="${view.viewBox}"
           role="img"
           aria-label="${escapeHtml(t("highlightedMap", { region: regionLabel(region) }))}"
           preserveAspectRatio="xMidYMid meet"
         >
-          <rect class="question-map-ocean" x="-1000" y="-500" width="3000" height="1500" />
+          <rect class="question-map-ocean" x="-10000" y="-10000" width="20000" height="20000" />
           <g aria-hidden="true">
             ${pathMarkup(contextFeatures, "question-map-country is-context")}
             ${pathMarkup(regionFeatures, "question-map-country")}
@@ -1178,14 +1217,13 @@
     });
   }
 
-  function exploreMapCountryMarkup(country, view, markerRadius, zoom) {
+  function exploreMapCountryMarkup(country, view) {
     const paths = view.features
       .filter((feature) => feature.code === country.code)
       .map((feature) =>
         regionalMapPathMarkup(feature, "explore-map-country-shape"),
       )
       .join("");
-    const markerHitRadius = Math.max(11, markerRadius * 3.2);
     const markers = view.markers
       .filter((marker) => marker.code === country.code)
       .map(
@@ -1194,9 +1232,8 @@
             class="explore-map-marker-hit"
             cx="${marker.x}"
             cy="${marker.y}"
-            r="${markerHitRadius / zoom}"
-            data-explore-marker-radius
-            data-base-radius="${markerHitRadius}"
+            r="11"
+            data-map-marker-screen-radius="11"
           />
         `,
       )
@@ -1231,11 +1268,8 @@
   function exploreMapMarkerLayerMarkup(
     sortedCountries,
     view,
-    markerRadius,
-    zoom,
   ) {
     const regionCodes = new Set(sortedCountries.map((country) => country.code));
-    const markerHitRadius = Math.max(11, markerRadius * 3.2);
 
     return view.markers
       .filter((marker) => regionCodes.has(marker.code))
@@ -1259,17 +1293,15 @@
               class="explore-map-marker-top-hit"
               cx="${marker.x}"
               cy="${marker.y}"
-              r="${markerHitRadius / zoom}"
-              data-explore-marker-radius
-              data-base-radius="${markerHitRadius}"
+              r="11"
+              data-map-marker-screen-radius="11"
             />
             <circle
               class="explore-map-country-marker"
               cx="${marker.x}"
               cy="${marker.y}"
-              r="${markerRadius / zoom}"
-              data-explore-marker-radius
-              data-base-radius="${markerRadius}"
+              r="3"
+              data-map-marker-screen-radius="3"
               vector-effect="non-scaling-stroke"
             />
           </g>
@@ -1291,17 +1323,61 @@
     return [viewBox.x, viewBox.y, viewBox.width, viewBox.height].join(" ");
   }
 
-  function getExploreMapViewport(baseViewBox) {
-    const base = parseMapViewBox(baseViewBox);
+  function mapViewBoxesEqual(first, second) {
+    return ["x", "y", "width", "height"].every(
+      (key) => Math.abs(first[key] - second[key]) < 0.01,
+    );
+  }
+
+  function fitMapViewBoxToAspect(base, aspectRatio) {
+    if (!Number.isFinite(aspectRatio) || aspectRatio <= 0) return { ...base };
+    let width = base.width;
+    let height = base.height;
+    if (width / height < aspectRatio) {
+      width = height * aspectRatio;
+    } else {
+      height = width / aspectRatio;
+    }
+    const centerX = base.x + base.width / 2;
+    const centerY = base.y + base.height / 2;
+    return {
+      x: centerX - width / 2,
+      y: centerY - height / 2,
+      width,
+      height,
+    };
+  }
+
+  function syncMapMarkerRadii(svg, viewBox, renderedBounds) {
+    const mapUnitsPerPixel =
+      viewBox.width / Math.max(renderedBounds.width, 1);
+    svg.querySelectorAll("[data-map-marker-screen-radius]").forEach(
+      (marker) => {
+        marker.setAttribute(
+          "r",
+          Number(marker.dataset.mapMarkerScreenRadius) * mapUnitsPerPixel,
+        );
+      },
+    );
+  }
+
+  function getExploreMapViewport(
+    baseViewBox,
+    scopeId = state.region,
+  ) {
+    const canonicalBase = parseMapViewBox(baseViewBox);
     if (
-      state.exploreMapViewport?.region !== state.region ||
-      state.exploreMapViewport.base.width !== base.width ||
-      state.exploreMapViewport.base.height !== base.height
+      state.exploreMapViewport?.region !== scopeId ||
+      !mapViewBoxesEqual(
+        state.exploreMapViewport.canonicalBase,
+        canonicalBase,
+      )
     ) {
       state.exploreMapViewport = {
-        region: state.region,
-        base,
-        view: { ...base },
+        region: scopeId,
+        canonicalBase,
+        base: { ...canonicalBase },
+        view: { ...canonicalBase },
       };
     }
     return state.exploreMapViewport;
@@ -1336,7 +1412,34 @@
     const svg = app.querySelector("[data-explore-map-svg]");
     if (!viewport || !svg) return;
 
+    const bounds = svg.getBoundingClientRect();
+    const nextBase = fitMapViewBoxToAspect(
+      viewport.canonicalBase,
+      bounds.width / Math.max(bounds.height, 1),
+    );
+    if (!mapViewBoxesEqual(nextBase, viewport.base)) {
+      const previousBase = viewport.base;
+      const zoom = exploreMapZoom(viewport);
+      const centerX = viewport.view.x + viewport.view.width / 2;
+      const centerY = viewport.view.y + viewport.view.height / 2;
+      const normalizedX = (centerX - previousBase.x) / previousBase.width;
+      const normalizedY = (centerY - previousBase.y) / previousBase.height;
+      viewport.base = nextBase;
+      const width = nextBase.width / zoom;
+      const height = nextBase.height / zoom;
+      viewport.view = clampExploreMapView(
+        {
+          x: nextBase.x + normalizedX * nextBase.width - width / 2,
+          y: nextBase.y + normalizedY * nextBase.height - height / 2,
+          width,
+          height,
+        },
+        nextBase,
+      );
+    }
+
     svg.setAttribute("viewBox", serializeMapViewBox(viewport.view));
+    syncMapMarkerRadii(svg, viewport.view, bounds);
     const zoom = exploreMapZoom(viewport);
     const percent = Math.round(zoom * 100);
     const zoomOut = app.querySelector('[data-action="explore-map-zoom-out"]');
@@ -1347,9 +1450,6 @@
     if (zoomOut) zoomOut.disabled = zoom <= 1.001;
     if (zoomIn) zoomIn.disabled = zoom >= exploreMapMaxZoom - 0.001;
     map?.classList.toggle("is-zoomed", zoom > 1.001);
-    svg.querySelectorAll("[data-explore-marker-radius]").forEach((marker) => {
-      marker.setAttribute("r", Number(marker.dataset.baseRadius) / zoom);
-    });
     const countryControls = new Map(
       [...svg.querySelectorAll(".explore-map-country[data-explore-code]")].map(
         (control) => [control.dataset.exploreCode, control],
@@ -1395,6 +1495,25 @@
   function scheduleExploreMapZoomUi() {
     if (exploreMapUiFrame !== null) return;
     exploreMapUiFrame = requestAnimationFrame(syncExploreMapZoomUi);
+  }
+
+  function syncResponsiveRegionMaps() {
+    responsiveMapFrame = null;
+    app.querySelectorAll("[data-responsive-region-map]").forEach((svg) => {
+      const bounds = svg.getBoundingClientRect();
+      const base = parseMapViewBox(svg.dataset.baseViewBox);
+      const fitted = fitMapViewBoxToAspect(
+        base,
+        bounds.width / Math.max(bounds.height, 1),
+      );
+      svg.setAttribute("viewBox", serializeMapViewBox(fitted));
+      syncMapMarkerRadii(svg, fitted, bounds);
+    });
+  }
+
+  function scheduleResponsiveRegionMaps() {
+    if (responsiveMapFrame !== null) return;
+    responsiveMapFrame = requestAnimationFrame(syncResponsiveRegionMaps);
   }
 
   function flushExploreMapZoomUi() {
@@ -1657,14 +1776,35 @@
   }
 
   function exploreRegionMapMarkup(sortedCountries) {
-    const view = mapData.quizRegions[state.region];
-    const mapViewport = getExploreMapViewport(view.viewBox);
+    const showingAfricaOverview = state.exploreMapOverview === "africa";
+    const showingFocusedAsia =
+      state.region === "east-south-asia" && !state.exploreAsiaFull;
+    const scopeId = showingAfricaOverview
+      ? "africa"
+      : `${state.region}:${showingFocusedAsia ? "focus" : "full"}`;
+    const scopeLabel = showingAfricaOverview
+      ? t("africaOverview")
+      : regionLabel(selectedRegion());
+    const view = showingAfricaOverview
+      ? mapData.overviewRegions.africa
+      : mapData.quizRegions[state.region];
+    const presetViewBox = showingFocusedAsia
+      ? view.focusViewBox
+      : view.viewBox;
+    const mapViewport = getExploreMapViewport(
+      presetViewBox,
+      scopeId,
+    );
     const zoom = exploreMapZoom(mapViewport);
     const zoomPercent = Math.round(zoom * 100);
-    const [, , viewWidth] = view.viewBox.split(/\s+/).map(Number);
-    const markerRadius = Math.min(3.8, Math.max(1.4, viewWidth * 0.0045));
-    const contextPaths = view.features
-      .filter((feature) => mapRegionForCode(feature.code) !== state.region)
+    const contextPaths = (view.backgroundFeatures ?? view.features)
+      .filter((feature) => {
+        if (view.backgroundFeatures) return true;
+        const region = mapRegionForCode(feature.code);
+        return showingAfricaOverview
+          ? !africaRegionIds.has(region)
+          : region !== state.region;
+      })
       .map((feature) =>
         regionalMapPathMarkup(feature, "explore-map-context-shape"),
       )
@@ -1672,28 +1812,56 @@
 
     return `
       <div class="explore-map-layout">
-        <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
+        <div class="explore-map-stage">
+          ${
+            africaRegionIds.has(state.region)
+              ? `<div class="explore-map-scope-controls">
+                  <button
+                    type="button"
+                    class="secondary-button explore-map-scope-button"
+                    data-action="toggle-africa-overview"
+                  >${
+                    showingAfricaOverview
+                      ? escapeHtml(t("showSelectedRegion", {
+                          region: regionLabel(selectedRegion()),
+                        }))
+                      : escapeHtml(t("viewAllAfrica"))
+                  }</button>
+                </div>`
+              : state.region === "east-south-asia"
+                ? `<div class="explore-map-scope-controls">
+                    <button
+                      type="button"
+                      class="secondary-button explore-map-scope-button"
+                      data-action="toggle-asia-focus"
+                    >${escapeHtml(
+                      state.exploreAsiaFull
+                        ? t("focusOnAsia")
+                        : t("showAllRussia"),
+                    )}</button>
+                  </div>`
+              : ""
+          }
+          <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
           <svg
             data-explore-map-svg
             viewBox="${serializeMapViewBox(mapViewport.view)}"
             role="group"
             aria-label="${escapeHtml(t("interactiveRegionMap", {
-              region: regionLabel(selectedRegion()),
+              region: scopeLabel,
             }))}"
             preserveAspectRatio="xMidYMid meet"
           >
-            <rect class="question-map-ocean" x="-1000" y="-500" width="3000" height="1500" />
+            <rect class="question-map-ocean" x="-10000" y="-10000" width="20000" height="20000" />
             <g aria-hidden="true">${contextPaths}</g>
             ${sortedCountries
               .map((country) =>
-                exploreMapCountryMarkup(country, view, markerRadius, zoom),
+                exploreMapCountryMarkup(country, view),
               )
               .join("")}
             ${exploreMapMarkerLayerMarkup(
               sortedCountries,
               view,
-              markerRadius,
-              zoom,
             )}
           </svg>
           <div
@@ -1725,6 +1893,7 @@
           </div>
           <div class="explore-silhouette-overlay">
             ${exploreSilhouetteOverlayMarkup()}
+          </div>
           </div>
         </div>
 
@@ -1884,12 +2053,20 @@
       (country) => country.code === state.modalCode,
     );
     const collator = new Intl.Collator(state.locale, { sensitivity: "base" });
-    const sortedCountries = [...countriesInRegion(state.region)].sort((a, b) =>
+    const viewingMap = state.exploreView === "map";
+    const showingAfricaOverview =
+      viewingMap && state.exploreMapOverview === "africa";
+    const scopedCountries = showingAfricaOverview
+      ? countriesInExploreMapScope()
+      : countriesInRegion(state.region);
+    const sortedCountries = [...scopedCountries].sort((a, b) =>
       collator.compare(countryName(a), countryName(b)),
     );
     const mapAvailable = mapSelectableRegions.includes(state.region);
-    const viewingMap = state.exploreView === "map";
-    const exploreLabel = `${t("explore")} · ${regionLabel(region)}`;
+    const scopeLabel = showingAfricaOverview
+      ? t("africaOverview")
+      : regionLabel(region);
+    const exploreLabel = `${t("explore")} · ${scopeLabel}`;
 
     return `
       <main class="site-shell explore-shell explore-${state.exploreView}-shell">
@@ -1901,7 +2078,7 @@
             tabindex="-1"
           >
             <span class="explore-context-prefix">${t("explore")} <span aria-hidden="true">·</span></span>
-            <span class="explore-context-region">${regionLabel(region)}</span>
+            <span class="explore-context-region">${scopeLabel}</span>
           </h1>
           ${homeButtonMarkup()}
         </header>
@@ -2266,6 +2443,7 @@
     app.innerHTML = screenMarkup();
     document.body?.classList.toggle("standalone-mode", isStandalone());
     scheduleScrollAffordanceUpdate();
+    scheduleResponsiveRegionMaps();
     if (state.screen === "explore" && state.exploreView === "map") {
       scheduleExploreMapZoomUi();
     }
@@ -2295,6 +2473,16 @@
     }
     if (options.focusExploreHeading) {
       app.querySelector(".explore-context")?.focus({ preventScroll: true });
+    }
+    if (options.focusExploreOverviewToggle) {
+      app
+        .querySelector('[data-action="toggle-africa-overview"]')
+        ?.focus({ preventScroll: true });
+    }
+    if (options.focusExploreAsiaToggle) {
+      app
+        .querySelector('[data-action="toggle-asia-focus"]')
+        ?.focus({ preventScroll: true });
     }
     if (options.focusMapRegion) {
       app.querySelector('[data-action="quiz-map-region"]')?.focus();
@@ -2368,6 +2556,8 @@
   function resetExploreCountryState() {
     state.explorePinnedCode = null;
     state.explorePreviewCode = null;
+    state.exploreMapOverview = null;
+    state.exploreAsiaFull = false;
     state.silhouetteExpanded = false;
     resetExploreMapInteraction();
   }
@@ -2442,6 +2632,8 @@
   function updateRegion(regionId) {
     if (!regionOptions.some((region) => region.id === regionId)) return false;
     if (state.region !== regionId) {
+      state.exploreMapOverview = null;
+      state.exploreAsiaFull = false;
       resetExploreMapInteraction();
     }
     state.region = regionId;
@@ -2679,6 +2871,29 @@
       return;
     }
 
+    if (action === "toggle-africa-overview") {
+      if (!africaRegionIds.has(state.region)) return;
+      state.exploreMapOverview =
+        state.exploreMapOverview === "africa" ? null : "africa";
+      state.explorePinnedCode = null;
+      state.explorePreviewCode = null;
+      state.silhouetteExpanded = false;
+      resetExploreMapInteraction();
+      render({ focusExploreOverviewToggle: true });
+      return;
+    }
+
+    if (action === "toggle-asia-focus") {
+      if (state.region !== "east-south-asia") return;
+      state.exploreAsiaFull = !state.exploreAsiaFull;
+      state.explorePinnedCode = null;
+      state.explorePreviewCode = null;
+      state.silhouetteExpanded = false;
+      resetExploreMapInteraction();
+      render({ focusExploreAsiaToggle: true });
+      return;
+    }
+
     if (action === "explore-map-zoom-out") {
       stepExploreMapZoom(-1);
       return;
@@ -2878,6 +3093,7 @@
   window.addEventListener("pointercancel", finishExploreMapPointer);
   window.addEventListener("resize", () => {
     scheduleScrollAffordanceUpdate();
+    scheduleResponsiveRegionMaps();
     if (state.screen === "explore" && state.exploreView === "map") {
       scheduleExploreMapZoomUi();
     }

@@ -197,12 +197,24 @@
   opacity: 0.28;
 }
 
+.question-map-country.is-crop-edge {
+  fill: none;
+  stroke: var(--blue-soft);
+  stroke-width: 4;
+  opacity: 1;
+  pointer-events: none;
+}
+
 .question-map-target-halo {
   fill: none;
   stroke: rgba(217, 111, 78, 0.42);
   stroke-width: 12;
   stroke-linejoin: round;
   stroke-linecap: round;
+}
+
+.question-map-target-halo.is-crop-edge {
+  display: none;
 }
 
 .question-map-country.is-target {
@@ -835,4 +847,3 @@
   font-size: 13px;
   line-height: 1.35;
 }
-

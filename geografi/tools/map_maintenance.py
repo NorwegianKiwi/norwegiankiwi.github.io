@@ -21,12 +21,25 @@ ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = Path(__file__).with_name("map-sources.json")
 VALID_REGIONS = {
     "europe",
-    "africa",
-    "asia",
+    "north-west-africa",
+    "east-south-africa",
+    "west-central-asia",
+    "east-south-asia",
     "oceania",
     "north-central-america",
     "south-america",
     "caribbean",
+}
+EXPECTED_REGION_COUNTS = {
+    "europe": 44,
+    "north-west-africa": 26,
+    "east-south-africa": 28,
+    "west-central-asia": 24,
+    "east-south-asia": 25,
+    "oceania": 14,
+    "north-central-america": 10,
+    "south-america": 12,
+    "caribbean": 13,
 }
 
 
@@ -38,13 +51,15 @@ def load_countries():
     text = (ROOT / "countries.js").read_text(encoding="utf-8")
     pattern = re.compile(
         r'^\s*\{\s*code:\s*"([a-z]{2})",\s*'
-        r'region:\s*"([^"]+)",\s*name:\s*\{',
+        r'region:\s*"([^"]+)",\s*name:\s*\{\s*'
+        r'nb:\s*"[^"]+",\s*en:\s*"([^"]+)"\s*\}',
         re.MULTILINE,
     )
     rows = [
         {
             "code": match.group(1),
             "region": match.group(2),
+            "name": match.group(3),
         }
         for match in pattern.finditer(text)
     ]
@@ -70,6 +85,9 @@ def load_generated_map(path=None):
     data = decode_assignment(text, "const data = ")
     data["quizProjection"] = decode_assignment(text, "data.quizProjection = ")
     data["quizRegions"] = decode_assignment(text, "data.quizRegions = ")
+    data["overviewRegions"] = decode_assignment(
+        text, "data.overviewRegions = "
+    ) if "data.overviewRegions = " in text else {}
     data["silhouetteViewBox"] = decode_assignment(
         text, "data.silhouetteViewBox = "
     )
@@ -83,6 +101,16 @@ def sha256(path):
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def parse_view_box(value):
+    if not isinstance(value, str):
+        return None
+    if not re.fullmatch(
+        r"-?\d+(?:\.\d+)?(?:\s+-?\d+(?:\.\d+)?){3}", value
+    ):
+        return None
+    return tuple(float(part) for part in value.split())
 
 
 def find_dataset_file(directory, stem, suffix):
@@ -145,6 +173,9 @@ def validate_local_data(map_path=None):
     warnings = []
 
     codes = [country["code"] for country in countries]
+    region_for_code = {
+        country["code"]: country["region"] for country in countries
+    }
     duplicate_codes = sorted(
         code for code, count in Counter(codes).items() if count > 1
     )
@@ -202,6 +233,12 @@ def validate_local_data(map_path=None):
         )
 
     for region, view in map_data["quizRegions"].items():
+        background_features = view.get("backgroundFeatures")
+        if not isinstance(background_features, list):
+            errors.append(f"{region} mangler backgroundFeatures")
+            background_features = []
+        if not parse_view_box(view.get("bleedViewBox")):
+            errors.append(f"{region} mangler gyldig bleedViewBox")
         geometry_codes = {
             feature["code"]
             for feature in view["features"]
@@ -220,6 +257,268 @@ def validate_local_data(map_path=None):
             errors.append(
                 f"{region} mangler quizgeometri for: {', '.join(missing)}"
             )
+        unexpected_features = sorted(
+            {
+                feature.get("code")
+                for feature in view["features"]
+                if feature.get("code") not in expected_codes
+            },
+            key=lambda value: value or "",
+        )
+        unexpected_markers = sorted(
+            {
+                marker.get("code")
+                for marker in view["markers"]
+                if marker.get("code") not in expected_codes
+            },
+            key=lambda value: value or "",
+        )
+        if unexpected_features or unexpected_markers:
+            errors.append(
+                f"{region} har ikke-aktive objekter i forgrunnslaget: "
+                + ", ".join(
+                    str(code)
+                    for code in unexpected_features + unexpected_markers
+                )
+            )
+        cropped_active = sorted(
+            feature["code"]
+            for feature in view["features"]
+            if feature.get("cropPath")
+        )
+        if cropped_active:
+            errors.append(
+                f"{region} beskjærer aktive quizland: "
+                + ", ".join(cropped_active)
+            )
+        active_background = sorted(
+            {
+                feature["code"]
+                for feature in background_features
+                if region_for_code.get(feature.get("code")) == region
+            }
+        )
+        if active_background:
+            errors.append(
+                f"{region} har aktive quizland i bakgrunnslaget: "
+                + ", ".join(active_background)
+            )
+        camera = parse_view_box(view.get("viewBox"))
+        bleed = parse_view_box(view.get("bleedViewBox"))
+        if camera and bleed:
+            camera_x, camera_y, camera_width, camera_height = camera
+            bleed_x, bleed_y, bleed_width, bleed_height = bleed
+            tolerance = 0.2
+            if not (
+                bleed_x <= camera_x + tolerance
+                and bleed_y <= camera_y + tolerance
+                and bleed_x + bleed_width
+                >= camera_x + camera_width - tolerance
+                and bleed_y + bleed_height
+                >= camera_y + camera_height - tolerance
+                and bleed_width >= camera_height * 2.4 - tolerance
+                and bleed_height >= camera_width / 0.75 - tolerance
+            ):
+                errors.append(f"{region} har for lite automatisk bleed-område")
+            camera_right = camera_x + camera_width
+            camera_bottom = camera_y + camera_height
+            outside_camera = set()
+            for feature in view["features"]:
+                coordinates = [
+                    float(value)
+                    for value in re.findall(
+                        r"-?\d+(?:\.\d+)?", feature["path"]
+                    )
+                ]
+                if any(
+                    x < camera_x - tolerance
+                    or x > camera_right + tolerance
+                    or y < camera_y - tolerance
+                    or y > camera_bottom + tolerance
+                    for x, y in zip(coordinates[::2], coordinates[1::2])
+                ):
+                    outside_camera.add(feature.get("code"))
+            for marker in view["markers"]:
+                if not (
+                    camera_x - tolerance
+                    <= marker["x"]
+                    <= camera_right + tolerance
+                    and camera_y - tolerance
+                    <= marker["y"]
+                    <= camera_bottom + tolerance
+                ):
+                    outside_camera.add(marker.get("code"))
+            if outside_camera:
+                errors.append(
+                    f"{region} har aktive land utenfor kameraet: "
+                    + ", ".join(sorted(outside_camera))
+                )
+
+    asia_focus = map_data["quizRegions"].get("east-south-asia", {}).get(
+        "focusViewBox"
+    )
+    focus_box = parse_view_box(asia_focus)
+    if not focus_box:
+        errors.append("east-south-asia mangler gyldig focusViewBox")
+    else:
+        focus_x, focus_y, focus_width, focus_height = focus_box
+        focus_right = focus_x + focus_width
+        focus_bottom = focus_y + focus_height
+        asia_view = map_data["quizRegions"]["east-south-asia"]
+        outside_focus = set()
+        for feature in asia_view["features"]:
+            code = feature.get("code")
+            if region_for_code.get(code) != "east-south-asia" or code == "ru":
+                continue
+            coordinates = [
+                float(value)
+                for value in re.findall(r"-?\d+(?:\.\d+)?", feature["path"])
+            ]
+            points = list(zip(coordinates[::2], coordinates[1::2]))
+            if any(
+                x < focus_x or x > focus_right or y < focus_y or y > focus_bottom
+                for x, y in points
+            ):
+                outside_focus.add(code)
+        for marker in asia_view["markers"]:
+            code = marker.get("code")
+            if region_for_code.get(code) != "east-south-asia" or code == "ru":
+                continue
+            if not (
+                focus_x <= marker["x"] <= focus_right
+                and focus_y <= marker["y"] <= focus_bottom
+            ):
+                outside_focus.add(code)
+        if outside_focus:
+            errors.append(
+                "Asia-fokus beskjærer andre aktive land enn Russland: "
+                + ", ".join(sorted(outside_focus))
+            )
+
+    expected_overviews = set(manifest.get("overviewRegions", {}))
+    overview_regions = map_data.get("overviewRegions", {})
+    actual_overviews = set(overview_regions)
+    if actual_overviews != expected_overviews:
+        errors.append(
+            "Oversiktskart avviker fra manifestet: "
+            f"forventet {sorted(expected_overviews)}, "
+            f"fant {sorted(actual_overviews)}"
+        )
+
+    for overview, settings in manifest.get("overviewRegions", {}).items():
+        view = overview_regions.get(overview)
+        if not view:
+            continue
+        if not isinstance(view.get("backgroundFeatures"), list):
+            errors.append(f"{overview} mangler backgroundFeatures")
+        if not parse_view_box(view.get("bleedViewBox")):
+            errors.append(f"{overview} mangler gyldig bleedViewBox")
+        active_overview_background = sorted(
+            {
+                feature["code"]
+                for feature in view.get("backgroundFeatures", [])
+                if region_for_code.get(feature.get("code"))
+                in set(settings["memberRegions"])
+            }
+        )
+        if active_overview_background:
+            errors.append(
+                f"{overview} har aktive land i bakgrunnslaget: "
+                + ", ".join(active_overview_background)
+            )
+        geometry_codes = {
+            feature["code"]
+            for feature in view["features"]
+            if feature.get("code")
+        }
+        geometry_codes.update(
+            marker["code"] for marker in view["markers"] if marker.get("code")
+        )
+        member_regions = set(settings["memberRegions"])
+        expected_codes = {
+            country["code"]
+            for country in countries
+            if country["region"] in member_regions
+        }
+        missing = sorted(expected_codes - geometry_codes)
+        if missing:
+            errors.append(
+                f"{overview} mangler oversiktsgeometri for: {', '.join(missing)}"
+            )
+        unexpected = sorted(
+            {
+                item.get("code")
+                for item in view["features"] + view["markers"]
+                if item.get("code") not in expected_codes
+            },
+            key=lambda value: value or "",
+        )
+        if unexpected:
+            errors.append(
+                f"{overview} har ikke-aktive objekter i forgrunnslaget: "
+                + ", ".join(str(code) for code in unexpected)
+            )
+        cropped = sorted(
+            feature["code"]
+            for feature in view["features"]
+            if feature.get("cropPath")
+        )
+        if cropped:
+            errors.append(
+                f"{overview} beskjærer aktive land: " + ", ".join(cropped)
+            )
+        camera = parse_view_box(view.get("viewBox"))
+        bleed = parse_view_box(view.get("bleedViewBox"))
+        if camera and bleed:
+            camera_x, camera_y, camera_width, camera_height = camera
+            bleed_x, bleed_y, bleed_width, bleed_height = bleed
+            tolerance = 0.2
+            if not (
+                bleed_x <= camera_x + tolerance
+                and bleed_y <= camera_y + tolerance
+                and bleed_x + bleed_width
+                >= camera_x + camera_width - tolerance
+                and bleed_y + bleed_height
+                >= camera_y + camera_height - tolerance
+                and bleed_width >= camera_height * 2.4 - tolerance
+                and bleed_height >= camera_width / 0.75 - tolerance
+            ):
+                errors.append(
+                    f"{overview} har for lite automatisk bleed-område"
+                )
+            camera_right = camera_x + camera_width
+            camera_bottom = camera_y + camera_height
+            outside_camera = set()
+            for feature in view["features"]:
+                coordinates = [
+                    float(value)
+                    for value in re.findall(
+                        r"-?\d+(?:\.\d+)?", feature["path"]
+                    )
+                ]
+                if any(
+                    x < camera_x - tolerance
+                    or x > camera_right + tolerance
+                    or y < camera_y - tolerance
+                    or y > camera_bottom + tolerance
+                    for x, y in zip(coordinates[::2], coordinates[1::2])
+                ):
+                    outside_camera.add(feature.get("code"))
+            for marker in view["markers"]:
+                if not (
+                    camera_x - tolerance
+                    <= marker["x"]
+                    <= camera_right + tolerance
+                    and camera_y - tolerance
+                    <= marker["y"]
+                    <= camera_bottom + tolerance
+                ):
+                    outside_camera.add(marker.get("code"))
+            if outside_camera:
+                errors.append(
+                    f"{overview} har aktive land utenfor kameraet: "
+                    + ", ".join(sorted(outside_camera))
+                )
 
     source = map_data.get("source", "")
     version = manifest["naturalEarthVersion"]
@@ -229,10 +528,22 @@ def validate_local_data(map_path=None):
         )
     if map_data.get("projection") != "Equal Earth":
         errors.append("Verdenskartets projeksjon er ikke Equal Earth")
-    if map_data.get("quizProjection") != "Mercator":
-        errors.append("Kartquizens projeksjon er ikke Mercator")
+    if map_data.get("quizProjection") != "Azimuthal equidistant":
+        errors.append(
+            "Kartquizens projeksjon er ikke Azimuthal equidistant"
+        )
 
     region_counts = Counter(country["region"] for country in countries)
+    if dict(region_counts) != EXPECTED_REGION_COUNTS:
+        errors.append(
+            "Uventede regiontall: "
+            + ", ".join(
+                f"{region}={region_counts[region]} "
+                f"(forventet {EXPECTED_REGION_COUNTS[region]})"
+                for region in sorted(EXPECTED_REGION_COUNTS)
+                if region_counts[region] != EXPECTED_REGION_COUNTS[region]
+            )
+        )
     print(f"Land: {len(countries)} ({len(set(codes))} unike koder)")
     print(f"Flagg: {len(flag_codes)}")
     print(
@@ -240,6 +551,7 @@ def validate_local_data(map_path=None):
         f"{len(world_geometry & set(codes))} quizkoder med geometri/markør"
     )
     print(f"Silhuetter: {len(silhouettes)}")
+    print(f"Oversiktskart: {len(actual_overviews)}")
     print(
         "Regioner: "
         + ", ".join(
