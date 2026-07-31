@@ -93,10 +93,14 @@ Den innsjekkede geometrien består av tre separate produkter:
 
 1. Verdenskart: 1:50m, Equal Earth, `0 0 1000 500`.
 2. Regionkart: 1:50m, nordvendt, regionsentrert azimutal ekvidistant
-   projeksjon med automatisk kamera fra aktive land. Oseania vikles rundt
-   180°.
-3. Formvindu: 1:10m, nordvendt silhuett, `0 0 100 100`, med synlige
-   erstatningsmarkører for svært små komponenter.
+   projeksjon med automatisk kamera fra aktive land. Aktive land med et
+   Natural Earth-smålandspunkt bruker 1:10m-geometri, slik at øyer som mangler
+   i 1:50m-kilden fortsatt finnes ved innzooming. Bakgrunnsgeografien forblir
+   1:50m. Oseania vikles rundt 180°.
+3. Formvindu: 1:10m, nordvendt silhuett, `0 0 100 100`. Svært små komponenter
+   beholdes som egen polygongeometri med lettere strekbehandling. Bare land
+   der all geometri er under lesbarhetsterskelen får høyst åtte representative
+   punkter i det kompakte formvinduet.
 
 Geometrien ble forenklet og koordinatene avrundet til én desimal. Smålandspunkter
 fra Natural Earth brukes når polygonet er for lite til å være lesbart.
@@ -128,9 +132,25 @@ python3 tools/generate_map_data.py \
   --base-map world-map.js
 ```
 
+Når formvinduene også skal regenereres uten å endre Equal Earth-verdenskartet,
+legg til `--refresh-silhouettes`. Uten dette flagget beholder `--base-map`
+eksisterende formvinduer:
+
+```sh
+python3 tools/generate_map_data.py \
+  /tmp/geografi-map-sources \
+  /tmp/world-map.candidate.js \
+  --base-map world-map.js \
+  --refresh-silhouettes
+```
+
 Hvert regionkart har aktive land i `features` og `markers`, mens
 `backgroundFeatures` bare inneholder ikke-aktiv geografi. Alle tre samlingene
 bruker samme sentralmeridian, projeksjon og forenklingstoleranse.
+Hver smålandsmarkør har `readableSize`, beregnet fra den største minsteaksen
+til én faktisk polygonkomponent. Grensesnittet viser derfor ikke polygonet før
+en enkelt komponent er lesbar; et spredt øyrikes samlede ytterramme er ikke
+tilstrekkelig.
 Projeksjonens breddegradssentrum er alltid midtpunktet i den geografiske
 utvalgsrammen; dette er samme regel for alle regioner.
 Aktive polygonkomponenter som treffer den geografiske utvalgsrammen med 10 %
@@ -157,8 +177,11 @@ forvrengning eller letterboxing.
 
 `viewBox` viser alltid den komplette regionen, både i kartquizen og Explore.
 
-Generatoren leser SHP/DBF direkte, projiserer og forenkler geometrien og
-beholder eksisterende `corner`-valg for formvinduene. Den nekter å skrive
+Generatoren leser SHP/DBF direkte, projiserer og forenkler geometrien.
+Silhuettene bruker en landssentrert ekvirektangulær projeksjon med ett fast
+standardparallell for hele landet. Dette bevarer nordretningen uten at ulike
+breddegrader får ulik vannrett skala og dermed skjevstiller formen.
+Alle formvinduer plasseres nederst til venstre. Generatoren nekter å skrive
 direkte til `world-map.js`. Dersom en fremtidig oppdatering krever mer avansert
 geometribehandling, kan GDAL/QGIS, D3 Geo eller Mapshaper brukes offline, men
 resultatet må fortsatt serialiseres til samme offentlige grensesnitt:
@@ -178,9 +201,8 @@ window.GEOGRAFI_QUIZ_MAP_DATA = {
 };
 ```
 
-Ingen av disse verktøyene skal bli runtime-avhengigheter. Behold
-`corner`-verdien for hvert eksisterende formvindu med mindre en visuell
-kontroll viser at landet skjules.
+Ingen av disse verktøyene skal bli runtime-avhengigheter. `corner` skal være
+`bottom-left` for alle formvinduer.
 
 Manifestets geografiske rammer velger relevante polygonkomponenter og gir
 projeksjonen en stabil målestokk; de er ikke synlige kameraer. Hele komponenter

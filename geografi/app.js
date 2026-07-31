@@ -744,6 +744,7 @@
     return `
       <path
         class="${className}"
+        data-map-country-code="${escapeHtml(feature.code ?? "")}"
         d="${feature.path}"
         vector-effect="non-scaling-stroke"
       />
@@ -751,6 +752,7 @@
         feature.cropPath
           ? `<path
               class="${className} is-crop-edge"
+              data-map-country-code="${escapeHtml(feature.code ?? "")}"
               d="${feature.cropPath}"
               vector-effect="non-scaling-stroke"
               aria-hidden="true"
@@ -772,6 +774,8 @@
         cy="${marker.y}"
         r="${screenRadius}"
         data-map-marker-screen-radius="${screenRadius}"
+        data-map-marker-code="${escapeHtml(marker.code)}"
+        data-map-marker-readable-size="${marker.readableSize}"
         vector-effect="non-scaling-stroke"
       />
     `;
@@ -783,7 +787,7 @@
   ) {
     const silhouette = mapData.silhouettes[countryCode];
     const hasSilhouettePath = Boolean(silhouette.path);
-    const expandedMarkerRadius = hasSilhouettePath ? 0.4 : 0.75;
+    const expandedMarkerRadius = 0;
     const currentMarkerRadius = expanded ? expandedMarkerRadius : null;
     const silhouetteMarkers = silhouette.markers
       .map(
@@ -802,7 +806,7 @@
       .join("");
     const classes = [
       "country-silhouette-inset",
-      `is-${silhouette.corner}`,
+      "is-bottom-left",
       hasSilhouettePath ? "has-silhouette-path" : "is-marker-only",
       interactive ? "is-interactive" : "is-preview-only",
       interactive && expanded ? "is-expanded" : "",
@@ -821,6 +825,11 @@
         ${
           silhouette.path
             ? `<path class="country-silhouette-shape" d="${silhouette.path}" />`
+            : ""
+        }
+        ${
+          silhouette.minorPath
+            ? `<path class="country-silhouette-minor-shape" d="${silhouette.minorPath}" />`
             : ""
         }
         ${silhouetteMarkers}
@@ -867,10 +876,18 @@
     const targetMarkers = view.markers.filter(
       (marker) => marker.code === targetCode,
     );
+    const locatorCodes = new Set(view.markers.map((marker) => marker.code));
 
     const pathMarkup = (features, className) =>
       features
-        .map((feature) => regionalMapPathMarkup(feature, className))
+        .map((feature) =>
+          regionalMapPathMarkup(
+            feature,
+            `${className}${
+              locatorCodes.has(feature.code) ? " is-locator-hidden" : ""
+            }`,
+          ),
+        )
         .join("");
     const markerMarkup = (markers, className, radius) =>
       markers
@@ -1214,6 +1231,9 @@
   }
 
   function exploreMapCountryMarkup(country, view) {
+    const hasLocatorMarker = view.markers.some(
+      (marker) => marker.code === country.code,
+    );
     const paths = view.features
       .filter((feature) => feature.code === country.code)
       .map((feature) =>
@@ -1238,6 +1258,7 @@
       "explore-map-country",
       state.explorePinnedCode === country.code ? "is-pinned" : "",
       state.explorePreviewCode === country.code ? "is-preview" : "",
+      hasLocatorMarker ? "has-locator-marker is-locator-hidden" : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -1283,6 +1304,7 @@
             class="${classes}"
             data-action="explore-country"
             data-explore-code="${marker.code}"
+            data-map-marker-readable-size="${marker.readableSize}"
             aria-hidden="true"
           >
             <circle
@@ -1355,6 +1377,66 @@
         );
       },
     );
+  }
+
+  function syncRegionalMarkerHandoffs(svg, viewBox, renderedBounds) {
+    const mapUnitsPerPixel =
+      viewBox.width / Math.max(renderedBounds.width, 1);
+    const markerControls = svg.querySelectorAll(
+      "[data-map-marker-readable-size]",
+    );
+    const processedQuizCodes = new Set();
+
+    markerControls.forEach((markerControl) => {
+      const readableSize = Number(
+        markerControl.dataset.mapMarkerReadableSize,
+      );
+      const threshold = markerControl.classList.contains(
+        "is-geometry-readable",
+      )
+        ? exploreMapGeometryHideSize
+        : exploreMapGeometryShowSize;
+      const geometryReadable =
+        readableSize / Math.max(mapUnitsPerPixel, Number.EPSILON) >= threshold;
+
+      markerControl.classList.toggle(
+        "is-geometry-readable",
+        geometryReadable,
+      );
+
+      const exploreCode = markerControl.dataset.exploreCode;
+      if (exploreCode) {
+        const countryControl = svg.querySelector(
+          `.explore-map-country[data-explore-code="${exploreCode}"]`,
+        );
+        countryControl?.classList.toggle(
+          "is-locator-hidden",
+          !geometryReadable,
+        );
+        countryControl?.classList.toggle(
+          "is-geometry-readable",
+          geometryReadable,
+        );
+        return;
+      }
+
+      const code = markerControl.dataset.mapMarkerCode;
+      if (!code || processedQuizCodes.has(code)) return;
+      processedQuizCodes.add(code);
+      svg
+        .querySelectorAll(`[data-map-marker-code="${code}"]`)
+        .forEach((marker) =>
+          marker.classList.toggle(
+            "is-geometry-readable",
+            geometryReadable,
+          ),
+        );
+      svg
+        .querySelectorAll(`[data-map-country-code="${code}"]`)
+        .forEach((shape) =>
+          shape.classList.toggle("is-locator-hidden", !geometryReadable),
+        );
+    });
   }
 
   function getExploreMapViewport(
@@ -1436,6 +1518,7 @@
 
     svg.setAttribute("viewBox", serializeMapViewBox(viewport.view));
     syncMapMarkerRadii(svg, viewport.view, bounds);
+    syncRegionalMarkerHandoffs(svg, viewport.view, bounds);
     const zoom = exploreMapZoom(viewport);
     const percent = Math.round(zoom * 100);
     const zoomOut = app.querySelector('[data-action="explore-map-zoom-out"]');
@@ -1446,40 +1529,6 @@
     if (zoomOut) zoomOut.disabled = zoom <= 1.001;
     if (zoomIn) zoomIn.disabled = zoom >= exploreMapMaxZoom - 0.001;
     map?.classList.toggle("is-zoomed", zoom > 1.001);
-    const countryControls = new Map(
-      [...svg.querySelectorAll(".explore-map-country[data-explore-code]")].map(
-        (control) => [control.dataset.exploreCode, control],
-      ),
-    );
-    svg
-      .querySelectorAll(".explore-map-marker-control[data-explore-code]")
-      .forEach((markerControl) => {
-        const countryControl = countryControls.get(
-          markerControl.dataset.exploreCode,
-        );
-        if (!countryControl) return;
-
-        const threshold = markerControl.classList.contains(
-          "is-geometry-readable",
-        )
-          ? exploreMapGeometryHideSize
-          : exploreMapGeometryShowSize;
-        const geometryReadable = [
-          ...countryControl.querySelectorAll(".explore-map-country-shape"),
-        ].some((shape) => {
-          const bounds = shape.getBoundingClientRect();
-          return bounds.width >= threshold && bounds.height >= threshold;
-        });
-
-        markerControl.classList.toggle(
-          "is-geometry-readable",
-          geometryReadable,
-        );
-        countryControl.classList.toggle(
-          "is-geometry-readable",
-          geometryReadable,
-        );
-      });
     if (reset) {
       reset.textContent = `${percent}%`;
       const label = t("resetMapZoom", { percent });
@@ -1504,6 +1553,7 @@
       );
       svg.setAttribute("viewBox", serializeMapViewBox(fitted));
       syncMapMarkerRadii(svg, fitted, bounds);
+      syncRegionalMarkerHandoffs(svg, fitted, bounds);
     });
   }
 

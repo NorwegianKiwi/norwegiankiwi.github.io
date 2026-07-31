@@ -89,14 +89,24 @@ offline consistency check with:
 python3 tools/map_maintenance.py validate
 ```
 
-The map quiz also includes a small shape inset with north-up country
-silhouettes generated from Natural Earth 1:10m Admin 0 Countries, version
-5.1.1. The higher level of detail provides visible outlines for microstates
-and small island states. Silhouettes are scaled and compressed in advance,
-and very small island components are retained as local point markers.
+The map quiz also includes a small shape inset in the lower-left corner with
+north-up country silhouettes generated from Natural Earth 1:10m Admin 0
+Countries, version 5.1.1. The higher level of detail provides visible outlines
+for microstates and small island states. Each silhouette uses one
+country-centered equirectangular projection with a fixed standard parallel,
+then is scaled and compressed in advance. Keeping the horizontal scale fixed
+across the whole country prevents north–south shear.
+Components below the normal readability threshold remain real polygon
+geometry: they render without an outline in the compact inset and gain a thin
+outline when enlarged. Only countries whose complete silhouette is sub-pixel
+use up to eight representative dots in the compact inset; those dots disappear
+in the enlarged view so the detailed polygons take over.
 
 The Maps view in Explore reuses the same regional azimuthal equidistant maps and
-silhouettes. A map is available for each of the nine individual regions;
+silhouettes. Active countries with Natural Earth tiny-country locator points
+use 1:10m foreground geometry on regional maps, while other foreground and all
+background geography use 1:50m. A map is available for each of the nine
+individual regions;
 Whole world instead presents a region choice. From either African region,
 Explore can temporarily show a full-Africa overview without changing the
 selected quiz region. East and South Asia always shows its complete regional
@@ -112,7 +122,7 @@ Tiny-country dots retain a constant on-screen size. The map data connects to
 country codes rather than duplicating region membership.
 Explore maps support map-local touchscreen and trackpad pinch zoom,
 touchscreen two-finger panning, and desktop press-and-drag panning, with
-keyboard-accessible controls from 100% to 400%; the surrounding page remains
+keyboard-accessible controls from 100% to 800%; the surrounding page remains
 at its normal scale.
 
 ## Globe

@@ -211,6 +211,7 @@
   stroke-width: 12;
   stroke-linejoin: round;
   stroke-linecap: round;
+  transition: opacity 150ms ease;
 }
 
 .question-map-target-halo.is-crop-edge {
@@ -225,10 +226,20 @@
   paint-order: stroke fill;
 }
 
+.question-map-country.is-locator-hidden,
+.question-map-target-halo.is-locator-hidden {
+  opacity: 0;
+}
+
 .question-map-marker {
   fill: #82998a;
   stroke: var(--card);
   stroke-width: 1.4;
+  transition: opacity 150ms ease;
+}
+
+.question-map-marker.is-geometry-readable {
+  opacity: 0;
 }
 
 .question-map-marker.is-target-halo {
@@ -289,30 +300,6 @@
     var(--silhouette-edge);
 }
 
-.country-silhouette-inset.is-bottom-right {
-  inset:
-    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
-    var(--silhouette-edge)
-    var(--silhouette-edge)
-    calc(100% - var(--silhouette-edge) - var(--silhouette-size));
-}
-
-.country-silhouette-inset.is-top-left {
-  inset:
-    var(--silhouette-edge)
-    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
-    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
-    var(--silhouette-edge);
-}
-
-.country-silhouette-inset.is-top-right {
-  inset:
-    var(--silhouette-edge)
-    var(--silhouette-edge)
-    calc(100% - var(--silhouette-edge) - var(--silhouette-size))
-    calc(100% - var(--silhouette-edge) - var(--silhouette-size));
-}
-
 .country-silhouette-inset.is-expanded {
   inset: var(--silhouette-edge);
   padding: 18px;
@@ -366,10 +353,27 @@
 }
 
 .country-silhouette-shape,
+.country-silhouette-minor-shape,
 .country-silhouette-marker {
   fill: var(--coral);
+}
+
+.country-silhouette-shape,
+.country-silhouette-marker {
   stroke: var(--ink);
   stroke-width: 1.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.country-silhouette-minor-shape {
+  fill-rule: evenodd;
+  stroke: none;
+  transition: stroke 180ms ease;
+}
+
+.country-silhouette-inset.is-expanded .country-silhouette-minor-shape {
+  stroke: var(--ink);
+  stroke-width: 0.8;
   vector-effect: non-scaling-stroke;
 }
 

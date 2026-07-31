@@ -26,6 +26,7 @@ from map_maintenance import (
 WORLD_SIZE = (1000, 500)
 QUIZ_SIZE = (1000, 650)
 SILHOUETTE_SIZE = (100, 100)
+SILHOUETTE_MARKER_LIMIT = 8
 PADDING = 8
 REGION_COMPONENT_MARGIN_RATIO = 0.10
 REGION_CAMERA_PADDING_RATIO = 0.06
@@ -559,6 +560,7 @@ def build_active_features(
 ):
     output = []
     points_by_code = {}
+    readable_sizes_by_code = {}
     for feature in features:
         code = feature["code"]
         if code not in active_codes:
@@ -574,6 +576,15 @@ def build_active_features(
             simplified = simplify(projected, REGION_SIMPLIFY_TOLERANCE)
             projected_rings.append(simplified)
             points_by_code.setdefault(code, []).extend(simplified)
+            width = max(x for x, _ in simplified) - min(
+                x for x, _ in simplified
+            )
+            height = max(y for _, y in simplified) - min(
+                y for _, y in simplified
+            )
+            readable_sizes_by_code[code] = max(
+                readable_sizes_by_code.get(code, 0), min(width, height)
+            )
         path = path_from_rings(projected_rings)
         if path:
             output.append(
@@ -583,7 +594,7 @@ def build_active_features(
                     "path": path,
                 }
             )
-    return output, points_by_code
+    return output, points_by_code, readable_sizes_by_code
 
 
 def build_active_markers(
@@ -594,6 +605,7 @@ def build_active_markers(
     center,
     projection,
     transform,
+    readable_sizes_by_code,
 ):
     markers = []
     points_by_code = {}
@@ -615,6 +627,7 @@ def build_active_markers(
                 "name": local_names.get(code, feature["name"]),
                 "x": point[0],
                 "y": point[1],
+                "readableSize": round(readable_sizes_by_code.get(code, 0), 1),
             }
         )
         points_by_code.setdefault(code, []).append(point)
@@ -717,7 +730,8 @@ def build_background_features(
 
 
 def build_region_views(
-    features,
+    active_features,
+    background_features,
     tiny_features,
     local_names,
     region_settings,
@@ -734,8 +748,12 @@ def build_region_views(
         )
         active_codes = active_codes_by_scope[region]
         selection_bounds = expanded_selection_bounds(bounds, center)
-        output_features, feature_points = build_active_features(
-            features,
+        (
+            output_features,
+            feature_points,
+            readable_sizes_by_code,
+        ) = build_active_features(
+            active_features,
             local_names,
             active_codes,
             selection_bounds,
@@ -751,6 +769,7 @@ def build_region_views(
             center,
             projection,
             transform,
+            readable_sizes_by_code,
         )
         camera = camera_view_box(feature_points, marker_points)
         bleed = bleed_view_box(camera)
@@ -760,7 +779,7 @@ def build_region_views(
             "features": output_features,
             "markers": markers,
             "backgroundFeatures": build_background_features(
-                features,
+                background_features,
                 local_names,
                 active_codes,
                 center,
@@ -783,7 +802,45 @@ def ring_area(ring):
     )
 
 
-def build_silhouettes(features, country_codes, existing_corners):
+def representative_silhouette_markers(candidates):
+    """Choose a small, deterministic set that preserves geographic spread."""
+    unique = {}
+    for candidate in candidates:
+        point = (candidate["x"], candidate["y"])
+        current = unique.get(point)
+        if current is None or candidate["area"] > current["area"]:
+            unique[point] = candidate
+    remaining = list(unique.values())
+    if not remaining:
+        return []
+
+    selected = [
+        max(remaining, key=lambda item: (item["area"], -item["index"]))
+    ]
+    remaining.remove(selected[0])
+    while remaining and len(selected) < SILHOUETTE_MARKER_LIMIT:
+        candidate = max(
+            remaining,
+            key=lambda item: (
+                min(
+                    (item["x"] - chosen["x"]) ** 2
+                    + (item["y"] - chosen["y"]) ** 2
+                    for chosen in selected
+                ),
+                item["area"],
+                -item["index"],
+            ),
+        )
+        selected.append(candidate)
+        remaining.remove(candidate)
+
+    return [
+        {"x": item["x"], "y": item["y"], "r": 1.25}
+        for item in selected
+    ]
+
+
+def build_silhouettes(features, country_codes):
     by_code = {}
     for feature in features:
         if feature["code"] in country_codes:
@@ -796,27 +853,32 @@ def build_silhouettes(features, country_codes, existing_corners):
             raise ValueError(f"Mangler 1:10m-ringer for {code}")
         largest = max(rings, key=ring_area)
         center = sum(point[0] for point in largest) / len(largest)
+        largest_latitudes = [lat for _, lat in largest]
+        center_latitude = (
+            min(largest_latitudes) + max(largest_latitudes)
+        ) / 2
+        longitude_scale = math.cos(math.radians(center_latitude))
         wrapped_rings = [
             [(wrap_longitude(lon, center), lat) for lon, lat in ring]
             for ring in rings
         ]
         raw = [
-            (lon * math.cos(math.radians(lat)), -lat)
+            ((lon - center) * longitude_scale, -lat)
             for ring in wrapped_rings
             for lon, lat in ring
         ]
         transform = fitted_transform(raw, *SILHOUETTE_SIZE, padding=8)
         path_rings = []
-        markers = []
-        for ring in wrapped_rings:
+        marker_candidates = []
+        for index, ring in enumerate(wrapped_rings):
             projected = [
-                transform((lon * math.cos(math.radians(lat)), -lat))
+                transform(((lon - center) * longitude_scale, -lat))
                 for lon, lat in ring
             ]
             width = max(x for x, _ in projected) - min(x for x, _ in projected)
             height = max(y for _, y in projected) - min(y for _, y in projected)
             if width < 1.4 and height < 1.4:
-                markers.append(
+                marker_candidates.append(
                     {
                         "x": round(
                             sum(x for x, _ in projected) / len(projected), 1
@@ -824,15 +886,29 @@ def build_silhouettes(features, country_codes, existing_corners):
                         "y": round(
                             sum(y for _, y in projected) / len(projected), 1
                         ),
-                        "r": 1.25,
+                        "area": ring_area(projected),
+                        "index": index,
+                        "projected": projected,
                     }
                 )
             else:
                 path_rings.append(simplify(projected, 0.18))
+        markers = (
+            []
+            if path_rings
+            else representative_silhouette_markers(marker_candidates)
+        )
+        minor_path = path_from_rings(
+            [
+                simplify(candidate["projected"], 0.08)
+                for candidate in marker_candidates
+            ]
+        )
         silhouettes[code] = {
             "path": path_from_rings(path_rings),
+            "minorPath": minor_path,
             "markers": markers,
-            "corner": existing_corners.get(code, "bottom-left"),
+            "corner": "bottom-left",
         }
     return silhouettes
 
@@ -892,6 +968,14 @@ def main():
             "map while regenerating regional views."
         ),
     )
+    parser.add_argument(
+        "--refresh-silhouettes",
+        action="store_true",
+        help=(
+            "Regenerate silhouettes from the 1:10m source even when "
+            "--base-map preserves the existing world map."
+        ),
+    )
     args = parser.parse_args()
     if args.output.resolve() == (ROOT / "world-map.js").resolve():
         parser.error(
@@ -913,16 +997,26 @@ def main():
         tiny50 = load_source_features(
             args.source_directory, "tinyCountries50m"
         )
+        countries10 = load_source_features(
+            args.source_directory, "countries10m"
+        )
+        tiny_codes = {
+            feature["code"]
+            for feature in tiny50
+            if feature["code"] in country_codes
+        }
+        regional_active_features = [
+            feature
+            for feature in countries50
+            if feature["code"] not in tiny_codes
+        ] + [
+            feature for feature in countries10 if feature["code"] in tiny_codes
+        ]
         existing = (
             load_generated_map(args.base_map)
             if args.base_map
             else load_generated_map()
         )
-        existing_corners = {
-            code: silhouette.get("corner", "bottom-left")
-            for code, silhouette in existing["silhouettes"].items()
-        }
-
         if args.base_map:
             world_features = existing["features"]
             world_markers = existing["markers"]
@@ -947,6 +1041,7 @@ def main():
             for overview, settings in manifest.get("overviewRegions", {}).items()
         }
         quiz_regions = build_region_views(
+            regional_active_features,
             countries50,
             tiny50,
             local_names,
@@ -954,21 +1049,17 @@ def main():
             quiz_active_codes,
         )
         overview_regions = build_region_views(
+            regional_active_features,
             countries50,
             tiny50,
             local_names,
             manifest.get("overviewRegions", {}),
             overview_active_codes,
         )
-        if args.base_map:
+        if args.base_map and not args.refresh_silhouettes:
             silhouettes = existing["silhouettes"]
         else:
-            countries10 = load_source_features(
-                args.source_directory, "countries10m"
-            )
-            silhouettes = build_silhouettes(
-                countries10, country_codes, existing_corners
-            )
+            silhouettes = build_silhouettes(countries10, country_codes)
         data = {
             "base": {
                 "viewBox": (

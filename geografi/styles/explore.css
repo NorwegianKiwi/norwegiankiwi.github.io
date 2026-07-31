@@ -155,7 +155,14 @@
   transition:
     fill 150ms ease,
     stroke 150ms ease,
-    filter 150ms ease;
+    filter 150ms ease,
+    opacity 150ms ease;
+}
+
+.explore-map-country.has-locator-marker.is-locator-hidden
+  .explore-map-country-shape {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .explore-map-country-marker {
@@ -165,7 +172,8 @@
   transition:
     fill 150ms ease,
     stroke 150ms ease,
-    filter 150ms ease;
+    filter 150ms ease,
+    opacity 150ms ease;
 }
 
 .explore-map-marker-hit {
@@ -176,11 +184,12 @@
 
 .explore-map-marker-control {
   cursor: pointer;
+  transition: opacity 150ms ease;
 }
 
 .explore-map-marker-control.is-geometry-readable,
 .explore-map-country.is-geometry-readable .explore-map-marker-hit {
-  visibility: hidden;
+  opacity: 0;
   pointer-events: none;
 }
 

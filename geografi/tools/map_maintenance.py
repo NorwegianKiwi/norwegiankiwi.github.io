@@ -207,6 +207,20 @@ def validate_local_data(map_path=None):
         warnings.append(
             f"Silhuetter uten quizland: {', '.join(extra_silhouettes)}"
         )
+    for code, silhouette in map_data["silhouettes"].items():
+        path = silhouette.get("path")
+        minor_path = silhouette.get("minorPath")
+        markers = silhouette.get("markers", [])
+        if not path and not minor_path and not markers:
+            errors.append(f"{code} har tom silhuett")
+        if path and markers:
+            errors.append(f"{code} har både silhuettgeometri og markører")
+        if markers and not minor_path:
+            errors.append(f"{code} har markører uten detaljgeometri")
+        if not path and len(markers) > 8:
+            errors.append(f"{code} har mer enn åtte silhuettmarkører")
+        if silhouette.get("corner") != "bottom-left":
+            errors.append(f"{code} har ikke silhuettvindu nederst til venstre")
 
     world_geometry = {
         feature["code"]
@@ -280,6 +294,20 @@ def validate_local_data(map_path=None):
                     str(code)
                     for code in unexpected_features + unexpected_markers
                 )
+            )
+        invalid_marker_sizes = sorted(
+            {
+                marker.get("code")
+                for marker in view["markers"]
+                if not isinstance(marker.get("readableSize"), (int, float))
+                or marker["readableSize"] < 0
+            },
+            key=lambda value: value or "",
+        )
+        if invalid_marker_sizes:
+            errors.append(
+                f"{region} har markører uten gyldig readableSize: "
+                + ", ".join(str(code) for code in invalid_marker_sizes)
             )
         cropped_active = sorted(
             feature["code"]
@@ -416,6 +444,20 @@ def validate_local_data(map_path=None):
             errors.append(
                 f"{overview} har ikke-aktive objekter i forgrunnslaget: "
                 + ", ".join(str(code) for code in unexpected)
+            )
+        invalid_marker_sizes = sorted(
+            {
+                marker.get("code")
+                for marker in view["markers"]
+                if not isinstance(marker.get("readableSize"), (int, float))
+                or marker["readableSize"] < 0
+            },
+            key=lambda value: value or "",
+        )
+        if invalid_marker_sizes:
+            errors.append(
+                f"{overview} har markører uten gyldig readableSize: "
+                + ", ".join(str(code) for code in invalid_marker_sizes)
             )
         cropped = sorted(
             feature["code"]
