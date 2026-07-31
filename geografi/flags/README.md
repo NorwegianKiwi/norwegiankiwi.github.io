@@ -1,35 +1,36 @@
-# Flaggfiler
+# Flag Files
 
-Flaggene i denne mappen er lokale 4:3-SVG-filer fra
-[lipis/flag-icons](https://github.com/lipis/flag-icons), nærmere bestemt
-prosjektets mappe
-[`flags/4x3`](https://github.com/lipis/flag-icons/tree/main/flags/4x3).
-Prosjektet distribueres under MIT-lisensen. En lokal kopi av lisensen ligger i
+The flags in this directory are local 4:3 SVG files from
+[lipis/flag-icons](https://github.com/lipis/flag-icons), specifically the
+project's
+[`flags/4x3`](https://github.com/lipis/flag-icons/tree/main/flags/4x3)
+directory. The project is distributed under the MIT License. A local copy of
+the license is stored in
 [`../licenses/flag-icons-MIT.txt`](../licenses/flag-icons-MIT.txt).
 
-Den eksakte versjonen som dagens filer opprinnelig ble hentet fra, er ikke
-dokumentert. Filnavnene er landkoder med små bokstaver, normalt
-ISO 3166-1 alpha-2, for eksempel `no.svg`. `xk.svg` brukes for Kosovo; `XK` er en
-vanlig brukerdefinert kode, men er ikke en offisiell ISO 3166-1-kode.
+The exact version from which the current files were originally retrieved is
+not documented. File names are lowercase country codes, normally ISO 3166-1
+alpha-2, for example `no.svg`. `xk.svg` is used for Kosovo; `XK` is a commonly
+used user-assigned code, but is not an official ISO 3166-1 code.
 
-Senere målrettede oppdateringer:
+Later targeted updates:
 
-- Frankrike, Ungarn, Latvia, Polen og Ukraina ble oppdatert fra
-  [kildecommit `40daebaa`](https://github.com/lipis/flag-icons/commit/40daebaa74b023fe63fb9f82489c022dc2c63b9d)
-  (3. mars 2026), som retter fargeblødning i Chrome.
-- Panama ble oppdatert fra
-  [kildecommit `086f7e97`](https://github.com/lipis/flag-icons/commit/086f7e97d657358203916dbe84f61c2bccaa81eb)
-  (7. april 2026), som fjerner en utilsiktet hvit kant.
+- France, Hungary, Latvia, Poland, and Ukraine were updated from
+  [source commit `40daebaa`](https://github.com/lipis/flag-icons/commit/40daebaa74b023fe63fb9f82489c022dc2c63b9d)
+  (March 3, 2026), which fixes color bleeding in Chrome.
+- Panama was updated from
+  [source commit `086f7e97`](https://github.com/lipis/flag-icons/commit/086f7e97d657358203916dbe84f61c2bccaa81eb)
+  (April 7, 2026), which removes an unintended white border.
 
-## Oppdatere flagg eller land
+## Updating flags or countries
 
-1. Se gjennom
-   [flag-icons-endringsloggen](https://github.com/lipis/flag-icons/blob/main/CHANGELOG.md)
-   og sammenlign de relevante filene i `flags/4x3`.
-2. Erstatt bare SVG-filene som quizen bruker, og behold filnavnene med små
-   bokstaver.
-3. Oppdater land, norske navn, hovedsteder og regioner separat i
-   [`../countries.js`](../countries.js). Disse dataene importeres ikke fra
-   flaggprosjektet.
-4. Kontroller at datasettet fortsatt har unike landkoder, og at hver kode har
-   nøyaktig én tilsvarende SVG-fil i denne mappen.
+1. Review the
+   [flag-icons changelog](https://github.com/lipis/flag-icons/blob/main/CHANGELOG.md)
+   and compare the relevant files in `flags/4x3`.
+2. Replace only the SVG files used by the quiz, and retain lowercase file
+   names.
+3. Update countries, Norwegian names, capitals, and regions separately in
+   [`../countries.js`](../countries.js). These data are not imported from the
+   flag project.
+4. Confirm that the dataset still has unique country codes and that every code
+   has exactly one corresponding SVG file in this directory.
