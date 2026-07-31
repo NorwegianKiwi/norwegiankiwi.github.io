@@ -155,10 +155,7 @@ synlige kartet. Aktive land ligger alltid utenfor denne beskyttelsessonen.
 dette området ved ekstreme kortformer; da vises mer hav i stedet for
 forvrengning eller letterboxing.
 
-`east-south-asia` har i tillegg `focusViewBox`, et Explore-only
-kameraalternativ beregnet med samme regel etter de 24 andre landene. Det kan
-skjære Russland, men ikke noe annet aktivt land.
-`viewBox` er fortsatt den komplette regionen og brukes alltid i kartquizen.
+`viewBox` viser alltid den komplette regionen, både i kartquizen og Explore.
 
 Generatoren leser SHP/DBF direkte, projiserer og forenkler geometrien og
 beholder eksisterende `corner`-valg for formvinduene. Den nekter å skrive

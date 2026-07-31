@@ -354,47 +354,6 @@ def validate_local_data(map_path=None):
                     + ", ".join(sorted(outside_camera))
                 )
 
-    asia_focus = map_data["quizRegions"].get("east-south-asia", {}).get(
-        "focusViewBox"
-    )
-    focus_box = parse_view_box(asia_focus)
-    if not focus_box:
-        errors.append("east-south-asia mangler gyldig focusViewBox")
-    else:
-        focus_x, focus_y, focus_width, focus_height = focus_box
-        focus_right = focus_x + focus_width
-        focus_bottom = focus_y + focus_height
-        asia_view = map_data["quizRegions"]["east-south-asia"]
-        outside_focus = set()
-        for feature in asia_view["features"]:
-            code = feature.get("code")
-            if region_for_code.get(code) != "east-south-asia" or code == "ru":
-                continue
-            coordinates = [
-                float(value)
-                for value in re.findall(r"-?\d+(?:\.\d+)?", feature["path"])
-            ]
-            points = list(zip(coordinates[::2], coordinates[1::2]))
-            if any(
-                x < focus_x or x > focus_right or y < focus_y or y > focus_bottom
-                for x, y in points
-            ):
-                outside_focus.add(code)
-        for marker in asia_view["markers"]:
-            code = marker.get("code")
-            if region_for_code.get(code) != "east-south-asia" or code == "ru":
-                continue
-            if not (
-                focus_x <= marker["x"] <= focus_right
-                and focus_y <= marker["y"] <= focus_bottom
-            ):
-                outside_focus.add(code)
-        if outside_focus:
-            errors.append(
-                "Asia-fokus beskjærer andre aktive land enn Russland: "
-                + ", ".join(sorted(outside_focus))
-            )
-
     expected_overviews = set(manifest.get("overviewRegions", {}))
     overview_regions = map_data.get("overviewRegions", {})
     actual_overviews = set(overview_regions)

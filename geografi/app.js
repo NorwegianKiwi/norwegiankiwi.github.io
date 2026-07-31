@@ -94,8 +94,6 @@
       africaOverview: "Afrika",
       viewAllAfrica: "Vis hele Afrika",
       showSelectedRegion: "Vis {region}",
-      showAllRussia: "Vis hele Russland",
-      focusOnAsia: "Fokuser på Asia",
       exploreMapDescription:
         "Regionkartet viser plasseringen og formen til hvert land.",
       exploreMapHeading: "Hvilket kart vil du utforske?",
@@ -209,8 +207,6 @@
       africaOverview: "Africa",
       viewAllAfrica: "View all Africa",
       showSelectedRegion: "Show {region}",
-      showAllRussia: "Show all Russia",
-      focusOnAsia: "Focus on Asia",
       exploreMapDescription:
         "The regional map shows the location and shape of each country.",
       exploreMapHeading: "Which map would you like to explore?",
@@ -364,7 +360,6 @@
     explorePreviewCode: null,
     exploreMapViewport: null,
     exploreMapOverview: null,
-    exploreAsiaFull: false,
   };
   let deferredInstallPrompt = null;
   let autoAdvanceTimer = null;
@@ -1778,22 +1773,17 @@
 
   function exploreRegionMapMarkup(sortedCountries) {
     const showingAfricaOverview = state.exploreMapOverview === "africa";
-    const showingFocusedAsia =
-      state.region === "east-south-asia" && !state.exploreAsiaFull;
     const scopeId = showingAfricaOverview
       ? "africa"
-      : `${state.region}:${showingFocusedAsia ? "focus" : "full"}`;
+      : state.region;
     const scopeLabel = showingAfricaOverview
       ? t("africaOverview")
       : regionLabel(selectedRegion());
     const view = showingAfricaOverview
       ? mapData.overviewRegions.africa
       : mapData.quizRegions[state.region];
-    const presetViewBox = showingFocusedAsia
-      ? view.focusViewBox
-      : view.viewBox;
     const mapViewport = getExploreMapViewport(
-      presetViewBox,
+      view.viewBox,
       scopeId,
     );
     const zoom = exploreMapZoom(mapViewport);
@@ -1829,18 +1819,6 @@
                       : escapeHtml(t("viewAllAfrica"))
                   }</button>
                 </div>`
-              : state.region === "east-south-asia"
-                ? `<div class="explore-map-scope-controls">
-                    <button
-                      type="button"
-                      class="secondary-button explore-map-scope-button"
-                      data-action="toggle-asia-focus"
-                    >${escapeHtml(
-                      state.exploreAsiaFull
-                        ? t("focusOnAsia")
-                        : t("showAllRussia"),
-                    )}</button>
-                  </div>`
               : ""
           }
           <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
@@ -2480,11 +2458,6 @@
         .querySelector('[data-action="toggle-africa-overview"]')
         ?.focus({ preventScroll: true });
     }
-    if (options.focusExploreAsiaToggle) {
-      app
-        .querySelector('[data-action="toggle-asia-focus"]')
-        ?.focus({ preventScroll: true });
-    }
     if (options.focusMapRegion) {
       app.querySelector('[data-action="quiz-map-region"]')?.focus();
     }
@@ -2558,7 +2531,6 @@
     state.explorePinnedCode = null;
     state.explorePreviewCode = null;
     state.exploreMapOverview = null;
-    state.exploreAsiaFull = false;
     state.silhouetteExpanded = false;
     resetExploreMapInteraction();
   }
@@ -2647,7 +2619,6 @@
     if (!regionOptions.some((region) => region.id === regionId)) return false;
     if (state.region !== regionId) {
       state.exploreMapOverview = null;
-      state.exploreAsiaFull = false;
       resetExploreMapInteraction();
     }
     state.region = regionId;
@@ -2904,17 +2875,6 @@
       state.silhouetteExpanded = false;
       resetExploreMapInteraction();
       render({ focusExploreOverviewToggle: true });
-      return;
-    }
-
-    if (action === "toggle-asia-focus") {
-      if (state.region !== "east-south-asia") return;
-      state.exploreAsiaFull = !state.exploreAsiaFull;
-      state.explorePinnedCode = null;
-      state.explorePreviewCode = null;
-      state.silhouetteExpanded = false;
-      resetExploreMapInteraction();
-      render({ focusExploreAsiaToggle: true });
       return;
     }
 

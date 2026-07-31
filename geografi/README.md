@@ -99,9 +99,9 @@ The Maps view in Explore reuses the same regional azimuthal equidistant maps and
 silhouettes. A map is available for each of the nine individual regions;
 Whole world instead presents a region choice. From either African region,
 Explore can temporarily show a full-Africa overview without changing the
-selected quiz region. East and South Asia opens with a closer Asia-focused
-camera and can temporarily reveal the complete Russia view. Both controls are
-Explore-only and do not change the selected region or URL. Regional maps use
+selected quiz region. East and South Asia always shows its complete regional
+view, including all of Russia. The Africa control is Explore-only and does not
+change the selected region or URL. Regional maps use
 an independent background layer generated with the same transform as its
 active countries. Every non-active country polygon intersecting the responsive
 frame is retained, without a relevance or proximity filter. The camera expands

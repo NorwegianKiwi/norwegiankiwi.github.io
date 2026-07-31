@@ -769,13 +769,6 @@ def build_region_views(
                 bleed,
             ),
         }
-        focus_exclusions = set(settings.get("focusExcludeCodes", []))
-        if focus_exclusions:
-            view["focusViewBox"] = format_view_box(
-                camera_view_box(
-                    feature_points, marker_points, focus_exclusions
-                )
-            )
         regions[region] = view
     return regions
 

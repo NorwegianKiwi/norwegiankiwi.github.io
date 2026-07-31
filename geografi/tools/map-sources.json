@@ -41,8 +41,7 @@
     },
     "east-south-asia": {
       "centerLongitude": 115,
-      "bounds": [18, -12, 192, 83],
-      "focusExcludeCodes": ["ru"]
+      "bounds": [18, -12, 192, 83]
     },
     "oceania": {
       "centerLongitude": 180,
