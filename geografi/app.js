@@ -2549,7 +2549,7 @@
     }
     render({ focusCorrect: !isCorrect });
     if (isCorrect) {
-      autoAdvanceTimer = window.setTimeout(advanceQuestion, 650);
+      autoAdvanceTimer = window.setTimeout(advanceQuestion, 350);
     }
   }
 
