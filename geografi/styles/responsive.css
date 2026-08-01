@@ -744,10 +744,6 @@
 }
 
 @media (max-width: 440px) {
-  .explore-map-scope-controls {
-    top: 50px;
-  }
-
   .explore-map-scope-button {
     min-height: 38px;
     padding: 6px 10px;
