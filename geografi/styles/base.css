@@ -71,9 +71,16 @@ a:focus-visible {
   border-bottom: 1px solid var(--line);
 }
 
-.setup-shell {
+.setup-page {
   min-height: 100vh;
   min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.setup-shell {
+  min-height: 0;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
 }
@@ -581,12 +588,26 @@ footer a {
   white-space: nowrap;
 }
 
+.install-app-banner {
+  width: 100%;
+  padding: 11px max(16px, env(safe-area-inset-right)) 12px
+    max(16px, env(safe-area-inset-left));
+  border-top: 3px solid var(--gold);
+  background: var(--green);
+  box-shadow: 0 5px 18px rgba(24, 35, 29, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
 .install-app-button {
-  min-height: 34px;
-  padding: 5px 11px 5px 8px;
+  min-height: 40px;
+  padding: 7px 14px 7px 10px;
   border: 1px solid rgba(36, 93, 69, 0.32);
   border-radius: 999px;
-  background: rgba(223, 236, 227, 0.62);
+  background: var(--card);
   color: var(--green);
   display: inline-flex;
   flex: 0 0 auto;
@@ -598,13 +619,13 @@ footer a {
 }
 
 .install-app-button img {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 
 .install-app-button:hover {
   border-color: var(--green);
-  background: rgba(223, 236, 227, 0.95);
+  background: #fff;
 }
 
 .install-app-button:focus-visible,
@@ -612,4 +633,3 @@ footer a {
   outline: 3px solid var(--gold);
   outline-offset: 2px;
 }
-

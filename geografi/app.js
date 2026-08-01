@@ -62,10 +62,13 @@
       flagsLicence: "Flagg fra flag-icons · MIT",
       globeLicence: "Jordklode fra Twemoji · CC BY 4.0",
       mapLicence: "Kart fra Natural Earth · public domain",
-      installApp: "Installer app",
+      installApp: "Legg til på Hjem-skjermen",
       installHelpTitle: "Legg til på Hjem-skjermen",
       installHelpText:
         "Trykk på Del i nettleseren, velg «Legg til på Hjem-skjermen», slå på «Åpne som webapp», og trykk «Legg til».",
+      installSafariTitle: "Åpne i Safari",
+      installSafariText:
+        "Åpne denne siden i Safari for å legge den til på Hjem-skjermen. Trykk deretter på Del, velg «Legg til på Hjem-skjermen», slå på «Åpne som webapp», og trykk «Legg til».",
       closeInstallHelp: "Lukk",
       review: "Gjennomgang",
       reviewHeading: "Dette kan du øve mer på",
@@ -173,10 +176,13 @@
       flagsLicence: "Flags from flag-icons · MIT",
       globeLicence: "Globe from Twemoji · CC BY 4.0",
       mapLicence: "Maps from Natural Earth · public domain",
-      installApp: "Install app",
+      installApp: "Add to Home Screen",
       installHelpTitle: "Add to Home Screen",
       installHelpText:
         "Tap Share in the browser, choose “Add to Home Screen”, turn on “Open as Web App”, and tap “Add”.",
+      installSafariTitle: "Open in Safari",
+      installSafariText:
+        "Open this page in Safari to add it to your Home Screen. Then tap Share, choose “Add to Home Screen”, turn on “Open as Web App”, and tap “Add”.",
       closeInstallHelp: "Close",
       review: "Review",
       reviewHeading: "Here is what you can practise",
@@ -946,6 +952,19 @@
     );
   }
 
+  function isIosSafari() {
+    if (!isIosDevice()) return false;
+
+    const userAgent = window.navigator.userAgent;
+    const alternativeBrowser =
+      /CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|DuckDuckGo|Ddg|GSA|YaBrowser/i;
+
+    return (
+      !alternativeBrowser.test(userAgent) &&
+      /Version\/[^\s]+.*Mobile\/[^\s]+.*Safari\//i.test(userAgent)
+    );
+  }
+
   function installActionMarkup() {
     if (
       isStandalone() ||
@@ -955,19 +974,28 @@
     }
 
     return `
-      <button
-        class="install-app-button"
-        type="button"
-        data-action="install-app"
-      >
-        <img src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-        <span>${t("installApp")}</span>
-      </button>
+      <aside class="install-app-banner">
+        <button
+          class="install-app-button"
+          type="button"
+          data-action="install-app"
+        >
+          <img src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
+          <span>${t("installApp")}</span>
+        </button>
+      </aside>
     `;
   }
 
   function installHelpMarkup() {
     if (!state.installHelpOpen || !isIosDevice() || isStandalone()) return "";
+
+    const title = isIosSafari()
+      ? t("installHelpTitle")
+      : t("installSafariTitle");
+    const description = isIosSafari()
+      ? t("installHelpText")
+      : t("installSafariText");
 
     return `
       <div
@@ -983,8 +1011,8 @@
           tabindex="-1"
         >
           <img class="install-help-icon" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-          <h2 id="install-help-title">${t("installHelpTitle")}</h2>
-          <p id="install-help-description">${t("installHelpText")}</p>
+          <h2 id="install-help-title">${title}</h2>
+          <p id="install-help-description">${description}</p>
           <button
             class="install-help-close"
             type="button"
@@ -1000,6 +1028,7 @@
   function setupMarkup() {
     const installAction = installActionMarkup();
     return `
+      <div class="setup-page">
       <main class="site-shell setup-shell">
         <header class="brand-bar">
           ${brandMarkup(false, false)}
@@ -1097,7 +1126,6 @@
 
         <footer>
           <span class="copyright">&copy; 2026 Lance Olav Eastgate</span>
-          ${installAction}
           <span class="license-links">
             <a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a>
             <a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a>
@@ -1106,6 +1134,8 @@
         </footer>
         ${installHelpMarkup()}
       </main>
+        ${installAction}
+      </div>
     `;
   }
 
