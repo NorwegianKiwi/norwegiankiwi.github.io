@@ -25,7 +25,6 @@ from map_maintenance import (
 
 WORLD_SIZE = (1000, 500)
 QUIZ_SIZE = (1000, 650)
-SILHOUETTE_SIZE = (100, 100)
 SILHOUETTE_MARKER_LIMIT = 8
 PADDING = 8
 REGION_COMPONENT_MARGIN_RATIO = 0.10
@@ -840,76 +839,141 @@ def representative_silhouette_markers(candidates):
     ]
 
 
-def build_silhouettes(features, country_codes):
-    by_code = {}
-    for feature in features:
-        if feature["code"] in country_codes:
-            by_code.setdefault(feature["code"], []).extend(feature["rings"])
+def ring_matches_selection(ring, source_name, selection):
+    longitude = sum(point[0] for point in ring) / len(ring)
+    latitude = sum(point[1] for point in ring) / len(ring)
+    area = ring_area(ring)
+    for rule in selection:
+        west, south, east, north = rule["bounds"]
+        if not (west <= longitude <= east and south <= latitude <= north):
+            continue
+        if area < rule.get("minArea", 0):
+            continue
+        if source_name not in rule.get("sourceNames", [source_name]):
+            continue
+        return True
+    return False
 
-    silhouettes = {}
-    for code in sorted(country_codes):
-        rings = by_code.get(code, [])
-        if not rings:
-            raise ValueError(f"Mangler 1:10m-ringer for {code}")
-        largest = max(rings, key=ring_area)
-        center = sum(point[0] for point in largest) / len(largest)
-        largest_latitudes = [lat for _, lat in largest]
-        center_latitude = (
-            min(largest_latitudes) + max(largest_latitudes)
-        ) / 2
-        longitude_scale = math.cos(math.radians(center_latitude))
-        wrapped_rings = [
-            [(wrap_longitude(lon, center), lat) for lon, lat in ring]
-            for ring in rings
-        ]
-        raw = [
-            ((lon - center) * longitude_scale, -lat)
-            for ring in wrapped_rings
+
+def selected_silhouette_rings(rings, selection):
+    return [
+        item
+        for item in rings
+        if ring_matches_selection(item["ring"], item["sourceName"], selection)
+    ]
+
+
+def build_silhouette_layer(ring_items, frame=(0, 0, 100, 100), padding=8):
+    if not ring_items:
+        raise ValueError("Tomt geografisk utvalg for silhuett")
+    rings = [item["ring"] for item in ring_items]
+    largest = max(rings, key=ring_area)
+    center = sum(point[0] for point in largest) / len(largest)
+    largest_latitudes = [lat for _, lat in largest]
+    center_latitude = (min(largest_latitudes) + max(largest_latitudes)) / 2
+    longitude_scale = math.cos(math.radians(center_latitude))
+    wrapped_rings = [
+        [(wrap_longitude(lon, center), lat) for lon, lat in ring]
+        for ring in rings
+    ]
+    raw = [
+        ((lon - center) * longitude_scale, -lat)
+        for ring in wrapped_rings
+        for lon, lat in ring
+    ]
+    frame_x, frame_y, frame_width, frame_height = frame
+    local_transform = fitted_transform(
+        raw,
+        frame_width,
+        frame_height,
+        padding=min(padding, frame_width / 4, frame_height / 4),
+    )
+
+    def transform(point):
+        x, y = local_transform(point)
+        return x + frame_x, y + frame_y
+
+    path_rings = []
+    marker_candidates = []
+    for index, ring in enumerate(wrapped_rings):
+        projected = [
+            transform(((lon - center) * longitude_scale, -lat))
             for lon, lat in ring
         ]
-        transform = fitted_transform(raw, *SILHOUETTE_SIZE, padding=8)
-        path_rings = []
-        marker_candidates = []
-        for index, ring in enumerate(wrapped_rings):
-            projected = [
-                transform(((lon - center) * longitude_scale, -lat))
-                for lon, lat in ring
-            ]
-            width = max(x for x, _ in projected) - min(x for x, _ in projected)
-            height = max(y for _, y in projected) - min(y for _, y in projected)
-            if width < 1.4 and height < 1.4:
-                marker_candidates.append(
-                    {
-                        "x": round(
-                            sum(x for x, _ in projected) / len(projected), 1
-                        ),
-                        "y": round(
-                            sum(y for _, y in projected) / len(projected), 1
-                        ),
-                        "area": ring_area(projected),
-                        "index": index,
-                        "projected": projected,
-                    }
-                )
-            else:
-                path_rings.append(simplify(projected, 0.18))
-        markers = (
-            []
-            if path_rings
-            else representative_silhouette_markers(marker_candidates)
-        )
-        minor_path = path_from_rings(
+        width = max(x for x, _ in projected) - min(x for x, _ in projected)
+        height = max(y for _, y in projected) - min(y for _, y in projected)
+        if width < 1.4 and height < 1.4:
+            marker_candidates.append(
+                {
+                    "x": round(sum(x for x, _ in projected) / len(projected), 1),
+                    "y": round(sum(y for _, y in projected) / len(projected), 1),
+                    "area": ring_area(projected),
+                    "index": index,
+                    "projected": projected,
+                }
+            )
+        else:
+            path_rings.append(simplify(projected, 0.18))
+    markers = (
+        []
+        if path_rings
+        else representative_silhouette_markers(marker_candidates)
+    )
+    return {
+        "path": path_from_rings(path_rings),
+        "minorPath": path_from_rings(
             [
                 simplify(candidate["projected"], 0.08)
                 for candidate in marker_candidates
             ]
+        ),
+        "markers": markers,
+    }
+
+
+def build_silhouettes(features, country_codes, overrides=None):
+    overrides = overrides or {}
+    by_code = {}
+    for feature in features:
+        if feature["code"] in country_codes:
+            by_code.setdefault(feature["code"], []).extend(
+                {"ring": ring, "sourceName": feature["name"]}
+                for ring in feature["rings"]
+            )
+
+    silhouettes = {}
+    for code in sorted(country_codes):
+        ring_items = by_code.get(code, [])
+        if not ring_items:
+            raise ValueError(f"Mangler 1:10m-ringer for {code}")
+        override = overrides.get(code)
+        main_items = (
+            selected_silhouette_rings(ring_items, override["main"])
+            if override else ring_items
         )
-        silhouettes[code] = {
-            "path": path_from_rings(path_rings),
-            "minorPath": minor_path,
-            "markers": markers,
+        silhouette = {
+            **build_silhouette_layer(main_items),
             "corner": "bottom-left",
         }
+        if override and override.get("insets"):
+            expanded_main = build_silhouette_layer(
+                main_items,
+                override["expandedMainFrame"],
+                padding=3,
+            )
+            expanded_main.pop("markers")
+            expanded_main["insets"] = []
+            for inset in override["insets"]:
+                inset_layer = build_silhouette_layer(
+                    selected_silhouette_rings(ring_items, inset["selection"]),
+                    inset["frame"],
+                    padding=3,
+                )
+                inset_layer.pop("markers")
+                inset_layer["frame"] = inset["frame"]
+                expanded_main["insets"].append(inset_layer)
+            silhouette["expanded"] = expanded_main
+        silhouettes[code] = silhouette
     return silhouettes
 
 
@@ -943,6 +1007,14 @@ def write_candidate(path, data):
   Object.freeze(data.overviewRegions);
   Object.values(data.silhouettes).forEach((silhouette) => {{
     Object.freeze(silhouette.markers);
+    if (silhouette.expanded) {{
+      silhouette.expanded.insets.forEach((inset) => {{
+        Object.freeze(inset.frame);
+        Object.freeze(inset);
+      }});
+      Object.freeze(silhouette.expanded.insets);
+      Object.freeze(silhouette.expanded);
+    }}
     Object.freeze(silhouette);
   }});
   Object.freeze(data.silhouettes);
@@ -976,7 +1048,19 @@ def main():
             "--base-map preserves the existing world map."
         ),
     )
+    parser.add_argument(
+        "--refresh-silhouette-overrides",
+        action="store_true",
+        help=(
+            "Regenerate only the country-specific silhouette overrides while "
+            "preserving every other map and silhouette from --base-map."
+        ),
+    )
     args = parser.parse_args()
+    if args.refresh_silhouette_overrides and not args.base_map:
+        parser.error("--refresh-silhouette-overrides krever --base-map")
+    if args.refresh_silhouette_overrides and args.refresh_silhouettes:
+        parser.error("Velg bare én metode for å regenerere silhuetter")
     if args.output.resolve() == (ROOT / "world-map.js").resolve():
         parser.error(
             "Av sikkerhetshensyn kan ikke generatoren skrive direkte til "
@@ -1040,26 +1124,45 @@ def main():
             }
             for overview, settings in manifest.get("overviewRegions", {}).items()
         }
-        quiz_regions = build_region_views(
-            regional_active_features,
-            countries50,
-            tiny50,
-            local_names,
-            manifest["quizRegions"],
-            quiz_active_codes,
-        )
-        overview_regions = build_region_views(
-            regional_active_features,
-            countries50,
-            tiny50,
-            local_names,
-            manifest.get("overviewRegions", {}),
-            overview_active_codes,
-        )
-        if args.base_map and not args.refresh_silhouettes:
+        if args.refresh_silhouette_overrides:
+            quiz_regions = existing["quizRegions"]
+            overview_regions = existing["overviewRegions"]
+        else:
+            quiz_regions = build_region_views(
+                regional_active_features,
+                countries50,
+                tiny50,
+                local_names,
+                manifest["quizRegions"],
+                quiz_active_codes,
+            )
+            overview_regions = build_region_views(
+                regional_active_features,
+                countries50,
+                tiny50,
+                local_names,
+                manifest.get("overviewRegions", {}),
+                overview_active_codes,
+            )
+        silhouette_overrides = manifest.get("silhouetteOverrides", {})
+        if args.refresh_silhouette_overrides:
+            regenerated = build_silhouettes(
+                countries10,
+                set(silhouette_overrides),
+                silhouette_overrides,
+            )
+            silhouettes = {
+                **existing["silhouettes"],
+                **regenerated,
+            }
+        elif args.base_map and not args.refresh_silhouettes:
             silhouettes = existing["silhouettes"]
         else:
-            silhouettes = build_silhouettes(countries10, country_codes)
+            silhouettes = build_silhouettes(
+                countries10,
+                country_codes,
+                silhouette_overrides,
+            )
         data = {
             "base": {
                 "viewBox": (

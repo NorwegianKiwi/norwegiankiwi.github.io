@@ -101,6 +101,10 @@ geometry: they render without an outline in the compact inset and gain a thin
 outline when enlarged. Only countries whose complete silhouette is sub-pixel
 use up to eight representative dots in the compact inset; those dots disappear
 in the enlarged view so the detailed polygons take over.
+For countries with remote territories, declarative editorial rules can instead
+fit the recognizable main form in the compact inset and compose selected remote
+areas in separate, independently scaled frames when enlarged. This affects the
+silhouette only, not any quiz or Explore map.
 
 The Maps view in Explore reuses the same regional azimuthal equidistant maps and
 silhouettes. Active countries with Natural Earth tiny-country locator points

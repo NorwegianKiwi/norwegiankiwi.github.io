@@ -74,6 +74,76 @@
     "silhouetteViewBox": "0 0 100 100",
     "coordinatePrecision": 1
   },
+  "silhouetteOverrides": {
+    "no": {
+      "main": [{"bounds": [4, 57, 35, 72]}],
+      "expandedMainFrame": [36, 4, 60, 92],
+      "insets": [
+        {"selection": [{"bounds": [8, 74, 36, 82]}], "frame": [4, 5, 28, 28]},
+        {"selection": [{"bounds": [-10, 70, -7, 72]}], "frame": [10, 43, 17, 25]}
+      ]
+    },
+    "fr": {
+      "main": [{"bounds": [-6, 41, 10, 52]}]
+    },
+    "es": {
+      "main": [
+        {"bounds": [-10, 36, 4, 44], "minArea": 1},
+        {"bounds": [1, 38, 5, 41]}
+      ],
+      "expandedMainFrame": [16, 4, 80, 64],
+      "insets": [
+        {"selection": [{"bounds": [-19, 27, -13, 30]}], "frame": [4, 72, 40, 23]}
+      ]
+    },
+    "pt": {
+      "main": [{"bounds": [-10, 36.8, -6, 42.3], "minArea": 1}],
+      "expandedMainFrame": [42, 4, 54, 92],
+      "insets": [
+        {"selection": [{"bounds": [-32, 36, -24, 40.5]}], "frame": [4, 14, 32, 28]},
+        {"selection": [{"bounds": [-18, 31.5, -15.5, 33.5]}], "frame": [10, 58, 25, 28]}
+      ]
+    },
+    "za": {
+      "main": [{"bounds": [15, -36, 34, -21]}]
+    },
+    "au": {
+      "main": [{"bounds": [110, -45, 155, -9], "sourceNames": ["Australia"]}]
+    },
+    "nz": {
+      "main": [{"bounds": [165, -48, 179, -33]}],
+      "expandedMainFrame": [4, 3, 59, 94],
+      "insets": [
+        {"selection": [{"bounds": [-178, -45, -175, -43]}], "frame": [68, 36, 27, 31]}
+      ]
+    },
+    "cr": {
+      "main": [{"bounds": [-86.5, 7, -82, 12]}]
+    },
+    "us": {
+      "main": [{"bounds": [-126, 24, -66, 50]}],
+      "expandedMainFrame": [31, 30, 65, 46],
+      "insets": [
+        {"selection": [{"bounds": [-180, 50, -126, 72]}, {"bounds": [170, 50, 180, 72]}], "frame": [4, 5, 37, 24]},
+        {"selection": [{"bounds": [-161, 18, -154, 23]}], "frame": [8, 76, 29, 18]}
+      ]
+    },
+    "cl": {
+      "main": [{"bounds": [-77, -57, -66, -17]}],
+      "expandedMainFrame": [42, 3, 54, 94],
+      "insets": [
+        {"selection": [{"bounds": [-82, -34.5, -78, -32.5]}], "frame": [16, 48, 23, 26]},
+        {"selection": [{"bounds": [-110, -28, -108, -26]}], "frame": [4, 16, 20, 22]}
+      ]
+    },
+    "ec": {
+      "main": [{"bounds": [-82, -6, -74, 2]}],
+      "expandedMainFrame": [40, 5, 56, 90],
+      "insets": [
+        {"selection": [{"bounds": [-93, -2, -89, 2]}], "frame": [4, 32, 31, 34]}
+      ]
+    }
+  },
   "policy": {
     "quizCountryList": "countries.js is authoritative; Natural Earth does not decide which entities are quiz countries",
     "quizRegionMembership": "countries.js is the only source of region membership",

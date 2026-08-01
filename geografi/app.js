@@ -793,6 +793,7 @@
   ) {
     const silhouette = mapData.silhouettes[countryCode];
     const hasSilhouettePath = Boolean(silhouette.path);
+    const expandedSilhouette = silhouette.expanded;
     const expandedMarkerRadius = 0;
     const currentMarkerRadius = expanded ? expandedMarkerRadius : null;
     const silhouetteMarkers = silhouette.markers
@@ -814,11 +815,46 @@
       "country-silhouette-inset",
       "is-bottom-left",
       hasSilhouettePath ? "has-silhouette-path" : "is-marker-only",
+      expandedSilhouette ? "has-expanded-composition" : "",
       interactive ? "is-interactive" : "is-preview-only",
       interactive && expanded ? "is-expanded" : "",
     ]
       .filter(Boolean)
       .join(" ");
+    const silhouettePathMarkup = (layer, pathClass = "") => `
+      ${
+        layer.path
+          ? `<path class="country-silhouette-shape ${pathClass}" d="${layer.path}" />`
+          : ""
+      }
+      ${
+        layer.minorPath
+          ? `<path class="country-silhouette-minor-shape ${pathClass}" d="${layer.minorPath}" />`
+          : ""
+      }
+    `;
+    const expandedMarkup = expandedSilhouette
+      ? `
+        <g class="country-silhouette-composition is-expanded-composition">
+          ${silhouettePathMarkup(expandedSilhouette)}
+          ${expandedSilhouette.insets
+            .map(
+              (inset) => `
+                <rect
+                  class="country-silhouette-inset-frame"
+                  x="${inset.frame[0]}"
+                  y="${inset.frame[1]}"
+                  width="${inset.frame[2]}"
+                  height="${inset.frame[3]}"
+                  rx="2"
+                />
+                ${silhouettePathMarkup(inset, "is-inset-shape")}
+              `,
+            )
+            .join("")}
+        </g>
+      `
+      : "";
     const contents = `
       ${interactive ? '<span class="silhouette-toggle-icon" aria-hidden="true"></span>' : ""}
       <svg
@@ -828,17 +864,11 @@
         focusable="false"
         preserveAspectRatio="xMidYMid meet"
       >
-        ${
-          silhouette.path
-            ? `<path class="country-silhouette-shape" d="${silhouette.path}" />`
-            : ""
-        }
-        ${
-          silhouette.minorPath
-            ? `<path class="country-silhouette-minor-shape" d="${silhouette.minorPath}" />`
-            : ""
-        }
-        ${silhouetteMarkers}
+        <g class="country-silhouette-composition is-compact-composition">
+          ${silhouettePathMarkup(silhouette)}
+          ${silhouetteMarkers}
+        </g>
+        ${expandedMarkup}
       </svg>
     `;
 

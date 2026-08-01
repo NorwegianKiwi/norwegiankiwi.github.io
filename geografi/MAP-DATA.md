@@ -105,6 +105,13 @@ The committed geometry consists of three separate products:
    threshold receive up to eight representative points in the compact shape
    inset.
 
+Eleven countries have editorial silhouette rules in `silhouetteOverrides` in
+`tools/map-sources.json`. Their compact shape is fitted from an explicit set
+of geographic components. The expanded composition may place remote inhabited
+areas in separate, unlabelled frames with independent scales. These rules
+affect only silhouettes; they must never be reused to filter the world or
+regional maps.
+
 The geometry was simplified and coordinates were rounded to one decimal place.
 Natural Earth tiny-country points are used when a polygon is too small to be
 readable. Country membership in region maps must always be looked up in
@@ -147,6 +154,17 @@ python3 tools/generate_map_data.py \
   --refresh-silhouettes
 ```
 
+To update only the editorial overrides while preserving every other map and
+silhouette byte-for-byte, use:
+
+```sh
+python3 tools/generate_map_data.py \
+  /tmp/geografi-map-sources \
+  /tmp/world-map.candidate.js \
+  --base-map world-map.js \
+  --refresh-silhouette-overrides
+```
+
 Each region map has active countries in `features` and `markers`, while
 `backgroundFeatures` contains only inactive geography. All three collections
 use the same central meridian, projection, and simplification tolerance.
@@ -187,10 +205,11 @@ The silhouettes use a country-centered equirectangular projection with one
 fixed standard parallel for the entire country. This preserves north-up
 orientation without giving different latitudes different horizontal scales
 and thereby skewing the shape.
-All shape insets are placed in the lower-left corner. The generator refuses to
-write directly to `world-map.js`. If a future update requires more advanced
-geometry processing, GDAL/QGIS, D3 Geo, or Mapshaper may be used offline, but
-the result must still be serialized to the same public interface:
+All shape insets are placed in the lower-left corner. Expanded compositions can
+contain unlabelled internal frames defined by the manifest. The generator
+refuses to write directly to `world-map.js`. If a future update requires more
+advanced geometry processing, GDAL/QGIS, D3 Geo, or Mapshaper may be used
+offline, but the result must still be serialized to the same public interface:
 
 ```js
 window.GEOGRAFI_QUIZ_MAP_DATA = {

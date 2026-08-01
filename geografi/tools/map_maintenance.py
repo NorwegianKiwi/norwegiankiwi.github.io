@@ -221,6 +221,35 @@ def validate_local_data(map_path=None):
             errors.append(f"{code} har mer enn åtte silhuettmarkører")
         if silhouette.get("corner") != "bottom-left":
             errors.append(f"{code} har ikke silhuettvindu nederst til venstre")
+        expanded = silhouette.get("expanded")
+        expected_expanded = bool(
+            manifest.get("silhouetteOverrides", {}).get(code, {}).get("insets")
+        )
+        if bool(expanded) != expected_expanded:
+            errors.append(f"{code} har uventet forstørret silhuettkomposisjon")
+        if expanded:
+            if not expanded.get("path") and not expanded.get("minorPath"):
+                errors.append(f"{code} har tom hovedform i forstørret silhuett")
+            insets = expanded.get("insets")
+            if not isinstance(insets, list) or not insets:
+                errors.append(f"{code} mangler innfellinger")
+                continue
+            for index, inset in enumerate(insets, start=1):
+                if not inset.get("path") and not inset.get("minorPath"):
+                    errors.append(f"{code} har tom innfelling {index}")
+                frame = inset.get("frame")
+                if (
+                    not isinstance(frame, list)
+                    or len(frame) != 4
+                    or not all(isinstance(value, (int, float)) for value in frame)
+                    or frame[0] < 0
+                    or frame[1] < 0
+                    or frame[2] <= 0
+                    or frame[3] <= 0
+                    or frame[0] + frame[2] > 100
+                    or frame[1] + frame[3] > 100
+                ):
+                    errors.append(f"{code} har ugyldig ramme for innfelling {index}")
 
     world_geometry = {
         feature["code"]
