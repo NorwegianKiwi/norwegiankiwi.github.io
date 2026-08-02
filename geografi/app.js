@@ -379,8 +379,8 @@
   let suppressExploreMapClickUntil = 0;
   const exploreMapMaxZoom = 8;
   const exploreMapZoomLevels = [1, 1.5, 2, 3, 4, 6, 8];
-  const exploreMapGeometryShowSize = 12;
-  const exploreMapGeometryHideSize = 10;
+  const exploreMapGeometryShowSize = 5; // Codex originally set this to 12
+  const exploreMapGeometryHideSize = 5; // Codex originally set this to 10
   const keyboardHintIgnoredKeys = new Set([
     "Tab",
     "Escape",
