@@ -109,8 +109,12 @@ or scale. A true zoom inset instead includes a source rectangle and connector
 lines. This affects the silhouette only, not any quiz or Explore map.
 Dispersed island states can use representative extent dots in the compact view
 and reveal their geographically positioned polygon geometry when enlarged.
-Frames are unlabelled, and capital stars are intentionally deferred. Cyprus is
-the sole silhouette whose enlarged view adds a dashed internal division guide.
+Frames are unlabelled. Enlarged silhouettes mark each listed capital with a
+small five-pointed star; compact silhouettes and regional maps do not. Monaco
+and Vatican City are explicit exceptions because each capital is effectively
+coextensive with its city-state. Capital coordinates come from Natural Earth
+1:10m Populated Places with documented editorial overrides. Cyprus is the sole
+silhouette whose enlarged view adds a dashed internal division guide.
 
 The Maps view in Explore reuses the same regional azimuthal equidistant maps and
 silhouettes. Active countries with Natural Earth tiny-country locator points

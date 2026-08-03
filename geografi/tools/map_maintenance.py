@@ -8,9 +8,11 @@ in the website and does not add a runtime or build dependency.
 import argparse
 import hashlib
 import json
+import math
 import re
 import struct
 import sys
+import unicodedata
 import urllib.request
 import zipfile
 from collections import Counter
@@ -41,6 +43,9 @@ EXPECTED_REGION_COUNTS = {
     "south-america": 12,
     "caribbean": 13,
 }
+EXPECTED_CAPITAL_COUNTRIES = 194
+EXPECTED_CAPITAL_MARKERS = 202
+EXPECTED_CAPITAL_EXCLUSIONS = {"mc", "va"}
 
 
 def valid_silhouette_frame(frame):
@@ -66,7 +71,8 @@ def load_countries():
     pattern = re.compile(
         r'^\s*\{\s*code:\s*"([a-z]{2})",\s*'
         r'region:\s*"([^"]+)",\s*name:\s*\{\s*'
-        r'nb:\s*"[^"]+",\s*en:\s*"([^"]+)"\s*\}',
+        r'nb:\s*"[^"]+",\s*en:\s*"([^"]+)"\s*\},\s*'
+        r'capital:\s*\{\s*nb:\s*"[^"]+",\s*en:\s*"([^"]+)"\s*\}',
         re.MULTILINE,
     )
     rows = [
@@ -74,6 +80,7 @@ def load_countries():
             "code": match.group(1),
             "region": match.group(2),
             "name": match.group(3),
+            "capitals": match.group(4).split(" / "),
         }
         for match in pattern.finditer(text)
     ]
@@ -83,6 +90,149 @@ def load_countries():
             "Oppdater parseren hvis filformatet bevisst er endret."
         )
     return rows
+
+
+CAPITAL_NAME_FIELDS = (
+    "NAME",
+    "NAMEASCII",
+    "NAMEPAR",
+    "NAMEALT",
+    "NAME_EN",
+    "LABEL",
+)
+
+
+def normalized_place_name(value):
+    ascii_value = unicodedata.normalize("NFKD", value).encode(
+        "ascii", errors="ignore"
+    ).decode("ascii")
+    return re.sub(r"[^a-z0-9]+", "", ascii_value.lower())
+
+
+def capital_code_for_source_row(row, manifest):
+    code = row.get("ISO_A2", "").lower()
+    if re.fullmatch(r"[a-z]{2}", code):
+        return code
+    return manifest.get("capitalCountryCodeOverrides", {}).get(
+        row.get("ADM0_A3")
+    )
+
+
+def resolve_capital_points(rows, countries, manifest):
+    """Resolve the editorial capital list to reproducible lon/lat points."""
+    by_code = {}
+    for row in rows:
+        code = capital_code_for_source_row(row, manifest)
+        if code:
+            by_code.setdefault(code, []).append(row)
+
+    exclusions = set(manifest.get("capitalExclusions", []))
+    overrides = manifest.get("capitalOverrides", {})
+    country_codes = {country["code"] for country in countries}
+    unknown_exclusions = sorted(exclusions - country_codes)
+    unknown_overrides = sorted(set(overrides) - country_codes)
+    if unknown_exclusions or unknown_overrides:
+        raise ValueError(
+            "Ukjente landkoder i hovedstadsreglene: "
+            + ", ".join(unknown_exclusions + unknown_overrides)
+        )
+
+    resolved = {}
+    used_override_labels = set()
+    for country in countries:
+        code = country["code"]
+        if code in exclusions:
+            continue
+        points = []
+        for capital in country["capitals"]:
+            override = overrides.get(code, {}).get(capital)
+            if override:
+                used_override_labels.add((code, capital))
+            if override and "coordinates" in override:
+                longitude, latitude = override["coordinates"]
+                if not (
+                    isinstance(longitude, (int, float))
+                    and isinstance(latitude, (int, float))
+                    and -180 <= longitude <= 180
+                    and -90 <= latitude <= 90
+                ):
+                    raise ValueError(
+                        f"Ugyldige hovedstadskoordinater for {code}: {capital}"
+                    )
+                points.append(
+                    {
+                        "name": capital,
+                        "longitude": float(longitude),
+                        "latitude": float(latitude),
+                    }
+                )
+                continue
+
+            source_name = (
+                override.get("sourceName", capital) if override else capital
+            )
+            normalized_source_name = normalized_place_name(source_name)
+            matches = []
+            for row in by_code.get(code, []):
+                field_score = max(
+                    (
+                        100 - index * 5
+                        for index, field in enumerate(CAPITAL_NAME_FIELDS)
+                        if normalized_place_name(row.get(field, ""))
+                        == normalized_source_name
+                    ),
+                    default=None,
+                )
+                if field_score is None:
+                    continue
+                feature_class = row.get("FEATURECLA", "")
+                capital_score = {
+                    "Admin-0 capital": 30,
+                    "Admin-0 capital alt": 25,
+                    "Admin-0 region capital": 20,
+                }.get(feature_class, 0)
+                matches.append((field_score + capital_score, row))
+            if not matches:
+                raise ValueError(
+                    f"Fant ikke hovedstaden {capital!r} for {code} i "
+                    "Natural Earth eller capitalOverrides"
+                )
+            best_score = max(score for score, _ in matches)
+            best_rows = [row for score, row in matches if score == best_score]
+            if len(best_rows) != 1:
+                raise ValueError(
+                    f"Hovedstaden {capital!r} for {code} matcher "
+                    f"{len(best_rows)} Natural Earth-poster"
+                )
+            row = best_rows[0]
+            try:
+                longitude = float(row["LONGITUDE"])
+                latitude = float(row["LATITUDE"])
+            except (KeyError, ValueError) as error:
+                raise ValueError(
+                    f"Mangler koordinater for hovedstaden {capital!r} ({code})"
+                ) from error
+            points.append(
+                {
+                    "name": capital,
+                    "longitude": longitude,
+                    "latitude": latitude,
+                }
+            )
+        resolved[code] = points
+
+    declared_override_labels = {
+        (code, label)
+        for code, capital_rules in overrides.items()
+        for label in capital_rules
+    }
+    unused_overrides = sorted(declared_override_labels - used_override_labels)
+    if unused_overrides:
+        raise ValueError(
+            "Ubrukte hovedstadsoverstyringer: "
+            + ", ".join(f"{code}:{label}" for code, label in unused_overrides)
+        )
+    return resolved
 
 
 def decode_assignment(text, prefix):
@@ -106,6 +256,11 @@ def load_generated_map(path=None):
         text, "data.silhouetteViewBox = "
     )
     data["silhouettes"] = decode_assignment(text, "data.silhouettes = ")
+    data["silhouetteCapitals"] = (
+        decode_assignment(text, "data.silhouetteCapitals = ")
+        if "data.silhouetteCapitals = " in text
+        else {}
+    )
     return data
 
 
@@ -211,6 +366,8 @@ def validate_local_data(map_path=None):
         errors.append(f"Ekstra flagg: {', '.join(extra_flags)}")
 
     silhouettes = set(map_data["silhouettes"])
+    silhouette_capitals = map_data.get("silhouetteCapitals", {})
+    capital_exclusions = set(manifest.get("capitalExclusions", []))
     missing_silhouettes = sorted(set(codes) - silhouettes)
     extra_silhouettes = sorted(silhouettes - set(codes))
     if missing_silhouettes:
@@ -220,6 +377,80 @@ def validate_local_data(map_path=None):
     if extra_silhouettes:
         warnings.append(
             f"Silhuetter uten quizland: {', '.join(extra_silhouettes)}"
+        )
+    expected_capital_codes = set(codes) - capital_exclusions
+    actual_capital_codes = set(silhouette_capitals)
+    missing_capital_codes = sorted(
+        expected_capital_codes - actual_capital_codes
+    )
+    extra_capital_codes = sorted(actual_capital_codes - expected_capital_codes)
+    if missing_capital_codes:
+        errors.append(
+            "Silhuetter uten hovedstadsmarkører: "
+            + ", ".join(missing_capital_codes)
+        )
+    if extra_capital_codes:
+        errors.append(
+            "Uventede hovedstadsmarkører: " + ", ".join(extra_capital_codes)
+        )
+    country_by_code = {country["code"]: country for country in countries}
+    total_capital_markers = 0
+    for code, layers in silhouette_capitals.items():
+        if not isinstance(layers, dict):
+            errors.append(f"{code} har ugyldige hovedstadslag")
+            continue
+        main = layers.get("main", [])
+        insets = layers.get("insets", [])
+        if not isinstance(main, list) or not isinstance(insets, list):
+            errors.append(f"{code} har ugyldige hovedstadslag")
+            continue
+        expected_insets = len(
+            map_data["silhouettes"].get(code, {}).get("expanded", {}).get(
+                "insets", []
+            )
+        )
+        if len(insets) != expected_insets:
+            errors.append(
+                f"{code} har {len(insets)} hovedstadsinnfellinger; "
+                f"forventet {expected_insets}"
+            )
+        if any(not isinstance(inset, list) for inset in insets):
+            errors.append(f"{code} har ugyldig hovedstadsinnfelling")
+            continue
+        points = main + [point for inset in insets for point in inset]
+        total_capital_markers += len(points)
+        expected_points = len(country_by_code.get(code, {}).get("capitals", []))
+        if len(points) != expected_points:
+            errors.append(
+                f"{code} har {len(points)} hovedstadsmarkører; "
+                f"forventet {expected_points}"
+            )
+        for point in points:
+            x = point.get("x") if isinstance(point, dict) else None
+            y = point.get("y") if isinstance(point, dict) else None
+            if not (
+                isinstance(x, (int, float))
+                and isinstance(y, (int, float))
+                and math.isfinite(x)
+                and math.isfinite(y)
+                and 0 <= x <= 100
+                and 0 <= y <= 100
+            ):
+                errors.append(f"{code} har hovedstadsmarkør utenfor silhuetten")
+    if capital_exclusions != EXPECTED_CAPITAL_EXCLUSIONS:
+        errors.append(
+            "Uventede land uten hovedstadsmarkør: "
+            + ", ".join(sorted(capital_exclusions))
+        )
+    if len(actual_capital_codes) != EXPECTED_CAPITAL_COUNTRIES:
+        errors.append(
+            f"Fant {len(actual_capital_codes)} silhuetter med hovedsteder; "
+            f"forventet {EXPECTED_CAPITAL_COUNTRIES}"
+        )
+    if total_capital_markers != EXPECTED_CAPITAL_MARKERS:
+        errors.append(
+            f"Fant {total_capital_markers} hovedstadsmarkører; "
+            f"forventet {EXPECTED_CAPITAL_MARKERS}"
         )
     for code, silhouette in map_data["silhouettes"].items():
         path = silhouette.get("path")
@@ -665,6 +896,10 @@ def validate_local_data(map_path=None):
         f"{len(world_geometry & set(codes))} quizkoder med geometri/markør"
     )
     print(f"Silhuetter: {len(silhouettes)}")
+    print(
+        f"Hovedstadsmarkører: {total_capital_markers} "
+        f"i {len(actual_capital_codes)} silhuetter"
+    )
     print(f"Oversiktskart: {len(actual_overviews)}")
     print(
         "Regioner: "
@@ -750,6 +985,32 @@ def audit_sources(directory):
         f"50m smålandspunkter: {len(tiny_rows)} poster, "
         f"{len(tiny_codes & quiz_codes)} quizkoder"
     )
+
+    capital_dataset = manifest["datasets"]["populatedPlaces10m"]
+    capital_stem = Path(capital_dataset["file"]).stem
+    capital_rows = read_dbf(
+        find_dataset_file(directory, capital_stem, ".dbf")
+    )
+    capital_version_file = find_dataset_file(
+        directory, capital_stem, ".VERSION.txt"
+    )
+    capital_version = capital_version_file.read_text(encoding="utf-8").strip()
+    if capital_dataset["version"] not in capital_version:
+        errors.append(
+            "10m hovedsteder: versjonsfilen samsvarer ikke med manifestet"
+        )
+    try:
+        capital_points = resolve_capital_points(
+            capital_rows, countries, manifest
+        )
+        print(
+            f"10m hovedsteder: {len(capital_rows)} poster, "
+            f"{sum(map(len, capital_points.values()))} valgte punkter "
+            f"for {len(capital_points)} quizland, "
+            f"versjonsfil={capital_version!r}"
+        )
+    except ValueError as error:
+        errors.append(f"10m hovedsteder: {error}")
 
     for error in errors:
         print(f"FEIL: {error}", file=sys.stderr)

@@ -787,6 +787,33 @@
     `;
   }
 
+  function silhouetteCapitalPath({ x, y }) {
+    const outerRadius = 2;
+    const innerRadius = 0.87;
+    return (
+      Array.from({ length: 10 }, (_, index) => {
+        const angle = -Math.PI / 2 + (index * Math.PI) / 5;
+        const radius = index % 2 === 0 ? outerRadius : innerRadius;
+        const pointX = (x + Math.cos(angle) * radius).toFixed(2);
+        const pointY = (y + Math.sin(angle) * radius).toFixed(2);
+        return `${index === 0 ? "M" : "L"}${pointX},${pointY}`;
+      }).join(" ") + "Z"
+    );
+  }
+
+  function silhouetteCapitalMarkup(points = []) {
+    return points
+      .map(
+        (point) => `
+          <path
+            class="country-silhouette-capital"
+            d="${silhouetteCapitalPath(point)}"
+          />
+        `,
+      )
+      .join("");
+  }
+
   function countrySilhouetteMarkup(
     countryCode,
     { interactive = true, expanded = state.silhouetteExpanded } = {},
@@ -794,6 +821,10 @@
     const silhouette = mapData.silhouettes[countryCode];
     const hasSilhouettePath = Boolean(silhouette.path);
     const expandedSilhouette = silhouette.expanded;
+    const capitalLayers = mapData.silhouetteCapitals[countryCode] ?? {
+      main: [],
+      insets: [],
+    };
     const expandedMarkerRadius = 0;
     const currentMarkerRadius = expanded ? expandedMarkerRadius : null;
     const silhouetteMarkers = silhouette.markers
@@ -821,7 +852,11 @@
     ]
       .filter(Boolean)
       .join(" ");
-    const silhouettePathMarkup = (layer, pathClass = "") => {
+    const silhouettePathMarkup = (
+      layer,
+      pathClass = "",
+      capitalPoints = [],
+    ) => {
       const layerClass = [
         pathClass,
         layer.mergeStroke ? "is-merged-shape" : "",
@@ -839,6 +874,7 @@
           ? `<path class="country-silhouette-minor-shape ${layerClass}" d="${layer.minorPath}" />`
           : ""
       }
+      ${silhouetteCapitalMarkup(capitalPoints)}
     `;
     };
     const silhouetteLocatorMarkup = (inset) => {
@@ -911,11 +947,11 @@
     const expandedMarkup = expandedSilhouette
       ? `
         <g class="country-silhouette-composition is-expanded-composition">
-          ${silhouettePathMarkup(expandedSilhouette)}
+          ${silhouettePathMarkup(expandedSilhouette, "", capitalLayers.main)}
           ${expandedSilhouette.insets.map(silhouetteLocatorMarkup).join("")}
           ${expandedSilhouette.insets
             .map(
-              (inset) => `
+              (inset, index) => `
                 <rect
                   class="country-silhouette-inset-frame"
                   x="${inset.frame[0]}"
@@ -924,7 +960,11 @@
                   height="${inset.frame[3]}"
                   rx="2"
                 />
-                ${silhouettePathMarkup(inset, "is-inset-shape")}
+                ${silhouettePathMarkup(
+                  inset,
+                  "is-inset-shape",
+                  capitalLayers.insets[index] ?? [],
+                )}
               `,
             )
             .join("")}
@@ -946,7 +986,7 @@
         preserveAspectRatio="xMidYMid meet"
       >
         <g class="country-silhouette-composition is-compact-composition">
-          ${silhouettePathMarkup(silhouette)}
+          ${silhouettePathMarkup(silhouette, "", capitalLayers.main)}
           ${silhouetteMarkers}
         </g>
         ${expandedMarkup}

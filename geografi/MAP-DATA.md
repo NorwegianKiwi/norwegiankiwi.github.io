@@ -26,10 +26,11 @@ here are maintenance tools and are not part of the runtime.
 - `world-map.js` contains generated runtime data. The SVG paths must not be
   edited by hand.
 
-The sources are Natural Earth Admin 0 Countries at 1:50m and 1:10m, as well as
-1:50m Tiny Country Points. The standard global dataset with Natural Earth's
-**de facto default view** is used. Do not switch to a country-specific POV
-dataset without an explicit editorial decision.
+The geometry sources are Natural Earth Admin 0 Countries at 1:50m and 1:10m,
+as well as 1:50m Tiny Country Points. Capital coordinates use the independently
+versioned Natural Earth 1:10m Populated Places dataset. The standard global
+dataset with Natural Earth's **de facto default view** is used. Do not switch
+to a country-specific POV dataset without an explicit editorial decision.
 
 ## Validation without updating
 
@@ -47,6 +48,7 @@ other things:
 - one local SVG flag per country
 - map geometry or a marker for every quiz country
 - one silhouette per country
+- the expected 202 capital markers across 194 silhouettes
 - complete coverage in each of the nine quiz-region maps and the Africa
   overview map
 - the expected Natural Earth version and projections
@@ -120,7 +122,17 @@ Compositions may include an optional `divisionPath` for internal geographic
 context. Named Natural Earth objects without a quiz code can be included
 explicitly when a complete land form spans multiple source objects. These rules
 affect only silhouettes; they must never be reused to filter the world or
-regional maps. Frames remain unlabelled, and capital stars are deferred.
+regional maps. Frames remain unlabelled.
+
+Expanded silhouettes mark the capitals listed in `countries.js` with small
+five-pointed stars. The generator matches the English editorial names against
+Natural Earth Populated Places and uses `capitalOverrides` for current names,
+policy-sensitive places, or cities absent from that release. It fails rather
+than guessing when a city is missing or ambiguous. Multi-capital countries
+receive one point per listed city. A point covered by an inset is projected
+only into that most detailed panel, not duplicated in the overview. Compact
+silhouettes and regional maps never render these points. `capitalExclusions`
+omits Monaco and Vatican City; San Marino follows the normal rule.
 
 `markerOverrides` corrects a tiny-country locator whose Natural Earth point is
 not on the pedagogically useful main island. `regionalGeometryOverrides` is a
@@ -239,7 +251,8 @@ window.GEOGRAFI_QUIZ_MAP_DATA = {
   quizRegions: { [id]: { viewBox, bleedViewBox, backgroundFeatures, features, markers } },
   overviewRegions: { [id]: { viewBox, bleedViewBox, backgroundFeatures, features, markers } },
   silhouetteViewBox,
-  silhouettes
+  silhouettes,
+  silhouetteCapitals: { [countryCode]: { main, insets } }
 };
 ```
 
@@ -257,6 +270,8 @@ Before replacing `world-map.js`:
 
 - Run local validation with the candidate data connected.
 - Confirm 196 countries, 196 flags, and 196 silhouettes.
+- Confirm 202 capital markers across 194 silhouettes, with none for Monaco or
+  Vatican City.
 - Confirm that unavailable territories are map context and cannot be selected.
 - Check that Russia appears only in East and South Asia, and Cyprus and Türkiye
   in West and Central Asia. Both the region map and the shape inset must show
@@ -266,6 +281,9 @@ Before replacing `world-map.js`:
   Oceania.
 - Inspect microstates and island nations, especially Vatican City, Monaco,
   Bahrain, the Maldives, Nauru, Tuvalu, and the Caribbean.
+- Expand ordinary, multi-capital, and inset silhouettes. Confirm that San
+  Marino has a star, Monaco and Vatican City do not, and Tonga and Tuvalu place
+  their stars only in the detailed inset.
 - Check all nine quiz-region maps, the Africa overview, and the shape inset's
   four possible corners.
 - Test the front-page map's mouse, keyboard, hover, focus, and selected region.

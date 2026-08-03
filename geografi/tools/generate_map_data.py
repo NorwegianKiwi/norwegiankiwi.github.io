@@ -20,6 +20,7 @@ from map_maintenance import (
     load_generated_map,
     load_manifest,
     read_dbf,
+    resolve_capital_points,
 )
 
 
@@ -976,6 +977,131 @@ def project_silhouette_ring(ring, projection):
     ]
 
 
+def project_silhouette_capitals(capitals, projection):
+    center = projection["center"]
+    longitude_scale = projection["longitudeScale"]
+    transform = projection["transform"]
+    output = []
+    for capital in capitals:
+        projected = transform(
+            (
+                (
+                    wrap_longitude(capital["longitude"], center) - center
+                )
+                * longitude_scale,
+                -capital["latitude"],
+            )
+        )
+        output.append(
+            {"x": round(projected[0], 1), "y": round(projected[1], 1)}
+        )
+    return output
+
+
+def capital_matches_selection(capital, selection):
+    longitude = capital["longitude"]
+    latitude = capital["latitude"]
+    return any(
+        west <= longitude <= east and south <= latitude <= north
+        for west, south, east, north in (
+            rule["bounds"] for rule in selection
+        )
+    )
+
+
+def build_silhouette_capitals(
+    features, country_codes, capital_points, overrides=None
+):
+    """Project capitals into the main or most detailed silhouette layer."""
+    overrides = overrides or {}
+    by_code = {}
+    by_name = {}
+    for feature in features:
+        by_name.setdefault(feature["name"], []).extend(
+            {"ring": ring, "sourceName": feature["name"]}
+            for ring in feature["rings"]
+        )
+        if feature["code"] in country_codes:
+            by_code.setdefault(feature["code"], []).extend(
+                {"ring": ring, "sourceName": feature["name"]}
+                for ring in feature["rings"]
+            )
+
+    output = {}
+    for code in sorted(country_codes):
+        capitals = capital_points.get(code)
+        if not capitals:
+            continue
+        ring_items = by_code.get(code, [])
+        if not ring_items:
+            raise ValueError(f"Mangler 1:10m-ringer for {code}")
+        override = overrides.get(code)
+        if override:
+            ring_items = ring_items + [
+                item
+                for source_name in override.get("includeSourceNames", [])
+                for item in by_name.get(source_name, [])
+            ]
+        main_items = (
+            selected_silhouette_rings(ring_items, override["main"])
+            if override
+            else ring_items
+        )
+
+        if not override or not (
+            override.get("insets") or override.get("division")
+        ):
+            projection = silhouette_projection(main_items)
+            output[code] = {
+                "main": project_silhouette_capitals(capitals, projection),
+                "insets": [],
+            }
+            continue
+
+        inset_capitals = [[] for _ in override.get("insets", [])]
+        main_capitals = []
+        for capital in capitals:
+            matching_inset = next(
+                (
+                    index
+                    for index, inset in enumerate(override.get("insets", []))
+                    if capital_matches_selection(capital, inset["selection"])
+                ),
+                None,
+            )
+            if matching_inset is None:
+                main_capitals.append(capital)
+            else:
+                inset_capitals[matching_inset].append(capital)
+
+        projected_insets = []
+        for inset, points in zip(override.get("insets", []), inset_capitals):
+            inset_items = selected_silhouette_rings(
+                ring_items, inset["selection"]
+            )
+            projection = silhouette_projection(
+                inset_items, inset["frame"], padding=3
+            )
+            projected_insets.append(
+                project_silhouette_capitals(points, projection)
+            )
+
+        if override.get("expandedPanelsOnly"):
+            projected_main = []
+        else:
+            projection = silhouette_projection(
+                main_items, override["expandedMainFrame"], padding=3
+            )
+            projected_main = project_silhouette_capitals(
+                main_capitals, projection
+            )
+        output[code] = {
+            "main": projected_main,
+            "insets": projected_insets,
+        }
+    return output
+
+
 def silhouette_source_frame(main_items, source_items, frame, padding=3):
     projection = silhouette_projection(main_items, frame, padding)
     points = [
@@ -1166,6 +1292,7 @@ def write_candidate(path, data):
   data.overviewRegions = {compact_json(data["overviewRegions"])};
   data.silhouetteViewBox = {compact_json(data["silhouetteViewBox"])};
   data.silhouettes = {compact_json(data["silhouettes"])};
+  data.silhouetteCapitals = {compact_json(data["silhouetteCapitals"])};
   Object.values(data.quizRegions).forEach((view) => {{
     Object.freeze(view.features);
     Object.freeze(view.markers);
@@ -1194,6 +1321,13 @@ def write_candidate(path, data):
     Object.freeze(silhouette);
   }});
   Object.freeze(data.silhouettes);
+  Object.values(data.silhouetteCapitals).forEach((capitalLayers) => {{
+    Object.freeze(capitalLayers.main);
+    capitalLayers.insets.forEach((inset) => Object.freeze(inset));
+    Object.freeze(capitalLayers.insets);
+    Object.freeze(capitalLayers);
+  }});
+  Object.freeze(data.silhouetteCapitals);
   Object.freeze(data.features);
   Object.freeze(data.markers);
   window.GEOGRAFI_QUIZ_MAP_DATA = Object.freeze(data);
@@ -1259,6 +1393,16 @@ def main():
         )
         countries10 = load_source_features(
             args.source_directory, "countries10m"
+        )
+        populated_places_dataset = manifest["datasets"]["populatedPlaces10m"]
+        populated_places_stem = Path(populated_places_dataset["file"]).stem
+        populated_places = read_dbf(
+            find_dataset_file(
+                args.source_directory, populated_places_stem, ".dbf"
+            )
+        )
+        capital_points = resolve_capital_points(
+            populated_places, countries, manifest
         )
         tiny_codes = {
             feature["code"]
@@ -1360,6 +1504,12 @@ def main():
                 country_codes,
                 silhouette_overrides,
             )
+        silhouette_capitals = build_silhouette_capitals(
+            countries10,
+            country_codes,
+            capital_points,
+            silhouette_overrides,
+        )
         data = {
             "base": {
                 "viewBox": (
@@ -1392,6 +1542,7 @@ def main():
                 else manifest["generatedOutput"]["silhouetteViewBox"]
             ),
             "silhouettes": silhouettes,
+            "silhouetteCapitals": silhouette_capitals,
         }
         args.output.parent.mkdir(parents=True, exist_ok=True)
         write_candidate(args.output, data)

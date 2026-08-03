@@ -392,6 +392,20 @@
   fill: var(--coral);
 }
 
+.country-silhouette-capital {
+  display: none;
+  fill: var(--gold);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+
+.country-silhouette-inset.is-expanded .country-silhouette-capital {
+  display: initial;
+}
+
 .country-silhouette-shape,
 .country-silhouette-marker {
   stroke: var(--ink);
