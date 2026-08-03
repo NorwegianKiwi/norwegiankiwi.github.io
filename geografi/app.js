@@ -821,22 +821,98 @@
     ]
       .filter(Boolean)
       .join(" ");
-    const silhouettePathMarkup = (layer, pathClass = "") => `
+    const silhouettePathMarkup = (layer, pathClass = "") => {
+      const layerClass = [
+        pathClass,
+        layer.mergeStroke ? "is-merged-shape" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      return `
       ${
         layer.path
-          ? `<path class="country-silhouette-shape ${pathClass}" d="${layer.path}" />`
+          ? `<path class="country-silhouette-shape ${layerClass}" d="${layer.path}" />`
           : ""
       }
       ${
         layer.minorPath
-          ? `<path class="country-silhouette-minor-shape ${pathClass}" d="${layer.minorPath}" />`
+          ? `<path class="country-silhouette-minor-shape ${layerClass}" d="${layer.minorPath}" />`
           : ""
       }
     `;
+    };
+    const silhouetteLocatorMarkup = (inset) => {
+      if (!inset.sourceFrame) return "";
+      const [sourceX, sourceY, sourceWidth, sourceHeight] = inset.sourceFrame;
+      const [insetX, insetY, insetWidth, insetHeight] = inset.frame;
+      const sourceCenterX = sourceX + sourceWidth / 2;
+      const sourceCenterY = sourceY + sourceHeight / 2;
+      const insetCenterX = insetX + insetWidth / 2;
+      const insetCenterY = insetY + insetHeight / 2;
+      const horizontal =
+        Math.abs(insetCenterX - sourceCenterX) >=
+        Math.abs(insetCenterY - sourceCenterY);
+      const sourcePoints = horizontal
+        ? [
+            [insetCenterX >= sourceCenterX ? sourceX + sourceWidth : sourceX, sourceY],
+            [
+              insetCenterX >= sourceCenterX ? sourceX + sourceWidth : sourceX,
+              sourceY + sourceHeight,
+            ],
+          ]
+        : [
+            [sourceX, insetCenterY >= sourceCenterY ? sourceY + sourceHeight : sourceY],
+            [
+              sourceX + sourceWidth,
+              insetCenterY >= sourceCenterY ? sourceY + sourceHeight : sourceY,
+            ],
+          ];
+      const insetPoints = horizontal
+        ? [
+            [insetCenterX >= sourceCenterX ? insetX : insetX + insetWidth, insetY],
+            [
+              insetCenterX >= sourceCenterX ? insetX : insetX + insetWidth,
+              insetY + insetHeight,
+            ],
+          ]
+        : [
+            [insetX, insetCenterY >= sourceCenterY ? insetY : insetY + insetHeight],
+            [
+              insetX + insetWidth,
+              insetCenterY >= sourceCenterY ? insetY : insetY + insetHeight,
+            ],
+          ];
+      return `
+        <g class="country-silhouette-inset-locator">
+          ${sourcePoints
+            .map(
+              (point, index) => `
+                <line
+                  class="country-silhouette-inset-connector"
+                  x1="${point[0]}"
+                  y1="${point[1]}"
+                  x2="${insetPoints[index][0]}"
+                  y2="${insetPoints[index][1]}"
+                />
+              `,
+            )
+            .join("")}
+          <rect
+            class="country-silhouette-source-frame"
+            x="${sourceX}"
+            y="${sourceY}"
+            width="${sourceWidth}"
+            height="${sourceHeight}"
+            rx="0.8"
+          />
+        </g>
+      `;
+    };
     const expandedMarkup = expandedSilhouette
       ? `
         <g class="country-silhouette-composition is-expanded-composition">
           ${silhouettePathMarkup(expandedSilhouette)}
+          ${expandedSilhouette.insets.map(silhouetteLocatorMarkup).join("")}
           ${expandedSilhouette.insets
             .map(
               (inset) => `
@@ -852,6 +928,11 @@
               `,
             )
             .join("")}
+          ${
+            expandedSilhouette.divisionPath
+              ? `<path class="country-silhouette-division" d="${expandedSilhouette.divisionPath}" />`
+              : ""
+          }
         </g>
       `
       : "";

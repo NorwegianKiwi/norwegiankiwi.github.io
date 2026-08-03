@@ -103,8 +103,14 @@ use up to eight representative dots in the compact inset; those dots disappear
 in the enlarged view so the detailed polygons take over.
 For countries with remote territories, declarative editorial rules can instead
 fit the recognizable main form in the compact inset and compose selected remote
-areas in separate, independently scaled frames when enlarged. This affects the
-silhouette only, not any quiz or Explore map.
+areas in separate, independently scaled frames when enlarged. These relocation
+frames preserve approximate compass direction and ordering, not exact distance
+or scale. A true zoom inset instead includes a source rectangle and connector
+lines. This affects the silhouette only, not any quiz or Explore map.
+Dispersed island states can use representative extent dots in the compact view
+and reveal their geographically positioned polygon geometry when enlarged.
+Frames are unlabelled, and capital stars are intentionally deferred. Cyprus is
+the sole silhouette whose enlarged view adds a dashed internal division guide.
 
 The Maps view in Explore reuses the same regional azimuthal equidistant maps and
 silhouettes. Active countries with Natural Earth tiny-country locator points

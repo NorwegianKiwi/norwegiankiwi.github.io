@@ -43,6 +43,20 @@ EXPECTED_REGION_COUNTS = {
 }
 
 
+def valid_silhouette_frame(frame):
+    return (
+        isinstance(frame, list)
+        and len(frame) == 4
+        and all(isinstance(value, (int, float)) for value in frame)
+        and frame[0] >= 0
+        and frame[1] >= 0
+        and frame[2] > 0
+        and frame[3] > 0
+        and frame[0] + frame[2] <= 100
+        and frame[1] + frame[3] <= 100
+    )
+
+
 def load_manifest():
     return json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
 
@@ -222,34 +236,104 @@ def validate_local_data(map_path=None):
         if silhouette.get("corner") != "bottom-left":
             errors.append(f"{code} har ikke silhuettvindu nederst til venstre")
         expanded = silhouette.get("expanded")
+        silhouette_override = manifest.get("silhouetteOverrides", {}).get(
+            code, {}
+        )
+        force_compact_markers = silhouette_override.get(
+            "forceCompactMarkers", False
+        )
+        if not isinstance(force_compact_markers, bool):
+            errors.append(f"{code} har ugyldig forceCompactMarkers-verdi")
+        if force_compact_markers and (path or not markers or not minor_path):
+            errors.append(
+                f"{code} bruker ikke tvungne kompaktmarkører som forventet"
+            )
         expected_expanded = bool(
-            manifest.get("silhouetteOverrides", {}).get(code, {}).get("insets")
+            silhouette_override.get("insets")
+            or silhouette_override.get("division")
         )
         if bool(expanded) != expected_expanded:
             errors.append(f"{code} har uventet forstørret silhuettkomposisjon")
         if expanded:
-            if not expanded.get("path") and not expanded.get("minorPath"):
+            insets = expanded.get("insets", [])
+            if (
+                not expanded.get("path")
+                and not expanded.get("minorPath")
+                and not insets
+            ):
                 errors.append(f"{code} har tom hovedform i forstørret silhuett")
-            insets = expanded.get("insets")
-            if not isinstance(insets, list) or not insets:
+            if not isinstance(insets, list):
                 errors.append(f"{code} mangler innfellinger")
                 continue
+            if silhouette_override.get("insets") and not insets:
+                errors.append(f"{code} mangler innfellinger")
+            if bool(expanded.get("divisionPath")) != bool(
+                silhouette_override.get("division")
+            ):
+                errors.append(f"{code} har uventet delelinje")
             for index, inset in enumerate(insets, start=1):
                 if not inset.get("path") and not inset.get("minorPath"):
                     errors.append(f"{code} har tom innfelling {index}")
                 frame = inset.get("frame")
-                if (
-                    not isinstance(frame, list)
-                    or len(frame) != 4
-                    or not all(isinstance(value, (int, float)) for value in frame)
-                    or frame[0] < 0
-                    or frame[1] < 0
-                    or frame[2] <= 0
-                    or frame[3] <= 0
-                    or frame[0] + frame[2] > 100
-                    or frame[1] + frame[3] > 100
-                ):
+                if not valid_silhouette_frame(frame):
                     errors.append(f"{code} har ugyldig ramme for innfelling {index}")
+                manifest_insets = silhouette_override.get("insets", [])
+                manifest_inset = (
+                    manifest_insets[index - 1]
+                    if index <= len(manifest_insets)
+                    else {}
+                )
+                connect_to_source = manifest_inset.get(
+                    "connectToSource", False
+                )
+                if not isinstance(connect_to_source, bool):
+                    errors.append(
+                        f"{code} har ugyldig connectToSource-verdi i "
+                        f"innfelling {index}"
+                    )
+                source_frame = inset.get("sourceFrame")
+                if bool(source_frame) != connect_to_source:
+                    errors.append(
+                        f"{code} har uventet kilderamme i innfelling {index}"
+                    )
+                if source_frame and not valid_silhouette_frame(source_frame):
+                    errors.append(
+                        f"{code} har ugyldig kilderamme i innfelling {index}"
+                    )
+                main_frame = silhouette_override.get("expandedMainFrame")
+                if (
+                    source_frame
+                    and valid_silhouette_frame(main_frame)
+                    and (
+                        source_frame[0] < main_frame[0]
+                        or source_frame[1] < main_frame[1]
+                        or source_frame[0] + source_frame[2]
+                        > main_frame[0] + main_frame[2]
+                        or source_frame[1] + source_frame[3]
+                        > main_frame[1] + main_frame[3]
+                    )
+                ):
+                    errors.append(
+                        f"{code} har kilderamme utenfor hovedrammen i "
+                        f"innfelling {index}"
+                    )
+
+    untouched_silhouette_codes = set(codes) - set(
+        manifest.get("silhouetteOverrides", {})
+    )
+    if map_path:
+        checked_in = load_generated_map()
+        changed_without_override = sorted(
+            code
+            for code in untouched_silhouette_codes
+            if checked_in["silhouettes"].get(code)
+            != map_data["silhouettes"].get(code)
+        )
+        if changed_without_override:
+            errors.append(
+                "Silhuetter endret uten redaksjonell regel: "
+                + ", ".join(changed_without_override)
+            )
 
     world_geometry = {
         feature["code"]

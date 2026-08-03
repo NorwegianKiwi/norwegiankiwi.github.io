@@ -74,6 +74,14 @@
     "silhouetteViewBox": "0 0 100 100",
     "coordinatePrecision": 1
   },
+  "markerOverrides": {
+    "sc": [55.45, -4.62]
+  },
+  "regionalGeometryOverrides": {
+    "cy": {
+      "includeSourceNames": ["Northern Cyprus"]
+    }
+  },
   "silhouetteOverrides": {
     "no": {
       "main": [{"bounds": [4, 57, 35, 72]}],
@@ -141,6 +149,71 @@
       "expandedMainFrame": [40, 5, 56, 90],
       "insets": [
         {"selection": [{"bounds": [-93, -2, -89, 2]}], "frame": [4, 32, 31, 34]}
+      ]
+    },
+    "sc": {
+      "main": [{"bounds": [55.2, -4.9, 56, -3.7]}],
+      "expandedMainFrame": [34, 4, 62, 66],
+      "insets": [
+        {"selection": [{"bounds": [46, -10, 48, -9]}], "frame": [4, 67, 28, 29]}
+      ]
+    },
+    "mu": {
+      "main": [{"bounds": [57.2, -20.6, 57.9, -19.9]}],
+      "expandedMainFrame": [24, 30, 52, 66],
+      "insets": [
+        {"selection": [{"bounds": [56.4, -10.5, 56.7, -10.2]}], "frame": [4, 4, 24, 24]},
+        {"selection": [{"bounds": [63.2, -19.9, 63.6, -19.5]}], "frame": [72, 8, 24, 26]}
+      ]
+    },
+    "cy": {
+      "includeSourceNames": [
+        "Northern Cyprus",
+        "Cyprus No Mans Area",
+        "Akrotiri Sovereign Base Area",
+        "Dhekelia Sovereign Base Area"
+      ],
+      "main": [{"bounds": [32.2, 34.5, 34.7, 35.8]}],
+      "mergeStroke": true,
+      "expandedMainFrame": [4, 4, 92, 92],
+      "division": [{"bounds": [32.5, 34.9, 34.1, 35.3], "sourceNames": ["Cyprus No Mans Area"]}]
+    },
+    "fj": {
+      "main": [
+        {"bounds": [176, -21.2, 180, -15.8]},
+        {"bounds": [-180, -21.2, -177, -15.8]}
+      ],
+      "expandedMainFrame": [30, 26, 66, 70],
+      "insets": [
+        {"selection": [{"bounds": [176.8, -12.7, 177.3, -12.3]}], "frame": [4, 4, 24, 24]}
+      ]
+    },
+    "mh": {
+      "main": [{"bounds": [164, 4, 173, 15]}],
+      "forceCompactMarkers": true
+    },
+    "pw": {
+      "main": [{"bounds": [134, 6.7, 135, 8.3]}],
+      "expandedMainFrame": [38, 4, 58, 66],
+      "insets": [
+        {"selection": [{"bounds": [131.8, 4.8, 132.5, 5.6]}], "frame": [8, 48, 26, 20]},
+        {"selection": [{"bounds": [130.8, 2.6, 132, 3.3]}], "frame": [4, 73, 30, 23]}
+      ]
+    },
+    "to": {
+      "main": [{"bounds": [-177, -23, -173, -15]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [-175.6, -21.7, -174.7, -20.8]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "tv": {
+      "main": [{"bounds": [175, -10, 181, -5]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [178.9, -8.7, 179.4, -8.3]}], "frame": [47, 18, 49, 64], "connectToSource": true}
       ]
     }
   },

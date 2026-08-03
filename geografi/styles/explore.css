@@ -152,6 +152,7 @@
   stroke: #6e7c72;
   stroke-width: 0.85;
   vector-effect: non-scaling-stroke;
+  paint-order: stroke fill;
   transition:
     fill 150ms ease,
     stroke 150ms ease,

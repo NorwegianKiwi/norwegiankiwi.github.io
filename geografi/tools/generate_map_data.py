@@ -323,7 +323,8 @@ def project_feature_rings(features, projection, transform, tolerance):
     return output
 
 
-def build_world(features, tiny_features, local_names):
+def build_world(features, tiny_features, local_names, marker_overrides=None):
+    marker_overrides = marker_overrides or {}
     raw_points = [
         equal_earth(*point)
         for feature in features
@@ -341,7 +342,8 @@ def build_world(features, tiny_features, local_names):
     for feature in tiny_features:
         if not feature["point"]:
             continue
-        x, y = transform(equal_earth(*feature["point"]))
+        marker_point = marker_overrides.get(feature["code"], feature["point"])
+        x, y = transform(equal_earth(*marker_point))
         markers.append(
             {
                 "code": feature["code"],
@@ -605,7 +607,9 @@ def build_active_markers(
     projection,
     transform,
     readable_sizes_by_code,
+    marker_overrides=None,
 ):
+    marker_overrides = marker_overrides or {}
     markers = []
     points_by_code = {}
     for feature in tiny_features:
@@ -616,7 +620,7 @@ def build_active_markers(
             or not point_in_bounds(feature["point"], selection_bounds, center)
         ):
             continue
-        longitude, latitude = feature["point"]
+        longitude, latitude = marker_overrides.get(code, feature["point"])
         longitude = wrap_longitude(longitude, center)
         x, y = transform(projection(longitude, latitude))
         point = (round(x, 1), round(y, 1))
@@ -686,10 +690,14 @@ def build_background_features(
     projection,
     transform,
     bleed,
+    excluded_feature_names=None,
 ):
+    excluded_feature_names = excluded_feature_names or set()
     output = []
     longitude_window = (center - 180, -85, center + 180, 85)
     for feature in features:
+        if feature["name"] in excluded_feature_names:
+            continue
         code = feature["code"]
         if code in active_codes:
             continue
@@ -728,6 +736,41 @@ def build_background_features(
     return output
 
 
+def apply_regional_geometry_overrides(features, overrides):
+    """Merge named source objects into a quiz country for regional maps."""
+    if not overrides:
+        return features
+    included_names = {
+        name
+        for settings in overrides.values()
+        for name in settings.get("includeSourceNames", [])
+    }
+    additions_by_code = {
+        code: [
+            feature
+            for feature in features
+            if feature["name"] in settings.get("includeSourceNames", [])
+        ]
+        for code, settings in overrides.items()
+    }
+    output = []
+    for feature in features:
+        if feature["name"] in included_names:
+            continue
+        additions = additions_by_code.get(feature["code"], [])
+        if not additions:
+            output.append(feature)
+            continue
+        output.append(
+            {
+                **feature,
+                "rings": feature["rings"]
+                + [ring for addition in additions for ring in addition["rings"]],
+            }
+        )
+    return output
+
+
 def build_region_views(
     active_features,
     background_features,
@@ -735,6 +778,8 @@ def build_region_views(
     local_names,
     region_settings,
     active_codes_by_scope,
+    marker_overrides=None,
+    regional_geometry_overrides=None,
 ):
     regions = {}
     for region, settings in region_settings.items():
@@ -746,6 +791,13 @@ def build_region_views(
             bounds, center, projection, *QUIZ_SIZE
         )
         active_codes = active_codes_by_scope[region]
+        excluded_background_names = {
+            name
+            for code in active_codes
+            for name in (regional_geometry_overrides or {})
+            .get(code, {})
+            .get("includeSourceNames", [])
+        }
         selection_bounds = expanded_selection_bounds(bounds, center)
         (
             output_features,
@@ -769,6 +821,7 @@ def build_region_views(
             projection,
             transform,
             readable_sizes_by_code,
+            marker_overrides,
         )
         camera = camera_view_box(feature_points, marker_points)
         bleed = bleed_view_box(camera)
@@ -785,6 +838,7 @@ def build_region_views(
                 projection,
                 transform,
                 bleed,
+                excluded_background_names,
             ),
         }
         regions[region] = view
@@ -863,7 +917,7 @@ def selected_silhouette_rings(rings, selection):
     ]
 
 
-def build_silhouette_layer(ring_items, frame=(0, 0, 100, 100), padding=8):
+def silhouette_projection(ring_items, frame=(0, 0, 100, 100), padding=8):
     if not ring_items:
         raise ValueError("Tomt geografisk utvalg for silhuett")
     rings = [item["ring"] for item in ring_items]
@@ -893,16 +947,88 @@ def build_silhouette_layer(ring_items, frame=(0, 0, 100, 100), padding=8):
         x, y = local_transform(point)
         return x + frame_x, y + frame_y
 
+    return {
+        "center": center,
+        "longitudeScale": longitude_scale,
+        "transform": transform,
+        "projectedRings": [
+            [
+                transform(((lon - center) * longitude_scale, -lat))
+                for lon, lat in ring
+            ]
+            for ring in wrapped_rings
+        ],
+    }
+
+
+def project_silhouette_ring(ring, projection):
+    center = projection["center"]
+    longitude_scale = projection["longitudeScale"]
+    transform = projection["transform"]
+    return [
+        transform(
+            (
+                (wrap_longitude(lon, center) - center) * longitude_scale,
+                -lat,
+            )
+        )
+        for lon, lat in ring
+    ]
+
+
+def silhouette_source_frame(main_items, source_items, frame, padding=3):
+    projection = silhouette_projection(main_items, frame, padding)
+    points = [
+        point
+        for item in source_items
+        for point in project_silhouette_ring(item["ring"], projection)
+    ]
+    if not points:
+        raise ValueError("Tom kildegeometri for silhuettinnfelling")
+
+    frame_x, frame_y, frame_width, frame_height = frame
+    min_x = min(point[0] for point in points) - 1.5
+    max_x = max(point[0] for point in points) + 1.5
+    min_y = min(point[1] for point in points) - 1.5
+    max_y = max(point[1] for point in points) + 1.5
+    minimum_size = 5
+    if max_x - min_x < minimum_size:
+        center_x = (min_x + max_x) / 2
+        min_x = center_x - minimum_size / 2
+        max_x = center_x + minimum_size / 2
+    if max_y - min_y < minimum_size:
+        center_y = (min_y + max_y) / 2
+        min_y = center_y - minimum_size / 2
+        max_y = center_y + minimum_size / 2
+
+    min_x = max(frame_x, min(min_x, frame_x + frame_width - minimum_size))
+    min_y = max(frame_y, min(min_y, frame_y + frame_height - minimum_size))
+    max_x = min(frame_x + frame_width, max(max_x, min_x + minimum_size))
+    max_y = min(frame_y + frame_height, max(max_y, min_y + minimum_size))
+    return [
+        round(min_x, 1),
+        round(min_y, 1),
+        round(max_x - min_x, 1),
+        round(max_y - min_y, 1),
+    ]
+
+
+def build_silhouette_layer(
+    ring_items,
+    frame=(0, 0, 100, 100),
+    padding=8,
+    division_items=None,
+    merge_stroke=False,
+    force_markers=False,
+):
+    projection = silhouette_projection(ring_items, frame, padding)
+
     path_rings = []
     marker_candidates = []
-    for index, ring in enumerate(wrapped_rings):
-        projected = [
-            transform(((lon - center) * longitude_scale, -lat))
-            for lon, lat in ring
-        ]
+    for index, projected in enumerate(projection["projectedRings"]):
         width = max(x for x, _ in projected) - min(x for x, _ in projected)
         height = max(y for _, y in projected) - min(y for _, y in projected)
-        if width < 1.4 and height < 1.4:
+        if force_markers or (width < 1.4 and height < 1.4):
             marker_candidates.append(
                 {
                     "x": round(sum(x for x, _ in projected) / len(projected), 1),
@@ -919,7 +1045,7 @@ def build_silhouette_layer(ring_items, frame=(0, 0, 100, 100), padding=8):
         if path_rings
         else representative_silhouette_markers(marker_candidates)
     )
-    return {
+    layer = {
         "path": path_from_rings(path_rings),
         "minorPath": path_from_rings(
             [
@@ -929,12 +1055,26 @@ def build_silhouette_layer(ring_items, frame=(0, 0, 100, 100), padding=8):
         ),
         "markers": markers,
     }
+    if merge_stroke:
+        layer["mergeStroke"] = True
+    if division_items:
+        division_rings = []
+        for item in division_items:
+            projected = project_silhouette_ring(item["ring"], projection)
+            division_rings.append(simplify(projected, 0.08))
+        layer["divisionPath"] = path_from_rings(division_rings)
+    return layer
 
 
 def build_silhouettes(features, country_codes, overrides=None):
     overrides = overrides or {}
     by_code = {}
+    by_name = {}
     for feature in features:
+        by_name.setdefault(feature["name"], []).extend(
+            {"ring": ring, "sourceName": feature["name"]}
+            for ring in feature["rings"]
+        )
         if feature["code"] in country_codes:
             by_code.setdefault(feature["code"], []).extend(
                 {"ring": ring, "sourceName": feature["name"]}
@@ -947,30 +1087,65 @@ def build_silhouettes(features, country_codes, overrides=None):
         if not ring_items:
             raise ValueError(f"Mangler 1:10m-ringer for {code}")
         override = overrides.get(code)
+        if override:
+            ring_items = ring_items + [
+                item
+                for source_name in override.get("includeSourceNames", [])
+                for item in by_name.get(source_name, [])
+            ]
         main_items = (
             selected_silhouette_rings(ring_items, override["main"])
             if override else ring_items
         )
         silhouette = {
-            **build_silhouette_layer(main_items),
+            **build_silhouette_layer(
+                main_items,
+                merge_stroke=bool(override and override.get("mergeStroke")),
+                force_markers=bool(
+                    override and override.get("forceCompactMarkers")
+                ),
+            ),
             "corner": "bottom-left",
         }
-        if override and override.get("insets"):
-            expanded_main = build_silhouette_layer(
-                main_items,
-                override["expandedMainFrame"],
-                padding=3,
+        if override and (override.get("insets") or override.get("division")):
+            division_items = (
+                selected_silhouette_rings(ring_items, override["division"])
+                if override.get("division")
+                else None
             )
-            expanded_main.pop("markers")
-            expanded_main["insets"] = []
-            for inset in override["insets"]:
+            if override.get("expandedPanelsOnly"):
+                expanded_main = {"path": "", "minorPath": "", "insets": []}
+            else:
+                expanded_main = build_silhouette_layer(
+                    main_items,
+                    override["expandedMainFrame"],
+                    padding=3,
+                    division_items=division_items,
+                    merge_stroke=bool(override.get("mergeStroke")),
+                )
+            expanded_main.pop("markers", None)
+            expanded_main.setdefault("insets", [])
+            for inset in override.get("insets", []):
+                inset_items = selected_silhouette_rings(
+                    ring_items, inset["selection"]
+                )
                 inset_layer = build_silhouette_layer(
-                    selected_silhouette_rings(ring_items, inset["selection"]),
+                    inset_items,
                     inset["frame"],
                     padding=3,
                 )
                 inset_layer.pop("markers")
                 inset_layer["frame"] = inset["frame"]
+                if inset.get("connectToSource"):
+                    source_items = selected_silhouette_rings(
+                        main_items, inset["selection"]
+                    )
+                    inset_layer["sourceFrame"] = silhouette_source_frame(
+                        main_items,
+                        source_items,
+                        override["expandedMainFrame"],
+                        padding=3,
+                    )
                 expanded_main["insets"].append(inset_layer)
             silhouette["expanded"] = expanded_main
         silhouettes[code] = silhouette
@@ -1010,6 +1185,7 @@ def write_candidate(path, data):
     if (silhouette.expanded) {{
       silhouette.expanded.insets.forEach((inset) => {{
         Object.freeze(inset.frame);
+        if (inset.sourceFrame) Object.freeze(inset.sourceFrame);
         Object.freeze(inset);
       }});
       Object.freeze(silhouette.expanded.insets);
@@ -1089,9 +1265,13 @@ def main():
             for feature in tiny50
             if feature["code"] in country_codes
         }
+        marker_overrides = manifest.get("markerOverrides", {})
+        regional_countries50 = apply_regional_geometry_overrides(
+            countries50, manifest.get("regionalGeometryOverrides", {})
+        )
         regional_active_features = [
             feature
-            for feature in countries50
+            for feature in regional_countries50
             if feature["code"] not in tiny_codes
         ] + [
             feature for feature in countries10 if feature["code"] in tiny_codes
@@ -1104,9 +1284,22 @@ def main():
         if args.base_map:
             world_features = existing["features"]
             world_markers = existing["markers"]
+            if marker_overrides:
+                _, regenerated_world_markers = build_world(
+                    countries50, tiny50, local_names, marker_overrides
+                )
+                replacement_markers = {
+                    marker["code"]: marker
+                    for marker in regenerated_world_markers
+                    if marker["code"] in marker_overrides
+                }
+                world_markers = [
+                    replacement_markers.get(marker["code"], marker)
+                    for marker in world_markers
+                ]
         else:
             world_features, world_markers = build_world(
-                countries50, tiny50, local_names
+                countries50, tiny50, local_names, marker_overrides
             )
         quiz_active_codes = {
             region: {
@@ -1135,6 +1328,8 @@ def main():
                 local_names,
                 manifest["quizRegions"],
                 quiz_active_codes,
+                marker_overrides,
+                manifest.get("regionalGeometryOverrides", {}),
             )
             overview_regions = build_region_views(
                 regional_active_features,
@@ -1143,6 +1338,8 @@ def main():
                 local_names,
                 manifest.get("overviewRegions", {}),
                 overview_active_codes,
+                marker_overrides,
+                manifest.get("regionalGeometryOverrides", {}),
             )
         silhouette_overrides = manifest.get("silhouetteOverrides", {})
         if args.refresh_silhouette_overrides:

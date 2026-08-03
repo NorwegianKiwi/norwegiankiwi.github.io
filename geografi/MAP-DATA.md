@@ -101,16 +101,31 @@ The committed geometry consists of three separate products:
    Background geography remains at 1:50m. Oceania wraps around 180°.
 3. Shape inset: 1:10m, north-up silhouette, `0 0 100 100`. Very small
    components are retained as separate polygon geometry with lighter stroke
-   treatment. Only countries whose entire geometry is below the readability
+   treatment. Countries whose entire geometry is below the readability
    threshold receive up to eight representative points in the compact shape
-   inset.
+   inset. An editorial rule can force the same compact-marker treatment for a
+   dispersed island state whose few readable components would otherwise hide
+   the country's full extent; the real geometry always replaces those markers
+   when enlarged.
 
-Eleven countries have editorial silhouette rules in `silhouetteOverrides` in
-`tools/map-sources.json`. Their compact shape is fitted from an explicit set
-of geographic components. The expanded composition may place remote inhabited
-areas in separate, unlabelled frames with independent scales. These rules
+Countries with dispersed islands or remote territories can have editorial
+silhouette rules in `silhouetteOverrides` in `tools/map-sources.json`. Their
+compact shape is fitted from an explicit set of geographic components. The
+expanded composition may place remote inhabited areas in separate, unlabelled
+frames with independent scales. Relocated island frames preserve approximate
+compass direction and ordering relative to the main form, but do not imply
+exact distance or a shared scale. A true enlargement of geometry already shown
+in the nationwide overview has a source rectangle and two connector lines.
+Compositions may include an optional `divisionPath` for internal geographic
+context. Named Natural Earth objects without a quiz code can be included
+explicitly when a complete land form spans multiple source objects. These rules
 affect only silhouettes; they must never be reused to filter the world or
-regional maps.
+regional maps. Frames remain unlabelled, and capital stars are deferred.
+
+`markerOverrides` corrects a tiny-country locator whose Natural Earth point is
+not on the pedagogically useful main island. `regionalGeometryOverrides` is a
+separate, narrowly scoped mechanism for combining source objects on a regional
+map; it must not alter the world map or silently change quiz membership.
 
 The geometry was simplified and coordinates were rounded to one decimal place.
 Natural Earth tiny-country points are used when a polygon is too small to be
@@ -205,8 +220,10 @@ The silhouettes use a country-centered equirectangular projection with one
 fixed standard parallel for the entire country. This preserves north-up
 orientation without giving different latitudes different horizontal scales
 and thereby skewing the shape.
-All shape insets are placed in the lower-left corner. Expanded compositions can
-contain unlabelled internal frames defined by the manifest. The generator
+All compact shape insets are placed in the lower-left corner. Expanded
+compositions can contain unlabelled internal frames defined by the manifest.
+Remote groups are placed in their approximate direction from the main form;
+zoom frames use a generated source locator and connector lines. The generator
 refuses to write directly to `world-map.js`. If a future update requires more
 advanced geometry processing, GDAL/QGIS, D3 Geo, or Mapshaper may be used
 offline, but the result must still be serialized to the same public interface:
