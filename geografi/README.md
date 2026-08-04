@@ -113,8 +113,10 @@ Frames are unlabelled. Enlarged silhouettes mark each listed capital with a
 small five-pointed star; compact silhouettes and regional maps do not. Monaco
 and Vatican City are explicit exceptions because each capital is effectively
 coextensive with its city-state. Capital coordinates come from Natural Earth
-1:10m Populated Places with documented editorial overrides. Cyprus is the sole
-silhouette whose enlarged view adds a dashed internal division guide.
+1:10m Populated Places with documented editorial overrides. Cyprus and Somalia
+are the silhouettes whose enlarged views add a dashed internal division guide.
+Cyprus follows the UN buffer zone, while Somalia's guide follows the shared
+Natural Earth boundary with Somaliland.
 
 The Maps view in Explore reuses the same regional azimuthal equidistant maps and
 silhouettes. Active countries with Natural Earth tiny-country locator points
@@ -192,3 +194,10 @@ and EU membership with support from
 [European Union](https://european-union.europa.eu/principles-countries-history/eu-countries/cyprus_en),
 and South Africa's three capitals with support from the
 [South African Government](https://www.gov.za/south-africa-glance).
+Somaliland is included in Somalia's regional geometry and silhouette as a
+pedagogical de jure country outline, while the enlarged silhouette retains its
+de facto separation as a dashed guide. This combines Natural Earth's
+[de facto boundary policy](https://www.naturalearthdata.com/about/disputed-boundaries-policy/)
+with the UN Security Council's reaffirmation of Somalia's sovereignty,
+territorial integrity, and unity in
+[resolution 2809 (2025)](https://digitallibrary.un.org/record/4096834?ln=en).

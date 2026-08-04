@@ -482,6 +482,7 @@ def validate_local_data(map_path=None):
         expected_expanded = bool(
             silhouette_override.get("insets")
             or silhouette_override.get("division")
+            or silhouette_override.get("divisionSharedBoundary")
         )
         if bool(expanded) != expected_expanded:
             errors.append(f"{code} har uventet forstørret silhuettkomposisjon")
@@ -498,10 +499,33 @@ def validate_local_data(map_path=None):
                 continue
             if silhouette_override.get("insets") and not insets:
                 errors.append(f"{code} mangler innfellinger")
-            if bool(expanded.get("divisionPath")) != bool(
+            expects_division = bool(
                 silhouette_override.get("division")
-            ):
+                or silhouette_override.get("divisionSharedBoundary")
+            )
+            if bool(expanded.get("divisionPath")) != expects_division:
                 errors.append(f"{code} har uventet delelinje")
+            shared_boundary = silhouette_override.get(
+                "divisionSharedBoundary"
+            )
+            if shared_boundary:
+                if silhouette_override.get("division"):
+                    errors.append(
+                        f"{code} kombinerer to typer delelinje"
+                    )
+                source_names = shared_boundary.get("sourceNames", [])
+                if (
+                    len(source_names) != 2
+                    or len(set(source_names)) != 2
+                ):
+                    errors.append(
+                        f"{code} har ugyldige kildenavn for delt grense"
+                    )
+                division_path = expanded.get("divisionPath", "")
+                if "Z" in division_path or "L" not in division_path:
+                    errors.append(
+                        f"{code} har ikke en åpen intern delelinje"
+                    )
             for index, inset in enumerate(insets, start=1):
                 if not inset.get("path") and not inset.get("minorPath"):
                     errors.append(f"{code} har tom innfelling {index}")

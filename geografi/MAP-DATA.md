@@ -119,10 +119,15 @@ compass direction and ordering relative to the main form, but do not imply
 exact distance or a shared scale. A true enlargement of geometry already shown
 in the nationwide overview has a source rectangle and two connector lines.
 Compositions may include an optional `divisionPath` for internal geographic
-context. Named Natural Earth objects without a quiz code can be included
-explicitly when a complete land form spans multiple source objects. These rules
-affect only silhouettes; they must never be reused to filter the world or
-regional maps. Frames remain unlabelled.
+context. A division can select polygon geometry, as with Cyprus's UN buffer
+zone, or derive only the shared open boundary between two named source objects,
+as with Somalia and Somaliland. Shared-boundary generation fails when the two
+objects do not have matching source segments, preventing a coastline or closed
+territory outline from being substituted accidentally. Named Natural Earth
+objects without a quiz code can be included explicitly when a complete land
+form spans multiple source objects. These rules affect only silhouettes; they
+must never be reused to filter the world or regional maps. Frames remain
+unlabelled.
 
 Expanded silhouettes mark the capitals listed in `countries.js` with small
 five-pointed stars. The generator matches the English editorial names against
@@ -138,6 +143,10 @@ omits Monaco and Vatican City; San Marino follows the normal rule.
 not on the pedagogically useful main island. `regionalGeometryOverrides` is a
 separate, narrowly scoped mechanism for combining source objects on a regional
 map; it must not alter the world map or silently change quiz membership.
+Somaliland is combined with Somalia in regional views and silhouettes, but it
+does not become a separate quiz country. The enlarged Somalia silhouette marks
+their shared de facto boundary with the same dashed guide style used for other
+internal geographic context.
 
 The geometry was simplified and coordinates were rounded to one decimal place.
 Natural Earth tiny-country points are used when a polygon is too small to be
@@ -277,6 +286,9 @@ Before replacing `world-map.js`:
   in West and Central Asia. Both the region map and the shape inset must show
   all of Russia, including Kaliningrad and the geometry at the date line.
 - Inspect Kosovo, Palestine, and all new code overrides separately.
+- Confirm that Somalia includes Somaliland in its active regional geometry and
+  compact silhouette, while only the enlarged silhouette shows their shared
+  boundary as an open dashed line that does not follow the coast.
 - Inspect the date line for Russia, the United States, Fiji, Kiribati, and
   Oceania.
 - Inspect microstates and island nations, especially Vatican City, Monaco,

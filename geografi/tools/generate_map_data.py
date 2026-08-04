@@ -190,6 +190,23 @@ def path_from_segments(segments, precision=1):
     )
 
 
+def path_from_polylines(lines, precision=1):
+    commands = []
+    for line in lines:
+        if len(line) < 2:
+            continue
+        commands.append(
+            "M"
+            + f"{format_number(line[0][0], precision)},{format_number(line[0][1], precision)}"
+            + "L"
+            + " ".join(
+                f"{format_number(x, precision)},{format_number(y, precision)}"
+                for x, y in line[1:]
+            )
+        )
+    return "".join(commands)
+
+
 def equal_earth(longitude, latitude):
     a1, a2, a3, a4 = 1.340264, -0.081106, 0.000893, 0.003796
     radians = math.pi / 180
@@ -918,6 +935,91 @@ def selected_silhouette_rings(rings, selection):
     ]
 
 
+def ring_edges(ring):
+    edges = list(zip(ring, ring[1:]))
+    if ring and ring[0] != ring[-1]:
+        edges.append((ring[-1], ring[0]))
+    return [(start, end) for start, end in edges if start != end]
+
+
+def undirected_edge(start, end):
+    return tuple(sorted((start, end)))
+
+
+def joined_boundary_lines(segments):
+    remaining = {undirected_edge(start, end) for start, end in segments}
+    adjacency = {}
+    for start, end in remaining:
+        adjacency.setdefault(start, set()).add(end)
+        adjacency.setdefault(end, set()).add(start)
+    if any(len(neighbours) > 2 for neighbours in adjacency.values()):
+        raise ValueError("Delt silhuettgrense har en tvetydig forgrening")
+
+    lines = []
+    while remaining:
+        active_points = {point for edge in remaining for point in edge}
+        endpoints = sorted(
+            point
+            for point in active_points
+            if sum(
+                undirected_edge(point, neighbour) in remaining
+                for neighbour in adjacency[point]
+            )
+            == 1
+        )
+        current = endpoints[0] if endpoints else min(active_points)
+        line = [current]
+        while True:
+            neighbours = sorted(
+                neighbour
+                for neighbour in adjacency[current]
+                if undirected_edge(current, neighbour) in remaining
+            )
+            if not neighbours:
+                break
+            following = neighbours[0]
+            remaining.remove(undirected_edge(current, following))
+            line.append(following)
+            current = following
+        lines.append(line)
+    return lines
+
+
+def shared_silhouette_boundary(ring_items, settings):
+    source_names = settings.get("sourceNames", [])
+    if len(source_names) != 2 or len(set(source_names)) != 2:
+        raise ValueError(
+            "divisionSharedBoundary krever nøyaktig to unike sourceNames"
+        )
+    edges_by_name = []
+    for source_name in source_names:
+        matching_rings = [
+            item["ring"]
+            for item in ring_items
+            if item["sourceName"] == source_name
+        ]
+        if not matching_rings:
+            raise ValueError(
+                f"Fant ikke kildeobjektet {source_name!r} for delt grense"
+            )
+        edges_by_name.append(
+            {
+                undirected_edge(start, end): (start, end)
+                for ring in matching_rings
+                for start, end in ring_edges(ring)
+            }
+        )
+    shared_edges = edges_by_name[0].keys() & edges_by_name[1].keys()
+    if not shared_edges:
+        raise ValueError(
+            "Fant ingen felles grensesegmenter mellom "
+            + " og ".join(repr(name) for name in source_names)
+        )
+    return joined_boundary_lines(
+        [edges_by_name[0][edge] for edge in shared_edges]
+    )
+
+
 def silhouette_projection(ring_items, frame=(0, 0, 100, 100), padding=8):
     if not ring_items:
         raise ValueError("Tomt geografisk utvalg for silhuett")
@@ -1049,7 +1151,9 @@ def build_silhouette_capitals(
         )
 
         if not override or not (
-            override.get("insets") or override.get("division")
+            override.get("insets")
+            or override.get("division")
+            or override.get("divisionSharedBoundary")
         ):
             projection = silhouette_projection(main_items)
             output[code] = {
@@ -1144,6 +1248,7 @@ def build_silhouette_layer(
     frame=(0, 0, 100, 100),
     padding=8,
     division_items=None,
+    division_lines=None,
     merge_stroke=False,
     force_markers=False,
 ):
@@ -1189,6 +1294,12 @@ def build_silhouette_layer(
             projected = project_silhouette_ring(item["ring"], projection)
             division_rings.append(simplify(projected, 0.08))
         layer["divisionPath"] = path_from_rings(division_rings)
+    if division_lines:
+        projected_lines = [
+            simplify(project_silhouette_ring(line, projection), 0.08)
+            for line in division_lines
+        ]
+        layer["divisionPath"] = path_from_polylines(projected_lines)
     return layer
 
 
@@ -1233,10 +1344,28 @@ def build_silhouettes(features, country_codes, overrides=None):
             ),
             "corner": "bottom-left",
         }
-        if override and (override.get("insets") or override.get("division")):
+        if override and (
+            override.get("insets")
+            or override.get("division")
+            or override.get("divisionSharedBoundary")
+        ):
+            if override.get("division") and override.get(
+                "divisionSharedBoundary"
+            ):
+                raise ValueError(
+                    f"{code} kan ikke kombinere division og "
+                    "divisionSharedBoundary"
+                )
             division_items = (
                 selected_silhouette_rings(ring_items, override["division"])
                 if override.get("division")
+                else None
+            )
+            division_lines = (
+                shared_silhouette_boundary(
+                    ring_items, override["divisionSharedBoundary"]
+                )
+                if override.get("divisionSharedBoundary")
                 else None
             )
             if override.get("expandedPanelsOnly"):
@@ -1247,6 +1376,7 @@ def build_silhouettes(features, country_codes, overrides=None):
                     override["expandedMainFrame"],
                     padding=3,
                     division_items=division_items,
+                    division_lines=division_lines,
                     merge_stroke=bool(override.get("mergeStroke")),
                 )
             expanded_main.pop("markers", None)

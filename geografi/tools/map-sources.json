@@ -113,6 +113,9 @@
   "regionalGeometryOverrides": {
     "cy": {
       "includeSourceNames": ["Northern Cyprus"]
+    },
+    "so": {
+      "includeSourceNames": ["Somaliland"]
     }
   },
   "silhouetteOverrides": {
@@ -211,6 +214,13 @@
       "expandedMainFrame": [4, 4, 92, 92],
       "division": [{"bounds": [32.5, 34.9, 34.1, 35.3], "sourceNames": ["Cyprus No Mans Area"]}]
     },
+    "so": {
+      "includeSourceNames": ["Somaliland"],
+      "main": [{"bounds": [40, -2, 52, 13]}],
+      "mergeStroke": true,
+      "expandedMainFrame": [4, 4, 92, 92],
+      "divisionSharedBoundary": {"sourceNames": ["Somalia", "Somaliland"]}
+    },
     "fj": {
       "main": [
         {"bounds": [176, -21.2, 180, -15.8]},
@@ -254,6 +264,7 @@
     "quizCountryList": "countries.js is authoritative; Natural Earth does not decide which entities are quiz countries",
     "quizRegionMembership": "countries.js is the only source of region membership",
     "russia": "Pedagogical exception: Russia belongs to East and South Asia; both its regional map and silhouette show the complete country",
+    "somalia": "Pedagogical exception: Somaliland is included in Somalia on regional maps and silhouettes; the enlarged silhouette marks their shared de facto boundary",
     "transcontinentalCountries": "Each quiz country has exactly one canonical region",
     "territories": "Natural Earth features not present in countries.js are non-selectable context",
     "disputedBoundaries": "Use the unmodified Natural Earth default de facto viewpoint, not a country-specific POV download",
