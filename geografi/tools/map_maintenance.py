@@ -357,6 +357,35 @@ def validate_local_data(map_path=None):
     if invalid_regions:
         errors.append(f"Ugyldige regioner: {', '.join(invalid_regions)}")
 
+    world_overrides = manifest.get("worldGeometryOverrides", {})
+    if not isinstance(world_overrides, dict):
+        errors.append("worldGeometryOverrides er ikke et objekt")
+        world_overrides = {}
+    world_features = map_data.get("features", [])
+    override_counts = Counter(world_overrides.values())
+    for feature_name, code in world_overrides.items():
+        if not isinstance(feature_name, str) or not feature_name:
+            errors.append("worldGeometryOverrides har ugyldig objektnavn")
+        if code not in codes:
+            errors.append(
+                f"worldGeometryOverrides bruker ukjent quizkode {code!r}"
+            )
+        if any(
+            feature.get("name") == feature_name
+            for feature in world_features
+        ):
+            errors.append(
+                f"Verdensobjektet {feature_name!r} er fortsatt kontekst"
+            )
+    world_feature_counts = Counter(
+        feature.get("code") for feature in world_features
+    )
+    for code, override_count in override_counts.items():
+        if code in codes and world_feature_counts[code] < override_count + 1:
+            errors.append(
+                f"{code} mangler verdensgeometri fra redaksjonell regel"
+            )
+
     flag_codes = {path.stem for path in (ROOT / "flags").glob("*.svg")}
     missing_flags = sorted(set(codes) - flag_codes)
     extra_flags = sorted(flag_codes - set(codes))

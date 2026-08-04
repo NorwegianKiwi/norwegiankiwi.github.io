@@ -661,15 +661,35 @@
     const codeAttribute = feature.code
       ? ` data-code="${escapeHtml(feature.code)}"`
       : "";
+    const mergedClass = feature.mergeStroke ? " is-merged-shape" : "";
     return `
       <path
-        class="map-country ${mapShapeIsActive(region) ? "is-active" : ""}"
+        class="map-country${mapShapeIsActive(region) ? " is-active" : ""}${mergedClass}"
         d="${feature.path}"
         data-region="${escapeHtml(region ?? "")}"
         ${codeAttribute}
         vector-effect="non-scaling-stroke"
       />
     `;
+  }
+
+  function mergedWorldRegionFeatures(regionId) {
+    const mergedByCode = new Map();
+    const output = [];
+    mapData.features
+      .filter((feature) => mapRegionForCode(feature.code) === regionId)
+      .forEach((feature) => {
+        const existing = mergedByCode.get(feature.code);
+        if (existing) {
+          existing.path += feature.path;
+          existing.mergeStroke = true;
+          return;
+        }
+        const copy = { ...feature };
+        mergedByCode.set(feature.code, copy);
+        output.push(copy);
+      });
+    return output;
   }
 
   function mapMarkerMarkup(marker) {
@@ -690,10 +710,7 @@
   function mapRegionMarkup(regionId) {
     const region = regionOptions.find((option) => option.id === regionId);
     const count = countriesInRegion(regionId).length;
-    const paths = mapData.features
-      .filter(
-        (feature) => mapRegionForCode(feature.code) === regionId,
-      )
+    const paths = mergedWorldRegionFeatures(regionId)
       .map(mapPathMarkup)
       .join("");
     const markers = mapData.markers

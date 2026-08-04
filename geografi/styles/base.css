@@ -287,6 +287,10 @@ a:focus-visible {
     opacity 150ms ease;
 }
 
+.map-country.is-merged-shape {
+  paint-order: stroke fill;
+}
+
 .map-context {
   pointer-events: none;
 }

@@ -201,6 +201,23 @@ python3 tools/generate_map_data.py \
   --refresh-silhouette-overrides
 ```
 
+Existing generated context polygons can be assigned to a quiz country through
+`worldGeometryOverrides`. This changes only their country code and localized
+name; paths, ordering, markers, regional maps, and silhouettes remain
+byte-for-byte unchanged. Apply these rules without reprojection using:
+
+```sh
+python3 tools/generate_map_data.py \
+  /tmp/geografi-map-sources \
+  /tmp/world-map.candidate.js \
+  --base-map world-map.js \
+  --refresh-world-overrides
+```
+
+The command fails if a configured generated feature name is missing or
+ambiguous. Use it instead of a full world regeneration when the checked-in
+legacy world projection must remain unchanged.
+
 Each region map has active countries in `features` and `markers`, while
 `backgroundFeatures` contains only inactive geography. All three collections
 use the same central meridian, projection, and simplification tolerance.

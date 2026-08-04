@@ -201,3 +201,6 @@ de facto separation as a dashed guide. This combines Natural Earth's
 with the UN Security Council's reaffirmation of Somalia's sovereignty,
 territorial integrity, and unity in
 [resolution 2809 (2025)](https://digitallibrary.un.org/record/4096834?ln=en).
+On the front-page world map, the existing Somaliland and Northern Cyprus
+context polygons are assigned to Somalia and Cyprus respectively without
+reprojecting or altering any other world geometry.

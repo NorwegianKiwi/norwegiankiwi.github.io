@@ -789,6 +789,76 @@ def apply_regional_geometry_overrides(features, overrides):
     return output
 
 
+def apply_world_geometry_overrides(features, overrides, local_names):
+    """Assign existing generated context objects to quiz countries."""
+    if not overrides:
+        return features
+    generated_names = {}
+    generated_counts = {}
+    for code in set(overrides.values()):
+        target_features = [
+            feature
+            for feature in features
+            if feature.get("code") == code
+        ]
+        names = {
+            feature["name"]
+            for feature in target_features
+        }
+        if len(names) != 1:
+            raise ValueError(
+                f"Forventet ett generert landnavn for {code!r}, "
+                f"fant {len(names)}"
+            )
+        generated_names[code] = names.pop()
+        generated_counts[code] = len(target_features)
+    missing_by_code = {}
+    for feature_name, code in overrides.items():
+        if code not in local_names:
+            raise ValueError(
+                f"Ukjent quizkode {code!r} i worldGeometryOverrides"
+            )
+        matches = [
+            feature
+            for feature in features
+            if feature["name"] == feature_name
+        ]
+        if len(matches) != 1:
+            if matches:
+                raise ValueError(
+                    f"Forventet ett verdensobjekt kalt {feature_name!r}, "
+                    f"fant {len(matches)}"
+                )
+            missing_by_code[code] = missing_by_code.get(code, 0) + 1
+    for code, missing_count in missing_by_code.items():
+        if generated_counts[code] < missing_count + 1:
+            missing_names = [
+                name
+                for name, target_code in overrides.items()
+                if target_code == code
+                and not any(
+                    feature["name"] == name for feature in features
+                )
+            ]
+            raise ValueError(
+                "Fant ikke verdensobjektet "
+                + ", ".join(repr(name) for name in missing_names)
+            )
+
+    return [
+        (
+            {
+                **feature,
+                "code": overrides[feature["name"]],
+                "name": generated_names[overrides[feature["name"]]],
+            }
+            if feature["name"] in overrides
+            else feature
+        )
+        for feature in features
+    ]
+
+
 def build_region_views(
     active_features,
     background_features,
@@ -1496,11 +1566,28 @@ def main():
             "preserving every other map and silhouette from --base-map."
         ),
     )
+    parser.add_argument(
+        "--refresh-world-overrides",
+        action="store_true",
+        help=(
+            "Apply only worldGeometryOverrides to existing generated world "
+            "objects while preserving every other datum from --base-map."
+        ),
+    )
     args = parser.parse_args()
     if args.refresh_silhouette_overrides and not args.base_map:
         parser.error("--refresh-silhouette-overrides krever --base-map")
     if args.refresh_silhouette_overrides and args.refresh_silhouettes:
         parser.error("Velg bare én metode for å regenerere silhuetter")
+    if args.refresh_world_overrides and not args.base_map:
+        parser.error("--refresh-world-overrides krever --base-map")
+    if args.refresh_world_overrides and (
+        args.refresh_silhouettes or args.refresh_silhouette_overrides
+    ):
+        parser.error(
+            "--refresh-world-overrides kan ikke kombineres med "
+            "silhuettoppdatering"
+        )
     if args.output.resolve() == (ROOT / "world-map.js").resolve():
         parser.error(
             "Av sikkerhetshensyn kan ikke generatoren skrive direkte til "
@@ -1558,7 +1645,13 @@ def main():
         if args.base_map:
             world_features = existing["features"]
             world_markers = existing["markers"]
-            if marker_overrides:
+            if args.refresh_world_overrides:
+                world_features = apply_world_geometry_overrides(
+                    world_features,
+                    manifest.get("worldGeometryOverrides", {}),
+                    local_names,
+                )
+            elif marker_overrides:
                 _, regenerated_world_markers = build_world(
                     countries50, tiny50, local_names, marker_overrides
                 )
@@ -1591,7 +1684,10 @@ def main():
             }
             for overview, settings in manifest.get("overviewRegions", {}).items()
         }
-        if args.refresh_silhouette_overrides:
+        if (
+            args.refresh_silhouette_overrides
+            or args.refresh_world_overrides
+        ):
             quiz_regions = existing["quizRegions"]
             overview_regions = existing["overviewRegions"]
         else:
@@ -1634,11 +1730,15 @@ def main():
                 country_codes,
                 silhouette_overrides,
             )
-        silhouette_capitals = build_silhouette_capitals(
-            countries10,
-            country_codes,
-            capital_points,
-            silhouette_overrides,
+        silhouette_capitals = (
+            existing["silhouetteCapitals"]
+            if args.refresh_world_overrides
+            else build_silhouette_capitals(
+                countries10,
+                country_codes,
+                capital_points,
+                silhouette_overrides,
+            )
         )
         data = {
             "base": {

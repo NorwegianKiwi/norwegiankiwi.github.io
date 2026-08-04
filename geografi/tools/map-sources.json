@@ -110,6 +110,10 @@
   "markerOverrides": {
     "sc": [55.45, -4.62]
   },
+  "worldGeometryOverrides": {
+    "Somaliland": "so",
+    "Turkish Republic of Northern Cyprus": "cy"
+  },
   "regionalGeometryOverrides": {
     "cy": {
       "includeSourceNames": ["Northern Cyprus"]
