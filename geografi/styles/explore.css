@@ -597,6 +597,44 @@
   color: var(--muted);
 }
 
+.country-table tbody tr {
+  cursor: pointer;
+}
+
+.country-table tbody tr > * {
+  transition: background 150ms ease;
+}
+
+@media (hover: hover) {
+  .country-table tbody tr:hover > * {
+    background: var(--coral-soft);
+  }
+
+  .country-table tbody:has(tr:hover)
+    tr:has(.table-flag-button:focus-visible):not(:hover)
+    > * {
+    background: transparent;
+  }
+
+  .country-table tbody:has(tr:hover)
+    tr:not(:hover)
+    .table-flag-button:focus-visible {
+    outline-color: transparent;
+  }
+}
+
+.country-table tbody
+  tr:has(
+    .table-flag-button:focus-visible:not(.is-pointer-restored-focus)
+  )
+  > * {
+  background: var(--coral-soft);
+}
+
+.table-flag-button.is-pointer-restored-focus:focus-visible {
+  outline-color: transparent;
+}
+
 .table-flag {
   width: 66px;
   border-radius: 4px;
@@ -732,6 +770,12 @@ body.modal-open {
   font-weight: 400;
 }
 
+.modal-capital {
+  margin-top: -8px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(14px, 2vw, 18px);
+}
+
 .country-note {
   width: min(640px, 86vw);
   margin: 0;
@@ -741,9 +785,4 @@ body.modal-open {
   background: rgba(255, 255, 255, 0.08);
   font-size: 15px;
   line-height: 1.5;
-}
-
-.modal-close-hint {
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 12px;
 }

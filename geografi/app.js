@@ -106,7 +106,6 @@
       tableCapital: "Hovedstad",
       showLargeFlag: "Vis flagget til {name} stort",
       largeFlag: "Stort flagg: {name}",
-      closeModalHint: "Trykk hvor som helst for å lukke",
       back: "Tilbake",
       flashcardsComplete: "Flashcards fullført",
       roundComplete: "Runden er ferdig.",
@@ -222,7 +221,6 @@
       tableCapital: "Capital",
       showLargeFlag: "Show a large flag of {name}",
       largeFlag: "Large flag: {name}",
-      closeModalHint: "Press anywhere to close",
       back: "Back",
       flashcardsComplete: "Flashcards complete",
       roundComplete: "The round is complete.",
@@ -2202,7 +2200,10 @@
             ${sortedCountries
               .map(
                 (country) => `
-                  <tr>
+                  <tr
+                    data-action="open-flag"
+                    data-code="${country.code}"
+                  >
                     <td>
                       <button
                         class="table-flag-button"
@@ -2243,12 +2244,12 @@
               <div class="flag-modal-card ${countryNote(modalCountry) ? "has-note" : ""}">
                 ${flagMarkup(modalCountry, "modal-flag", true)}
                 <strong>${escapeHtml(countryName(modalCountry))}</strong>
+                <span class="modal-capital">${escapeHtml(countryCapital(modalCountry))}</span>
                 ${
                   countryNote(modalCountry)
                     ? `<p class="country-note">${escapeHtml(countryNote(modalCountry))}</p>`
                     : ""
                 }
-                <span class="modal-close-hint">${t("closeModalHint")}</span>
               </div>
             </div>
           `
@@ -2672,11 +2673,14 @@
       app.querySelector('[data-action="install-app"]')?.focus();
     }
     if (options.focusFlagCode) {
-      app
-        .querySelector(
-          `[data-action="open-flag"][data-code="${options.focusFlagCode}"]`,
-        )
-        ?.focus();
+      const flagButton = app.querySelector(
+        `.table-flag-button[data-code="${options.focusFlagCode}"]`,
+      );
+      flagButton?.classList.toggle(
+        "is-pointer-restored-focus",
+        options.suppressFlagFocusVisible === true,
+      );
+      flagButton?.focus();
     }
     if (options.focusFlashcard) {
       app.querySelector('[data-action="flashcard-toggle"]')?.focus();
@@ -2954,10 +2958,10 @@
     renderAtTop();
   }
 
-  function closeFlagModal() {
+  function closeFlagModal(options = {}) {
     const code = state.modalCode;
     state.modalCode = null;
-    render({ focusFlagCode: code });
+    render({ focusFlagCode: code, ...options });
     window.scrollTo({ top: state.exploreScrollTop });
   }
 
@@ -3191,7 +3195,7 @@
     }
 
     if (action === "close-modal") {
-      closeFlagModal();
+      closeFlagModal({ suppressFlagFocusVisible: true });
       return;
     }
 
@@ -3407,6 +3411,13 @@
   });
 
   app.addEventListener("keydown", (event) => {
+    const pointerRestoredFocus = event.target.closest(
+      ".table-flag-button.is-pointer-restored-focus",
+    );
+    if (pointerRestoredFocus && app.contains(pointerRestoredFocus)) {
+      pointerRestoredFocus.classList.remove("is-pointer-restored-focus");
+    }
+
     const countryControl = event.target.closest(
       '[data-action="explore-country"]',
     );
