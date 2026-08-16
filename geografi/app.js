@@ -1613,7 +1613,7 @@
               <p>
                 ${t("scoreBefore")} <strong>${state.score}</strong> ${t("scoreOf")}
                 <strong>${state.questions.length}</strong> ${t("scoreAfter")}
-                ${regionLabelInSentence(selectedRegion())}.
+                <strong>${regionLabelInSentence(selectedRegion())}</strong>.
               </p>
             </div>
             <h1>${heading}</h1>
