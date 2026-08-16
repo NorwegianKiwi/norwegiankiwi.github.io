@@ -344,6 +344,125 @@ a:focus-visible {
   gap: 9px;
 }
 
+.open-challenge-entry {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border: 1px dashed rgba(40, 117, 122, 0.42);
+  border-radius: 14px;
+  background: rgba(220, 236, 237, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.open-challenge-entry .secondary-button {
+  min-height: 38px;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+
+.open-challenge-overlay {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  padding: 24px;
+  background: rgba(16, 29, 23, 0.7);
+  display: grid;
+  place-items: center;
+}
+
+.open-challenge-dialog {
+  width: min(540px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  padding: clamp(24px, 6vw, 38px);
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 24px 70px rgba(11, 25, 18, 0.3);
+}
+
+.open-challenge-dialog h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 7vw, 42px);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.open-challenge-dialog > p {
+  margin: 14px 0 24px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.open-challenge-dialog form,
+.open-challenge-dialog label {
+  display: grid;
+}
+
+.open-challenge-dialog label {
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.open-challenge-dialog input {
+  width: 100%;
+  min-height: 50px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.open-challenge-dialog input:focus {
+  border-color: var(--green);
+  outline: 3px solid rgba(36, 93, 69, 0.18);
+  outline-offset: 1px;
+}
+
+.open-challenge-dialog input[aria-invalid="true"] {
+  border-color: var(--coral);
+}
+
+.open-challenge-error {
+  min-height: 1.4em;
+  margin: 7px 0 14px;
+  color: #a23f26;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.open-challenge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.open-challenge-actions .primary-button,
+.open-challenge-actions .secondary-button {
+  min-height: 46px;
+}
+
+@media (max-width: 420px) {
+  .open-challenge-entry {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 7px;
+    text-align: center;
+  }
+
+  .open-challenge-actions {
+    display: grid;
+  }
+}
+
 .activity-panel {
   min-width: 0;
   min-height: 106px;

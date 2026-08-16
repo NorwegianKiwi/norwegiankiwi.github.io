@@ -111,6 +111,17 @@
       challengeShareTitle: "Hei verden! – en utfordring",
       challengeShareText:
         "Jeg fikk {score} av {total} i {mode}. Klarer du å slå meg?",
+      openChallenge: "Åpne utfordring",
+      openChallengePrompt: "Har du fått en utfordring?",
+      openChallengeDescription:
+        "Lim inn hele utfordringslenken for å åpne den her.",
+      challengeUrlLabel: "Utfordringslenke",
+      challengeUrlPlaceholder: "https://…",
+      cancel: "Avbryt",
+      challengeUrlRequired: "Lim inn en utfordringslenke.",
+      challengeUrlMalformed: "Dette er ikke en gyldig nettadresse.",
+      challengeUrlWrongApp: "Lenken tilhører ikke denne geografiappen.",
+      challengeUrlInvalid: "Dette er ikke en gyldig utfordringslenke.",
       chooseCountry: "Velg et land",
       countryCapital: "{name}, hovedstad {capital}",
       interactiveRegionMap: "Interaktivt kart over {region}",
@@ -250,6 +261,17 @@
       challengeShareTitle: "Hello World! – a challenge",
       challengeShareText:
         "I scored {score} out of {total} in {mode}. Can you beat me?",
+      openChallenge: "Open challenge",
+      openChallengePrompt: "Have you received a challenge?",
+      openChallengeDescription:
+        "Paste the complete challenge link to open it here.",
+      challengeUrlLabel: "Challenge link",
+      challengeUrlPlaceholder: "https://…",
+      cancel: "Cancel",
+      challengeUrlRequired: "Paste a challenge link.",
+      challengeUrlMalformed: "This is not a valid web address.",
+      challengeUrlWrongApp: "This link does not belong to this geography app.",
+      challengeUrlInvalid: "This is not a valid challenge link.",
       chooseCountry: "Choose a country",
       countryCapital: "{name}, capital {capital}",
       interactiveRegionMap: "Interactive map of {region}",
@@ -358,16 +380,16 @@
     },
   ];
 
-  function readInitialChallenge() {
+  function readChallengeUrl(url) {
     const challengeKeys = ["cv", "seed", "score", "proof"];
-    if (!challengeKeys.some((key) => initialUrl.searchParams.has(key))) {
+    if (!challengeKeys.some((key) => url.searchParams.has(key))) {
       return null;
     }
 
-    const version = Number(initialUrl.searchParams.get("cv"));
-    const mode = initialUrl.searchParams.get("mode");
-    const region = initialUrl.searchParams.get("region");
-    const seed = challenge.normalizeSeed(initialUrl.searchParams.get("seed"));
+    const version = Number(url.searchParams.get("cv"));
+    const mode = url.searchParams.get("mode");
+    const region = url.searchParams.get("region");
+    const seed = challenge.normalizeSeed(url.searchParams.get("seed"));
     const validMode = modes.some((option) => option.id === mode);
     const validRegion = regionOptions.some((option) => option.id === region);
     const compatibleMapRegion =
@@ -389,12 +411,12 @@
       mode,
       region,
       seed,
-      scoreParam: initialUrl.searchParams.get("score"),
-      proof: initialUrl.searchParams.get("proof"),
+      scoreParam: url.searchParams.get("score"),
+      proof: url.searchParams.get("proof"),
     };
   }
 
-  const initialChallenge = readInitialChallenge();
+  const initialChallenge = readChallengeUrl(initialUrl);
 
   const state = {
     locale: initialLocale,
@@ -439,6 +461,9 @@
     flashcardRevealed: false,
     modalCode: null,
     installHelpOpen: false,
+    openChallengeOpen: false,
+    openChallengeValue: "",
+    openChallengeError: null,
     exploreScrollTop: 0,
     exploreView: "list",
     explorePinnedCode: null,
@@ -1241,6 +1266,48 @@
     `;
   }
 
+  function openChallengeMarkup() {
+    if (!state.openChallengeOpen) return "";
+    return `
+      <div class="open-challenge-overlay" data-action="close-open-challenge">
+        <section
+          class="open-challenge-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="open-challenge-title"
+          aria-describedby="open-challenge-description"
+          tabindex="-1"
+        >
+          <h2 id="open-challenge-title">${t("openChallengePrompt")}</h2>
+          <p id="open-challenge-description">${t("openChallengeDescription")}</p>
+          <form data-open-challenge-form novalidate>
+            <label for="challenge-url">${t("challengeUrlLabel")}</label>
+            <input
+              id="challenge-url"
+              name="challenge-url"
+              type="url"
+              inputmode="url"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              placeholder="${escapeHtml(t("challengeUrlPlaceholder"))}"
+              value="${escapeHtml(state.openChallengeValue)}"
+              aria-describedby="open-challenge-error"
+              ${state.openChallengeError ? 'aria-invalid="true"' : ""}
+            />
+            <p id="open-challenge-error" class="open-challenge-error" aria-live="polite">
+              ${state.openChallengeError ? t(state.openChallengeError) : ""}
+            </p>
+            <div class="open-challenge-actions">
+              <button class="primary-button" type="submit">${t("openChallenge")}</button>
+              <button class="secondary-button" type="button" data-action="cancel-open-challenge">${t("cancel")}</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    `;
+  }
+
   function setupMarkup() {
     const installAction = installActionMarkup();
     return `
@@ -1338,6 +1405,12 @@
               </div>
             </section>
           </div>
+          <div class="open-challenge-entry">
+            <span>${t("openChallengePrompt")}</span>
+            <button class="secondary-button" type="button" data-action="open-challenge">
+              ${t("openChallenge")}
+            </button>
+          </div>
         </section>
 
         <footer>
@@ -1349,6 +1422,7 @@
           </span>
         </footer>
         ${installHelpMarkup()}
+        ${openChallengeMarkup()}
       </main>
         ${installAction}
       </div>
@@ -2831,7 +2905,9 @@
 
     document.body?.classList.toggle(
       "modal-open",
-      state.modalCode !== null || state.installHelpOpen,
+      state.modalCode !== null ||
+        state.installHelpOpen ||
+        state.openChallengeOpen,
     );
 
     if (options.focusCorrect) app.querySelector(".is-correction")?.focus();
@@ -2841,6 +2917,14 @@
     }
     if (options.focusInstallButton) {
       app.querySelector('[data-action="install-app"]')?.focus();
+    }
+    if (options.focusOpenChallengeInput) {
+      const input = app.querySelector("#challenge-url");
+      input?.focus();
+      if (options.selectOpenChallengeInput) input?.select();
+    }
+    if (options.focusOpenChallengeButton) {
+      app.querySelector('[data-action="open-challenge"]')?.focus();
     }
     if (options.focusFlagCode) {
       const flagButton = app.querySelector(
@@ -3156,6 +3240,91 @@
     render({ focusInstallButton: true });
   }
 
+  function openChallengeDialog() {
+    state.openChallengeOpen = true;
+    state.openChallengeValue = "";
+    state.openChallengeError = null;
+    render({ focusOpenChallengeInput: true });
+  }
+
+  function closeOpenChallenge() {
+    if (!state.openChallengeOpen) return;
+    state.openChallengeOpen = false;
+    state.openChallengeValue = "";
+    state.openChallengeError = null;
+    render({ focusOpenChallengeButton: true });
+  }
+
+  function normalizedAppPath(url) {
+    const withoutIndex = url.pathname.replace(/\/index\.html$/, "/");
+    return withoutIndex.endsWith("/") ? withoutIndex : `${withoutIndex}/`;
+  }
+
+  function canonicalImportedChallengeUrl(sourceUrl, recipe) {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.hash = "";
+    if (sourceUrl.searchParams.get("lang") === "en") {
+      url.searchParams.set("lang", "en");
+    }
+    url.searchParams.set("cv", String(recipe.version));
+    url.searchParams.set("mode", recipe.mode);
+    url.searchParams.set("region", recipe.region);
+    url.searchParams.set("seed", recipe.seed);
+    if (recipe.scoreParam !== null) {
+      url.searchParams.set("score", recipe.scoreParam);
+    }
+    if (recipe.proof !== null) url.searchParams.set("proof", recipe.proof);
+    return url;
+  }
+
+  function openPastedChallenge(value) {
+    const trimmedValue = value.trim();
+    state.openChallengeValue = trimmedValue;
+    if (!trimmedValue) {
+      state.openChallengeError = "challengeUrlRequired";
+      render({ focusOpenChallengeInput: true });
+      return;
+    }
+
+    let sourceUrl;
+    try {
+      sourceUrl = new URL(trimmedValue);
+    } catch {
+      state.openChallengeError = "challengeUrlMalformed";
+      render({
+        focusOpenChallengeInput: true,
+        selectOpenChallengeInput: true,
+      });
+      return;
+    }
+
+    const currentUrl = new URL(window.location.href);
+    if (
+      sourceUrl.origin !== currentUrl.origin ||
+      normalizedAppPath(sourceUrl) !== normalizedAppPath(currentUrl)
+    ) {
+      state.openChallengeError = "challengeUrlWrongApp";
+      render({
+        focusOpenChallengeInput: true,
+        selectOpenChallengeInput: true,
+      });
+      return;
+    }
+
+    const recipe = readChallengeUrl(sourceUrl);
+    if (!recipe?.valid) {
+      state.openChallengeError = "challengeUrlInvalid";
+      render({
+        focusOpenChallengeInput: true,
+        selectOpenChallengeInput: true,
+      });
+      return;
+    }
+
+    window.location.assign(canonicalImportedChallengeUrl(sourceUrl, recipe));
+  }
+
   function scoreProofRecipe(score = state.score) {
     return {
       version: state.challengeVersion,
@@ -3312,6 +3481,9 @@
     state.flashcardRevealed = false;
     state.modalCode = null;
     state.installHelpOpen = false;
+    state.openChallengeOpen = false;
+    state.openChallengeValue = "";
+    state.openChallengeError = null;
     state.quizSeed = null;
     state.challengeVersion = challenge.VERSION;
     state.challengeActive = false;
@@ -3387,6 +3559,21 @@
 
     if (action === "start-challenge") {
       startQuiz(state.mode, { challengeRound: true });
+      return;
+    }
+
+    if (action === "open-challenge") {
+      openChallengeDialog();
+      return;
+    }
+
+    if (action === "close-open-challenge") {
+      if (event.target === control) closeOpenChallenge();
+      return;
+    }
+
+    if (action === "cancel-open-challenge") {
+      closeOpenChallenge();
       return;
     }
 
@@ -3530,6 +3717,19 @@
     if (action === "setup") {
       returnToSetup();
     }
+  });
+
+  app.addEventListener("submit", (event) => {
+    const form = event.target.closest("[data-open-challenge-form]");
+    if (!form || !app.contains(form)) return;
+    event.preventDefault();
+    openPastedChallenge(form.elements.namedItem("challenge-url")?.value ?? "");
+  });
+
+  app.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.target?.id !== "challenge-url") return;
+    event.preventDefault();
+    event.target.form?.requestSubmit();
   });
 
   app.addEventListener(
@@ -3836,12 +4036,17 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    if (state.installHelpOpen && event.key === "Tab") {
-      const dialog = app.querySelector(".install-help-dialog");
+    const activeDialog = state.openChallengeOpen
+      ? app.querySelector(".open-challenge-dialog")
+      : state.installHelpOpen
+        ? app.querySelector(".install-help-dialog")
+        : null;
+    if (activeDialog && event.key === "Tab") {
+      const dialog = activeDialog;
       const focusable = dialog
         ? [
             ...dialog.querySelectorAll(
-              "button, a[href], [tabindex]:not([tabindex='-1'])",
+              "button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])",
             ),
           ]
         : [];
@@ -3865,6 +4070,12 @@
     }
 
     if (event.key !== "Escape") return;
+
+    if (state.openChallengeOpen) {
+      event.preventDefault();
+      closeOpenChallenge();
+      return;
+    }
 
     if (state.installHelpOpen) {
       event.preventDefault();

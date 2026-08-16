@@ -45,6 +45,13 @@ but it is not authentication: this is a static site and a determined person
 can recreate a valid proof. An invalid or missing score proof removes the score
 to beat but does not prevent the deterministic round from being played.
 
+The setup page always offers **Open challenge** in both browser and installed
+app display modes. Pasting a complete challenge URL validates it with the same
+rules as a directly opened link, then reconstructs it on the current app origin
+before navigating. This lets an iPhone Home Screen installation open a link
+copied from Safari or a message without relying on unsupported external-link
+capture.
+
 Version 1 is a compatibility contract. Changes to the seeded random generator,
 region membership, distractor selection, or random-call order must introduce a
 new recipe version and keep the v1 implementation available. Run the immutable
