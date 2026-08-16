@@ -52,6 +52,11 @@ before navigating. This lets an iPhone Home Screen installation open a link
 copied from Safari or a message without relying on unsupported external-link
 capture.
 
+Every valid challenge intro also offers a quiet **Copy challenge link** action
+below the primary Start button. It copies a canonical URL containing only the
+active language and challenge recipe, including an unverified score claim
+unchanged so that reopening it shows the same warning.
+
 Version 1 is a compatibility contract. Changes to the seeded random generator,
 region membership, distractor selection, or random-call order must introduce a
 new recipe version and keep the v1 implementation available. Run the immutable

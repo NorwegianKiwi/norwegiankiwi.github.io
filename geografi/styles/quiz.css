@@ -829,6 +829,48 @@
   line-height: 1.45;
 }
 
+.challenge-intro-actions {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.challenge-intro-copy {
+  padding: 7px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: text-decoration-color 160ms ease;
+}
+
+.challenge-intro-copy:hover {
+  text-decoration-color: currentColor;
+}
+
+.challenge-intro-copy:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.challenge-intro-status {
+  margin: 0;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.challenge-intro-status:empty {
+  display: none;
+}
+
 .result-card {
   width: min(760px, 100%);
   margin: 0 auto;

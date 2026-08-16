@@ -106,7 +106,9 @@
       challengeMissed: "Du fikk {score}; poengsummen å slå var {target}.",
       shareChallenge: "Utfordre en venn",
       copyChallengeLink: "Kopier lenke",
+      copyChallengeLinkFull: "Kopier utfordringslenke",
       challengeLinkCopied: "Utfordringslenken er kopiert.",
+      challengeCopyFailed: "Kunne ikke kopiere utfordringslenken.",
       challengeShareFailed: "Kunne ikke dele lenken. Prøv å kopiere den.",
       challengeShareTitle: "Hei verden! – en utfordring",
       challengeShareText:
@@ -256,7 +258,9 @@
       challengeMissed: "You scored {score}; the score to beat was {target}.",
       shareChallenge: "Challenge a friend",
       copyChallengeLink: "Copy link",
+      copyChallengeLinkFull: "Copy challenge link",
       challengeLinkCopied: "Challenge link copied.",
+      challengeCopyFailed: "Could not copy the challenge link.",
       challengeShareFailed: "Could not share the link. Try copying it instead.",
       challengeShareTitle: "Hello World! – a challenge",
       challengeShareText:
@@ -1494,9 +1498,15 @@
               ? `<p class="challenge-warning" role="status">${t("unverifiedScore")}</p>`
               : ""
           }
-          <button class="primary-button" data-action="start-challenge">
-            ${t("startChallenge")} <span aria-hidden="true">→</span>
-          </button>
+          <div class="challenge-intro-actions">
+            <button class="primary-button" data-action="start-challenge">
+              ${t("startChallenge")} <span aria-hidden="true">→</span>
+            </button>
+            <button class="challenge-intro-copy" data-action="copy-intro-challenge">
+              ${t("copyChallengeLinkFull")}
+            </button>
+            <p class="challenge-intro-status" data-challenge-status aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p>
+          </div>
         </section>
       </main>
     `;
@@ -1546,7 +1556,7 @@
             ${t("copyChallengeLink")}
           </button>
         </div>
-        <p class="challenge-share-status" aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p>
+        <p class="challenge-share-status" data-challenge-status aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p>
       </section>
     `;
   }
@@ -3260,13 +3270,11 @@
     return withoutIndex.endsWith("/") ? withoutIndex : `${withoutIndex}/`;
   }
 
-  function canonicalImportedChallengeUrl(sourceUrl, recipe) {
+  function canonicalChallengeUrl(recipe, locale = state.locale) {
     const url = new URL(window.location.href);
     url.search = "";
     url.hash = "";
-    if (sourceUrl.searchParams.get("lang") === "en") {
-      url.searchParams.set("lang", "en");
-    }
+    if (locale === "en") url.searchParams.set("lang", "en");
     url.searchParams.set("cv", String(recipe.version));
     url.searchParams.set("mode", recipe.mode);
     url.searchParams.set("region", recipe.region);
@@ -3276,6 +3284,11 @@
     }
     if (recipe.proof !== null) url.searchParams.set("proof", recipe.proof);
     return url;
+  }
+
+  function canonicalImportedChallengeUrl(sourceUrl, recipe) {
+    const locale = sourceUrl.searchParams.get("lang") === "en" ? "en" : "nb";
+    return canonicalChallengeUrl(recipe, locale);
   }
 
   function openPastedChallenge(value) {
@@ -3337,24 +3350,31 @@
 
   function setShareStatus(messageKey) {
     state.shareStatus = messageKey;
-    const status = app.querySelector(".challenge-share-status");
+    const status = app.querySelector("[data-challenge-status]");
     if (status) status.textContent = t(messageKey);
+  }
+
+  function challengeIntroUrl() {
+    return canonicalChallengeUrl({
+      version: state.challengeVersion,
+      mode: state.mode,
+      region: state.region,
+      seed: state.quizSeed,
+      scoreParam: state.challengeScoreParam,
+      proof: state.challengeProof,
+    }).href;
   }
 
   function challengeShareUrl() {
     if (!state.shareProof) return null;
-    const url = new URL(window.location.href);
-    url.searchParams.set("cv", String(state.challengeVersion));
-    url.searchParams.set("mode", state.mode);
-    url.searchParams.set("region", state.region);
-    url.searchParams.set("seed", state.quizSeed);
-    url.searchParams.set("score", String(state.score));
-    url.searchParams.set("proof", state.shareProof);
-    if (state.locale === "nb") url.searchParams.delete("lang");
-    else url.searchParams.set("lang", state.locale);
-    url.searchParams.delete("_result");
-    url.searchParams.delete("_mode");
-    return url.href;
+    return canonicalChallengeUrl({
+      version: state.challengeVersion,
+      mode: state.mode,
+      region: state.region,
+      seed: state.quizSeed,
+      scoreParam: String(state.score),
+      proof: state.shareProof,
+    }).href;
   }
 
   async function prepareChallengeShare() {
@@ -3430,7 +3450,20 @@
         setShareStatus("challengeLinkCopied");
       }
     } catch (error) {
-      if (error?.name !== "AbortError") setShareStatus("challengeShareFailed");
+      if (error?.name !== "AbortError") {
+        setShareStatus(
+          useNativeShare ? "challengeShareFailed" : "challengeCopyFailed",
+        );
+      }
+    }
+  }
+
+  async function copyIntroChallenge() {
+    try {
+      await copyText(challengeIntroUrl());
+      setShareStatus("challengeLinkCopied");
+    } catch {
+      setShareStatus("challengeCopyFailed");
     }
   }
 
@@ -3554,6 +3587,11 @@
 
     if (action === "copy-challenge") {
       void shareChallenge(false);
+      return;
+    }
+
+    if (action === "copy-intro-challenge") {
+      void copyIntroChallenge();
       return;
     }
 
