@@ -11,9 +11,10 @@
   const data = window.GEOGRAFI_QUIZ_DATA;
   const distractorData = window.GEOGRAFI_QUIZ_DISTRACTOR_DATA;
   const mapData = window.GEOGRAFI_QUIZ_MAP_DATA;
+  const challenge = window.GEOGRAFI_CHALLENGE;
   const app = document.getElementById("app");
 
-  if (!data || !distractorData || !mapData || !app) {
+  if (!data || !distractorData || !mapData || !challenge || !app) {
     throw new Error(
       initialLocale === "en"
         ? "Hello World! could not load the country data."
@@ -86,6 +87,30 @@
       wrong: "Feil",
       chooseNewActivity: "Velg ny øvelse",
       reviewErrors: "Se gjennom {count} feil",
+      challengeKicker: "Utfordring fra en venn",
+      challengeTitle: "Du har blitt utfordret!",
+      challengeDescription:
+        "Du får nøyaktig samme land og svaralternativer i samme rekkefølge.",
+      challengeCode: "Utfordringskode",
+      scoreToBeat: "Poeng å slå",
+      questionsLabel: "Spørsmål",
+      startChallenge: "Start utfordringen",
+      unverifiedScore:
+        "Poengsummen i lenken kunne ikke bekreftes. Du kan fortsatt spille den samme runden.",
+      invalidChallengeKicker: "Ugyldig utfordring",
+      invalidChallengeTitle: "Denne utfordringslenken virker ikke.",
+      invalidChallengeDescription:
+        "Lenken mangler en gyldig spilltype, region, versjon eller utfordringskode.",
+      challengeBeat: "Du slo poengsummen på {score}!",
+      challengeTied: "Du fikk samme poengsum: {score}.",
+      challengeMissed: "Du fikk {score}; poengsummen å slå var {target}.",
+      shareChallenge: "Utfordre en venn",
+      copyChallengeLink: "Kopier lenke",
+      challengeLinkCopied: "Utfordringslenken er kopiert.",
+      challengeShareFailed: "Kunne ikke dele lenken. Prøv å kopiere den.",
+      challengeShareTitle: "Hei verden! – en utfordring",
+      challengeShareText:
+        "Jeg fikk {score} av {total} i {mode}. Klarer du å slå meg?",
       chooseCountry: "Velg et land",
       countryCapital: "{name}, hovedstad {capital}",
       interactiveRegionMap: "Interaktivt kart over {region}",
@@ -201,6 +226,30 @@
       chooseNewActivity: "Choose another activity",
       reviewErrors:
         "Review {count} {count, plural, one {mistake} other {mistakes}}",
+      challengeKicker: "A challenge from a friend",
+      challengeTitle: "You’ve been challenged!",
+      challengeDescription:
+        "You will get exactly the same countries and answer choices in the same order.",
+      challengeCode: "Challenge code",
+      scoreToBeat: "Score to beat",
+      questionsLabel: "Questions",
+      startChallenge: "Start challenge",
+      unverifiedScore:
+        "The score in this link could not be verified. You can still play the same round.",
+      invalidChallengeKicker: "Invalid challenge",
+      invalidChallengeTitle: "This challenge link does not work.",
+      invalidChallengeDescription:
+        "The link is missing a valid game type, region, version, or challenge code.",
+      challengeBeat: "You beat the score of {score}!",
+      challengeTied: "You matched the score of {score}.",
+      challengeMissed: "You scored {score}; the score to beat was {target}.",
+      shareChallenge: "Challenge a friend",
+      copyChallengeLink: "Copy link",
+      challengeLinkCopied: "Challenge link copied.",
+      challengeShareFailed: "Could not share the link. Try copying it instead.",
+      challengeShareTitle: "Hello World! – a challenge",
+      challengeShareText:
+        "I scored {score} out of {total} in {mode}. Can you beat me?",
       chooseCountry: "Choose a country",
       countryCapital: "{name}, capital {capital}",
       interactiveRegionMap: "Interactive map of {region}",
@@ -282,34 +331,6 @@
   const countriesByCode = new Map(
     countries.map((country) => [country.code, country]),
   );
-  const primaryFlagDistractorCodesByCountry = new Map();
-  const secondaryFlagDistractorCodesByCountry = new Map();
-  const flagConflictCodesByCountry = new Map();
-
-  flagDistractorGroups.forEach((group) => {
-    const distractorCodesByCountry =
-      group.strength === "primary"
-        ? primaryFlagDistractorCodesByCountry
-        : secondaryFlagDistractorCodesByCountry;
-    group.codes.forEach((code) => {
-      const relatedCodes = distractorCodesByCountry.get(code) ?? new Set();
-      group.codes.forEach((relatedCode) => {
-        if (relatedCode !== code) relatedCodes.add(relatedCode);
-      });
-      distractorCodesByCountry.set(code, relatedCodes);
-    });
-  });
-
-  flagConflictPairs.forEach(([firstCode, secondCode]) => {
-    const firstConflicts =
-      flagConflictCodesByCountry.get(firstCode) ?? new Set();
-    const secondConflicts =
-      flagConflictCodesByCountry.get(secondCode) ?? new Set();
-    firstConflicts.add(secondCode);
-    secondConflicts.add(firstCode);
-    flagConflictCodesByCountry.set(firstCode, firstConflicts);
-    flagConflictCodesByCountry.set(secondCode, secondConflicts);
-  });
 
   const modes = [
     {
@@ -337,15 +358,75 @@
     },
   ];
 
+  function readInitialChallenge() {
+    const challengeKeys = ["cv", "seed", "score", "proof"];
+    if (!challengeKeys.some((key) => initialUrl.searchParams.has(key))) {
+      return null;
+    }
+
+    const version = Number(initialUrl.searchParams.get("cv"));
+    const mode = initialUrl.searchParams.get("mode");
+    const region = initialUrl.searchParams.get("region");
+    const seed = challenge.normalizeSeed(initialUrl.searchParams.get("seed"));
+    const validMode = modes.some((option) => option.id === mode);
+    const validRegion = regionOptions.some((option) => option.id === region);
+    const compatibleMapRegion =
+      mode !== "map-country" || mapSelectableRegions.includes(region);
+
+    if (
+      version !== challenge.VERSION ||
+      !validMode ||
+      !validRegion ||
+      !seed ||
+      !compatibleMapRegion
+    ) {
+      return { valid: false };
+    }
+
+    return {
+      valid: true,
+      version,
+      mode,
+      region,
+      seed,
+      scoreParam: initialUrl.searchParams.get("score"),
+      proof: initialUrl.searchParams.get("proof"),
+    };
+  }
+
+  const initialChallenge = readInitialChallenge();
+
   const state = {
     locale: initialLocale,
-    screen: "setup",
-    mode: "country-flag",
-    region: regionOptions.some(
-      (region) => region.id === initialUrl.searchParams.get("region"),
-    )
-      ? initialUrl.searchParams.get("region")
-      : "world",
+    screen:
+      initialChallenge?.valid === true
+        ? "challenge-intro"
+        : initialChallenge?.valid === false
+          ? "challenge-error"
+          : "setup",
+    mode: initialChallenge?.valid ? initialChallenge.mode : "country-flag",
+    region: initialChallenge?.valid
+      ? initialChallenge.region
+      : regionOptions.some(
+            (region) => region.id === initialUrl.searchParams.get("region"),
+          )
+        ? initialUrl.searchParams.get("region")
+        : "world",
+    quizSeed: initialChallenge?.valid ? initialChallenge.seed : null,
+    challengeVersion: initialChallenge?.valid
+      ? initialChallenge.version
+      : challenge.VERSION,
+    challengeActive: initialChallenge?.valid === true,
+    challengeTargetScore: null,
+    challengeScoreVerified: false,
+    challengeScoreWarning: initialChallenge?.valid === true,
+    challengeScoreParam: initialChallenge?.valid
+      ? initialChallenge.scoreParam
+      : null,
+    challengeProof: initialChallenge?.valid ? initialChallenge.proof : null,
+    shareStatus: null,
+    shareProof: null,
+    shareProofPending: false,
     questions: [],
     questionIndex: 0,
     selectedCode: null,
@@ -463,66 +544,16 @@
     return countriesInRegion(state.region);
   }
 
-  function selectCompatibleFlagDistractors(candidates, count, selectedCodes) {
-    if (count <= 0) return [];
-    const selected = [];
-    for (const candidate of shuffle(candidates)) {
-      const conflicts = flagConflictCodesByCountry.get(candidate.code);
-      if (
-        selectedCodes.has(candidate.code) ||
-        [...(conflicts ?? [])].some((code) => selectedCodes.has(code))
-      ) {
-        continue;
-      }
-      selected.push(candidate);
-      selectedCodes.add(candidate.code);
-      if (selected.length === count) break;
-    }
-    return selected;
-  }
-
-  function createQuestions(pool, choiceCount = 9, mode = null) {
-    const usesFlagDistractors =
-      mode === "country-flag" || mode === "flag-country";
-
-    return shuffle(pool).map((country) => {
-      let distractors;
-      if (usesFlagDistractors) {
-        const selectedCodes = new Set([country.code]);
-        const primaryCodes =
-          primaryFlagDistractorCodesByCountry.get(country.code) ?? [];
-        const secondaryCodes =
-          secondaryFlagDistractorCodesByCountry.get(country.code) ?? [];
-        const primaryDistractors = selectCompatibleFlagDistractors(
-          [...primaryCodes].map((code) => countriesByCode.get(code)),
-          Math.min(1, choiceCount - 1),
-          selectedCodes,
-        );
-        const relatedCodes = new Set([...primaryCodes, ...secondaryCodes]);
-        const otherRelatedDistractors = selectCompatibleFlagDistractors(
-          [...relatedCodes].map((code) => countriesByCode.get(code)),
-          Math.min(2, choiceCount - 1) - primaryDistractors.length,
-          selectedCodes,
-        );
-        const relatedDistractors = [
-          ...primaryDistractors,
-          ...otherRelatedDistractors,
-        ];
-        const randomDistractors = selectCompatibleFlagDistractors(
-          pool,
-          choiceCount - 1 - relatedDistractors.length,
-          selectedCodes,
-        );
-        distractors = [...relatedDistractors, ...randomDistractors];
-      } else {
-        distractors = shuffle(
-          pool.filter((item) => item.code !== country.code),
-        ).slice(0, choiceCount - 1);
-      }
-      return {
-        country,
-        choices: shuffle([country, ...distractors]),
-      };
+  function createQuestions(pool, choiceCount = 9, mode = null, seed) {
+    return challenge.createQuestions({
+      pool,
+      allCountries: countries,
+      flagDistractorGroups,
+      flagConflictPairs,
+      choiceCount,
+      mode,
+      seed,
+      version: state.challengeVersion,
     });
   }
 
@@ -620,10 +651,29 @@
     } else {
       url.searchParams.set("lang", state.locale);
     }
-    if (state.region === "world") {
+    if (state.region === "world" && !state.challengeActive) {
       url.searchParams.delete("region");
     } else {
       url.searchParams.set("region", state.region);
+    }
+    if (state.challengeActive) {
+      url.searchParams.set("cv", String(state.challengeVersion));
+      url.searchParams.set("mode", state.mode);
+      url.searchParams.set("seed", state.quizSeed);
+      if (state.challengeScoreParam !== null) {
+        url.searchParams.set("score", state.challengeScoreParam);
+      } else {
+        url.searchParams.delete("score");
+      }
+      if (state.challengeProof !== null) {
+        url.searchParams.set("proof", state.challengeProof);
+      } else {
+        url.searchParams.delete("proof");
+      }
+    } else {
+      ["cv", "mode", "seed", "score", "proof"].forEach((key) =>
+        url.searchParams.delete(key),
+      );
     }
     try {
       window.history.replaceState(null, "", url.href);
@@ -1332,6 +1382,101 @@
     `;
   }
 
+  function challengeCodeMarkup() {
+    return `
+      <div class="challenge-code-block">
+        <span>${t("challengeCode")}</span>
+        <strong>${escapeHtml(state.quizSeed)}</strong>
+      </div>
+    `;
+  }
+
+  function challengeIntroMarkup() {
+    const mode = selectedMode();
+    const questionTotal = countriesInRegion(state.region).length;
+    return `
+      <main class="quiz-shell challenge-shell">
+        <header class="quiz-header">
+          ${brandMarkup(true, false)}
+          ${homeButtonMarkup()}
+        </header>
+        <section class="challenge-card">
+          <p class="kicker">${t("challengeKicker")}</p>
+          <h1>${t("challengeTitle")}</h1>
+          <p>${t("challengeDescription")}</p>
+          ${challengeCodeMarkup()}
+          <div class="challenge-details${state.challengeScoreVerified ? " has-score" : ""}">
+            <div><span>${t("testYourself")}</span><strong>${t(mode.shortLabelKey)}</strong></div>
+            <div><span>${t("chooseArea")}</span><strong>${regionLabel(selectedRegion())}</strong></div>
+            <div><span>${t("questionsLabel")}</span><strong>${questionTotal}</strong></div>
+            ${
+              state.challengeScoreVerified
+                ? `<div><span>${t("scoreToBeat")}</span><strong>${state.challengeTargetScore} / ${questionTotal}</strong></div>`
+                : ""
+            }
+          </div>
+          ${
+            state.challengeScoreWarning
+              ? `<p class="challenge-warning" role="status">${t("unverifiedScore")}</p>`
+              : ""
+          }
+          <button class="primary-button" data-action="start-challenge">
+            ${t("startChallenge")} <span aria-hidden="true">→</span>
+          </button>
+        </section>
+      </main>
+    `;
+  }
+
+  function invalidChallengeMarkup() {
+    return `
+      <main class="quiz-shell challenge-shell">
+        <header class="quiz-header">${brandMarkup(true, false)}</header>
+        <section class="challenge-card">
+          <p class="kicker">${t("invalidChallengeKicker")}</p>
+          <h1>${t("invalidChallengeTitle")}</h1>
+          <p>${t("invalidChallengeDescription")}</p>
+          <button class="primary-button" data-action="setup">
+            ${t("home")} <span aria-hidden="true">→</span>
+          </button>
+        </section>
+      </main>
+    `;
+  }
+
+  function challengeComparisonMarkup() {
+    if (!state.challengeActive || !state.challengeScoreVerified) return "";
+    const message =
+      state.score > state.challengeTargetScore
+        ? t("challengeBeat", { score: state.challengeTargetScore })
+        : state.score === state.challengeTargetScore
+          ? t("challengeTied", { score: state.challengeTargetScore })
+          : t("challengeMissed", {
+              score: state.score,
+              target: state.challengeTargetScore,
+            });
+    return `<p class="challenge-comparison">${message}</p>`;
+  }
+
+  function challengeShareMarkup() {
+    return `
+      <section class="challenge-share" aria-label="${escapeHtml(t("shareChallenge"))}">
+        ${challengeCodeMarkup()}
+        <div class="challenge-share-actions">
+          ${
+            typeof navigator.share === "function"
+              ? `<button class="primary-button" data-action="share-challenge" ${state.shareProof ? "" : "disabled"}>${t("shareChallenge")}</button>`
+              : ""
+          }
+          <button class="secondary-button" data-action="copy-challenge" ${state.shareProof ? "" : "disabled"}>
+            ${t("copyChallengeLink")}
+          </button>
+        </div>
+        <p class="challenge-share-status" aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p>
+      </section>
+    `;
+  }
+
   function resultMarkup() {
     const hasReview = state.wrongAnswers.length > 0;
     const percentage = Math.round((state.score / state.questions.length) * 100);
@@ -1361,6 +1506,7 @@
             <strong>${state.questions.length}</strong> ${t("scoreAfter")}
             ${regionLabelInSentence(selectedRegion())}.
           </p>
+          ${challengeComparisonMarkup()}
           <div class="result-stats">
             <div><span>${t("correctPlural")}</span><strong>${state.score}</strong></div>
             <div>
@@ -1369,6 +1515,7 @@
             </div>
             <div><span>${t("testYourself")}</span><strong>${t(selectedMode().shortLabelKey)}</strong></div>
           </div>
+          ${challengeShareMarkup()}
           <button class="primary-button" data-action="setup">
             ${t("chooseNewActivity")}
             <span aria-hidden="true">→</span>
@@ -2564,6 +2711,7 @@
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
             <span>${regionLabel(selectedRegion())}</span>
+            ${state.challengeActive ? `<span class="challenge-meta-code">${escapeHtml(state.quizSeed)}</span>` : ""}
             <strong>${state.questionIndex + 1} / ${state.questions.length}</strong>
           </div>
           ${homeButtonMarkup()}
@@ -2616,6 +2764,10 @@
     switch (state.screen) {
       case "setup":
         return setupMarkup();
+      case "challenge-intro":
+        return challengeIntroMarkup();
+      case "challenge-error":
+        return invalidChallengeMarkup();
       case "result":
         return resultMarkup();
       case "explore":
@@ -2675,6 +2827,7 @@
     if (state.screen === "explore" && state.exploreView === "map") {
       scheduleExploreMapZoomUi();
     }
+    if (state.screen === "result") prepareChallengeShare();
 
     document.body?.classList.toggle(
       "modal-open",
@@ -2930,9 +3083,19 @@
     renderAtTop();
   }
 
-  function startQuiz(mode) {
+  function startQuiz(mode, { challengeRound = false } = {}) {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
+    if (!challengeRound) {
+      state.challengeActive = false;
+      state.challengeTargetScore = null;
+      state.challengeScoreVerified = false;
+      state.challengeScoreWarning = false;
+      state.challengeScoreParam = null;
+      state.challengeProof = null;
+      state.challengeVersion = challenge.VERSION;
+      state.quizSeed = null;
+    }
     if (
       mode === "map-country" &&
       !mapSelectableRegions.includes(state.region)
@@ -2943,12 +3106,14 @@
       renderAtTop({ focusMapRegion: true });
       return;
     }
+    if (!state.quizSeed) state.quizSeed = challenge.createRandomSeed();
     state.mode = mode;
     const modeConfig = modes.find((option) => option.id === mode);
     state.questions = createQuestions(
       countriesInRegion(state.region),
       modeConfig?.choiceCount,
       mode,
+      state.quizSeed,
     );
     state.questionIndex = 0;
     state.selectedCode = null;
@@ -2956,6 +3121,9 @@
     state.silhouetteExpanded = false;
     state.score = 0;
     state.wrongAnswers = [];
+    state.shareStatus = null;
+    state.shareProof = null;
+    state.shareProofPending = false;
     state.screen = "quiz";
     renderAtTop();
   }
@@ -2986,6 +3154,115 @@
     if (!state.installHelpOpen) return;
     state.installHelpOpen = false;
     render({ focusInstallButton: true });
+  }
+
+  function scoreProofRecipe(score = state.score) {
+    return {
+      version: state.challengeVersion,
+      mode: state.mode,
+      region: state.region,
+      seed: state.quizSeed,
+      score,
+    };
+  }
+
+  function setShareStatus(messageKey) {
+    state.shareStatus = messageKey;
+    const status = app.querySelector(".challenge-share-status");
+    if (status) status.textContent = t(messageKey);
+  }
+
+  function challengeShareUrl() {
+    if (!state.shareProof) return null;
+    const url = new URL(window.location.href);
+    url.searchParams.set("cv", String(state.challengeVersion));
+    url.searchParams.set("mode", state.mode);
+    url.searchParams.set("region", state.region);
+    url.searchParams.set("seed", state.quizSeed);
+    url.searchParams.set("score", String(state.score));
+    url.searchParams.set("proof", state.shareProof);
+    if (state.locale === "nb") url.searchParams.delete("lang");
+    else url.searchParams.set("lang", state.locale);
+    url.searchParams.delete("_result");
+    url.searchParams.delete("_mode");
+    return url.href;
+  }
+
+  async function prepareChallengeShare() {
+    if (
+      state.shareProof ||
+      state.shareProofPending ||
+      !state.quizSeed ||
+      state.questions.length === 0
+    ) {
+      return;
+    }
+    state.shareProofPending = true;
+    const expectedSeed = state.quizSeed;
+    const expectedScore = state.score;
+    try {
+      const proof = await challenge.createScoreProof(
+        scoreProofRecipe(expectedScore),
+      );
+      if (
+        state.screen !== "result" ||
+        state.quizSeed !== expectedSeed ||
+        state.score !== expectedScore
+      ) {
+        return;
+      }
+      state.shareProof = proof;
+      app
+        .querySelectorAll('[data-action="share-challenge"], [data-action="copy-challenge"]')
+        .forEach((button) => {
+          button.disabled = false;
+        });
+    } catch {
+      if (state.screen === "result") setShareStatus("challengeShareFailed");
+    } finally {
+      state.shareProofPending = false;
+    }
+  }
+
+  async function copyText(value) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return;
+    }
+    const input = document.createElement("textarea");
+    input.value = value;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.opacity = "0";
+    document.body.append(input);
+    input.select();
+    const copied = document.execCommand("copy");
+    input.remove();
+    if (!copied) throw new Error("Copy failed");
+  }
+
+  async function shareChallenge(useNativeShare) {
+    const url = challengeShareUrl();
+    if (!url) return;
+    const shareData = {
+      title: t("challengeShareTitle"),
+      text: t("challengeShareText", {
+        score: state.score,
+        total: state.questions.length,
+        mode: t(selectedMode().shortLabelKey),
+      }),
+      url,
+    };
+    try {
+      if (useNativeShare && typeof navigator.share === "function") {
+        await navigator.share(shareData);
+      } else {
+        await copyText(url);
+        setShareStatus("challengeLinkCopied");
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") setShareStatus("challengeShareFailed");
+    }
   }
 
   async function requestInstall() {
@@ -3035,7 +3312,19 @@
     state.flashcardRevealed = false;
     state.modalCode = null;
     state.installHelpOpen = false;
+    state.quizSeed = null;
+    state.challengeVersion = challenge.VERSION;
+    state.challengeActive = false;
+    state.challengeTargetScore = null;
+    state.challengeScoreVerified = false;
+    state.challengeScoreWarning = false;
+    state.challengeScoreParam = null;
+    state.challengeProof = null;
+    state.shareStatus = null;
+    state.shareProof = null;
+    state.shareProofPending = false;
     resetExploreCountryState();
+    syncUrlState();
     renderAtTop({ focusSetupMap: focusMapQuiz });
   }
 
@@ -3083,6 +3372,21 @@
 
     if (action === "install-app") {
       void requestInstall();
+      return;
+    }
+
+    if (action === "share-challenge") {
+      void shareChallenge(true);
+      return;
+    }
+
+    if (action === "copy-challenge") {
+      void shareChallenge(false);
+      return;
+    }
+
+    if (action === "start-challenge") {
+      startQuiz(state.mode, { challengeRound: true });
       return;
     }
 
@@ -3594,6 +3898,7 @@
   });
 
   function applyResultPreviewFromUrl() {
+    if (initialChallenge !== null) return;
     const scenario = initialUrl.searchParams.get("_result");
     if (!["perfect", "mixed", "wrong"].includes(scenario)) return;
 
@@ -3612,9 +3917,44 @@
 
     state.screen = "result";
     state.mode = previewMode;
+    state.quizSeed = "ABCDE";
     state.questions = previewCountries.map((country) => ({ country }));
     state.score = score;
     state.wrongAnswers = previewCountries.slice(score);
+  }
+
+  async function validateInitialChallengeScore() {
+    if (!initialChallenge?.valid) return;
+    const scoreText = initialChallenge.scoreParam;
+    const score = /^\d+$/.test(scoreText ?? "") ? Number(scoreText) : NaN;
+    const maximum = countriesInRegion(initialChallenge.region).length;
+    if (
+      !Number.isSafeInteger(score) ||
+      score < 0 ||
+      score > maximum ||
+      !initialChallenge.proof
+    ) {
+      return;
+    }
+
+    const recipe = {
+      version: initialChallenge.version,
+      mode: initialChallenge.mode,
+      region: initialChallenge.region,
+      seed: initialChallenge.seed,
+      score,
+    };
+    if (
+      await challenge.verifyScoreProof(
+        recipe,
+        initialChallenge.proof,
+      )
+    ) {
+      state.challengeTargetScore = score;
+      state.challengeScoreVerified = true;
+      state.challengeScoreWarning = false;
+      state.challengeScoreParam = String(score);
+    }
   }
 
   window.addEventListener("beforeinstallprompt", (event) => {
@@ -3629,7 +3969,12 @@
     if (state.screen === "setup") render();
   });
 
-  applyResultPreviewFromUrl();
-  syncUrlState();
-  render();
+  async function initialize() {
+    await validateInitialChallengeScore();
+    applyResultPreviewFromUrl();
+    if (state.screen !== "challenge-error") syncUrlState();
+    render();
+  }
+
+  void initialize();
 })();

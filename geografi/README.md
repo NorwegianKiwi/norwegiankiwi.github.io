@@ -29,6 +29,31 @@ URL:
 The language can be changed from anywhere on the site without resetting an
 active quiz, flashcard round, or Explore view.
 
+## Friend challenges
+
+Every scored quiz result can be shared as a deterministic friend challenge.
+An official challenge URL contains a recipe version, quiz mode, region,
+five-letter seed, score, and score proof, for example:
+
+`?cv=1&mode=country-flag&region=europe&seed=KXWPR&score=23&proof=AcJBW5KX36Q`
+
+Version 1 seeds use five uppercase letters from
+`ABCDEFGHJKMNPQRSTUVWXYZ`; lowercase URL input is normalized. The recipe fixes
+the country order, distractors, and answer order independently of the chosen
+interface language. The proof detects casual edits to any public recipe field,
+but it is not authentication: this is a static site and a determined person
+can recreate a valid proof. An invalid or missing score proof removes the score
+to beat but does not prevent the deterministic round from being played.
+
+Version 1 is a compatibility contract. Changes to the seeded random generator,
+region membership, distractor selection, or random-call order must introduce a
+new recipe version and keep the v1 implementation available. Run the immutable
+golden vectors with:
+
+```sh
+node tests/challenge.test.js
+```
+
 ## Result-screen previews
 
 Internal query parameters can open deterministic result screens for visual
