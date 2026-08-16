@@ -1478,7 +1478,7 @@
           ${brandMarkup(true, false)}
           ${homeButtonMarkup()}
         </header>
-        <section class="challenge-card">
+        <section class="challenge-card challenge-intro-card">
           <p class="kicker">${t("challengeKicker")}</p>
           <h1>${t("challengeTitle")}</h1>
           <p>${t("challengeDescription")}</p>
@@ -1516,7 +1516,7 @@
     return `
       <main class="quiz-shell challenge-shell">
         <header class="quiz-header">${brandMarkup(true, false)}</header>
-        <section class="challenge-card">
+        <section class="challenge-card challenge-error-card">
           <p class="kicker">${t("invalidChallengeKicker")}</p>
           <h1>${t("invalidChallengeTitle")}</h1>
           <p>${t("invalidChallengeDescription")}</p>
@@ -2906,6 +2906,10 @@
     updateDocumentMetadata();
     app.innerHTML = screenMarkup();
     document.body?.classList.toggle("standalone-mode", isStandalone());
+    document.body?.classList.toggle(
+      "challenge-page",
+      state.screen === "challenge-intro" || state.screen === "challenge-error",
+    );
     scheduleScrollAffordanceUpdate();
     scheduleResponsiveRegionMaps();
     if (state.screen === "explore" && state.exploreView === "map") {
