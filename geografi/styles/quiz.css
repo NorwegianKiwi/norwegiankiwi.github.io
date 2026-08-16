@@ -1193,22 +1193,52 @@ body.challenge-page {
   }
 }
 
+body.result-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.result-shell {
+  --result-header-height: 88px;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 .result-card {
-  width: min(760px, 100%);
+  width: min(900px, 100%);
+  min-height: calc(100dvh - var(--result-header-height));
   margin: 0 auto;
-  padding: 85px 0 70px;
+  padding: clamp(28px, 5dvh, 52px) 0 max(28px, env(safe-area-inset-bottom));
+  display: grid;
+  align-content: center;
+  gap: 22px;
   text-align: center;
 }
 
+.has-review .result-card {
+  min-height: calc(100dvh - var(--result-header-height) - 48px);
+}
+
+.result-summary-main,
+.result-summary-support {
+  min-width: 0;
+}
+
+.result-actions {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+}
+
 .review-jump {
-  border: 0;
-  background: transparent;
-  color: var(--green);
-  margin: 16px auto 0;
-  padding: 8px 12px;
+  margin: 0;
+  padding: 7px 12px;
   display: flex;
   align-items: center;
   gap: 9px;
+  border: 0;
+  background: transparent;
+  color: var(--green);
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
@@ -1218,92 +1248,115 @@ body.challenge-page {
   color: var(--coral);
 }
 
-.has-review .result-card {
-  padding: 28px 0 22px;
+.result-overview {
+  width: min(620px, 100%);
+  margin: 0 auto 14px;
+  padding: 14px 18px 17px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  text-align: center;
 }
 
-.has-review .result-score {
-  margin: 8px 0 6px;
+.result-overview-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
-.has-review .result-score strong {
-  font-size: clamp(72px, 10vw, 105px);
-}
-
-.has-review .result-card h1 {
-  font-size: clamp(36px, 4.5vw, 52px);
-}
-
-.has-review .result-card > p:not(.kicker) {
-  margin-top: 12px;
-  font-size: 16px;
-}
-
-.has-review .result-stats {
-  margin: 22px 0 18px;
-}
-
-.has-review .result-stats div {
-  min-height: 70px;
-  padding: 12px 18px;
-}
-
-.has-review .primary-button {
-  min-height: 48px;
+.result-overview-mode {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .result-score {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: center;
-  gap: 4px;
-  color: var(--coral);
-  margin: 15px 0 12px;
+  gap: 0;
+  margin: 4px 0 7px;
   font-family: Georgia, "Times New Roman", serif;
 }
 
 .result-score strong {
-  font-size: clamp(88px, 14vw, 150px);
+  color: var(--coral);
+  font-size: clamp(78px, 12vw, 126px);
   font-weight: 400;
   letter-spacing: -0.06em;
   line-height: 0.9;
 }
 
-.result-score span {
-  margin-top: 12px;
-  font-size: 30px;
+.result-score-percent {
+  color: var(--coral);
+  font-size: clamp(27px, 4vw, 42px);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.result-overview > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.35;
 }
 
 .result-card h1 {
-  font-size: clamp(42px, 6vw, 68px);
+  margin: 0;
+  font-size: clamp(38px, 5vw, 58px);
 }
 
-.result-card > p:not(.kicker) {
-  color: var(--muted);
-  font-size: 18px;
-  margin: 24px auto 0;
-}
-
-.result-card .challenge-comparison {
-  margin-top: 10px;
+.result-summary-main .challenge-comparison {
+  margin-top: 7px;
   color: var(--green);
   font-weight: 800;
 }
 
 .challenge-share {
-  margin: 22px 0;
-  padding: 18px;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--card);
+  text-align: left;
 }
 
-.challenge-share .challenge-code-block {
-  margin: 0 0 13px;
+.challenge-share-heading {
+  min-width: 0;
 }
 
-.challenge-share .challenge-code-block strong {
-  font-size: 28px;
+.challenge-share-heading h2 {
+  margin: 0 0 3px;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.challenge-share-heading > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.challenge-share-heading strong {
+  margin-left: 4px;
+  color: var(--coral);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.12em;
 }
 
 .challenge-share-actions {
@@ -1313,9 +1366,8 @@ body.challenge-page {
   gap: 10px;
 }
 
-.challenge-share-actions .primary-button,
 .challenge-share-actions .secondary-button {
-  min-height: 46px;
+  min-height: 42px;
 }
 
 .primary-button:disabled,
@@ -1326,48 +1378,15 @@ body.challenge-page {
 }
 
 .challenge-share-status {
-  min-height: 1.4em;
-  margin: 9px 0 -5px;
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
   color: var(--green);
   font-size: 13px;
   font-weight: 700;
 }
 
-.result-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1.6fr;
-  margin: 48px 0 32px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--card);
-  text-align: left;
-}
-
-.result-stats div {
-  min-height: 92px;
-  padding: 20px;
-  display: grid;
-  gap: 7px;
-  align-content: center;
-  border-right: 1px solid var(--line);
-}
-
-.result-stats div:last-child {
-  border-right: 0;
-}
-
-.result-stats span {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.result-stats strong {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 24px;
-  font-weight: 400;
+.challenge-share-status:empty {
+  display: none;
 }
 
 .result-review {

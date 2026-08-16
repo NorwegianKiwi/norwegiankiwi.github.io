@@ -74,8 +74,9 @@
       review: "Gjennomgang",
       reviewHeading: "Dette kan du øve mer på",
       reviewCount: "{count} land å se nærmere på.",
-      resultComplete: "Øvelsen er fullført",
       percentCorrect: "{percentage} prosent riktig",
+      resultLabel: "Resultat",
+      resultPercentSuffix: " %",
       resultExcellent: "Imponerende!",
       resultGreat: "Godt jobbet!",
       resultGood: "Du er på god vei.",
@@ -92,7 +93,7 @@
       challengeDescription:
         "Du får nøyaktig samme land og svaralternativer i samme rekkefølge.",
       challengeCode: "Utfordringskode",
-      scoreToBeat: "Poeng å slå",
+      scoreToMatch: "Resultat å matche",
       questionsLabel: "Spørsmål",
       startChallenge: "Start utfordringen",
       unverifiedScore:
@@ -101,10 +102,15 @@
       invalidChallengeTitle: "Denne utfordringslenken virker ikke.",
       invalidChallengeDescription:
         "Lenken mangler en gyldig spilltype, region, versjon eller utfordringskode.",
-      challengeBeat: "Du slo poengsummen på {score}!",
-      challengeTied: "Du fikk samme poengsum: {score}.",
-      challengeMissed: "Du fikk {score}; poengsummen å slå var {target}.",
+      challengeBeat: "Du slo resultatet på {target} poeng!",
+      challengeTied: "Du matchet resultatet: {target} poeng.",
+      challengePerfectTied:
+        "Perfekt! Du matchet utfordringen med full poengsum.",
+      challengeMissed:
+        "Du fikk {score} poeng; resultatet å matche var {target}.",
       shareChallenge: "Utfordre en venn",
+      nativeShare: "Del",
+      roundLabel: "Runde",
       copyChallengeLink: "Kopier lenke",
       copyChallengeLinkFull: "Kopier utfordringslenke",
       challengeLinkCopied: "Utfordringslenken er kopiert.",
@@ -225,8 +231,9 @@
       reviewHeading: "Here is what you can practise",
       reviewCount:
         "{count} {count, plural, one {country} other {countries}} to revisit.",
-      resultComplete: "Practice complete",
       percentCorrect: "{percentage} per cent correct",
+      resultLabel: "Result",
+      resultPercentSuffix: "%",
       resultExcellent: "Impressive!",
       resultGreat: "Well done!",
       resultGood: "You’re on your way.",
@@ -244,7 +251,7 @@
       challengeDescription:
         "You will get exactly the same countries and answer choices in the same order.",
       challengeCode: "Challenge code",
-      scoreToBeat: "Score to beat",
+      scoreToMatch: "Score to match",
       questionsLabel: "Questions",
       startChallenge: "Start challenge",
       unverifiedScore:
@@ -253,10 +260,14 @@
       invalidChallengeTitle: "This challenge link does not work.",
       invalidChallengeDescription:
         "The link is missing a valid game type, region, version, or challenge code.",
-      challengeBeat: "You beat the score of {score}!",
-      challengeTied: "You matched the score of {score}.",
-      challengeMissed: "You scored {score}; the score to beat was {target}.",
+      challengeBeat: "You beat the score of {target}!",
+      challengeTied: "You matched the score: {target}.",
+      challengePerfectTied:
+        "Perfect! You matched the challenge with a full score.",
+      challengeMissed: "You scored {score}; the score to match was {target}.",
       shareChallenge: "Challenge a friend",
+      nativeShare: "Share",
+      roundLabel: "Round",
       copyChallengeLink: "Copy link",
       copyChallengeLinkFull: "Copy challenge link",
       challengeLinkCopied: "Challenge link copied.",
@@ -1437,7 +1448,7 @@
     if (state.wrongAnswers.length === 0) return "";
 
     return `
-      <section class="result-review" id="result-review" aria-labelledby="review-heading">
+      <section class="result-review" id="result-review" aria-labelledby="review-heading" tabindex="-1">
         <p class="kicker">${t("review")}</p>
         <h2 id="review-heading">${t("reviewHeading")}</h2>
         <p>${t("reviewCount", { count: state.wrongAnswers.length })}</p>
@@ -1489,7 +1500,7 @@
             <div><span>${t("questionsLabel")}</span><strong>${questionTotal}</strong></div>
             ${
               state.challengeScoreVerified
-                ? `<div><span>${t("scoreToBeat")}</span><strong>${state.challengeTargetScore} / ${questionTotal}</strong></div>`
+                ? `<div><span>${t("scoreToMatch")}</span><strong>${state.challengeTargetScore} / ${questionTotal}</strong></div>`
                 : ""
             }
           </div>
@@ -1530,11 +1541,15 @@
 
   function challengeComparisonMarkup() {
     if (!state.challengeActive || !state.challengeScoreVerified) return "";
-    const message =
-      state.score > state.challengeTargetScore
-        ? t("challengeBeat", { score: state.challengeTargetScore })
-        : state.score === state.challengeTargetScore
-          ? t("challengeTied", { score: state.challengeTargetScore })
+    const matchedTarget = state.score === state.challengeTargetScore;
+    const matchedPerfectTarget =
+      matchedTarget && state.score === state.questions.length;
+    const message = state.score > state.challengeTargetScore
+      ? t("challengeBeat", { target: state.challengeTargetScore })
+      : matchedPerfectTarget
+        ? t("challengePerfectTied")
+        : matchedTarget
+          ? t("challengeTied", { target: state.challengeTargetScore })
           : t("challengeMissed", {
               score: state.score,
               target: state.challengeTargetScore,
@@ -1544,12 +1559,15 @@
 
   function challengeShareMarkup() {
     return `
-      <section class="challenge-share" aria-label="${escapeHtml(t("shareChallenge"))}">
-        ${challengeCodeMarkup()}
+      <section class="challenge-share" aria-labelledby="challenge-share-heading">
+        <div class="challenge-share-heading">
+          <h2 id="challenge-share-heading">${t("shareChallenge")}</h2>
+          <span>${t("roundLabel")} <strong>${escapeHtml(state.quizSeed)}</strong></span>
+        </div>
         <div class="challenge-share-actions">
           ${
             typeof navigator.share === "function"
-              ? `<button class="primary-button" data-action="share-challenge" ${state.shareProof ? "" : "disabled"}>${t("shareChallenge")}</button>`
+              ? `<button class="secondary-button" data-action="share-challenge" ${state.shareProof ? "" : "disabled"}>${t("nativeShare")}</button>`
               : ""
           }
           <button class="secondary-button" data-action="copy-challenge" ${state.shareProof ? "" : "disabled"}>
@@ -1580,40 +1598,46 @@
           ${homeButtonMarkup()}
         </header>
         <section class="result-card">
-          <p class="kicker">${t("resultComplete")}</p>
-          <div class="result-score" aria-label="${escapeHtml(t("percentCorrect", { percentage }))}">
-            <strong>${percentage}</strong><span>%</span>
-          </div>
-          <h1>${heading}</h1>
-          <p>
-            ${t("scoreBefore")} <strong>${state.score}</strong> ${t("scoreOf")}
-            <strong>${state.questions.length}</strong> ${t("scoreAfter")}
-            ${regionLabelInSentence(selectedRegion())}.
-          </p>
-          ${challengeComparisonMarkup()}
-          <div class="result-stats">
-            <div><span>${t("correctPlural")}</span><strong>${state.score}</strong></div>
-            <div>
-              <span>${t("wrong")}</span>
-              <strong>${state.questions.length - state.score}</strong>
+          <div class="result-summary-main">
+            <div class="result-overview">
+              <div class="result-overview-meta">
+                <span>${t("resultLabel")}</span>
+                <span
+                  class="result-overview-mode"
+                  aria-label="${escapeHtml(`${t("testYourself")}: ${t(selectedMode().shortLabelKey)}`)}"
+                >${t(selectedMode().shortLabelKey)}</span>
+              </div>
+              <div class="result-score" aria-label="${escapeHtml(t("percentCorrect", { percentage }))}">
+                <strong>${percentage}</strong><span class="result-score-percent">${t("resultPercentSuffix")}</span>
+              </div>
+              <p>
+                ${t("scoreBefore")} <strong>${state.score}</strong> ${t("scoreOf")}
+                <strong>${state.questions.length}</strong> ${t("scoreAfter")}
+                ${regionLabelInSentence(selectedRegion())}.
+              </p>
             </div>
-            <div><span>${t("testYourself")}</span><strong>${t(selectedMode().shortLabelKey)}</strong></div>
+            <h1>${heading}</h1>
+            ${challengeComparisonMarkup()}
           </div>
-          ${challengeShareMarkup()}
-          <button class="primary-button" data-action="setup">
-            ${t("chooseNewActivity")}
-            <span aria-hidden="true">→</span>
-          </button>
-          ${
-            hasReview
-              ? `
-                <button class="review-jump" data-action="review">
-                  ${t("reviewErrors", { count: state.wrongAnswers.length })}
-                  <span aria-hidden="true">↓</span>
-                </button>
-              `
-              : ""
-          }
+          <div class="result-summary-support">
+            ${challengeShareMarkup()}
+            <div class="result-actions">
+              <button class="primary-button" data-action="setup">
+                ${t("chooseNewActivity")}
+                <span aria-hidden="true">→</span>
+              </button>
+              ${
+                hasReview
+                  ? `
+                    <button class="review-jump" data-action="review">
+                      ${t("reviewErrors", { count: state.wrongAnswers.length })}
+                      <span aria-hidden="true">↓</span>
+                    </button>
+                  `
+                  : ""
+              }
+            </div>
+          </div>
         </section>
         ${reviewMarkup()}
       </main>
@@ -2910,6 +2934,7 @@
       "challenge-page",
       state.screen === "challenge-intro" || state.screen === "challenge-error",
     );
+    document.body?.classList.toggle("result-page", state.screen === "result");
     scheduleScrollAffordanceUpdate();
     scheduleResponsiveRegionMaps();
     if (state.screen === "explore" && state.exploreView === "map") {
@@ -3446,8 +3471,10 @@
       }),
       url,
     };
+    const usesNativeShare =
+      useNativeShare && typeof navigator.share === "function";
     try {
-      if (useNativeShare && typeof navigator.share === "function") {
+      if (usesNativeShare) {
         await navigator.share(shareData);
       } else {
         await copyText(url);
@@ -3456,7 +3483,7 @@
     } catch (error) {
       if (error?.name !== "AbortError") {
         setShareStatus(
-          useNativeShare ? "challengeShareFailed" : "challengeCopyFailed",
+          usesNativeShare ? "challengeShareFailed" : "challengeCopyFailed",
         );
       }
     }
@@ -3750,9 +3777,9 @@
     }
 
     if (action === "review") {
-      document
-        .getElementById("result-review")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const review = document.getElementById("result-review");
+      review?.focus({ preventScroll: true });
+      review?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
 
