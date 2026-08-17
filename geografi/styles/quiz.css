@@ -1370,6 +1370,111 @@ body.result-page {
   min-height: 42px;
 }
 
+.challenge-code-overlay {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(16, 29, 23, 0.7);
+}
+
+.challenge-code-dialog {
+  width: min(520px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  padding: clamp(24px, 6vw, 38px);
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 24px 70px rgba(11, 25, 18, 0.3);
+  text-align: center;
+}
+
+.challenge-code-dialog h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 7vw, 42px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.challenge-code-dialog > p {
+  margin: 12px auto 22px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.challenge-code-value {
+  display: block;
+  color: var(--coral);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(48px, 14vw, 72px);
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-indent: 0.16em;
+}
+
+.challenge-code-copy {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.challenge-code-copy .secondary-button {
+  min-height: 38px;
+  padding: 0 16px;
+}
+
+.challenge-code-dialog > .challenge-code-copy-status {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.challenge-code-details {
+  margin: 12px 0 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.challenge-code-details div {
+  min-width: 0;
+  padding: 12px 9px;
+}
+
+.challenge-code-details div + div {
+  border-left: 1px solid var(--line);
+}
+
+.challenge-code-details dt {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.challenge-code-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.challenge-code-dialog .primary-button {
+  min-width: 130px;
+}
+
 .primary-button:disabled,
 .secondary-button:disabled {
   cursor: wait;

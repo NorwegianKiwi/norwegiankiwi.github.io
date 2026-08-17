@@ -80,6 +80,18 @@ const goldenVectors = [
       ["ws", ["tv", "nz", "nr", "ws", "fj", "ki"]],
     ],
   },
+  {
+    mode: "country-capital",
+    region: "europe",
+    seed: "ABC",
+    choiceCount: 6,
+    total: 44,
+    first: [
+      ["pl", ["lt", "al", "sm", "va", "pl", "se"]],
+      ["fr", ["lv", "me", "si", "fr", "it", "ch"]],
+      ["ee", ["md", "be", "ee", "se", "cz", "pl"]],
+    ],
+  },
 ];
 
 for (const vector of goldenVectors) {
@@ -101,7 +113,19 @@ for (const vector of goldenVectors) {
 }
 
 assert.equal(challenge.normalizeSeed(" kxwpr "), "KXWPR");
-for (const invalid of ["ABCD", "ABCDEF", "AB1DE", "ABIDE", "ABODE", ""]) {
+assert.equal(challenge.normalizeSeed(" abc "), "ABC");
+for (const invalid of [
+  "AB",
+  "ABCD",
+  "ABCDEF",
+  "AB1",
+  "AIC",
+  "AOC",
+  "AB1DE",
+  "ABIDE",
+  "ABODE",
+  "",
+]) {
   assert.equal(challenge.normalizeSeed(invalid), null);
 }
 
@@ -111,7 +135,7 @@ const fakeCrypto = {
     return bytes;
   },
 };
-assert.equal(challenge.createRandomSeed(fakeCrypto), "ABCDE");
+assert.equal(challenge.createRandomSeed(fakeCrypto), "ABC");
 assert.throws(() => challenge.createSeededRandom("ABCDE", 2));
 
 (async () => {
@@ -142,6 +166,17 @@ assert.throws(() => challenge.createSeededRandom("ABCDE", 2));
     false,
   );
   assert.equal(await challenge.verifyScoreProof(recipe, "not-a-proof"), false);
+  const shortRecipe = { ...recipe, seed: "ABC" };
+  const shortProof = await challenge.createScoreProof(shortRecipe);
+  assert.equal(shortProof, "Hg_AspvV34I");
+  assert.equal(await challenge.verifyScoreProof(shortRecipe, shortProof), true);
+  assert.equal(
+    await challenge.verifyScoreProof(
+      { ...shortRecipe, seed: "ABD" },
+      shortProof,
+    ),
+    false,
+  );
   for (const score of [0, 1, 195, 196]) {
     const edgeRecipe = { ...recipe, region: "world", score };
     const edgeProof = await challenge.createScoreProof(edgeRecipe);

@@ -9,7 +9,9 @@
 
   const VERSION = 1;
   const SEED_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ";
-  const SEED_PATTERN = /^[ABCDEFGHJKMNPQRSTUVWXYZ]{5}$/;
+  const GENERATED_SEED_LENGTH = 3;
+  const SEED_PATTERN =
+    /^(?:[ABCDEFGHJKMNPQRSTUVWXYZ]{3}|[ABCDEFGHJKMNPQRSTUVWXYZ]{5})$/;
   const PROOF_PREFIX = "hello-world-friend-challenge";
 
   function normalizeSeed(value) {
@@ -23,19 +25,19 @@
       Math.floor(256 / SEED_ALPHABET.length) * SEED_ALPHABET.length;
 
     if (cryptoObject?.getRandomValues) {
-      while (seed.length < 5) {
+      while (seed.length < GENERATED_SEED_LENGTH) {
         const bytes = new Uint8Array(8);
         cryptoObject.getRandomValues(bytes);
         for (const byte of bytes) {
           if (byte >= maximumUnbiasedByte) continue;
           seed += SEED_ALPHABET[byte % SEED_ALPHABET.length];
-          if (seed.length === 5) break;
+          if (seed.length === GENERATED_SEED_LENGTH) break;
         }
       }
       return seed;
     }
 
-    while (seed.length < 5) {
+    while (seed.length < GENERATED_SEED_LENGTH) {
       seed += SEED_ALPHABET[Math.floor(Math.random() * SEED_ALPHABET.length)];
     }
     return seed;

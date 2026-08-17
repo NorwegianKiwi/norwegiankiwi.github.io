@@ -110,6 +110,7 @@
         "Du fikk {score} poeng; resultatet å matche var {target}.",
       shareChallenge: "Utfordre en venn",
       nativeShare: "Del",
+      showChallengeCode: "Vis kode",
       roundLabel: "Runde",
       copyChallengeLink: "Kopier lenke",
       copyChallengeLinkFull: "Kopier utfordringslenke",
@@ -119,17 +120,33 @@
       challengeShareTitle: "Hei verden! – en utfordring",
       challengeShareText:
         "Jeg fikk {score} av {total} i {mode}. Klarer du å slå meg?",
+      challengeShareDetails:
+        "Kode: {code}\nOmråde: {region}\nSpilltype: {mode}\nResultat: {score} av {total}\n\nÅpne utfordringen i Hei verden!, skriv inn koden og velg samme område og spilltype.",
+      showCodeTitle: "Vis denne utfordringen",
+      showCodeDescription:
+        "Gi denne informasjonen til personen du vil utfordre.",
+      copyChallengeCode: "Kopier kode",
+      challengeCodeCopied: "Koden er kopiert.",
+      challengeCodeCopyFailed: "Kunne ikke kopiere koden.",
+      challengeRegionLabel: "Område",
+      challengeModeLabel: "Spilltype",
+      challengeScoreLabel: "Resultat",
+      close: "Lukk",
       openChallenge: "Åpne utfordring",
       openChallengePrompt: "Har du fått en utfordring?",
       openChallengeDescription:
-        "Lim inn hele utfordringslenken for å åpne den her.",
-      challengeUrlLabel: "Utfordringslenke",
-      challengeUrlPlaceholder: "https://…",
+        "Lim inn hele utfordringslenken, eller skriv inn koden på tre bokstaver. Eldre koder på fem bokstaver virker også.",
+      challengeInputLabel: "Utfordringslenke eller kode",
+      challengeInputPlaceholder: "https://… eller ABC",
       cancel: "Avbryt",
-      challengeUrlRequired: "Lim inn en utfordringslenke.",
+      challengeInputRequired: "Lim inn en utfordringslenke eller skriv inn en kode.",
+      challengeCodeInvalid:
+        "Koden må ha tre bokstaver, eller fem for en eldre kode.",
       challengeUrlMalformed: "Dette er ikke en gyldig nettadresse.",
       challengeUrlWrongApp: "Lenken tilhører ikke denne geografiappen.",
       challengeUrlInvalid: "Dette er ikke en gyldig utfordringslenke.",
+      challengeCodeReady: "Kode {code} er klar",
+      clearChallengeCode: "Fjern utfordringskode {code}",
       chooseCountry: "Velg et land",
       countryCapital: "{name}, hovedstad {capital}",
       interactiveRegionMap: "Interaktivt kart over {region}",
@@ -267,6 +284,7 @@
       challengeMissed: "You scored {score}; the score to match was {target}.",
       shareChallenge: "Challenge a friend",
       nativeShare: "Share",
+      showChallengeCode: "Show code",
       roundLabel: "Round",
       copyChallengeLink: "Copy link",
       copyChallengeLinkFull: "Copy challenge link",
@@ -276,17 +294,33 @@
       challengeShareTitle: "Hello World! – a challenge",
       challengeShareText:
         "I scored {score} out of {total} in {mode}. Can you beat me?",
+      challengeShareDetails:
+        "Code: {code}\nRegion: {region}\nQuiz mode: {mode}\nScore: {score} out of {total}\n\nOpen the challenge in Hello World!, enter the code, and choose the same region and quiz mode.",
+      showCodeTitle: "Show this challenge",
+      showCodeDescription:
+        "Give this information to the person you want to challenge.",
+      copyChallengeCode: "Copy code",
+      challengeCodeCopied: "Code copied.",
+      challengeCodeCopyFailed: "Could not copy the code.",
+      challengeRegionLabel: "Region",
+      challengeModeLabel: "Quiz mode",
+      challengeScoreLabel: "Score",
+      close: "Close",
       openChallenge: "Open challenge",
       openChallengePrompt: "Have you received a challenge?",
       openChallengeDescription:
-        "Paste the complete challenge link to open it here.",
-      challengeUrlLabel: "Challenge link",
-      challengeUrlPlaceholder: "https://…",
+        "Paste the complete challenge link, or enter the three-letter code. Older five-letter codes also work.",
+      challengeInputLabel: "Challenge link or code",
+      challengeInputPlaceholder: "https://… or ABC",
       cancel: "Cancel",
-      challengeUrlRequired: "Paste a challenge link.",
+      challengeInputRequired: "Paste a challenge link or enter a code.",
+      challengeCodeInvalid:
+        "The code must have three letters, or five for an older code.",
       challengeUrlMalformed: "This is not a valid web address.",
       challengeUrlWrongApp: "This link does not belong to this geography app.",
       challengeUrlInvalid: "This is not a valid challenge link.",
+      challengeCodeReady: "Code {code} is ready",
+      clearChallengeCode: "Remove challenge code {code}",
       chooseCountry: "Choose a country",
       countryCapital: "{name}, capital {capital}",
       interactiveRegionMap: "Interactive map of {region}",
@@ -454,6 +488,7 @@
       ? initialChallenge.version
       : challenge.VERSION,
     challengeActive: initialChallenge?.valid === true,
+    manualChallengeActive: false,
     challengeTargetScore: null,
     challengeScoreVerified: false,
     challengeScoreWarning: initialChallenge?.valid === true,
@@ -479,6 +514,9 @@
     openChallengeOpen: false,
     openChallengeValue: "",
     openChallengeError: null,
+    pendingManualSeed: null,
+    challengeCodeDialogOpen: false,
+    challengeCodeCopyStatus: null,
     exploreScrollTop: 0,
     exploreView: "list",
     explorePinnedCode: null,
@@ -1296,16 +1334,15 @@
           <h2 id="open-challenge-title">${t("openChallengePrompt")}</h2>
           <p id="open-challenge-description">${t("openChallengeDescription")}</p>
           <form data-open-challenge-form novalidate>
-            <label for="challenge-url">${t("challengeUrlLabel")}</label>
+            <label for="challenge-input">${t("challengeInputLabel")}</label>
             <input
-              id="challenge-url"
-              name="challenge-url"
-              type="url"
-              inputmode="url"
+              id="challenge-input"
+              name="challenge-input"
+              type="text"
               autocomplete="off"
-              autocapitalize="none"
+              autocapitalize="characters"
               spellcheck="false"
-              placeholder="${escapeHtml(t("challengeUrlPlaceholder"))}"
+              placeholder="${escapeHtml(t("challengeInputPlaceholder"))}"
               value="${escapeHtml(state.openChallengeValue)}"
               aria-describedby="open-challenge-error"
               ${state.openChallengeError ? 'aria-invalid="true"' : ""}
@@ -1323,14 +1360,33 @@
     `;
   }
 
+  function pendingManualSeedMarkup() {
+    if (!state.pendingManualSeed) return "";
+    const code = escapeHtml(state.pendingManualSeed);
+    return `
+      <span class="pending-challenge-code" role="status">
+        <span>${t("challengeCodeReady", { code })}</span>
+        <button
+          type="button"
+          data-action="clear-challenge-code"
+          aria-label="${escapeHtml(t("clearChallengeCode", { code }))}"
+          title="${escapeHtml(t("clearChallengeCode", { code }))}"
+        >×</button>
+      </span>
+    `;
+  }
+
   function setupMarkup() {
     const installAction = installActionMarkup();
     return `
       <div class="setup-page">
       <main class="site-shell setup-shell">
-        <header class="brand-bar">
+        <header class="brand-bar ${state.pendingManualSeed ? "has-pending-challenge" : ""}">
           ${brandMarkup(false, false)}
-          ${siteHomeLinkMarkup()}
+          <div class="setup-header-actions">
+            ${pendingManualSeedMarkup()}
+            ${siteHomeLinkMarkup()}
+          </div>
         </header>
 
         <section class="hero" id="top">
@@ -1565,6 +1621,7 @@
           <span>${t("roundLabel")} <strong>${escapeHtml(state.quizSeed)}</strong></span>
         </div>
         <div class="challenge-share-actions">
+          <button class="secondary-button" data-action="show-challenge-code">${t("showChallengeCode")}</button>
           ${
             typeof navigator.share === "function"
               ? `<button class="secondary-button" data-action="share-challenge" ${state.shareProof ? "" : "disabled"}>${t("nativeShare")}</button>`
@@ -1576,6 +1633,52 @@
         </div>
         <p class="challenge-share-status" data-challenge-status aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p>
       </section>
+    `;
+  }
+
+  function challengeCodeDialogMarkup() {
+    if (!state.challengeCodeDialogOpen) return "";
+    const code = escapeHtml(state.quizSeed);
+    return `
+      <div class="challenge-code-overlay" data-action="close-challenge-code">
+        <section
+          class="challenge-code-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="challenge-code-title"
+          aria-describedby="challenge-code-description"
+          tabindex="-1"
+        >
+          <h2 id="challenge-code-title">${t("showCodeTitle")}</h2>
+          <p id="challenge-code-description">${t("showCodeDescription")}</p>
+          <div class="challenge-code-copy">
+            <strong class="challenge-code-value">${code}</strong>
+            <button class="secondary-button" type="button" data-action="copy-challenge-code">
+              ${t("copyChallengeCode")}
+            </button>
+          </div>
+          <p class="challenge-code-copy-status" data-challenge-code-copy-status aria-live="polite">
+            ${state.challengeCodeCopyStatus ? t(state.challengeCodeCopyStatus) : ""}
+          </p>
+          <dl class="challenge-code-details">
+            <div>
+              <dt>${t("challengeRegionLabel")}</dt>
+              <dd>${escapeHtml(regionLabel(selectedRegion()))}</dd>
+            </div>
+            <div>
+              <dt>${t("challengeModeLabel")}</dt>
+              <dd>${escapeHtml(t(selectedMode().shortLabelKey))}</dd>
+            </div>
+            <div>
+              <dt>${t("challengeScoreLabel")}</dt>
+              <dd>${state.score} / ${state.questions.length}</dd>
+            </div>
+          </dl>
+          <button class="primary-button" type="button" data-action="close-challenge-code-button">
+            ${t("close")}
+          </button>
+        </section>
+      </div>
     `;
   }
 
@@ -1641,6 +1744,7 @@
         </section>
         ${reviewMarkup()}
       </main>
+      ${challengeCodeDialogMarkup()}
     `;
   }
 
@@ -2819,7 +2923,7 @@
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
             <span>${regionLabel(selectedRegion())}</span>
-            ${state.challengeActive ? `<span class="challenge-meta-code">${escapeHtml(state.quizSeed)}</span>` : ""}
+            ${state.challengeActive || state.manualChallengeActive ? `<span class="challenge-meta-code" aria-label="${escapeHtml(`${t("challengeCode")}: ${state.quizSeed}`)}">${escapeHtml(state.quizSeed)}</span>` : ""}
             <strong>${state.questionIndex + 1} / ${state.questions.length}</strong>
           </div>
           ${homeButtonMarkup()}
@@ -2946,7 +3050,8 @@
       "modal-open",
       state.modalCode !== null ||
         state.installHelpOpen ||
-        state.openChallengeOpen,
+        state.openChallengeOpen ||
+        state.challengeCodeDialogOpen,
     );
 
     if (options.focusCorrect) app.querySelector(".is-correction")?.focus();
@@ -2958,12 +3063,27 @@
       app.querySelector('[data-action="install-app"]')?.focus();
     }
     if (options.focusOpenChallengeInput) {
-      const input = app.querySelector("#challenge-url");
+      const input = app.querySelector("#challenge-input");
       input?.focus();
       if (options.selectOpenChallengeInput) input?.select();
     }
     if (options.focusOpenChallengeButton) {
       app.querySelector('[data-action="open-challenge"]')?.focus();
+    }
+    if (options.focusPendingManualSeed) {
+      app
+        .querySelector('[data-action="clear-challenge-code"]')
+        ?.focus({ preventScroll: true });
+    }
+    if (options.focusChallengeCodeDialog) {
+      app
+        .querySelector('[data-action="close-challenge-code-button"]')
+        ?.focus({ preventScroll: true });
+    }
+    if (options.focusShowChallengeCode) {
+      app
+        .querySelector('[data-action="show-challenge-code"]')
+        ?.focus({ preventScroll: true });
     }
     if (options.focusFlagCode) {
       const flagButton = app.querySelector(
@@ -3209,6 +3329,10 @@
   function startQuiz(mode, { challengeRound = false } = {}) {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
+    state.manualChallengeActive = false;
+    const pendingManualSeed = challengeRound
+      ? null
+      : state.pendingManualSeed;
     if (!challengeRound) {
       state.challengeActive = false;
       state.challengeTargetScore = null;
@@ -3229,7 +3353,13 @@
       renderAtTop({ focusMapRegion: true });
       return;
     }
-    if (!state.quizSeed) state.quizSeed = challenge.createRandomSeed();
+    if (!state.quizSeed) {
+      state.quizSeed = pendingManualSeed ?? challenge.createRandomSeed();
+      if (pendingManualSeed) {
+        state.pendingManualSeed = null;
+        state.manualChallengeActive = true;
+      }
+    }
     state.mode = mode;
     const modeConfig = modes.find((option) => option.id === mode);
     state.questions = createQuestions(
@@ -3294,6 +3424,20 @@
     render({ focusOpenChallengeButton: true });
   }
 
+  function openChallengeCodeDialog() {
+    if (state.screen !== "result" || !state.quizSeed) return;
+    state.challengeCodeDialogOpen = true;
+    state.challengeCodeCopyStatus = null;
+    render({ focusChallengeCodeDialog: true });
+  }
+
+  function closeChallengeCodeDialog() {
+    if (!state.challengeCodeDialogOpen) return;
+    state.challengeCodeDialogOpen = false;
+    state.challengeCodeCopyStatus = null;
+    render({ focusShowChallengeCode: true });
+  }
+
   function normalizedAppPath(url) {
     const withoutIndex = url.pathname.replace(/\/index\.html$/, "/");
     return withoutIndex.endsWith("/") ? withoutIndex : `${withoutIndex}/`;
@@ -3320,12 +3464,31 @@
     return canonicalChallengeUrl(recipe, locale);
   }
 
-  function openPastedChallenge(value) {
+  function openChallengeInput(value) {
     const trimmedValue = value.trim();
     state.openChallengeValue = trimmedValue;
     if (!trimmedValue) {
-      state.openChallengeError = "challengeUrlRequired";
+      state.openChallengeError = "challengeInputRequired";
       render({ focusOpenChallengeInput: true });
+      return;
+    }
+
+    const manualSeed = challenge.normalizeSeed(trimmedValue);
+    if (manualSeed) {
+      state.pendingManualSeed = manualSeed;
+      state.openChallengeOpen = false;
+      state.openChallengeValue = "";
+      state.openChallengeError = null;
+      render({ focusPendingManualSeed: true });
+      return;
+    }
+
+    if (/^[A-Za-z0-9]+$/.test(trimmedValue)) {
+      state.openChallengeError = "challengeCodeInvalid";
+      render({
+        focusOpenChallengeInput: true,
+        selectOpenChallengeInput: true,
+      });
       return;
     }
 
@@ -3459,6 +3622,22 @@
     if (!copied) throw new Error("Copy failed");
   }
 
+  function setChallengeCodeCopyStatus(messageKey) {
+    state.challengeCodeCopyStatus = messageKey;
+    const status = app.querySelector("[data-challenge-code-copy-status]");
+    if (status) status.textContent = t(messageKey);
+  }
+
+  async function copyChallengeCode() {
+    if (!state.challengeCodeDialogOpen || !state.quizSeed) return;
+    try {
+      await copyText(state.quizSeed);
+      setChallengeCodeCopyStatus("challengeCodeCopied");
+    } catch {
+      setChallengeCodeCopyStatus("challengeCodeCopyFailed");
+    }
+  }
+
   async function shareChallenge(useNativeShare) {
     const url = challengeShareUrl();
     if (!url) return;
@@ -3468,6 +3647,12 @@
         score: state.score,
         total: state.questions.length,
         mode: t(selectedMode().shortLabelKey),
+      }) + "\n\n" + t("challengeShareDetails", {
+        code: state.quizSeed,
+        region: regionLabel(selectedRegion()),
+        mode: t(selectedMode().shortLabelKey),
+        score: state.score,
+        total: state.questions.length,
       }),
       url,
     };
@@ -3548,9 +3733,12 @@
     state.openChallengeOpen = false;
     state.openChallengeValue = "";
     state.openChallengeError = null;
+    state.challengeCodeDialogOpen = false;
+    state.challengeCodeCopyStatus = null;
     state.quizSeed = null;
     state.challengeVersion = challenge.VERSION;
     state.challengeActive = false;
+    state.manualChallengeActive = false;
     state.challengeTargetScore = null;
     state.challengeScoreVerified = false;
     state.challengeScoreWarning = false;
@@ -3621,6 +3809,26 @@
       return;
     }
 
+    if (action === "show-challenge-code") {
+      openChallengeCodeDialog();
+      return;
+    }
+
+    if (action === "close-challenge-code") {
+      if (event.target === control) closeChallengeCodeDialog();
+      return;
+    }
+
+    if (action === "close-challenge-code-button") {
+      closeChallengeCodeDialog();
+      return;
+    }
+
+    if (action === "copy-challenge-code") {
+      void copyChallengeCode();
+      return;
+    }
+
     if (action === "copy-intro-challenge") {
       void copyIntroChallenge();
       return;
@@ -3643,6 +3851,12 @@
 
     if (action === "cancel-open-challenge") {
       closeOpenChallenge();
+      return;
+    }
+
+    if (action === "clear-challenge-code") {
+      state.pendingManualSeed = null;
+      render({ focusOpenChallengeButton: true });
       return;
     }
 
@@ -3792,11 +4006,13 @@
     const form = event.target.closest("[data-open-challenge-form]");
     if (!form || !app.contains(form)) return;
     event.preventDefault();
-    openPastedChallenge(form.elements.namedItem("challenge-url")?.value ?? "");
+    openChallengeInput(
+      form.elements.namedItem("challenge-input")?.value ?? "",
+    );
   });
 
   app.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" || event.target?.id !== "challenge-url") return;
+    if (event.key !== "Enter" || event.target?.id !== "challenge-input") return;
     event.preventDefault();
     event.target.form?.requestSubmit();
   });
@@ -4107,9 +4323,11 @@
   document.addEventListener("keydown", (event) => {
     const activeDialog = state.openChallengeOpen
       ? app.querySelector(".open-challenge-dialog")
-      : state.installHelpOpen
-        ? app.querySelector(".install-help-dialog")
-        : null;
+      : state.challengeCodeDialogOpen
+        ? app.querySelector(".challenge-code-dialog")
+        : state.installHelpOpen
+          ? app.querySelector(".install-help-dialog")
+          : null;
     if (activeDialog && event.key === "Tab") {
       const dialog = activeDialog;
       const focusable = dialog
@@ -4143,6 +4361,12 @@
     if (state.openChallengeOpen) {
       event.preventDefault();
       closeOpenChallenge();
+      return;
+    }
+
+    if (state.challengeCodeDialogOpen) {
+      event.preventDefault();
+      closeChallengeCodeDialog();
       return;
     }
 
@@ -4197,7 +4421,7 @@
 
     state.screen = "result";
     state.mode = previewMode;
-    state.quizSeed = "ABCDE";
+    state.quizSeed = "ABC";
     state.questions = previewCountries.map((country) => ({ country }));
     state.score = score;
     state.wrongAnswers = previewCountries.slice(score);

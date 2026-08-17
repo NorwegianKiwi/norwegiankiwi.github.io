@@ -33,24 +33,42 @@ active quiz, flashcard round, or Explore view.
 
 Every scored quiz result can be shared as a deterministic friend challenge.
 An official challenge URL contains a recipe version, quiz mode, region,
-five-letter seed, score, and score proof, for example:
+three- or legacy five-letter seed, score, and score proof, for example:
 
-`?cv=1&mode=country-flag&region=europe&seed=KXWPR&score=23&proof=AcJBW5KX36Q`
+`?cv=1&mode=country-flag&region=europe&seed=ABC&score=23&proof=Hg_AspvV34I`
 
-Version 1 seeds use five uppercase letters from
-`ABCDEFGHJKMNPQRSTUVWXYZ`; lowercase URL input is normalized. The recipe fixes
-the country order, distractors, and answer order independently of the chosen
-interface language. The proof detects casual edits to any public recipe field,
-but it is not authentication: this is a static site and a determined person
-can recreate a valid proof. An invalid or missing score proof removes the score
-to beat but does not prevent the deterministic round from being played.
+Version 1 seeds use uppercase letters from `ABCDEFGHJKMNPQRSTUVWXYZ`;
+lowercase input is normalized. New rounds generate three-letter seeds, giving
+12,167 possible codes for each region and quiz-mode combination. Existing
+five-letter v1 seeds remain valid and reproduce their original rounds exactly.
+The recipe fixes the country order, distractors, and answer order independently
+of the chosen interface language. The proof detects casual edits to any public
+recipe field, but it is not authentication: this is a static site and a
+determined person can recreate a valid proof. An invalid or missing score proof
+removes the score to beat but does not prevent the deterministic round from
+being played.
 
 The setup page always offers **Open challenge** in both browser and installed
-app display modes. Pasting a complete challenge URL validates it with the same
-rules as a directly opened link, then reconstructs it on the current app origin
-before navigating. This lets an iPhone Home Screen installation open a link
-copied from Safari or a message without relying on unsupported external-link
-capture.
+app display modes. It accepts either a complete challenge URL, a current
+three-letter code, or a legacy five-letter code. Pasting a URL validates it with
+the same rules as a directly opened link, then reconstructs it on the current
+app origin before navigating. This lets an iPhone Home Screen installation open
+a link copied from Safari or a message without relying on unsupported
+external-link capture.
+
+A code alone is only the deterministic round seed; it does not
+contain the region, quiz mode, score, or score proof. Entering one therefore
+arms the next scored quiz on the setup page. The recipient chooses the region
+and quiz mode supplied by the sender, and the code is consumed when that quiz
+actually starts. It is not consumed by Explore, Flashcards, or the map quiz's
+region-selection step, and it is not stored in the URL or across reloads.
+
+The result screen's **Show code** dialog presents the code, region, quiz mode,
+and score for in-person sharing, and **Copy code** copies only the seed. Native
+share messages include the same manual details as well as the canonical URL.
+**Copy link** continues to copy only the URL. Code-only rounds reproduce the
+questions but do not show a verified score to beat. The active code is also
+shown in the quiz header for URL and manually entered challenges.
 
 Every valid challenge intro also offers a quiet **Copy challenge link** action
 below the primary Start button. It copies a canonical URL containing only the
