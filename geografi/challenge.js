@@ -187,6 +187,13 @@
     });
   }
 
+  function randomizeChoiceOrder(questions, random = Math.random) {
+    return questions.map((question) => ({
+      ...question,
+      choices: shuffle(question.choices, random),
+    }));
+  }
+
   function proofMessage({ version, mode, region, seed, score }) {
     return `${PROOF_PREFIX}|${version}|${mode}|${region}|${seed}|${score}`;
   }
@@ -227,6 +234,7 @@
     createRandomSeed,
     createSeededRandom,
     createQuestions,
+    randomizeChoiceOrder,
     createScoreProof,
     verifyScoreProof,
   };

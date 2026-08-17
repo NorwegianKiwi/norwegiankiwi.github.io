@@ -41,12 +41,14 @@ Version 1 seeds use uppercase letters from `ABCDEFGHJKMNPQRSTUVWXYZ`;
 lowercase input is normalized. New rounds generate three-letter seeds, giving
 12,167 possible codes for each region and quiz-mode combination. Existing
 five-letter v1 seeds remain valid and reproduce their original rounds exactly.
-The recipe fixes the country order, distractors, and answer order independently
-of the chosen interface language. The proof detects casual edits to any public
-recipe field, but it is not authentication: this is a static site and a
-determined person can recreate a valid proof. An invalid or missing score proof
-removes the score to beat but does not prevent the deterministic round from
-being played.
+The recipe fixes the country order and the exact set of alternatives for each
+question independently of the chosen interface language. Their displayed
+positions are shuffled once whenever a quiz starts, so replaying the same
+challenge requires reading the alternatives again. Positions remain stable
+throughout that playthrough. The proof detects casual edits to any public recipe
+field, but it is not authentication: this is a static site and a determined
+person can recreate a valid proof. An invalid or missing score proof removes the
+score to beat but does not prevent the deterministic round from being played.
 
 The setup page always offers **Open challenge** in both browser and installed
 app display modes. It accepts either a complete challenge URL, a current

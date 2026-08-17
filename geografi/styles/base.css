@@ -177,6 +177,7 @@ a:focus-visible {
 
 .setup-header-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: 14px;
@@ -185,17 +186,36 @@ a:focus-visible {
 
 .pending-challenge-code {
   min-height: 34px;
-  padding: 4px 5px 4px 12px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  border: 1px solid rgba(36, 93, 69, 0.35);
-  border-radius: 999px;
-  background: var(--green-soft);
-  color: var(--green);
-  font-size: 12px;
-  font-weight: 800;
   white-space: nowrap;
+}
+
+.pending-challenge-context {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pending-challenge-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.challenge-code-pill,
+.quiz-meta .challenge-code-pill {
+  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: #735913;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
 }
 
 .pending-challenge-code button {
@@ -204,15 +224,16 @@ a:focus-visible {
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(36, 93, 69, 0.12);
-  color: var(--green);
+  background: rgba(24, 35, 29, 0.08);
+  color: var(--muted);
   font: inherit;
   line-height: 1;
   cursor: pointer;
 }
 
 .pending-challenge-code button:hover {
-  background: rgba(36, 93, 69, 0.22);
+  background: rgba(24, 35, 29, 0.16);
+  color: var(--ink);
 }
 
 .brand-mark {

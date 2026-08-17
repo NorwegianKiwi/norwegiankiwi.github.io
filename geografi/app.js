@@ -111,7 +111,6 @@
       shareChallenge: "Utfordre en venn",
       nativeShare: "Del",
       showChallengeCode: "Vis kode",
-      roundLabel: "Runde",
       copyChallengeLink: "Kopier lenke",
       copyChallengeLinkFull: "Kopier utfordringslenke",
       challengeLinkCopied: "Utfordringslenken er kopiert.",
@@ -122,7 +121,7 @@
         "Jeg fikk {score} av {total} i {mode}. Klarer du å slå meg?",
       challengeShareDetails:
         "Kode: {code}\nOmråde: {region}\nSpilltype: {mode}\nResultat: {score} av {total}\n\nÅpne utfordringen i Hei verden!, skriv inn koden og velg samme område og spilltype.",
-      showCodeTitle: "Vis denne utfordringen",
+      showCodeTitle: "Utfordringskode",
       showCodeDescription:
         "Gi denne informasjonen til personen du vil utfordre.",
       copyChallengeCode: "Kopier kode",
@@ -135,17 +134,15 @@
       openChallenge: "Åpne utfordring",
       openChallengePrompt: "Har du fått en utfordring?",
       openChallengeDescription:
-        "Lim inn hele utfordringslenken, eller skriv inn koden på tre bokstaver. Eldre koder på fem bokstaver virker også.",
+        "Lim inn en utfordringslenke, eller skriv inn en utfordringskode.",
       challengeInputLabel: "Utfordringslenke eller kode",
       challengeInputPlaceholder: "https://… eller ABC",
       cancel: "Avbryt",
       challengeInputRequired: "Lim inn en utfordringslenke eller skriv inn en kode.",
-      challengeCodeInvalid:
-        "Koden må ha tre bokstaver, eller fem for en eldre kode.",
+      challengeCodeInvalid: "Dette er ikke en gyldig utfordringskode.",
       challengeUrlMalformed: "Dette er ikke en gyldig nettadresse.",
       challengeUrlWrongApp: "Lenken tilhører ikke denne geografiappen.",
       challengeUrlInvalid: "Dette er ikke en gyldig utfordringslenke.",
-      challengeCodeReady: "Kode {code} er klar",
       clearChallengeCode: "Fjern utfordringskode {code}",
       chooseCountry: "Velg et land",
       countryCapital: "{name}, hovedstad {capital}",
@@ -285,7 +282,6 @@
       shareChallenge: "Challenge a friend",
       nativeShare: "Share",
       showChallengeCode: "Show code",
-      roundLabel: "Round",
       copyChallengeLink: "Copy link",
       copyChallengeLinkFull: "Copy challenge link",
       challengeLinkCopied: "Challenge link copied.",
@@ -296,7 +292,7 @@
         "I scored {score} out of {total} in {mode}. Can you beat me?",
       challengeShareDetails:
         "Code: {code}\nRegion: {region}\nQuiz mode: {mode}\nScore: {score} out of {total}\n\nOpen the challenge in Hello World!, enter the code, and choose the same region and quiz mode.",
-      showCodeTitle: "Show this challenge",
+      showCodeTitle: "Challenge code",
       showCodeDescription:
         "Give this information to the person you want to challenge.",
       copyChallengeCode: "Copy code",
@@ -309,17 +305,15 @@
       openChallenge: "Open challenge",
       openChallengePrompt: "Have you received a challenge?",
       openChallengeDescription:
-        "Paste the complete challenge link, or enter the three-letter code. Older five-letter codes also work.",
+        "Paste a challenge link, or enter a challenge code.",
       challengeInputLabel: "Challenge link or code",
       challengeInputPlaceholder: "https://… or ABC",
       cancel: "Cancel",
       challengeInputRequired: "Paste a challenge link or enter a code.",
-      challengeCodeInvalid:
-        "The code must have three letters, or five for an older code.",
+      challengeCodeInvalid: "This is not a valid challenge code.",
       challengeUrlMalformed: "This is not a valid web address.",
       challengeUrlWrongApp: "This link does not belong to this geography app.",
       challengeUrlInvalid: "This is not a valid challenge link.",
-      challengeCodeReady: "Code {code} is ready",
       clearChallengeCode: "Remove challenge code {code}",
       chooseCountry: "Choose a country",
       countryCapital: "{name}, capital {capital}",
@@ -1364,15 +1358,22 @@
     if (!state.pendingManualSeed) return "";
     const code = escapeHtml(state.pendingManualSeed);
     return `
-      <span class="pending-challenge-code" role="status">
-        <span>${t("challengeCodeReady", { code })}</span>
+      <div class="pending-challenge-code">
+        <span
+          class="pending-challenge-context"
+          role="status"
+          aria-label="${escapeHtml(`${t("challengeCode")}: ${state.pendingManualSeed}`)}"
+        >
+          <span class="pending-challenge-label">${t("challengeCode")}:</span>
+          <strong class="challenge-code-pill">${code}</strong>
+        </span>
         <button
           type="button"
           data-action="clear-challenge-code"
           aria-label="${escapeHtml(t("clearChallengeCode", { code }))}"
           title="${escapeHtml(t("clearChallengeCode", { code }))}"
         >×</button>
-      </span>
+      </div>
     `;
   }
 
@@ -1618,7 +1619,6 @@
       <section class="challenge-share" aria-labelledby="challenge-share-heading">
         <div class="challenge-share-heading">
           <h2 id="challenge-share-heading">${t("shareChallenge")}</h2>
-          <span>${t("roundLabel")} <strong>${escapeHtml(state.quizSeed)}</strong></span>
         </div>
         <div class="challenge-share-actions">
           <button class="secondary-button" data-action="show-challenge-code">${t("showChallengeCode")}</button>
@@ -2923,7 +2923,7 @@
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
             <span>${regionLabel(selectedRegion())}</span>
-            ${state.challengeActive || state.manualChallengeActive ? `<span class="challenge-meta-code" aria-label="${escapeHtml(`${t("challengeCode")}: ${state.quizSeed}`)}">${escapeHtml(state.quizSeed)}</span>` : ""}
+            ${state.challengeActive || state.manualChallengeActive ? `<span class="challenge-meta-code challenge-code-pill" aria-label="${escapeHtml(`${t("challengeCode")}: ${state.quizSeed}`)}">${escapeHtml(state.quizSeed)}</span>` : ""}
             <strong>${state.questionIndex + 1} / ${state.questions.length}</strong>
           </div>
           ${homeButtonMarkup()}
@@ -3362,11 +3362,13 @@
     }
     state.mode = mode;
     const modeConfig = modes.find((option) => option.id === mode);
-    state.questions = createQuestions(
-      countriesInRegion(state.region),
-      modeConfig?.choiceCount,
-      mode,
-      state.quizSeed,
+    state.questions = challenge.randomizeChoiceOrder(
+      createQuestions(
+        countriesInRegion(state.region),
+        modeConfig?.choiceCount,
+        mode,
+        state.quizSeed,
+      ),
     );
     state.questionIndex = 0;
     state.selectedCode = null;

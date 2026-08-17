@@ -25,15 +25,6 @@
   color: var(--muted);
 }
 
-.quiz-meta .challenge-meta-code {
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: var(--gold-soft);
-  color: #735913;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
 .quiet-button {
   color: var(--muted);
   font-size: 13px;
@@ -1342,21 +1333,6 @@ body.result-page {
   font-family: inherit;
   font-size: 16px;
   line-height: 1.15;
-}
-
-.challenge-share-heading > span {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.challenge-share-heading strong {
-  margin-left: 4px;
-  color: var(--coral);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  letter-spacing: 0.12em;
 }
 
 .challenge-share-actions {

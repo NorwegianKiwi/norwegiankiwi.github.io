@@ -112,6 +112,36 @@ for (const vector of goldenVectors) {
   );
 }
 
+const canonicalQuestions = round("country-capital", "europe", "ABC", 6).slice(
+  0,
+  3,
+);
+const canonicalSnapshot = codes(canonicalQuestions);
+const lowChoiceOrder = challenge.randomizeChoiceOrder(
+  canonicalQuestions,
+  () => 0,
+);
+const highChoiceOrder = challenge.randomizeChoiceOrder(
+  canonicalQuestions,
+  () => 0.999,
+);
+assert.deepEqual(
+  lowChoiceOrder.map((question) => question.country.code),
+  canonicalQuestions.map((question) => question.country.code),
+);
+assert.deepEqual(
+  lowChoiceOrder.map((question) =>
+    question.choices.map((choice) => choice.code).sort(),
+  ),
+  canonicalQuestions.map((question) =>
+    question.choices.map((choice) => choice.code).sort(),
+  ),
+);
+assert.deepEqual(codes(canonicalQuestions), canonicalSnapshot);
+assert.notDeepEqual(codes(lowChoiceOrder), codes(highChoiceOrder));
+assert.notEqual(lowChoiceOrder[0], canonicalQuestions[0]);
+assert.notEqual(lowChoiceOrder[0].choices, canonicalQuestions[0].choices);
+
 assert.equal(challenge.normalizeSeed(" kxwpr "), "KXWPR");
 assert.equal(challenge.normalizeSeed(" abc "), "ABC");
 for (const invalid of [
