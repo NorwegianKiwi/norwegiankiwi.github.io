@@ -118,9 +118,10 @@
       challengeShareFailed: "Kunne ikke dele lenken. Prøv å kopiere den.",
       challengeShareTitle: "Hei verden! – en utfordring",
       challengeShareText:
-        "Jeg fikk {score} av {total} i {mode}. Klarer du å slå meg?",
+        "Jeg fikk {score} av {total} i {mode}. Klarer du?",
       challengeShareDetails:
-        "Kode: {code}\nOmråde: {region}\nSpilltype: {mode}\nResultat: {score} av {total}\n\nÅpne utfordringen i Hei verden!, skriv inn koden og velg samme område og spilltype.",
+        "Kode: {code}\nOmråde: {region}\nSpilltype: {mode}\nResultat: {score} av {total}",
+      challengeShareOpen: "Åpne utfordringen: {url}",
       showCodeTitle: "Utfordringskode",
       showCodeDescription:
         "Gi denne informasjonen til personen du vil utfordre.",
@@ -289,9 +290,10 @@
       challengeShareFailed: "Could not share the link. Try copying it instead.",
       challengeShareTitle: "Hello World! – a challenge",
       challengeShareText:
-        "I scored {score} out of {total} in {mode}. Can you beat me?",
+        "I scored {score} out of {total} in {mode}. Can you?",
       challengeShareDetails:
-        "Code: {code}\nRegion: {region}\nQuiz mode: {mode}\nScore: {score} out of {total}\n\nOpen the challenge in Hello World!, enter the code, and choose the same region and quiz mode.",
+        "Code: {code}\nRegion: {region}\nQuiz mode: {mode}\nScore: {score} out of {total}",
+      challengeShareOpen: "Open the challenge: {url}",
       showCodeTitle: "Challenge code",
       showCodeDescription:
         "Give this information to the person you want to challenge.",
@@ -3655,8 +3657,7 @@
         mode: t(selectedMode().shortLabelKey),
         score: state.score,
         total: state.questions.length,
-      }),
-      url,
+      }) + "\n\n" + t("challengeShareOpen", { url }),
     };
     const usesNativeShare =
       useNativeShare && typeof navigator.share === "function";

@@ -67,10 +67,11 @@ region-selection step, and it is not stored in the URL or across reloads.
 
 The result screen's **Show code** dialog presents the code, region, quiz mode,
 and score for in-person sharing, and **Copy code** copies only the seed. Native
-share messages include the same manual details as well as the canonical URL.
-**Copy link** continues to copy only the URL. Code-only rounds reproduce the
-questions but do not show a verified score to beat. The active code is also
-shown in the quiz header for URL and manually entered challenges.
+share messages send the invitation, manual details, and canonical URL together
+as one text block so receiving apps retain the full challenge context. **Copy
+link** continues to copy only the URL. Code-only rounds reproduce the questions
+but do not show a verified score to beat. The active code is also shown in the
+quiz header for URL and manually entered challenges.
 
 Every valid challenge intro also offers a quiet **Copy challenge link** action
 below the primary Start button. It copies a canonical URL containing only the
