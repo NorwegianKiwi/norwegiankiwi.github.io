@@ -34,6 +34,23 @@ in `curriculum.js`. Profile, persistence, transfer and backup behavior lives in
 `progress.js`. Both are dependency-free UMD modules so they work directly in a
 browser and in the Node-based domain tests.
 
+## Test profiles
+
+Import `fixtures/test-profiles-backup.json` through **Settings → Import backup
+file → Import all profiles** to add ten switchable test profiles. They cover a
+new player, played and partially mastered states, progression milestones, all
+regular levels complete, all but whole-world mastery, and all 188 quizzes
+mastered. Their IDs begin with `test-`, so importing the file again safely
+merges the same profiles instead of creating duplicates. Because imports never
+reduce progress, delete the existing `Test · …` profiles before re-importing if
+you want to restore their original baseline after playing them.
+
+Regenerate the file after changing the curriculum with:
+
+```sh
+node tools/generate_test_profiles_backup.js
+```
+
 ## Friend challenges
 
 Curriculum quiz results can be shared as version 2 deterministic friend
@@ -71,6 +88,9 @@ node tests/challenge.test.js
   deterministic curriculum attempt construction
 - `progress.js` – local profiles, progress derivation, persistence, transfer,
   backup and safe merging
+- `fixtures/test-profiles-backup.json` – importable browser test profiles ranging
+  from brand new to every level mastered; regenerate it with
+  `node tools/generate_test_profiles_backup.js`
 - `world-map.js` – local projected map data derived from Natural Earth
 - `MAP-DATA.md` – map-data verification and update procedure
 - `tools/` – machine-readable map manifest and dependency-free maintenance tools
