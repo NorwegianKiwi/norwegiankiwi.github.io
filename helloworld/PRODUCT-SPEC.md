@@ -351,16 +351,14 @@ Profile transfer remains a separate private action.
 
 Sharing is secondary and must not displace Continue, Try Again or Next Quiz.
 
-## 16. Compatibility and retained features
+## 16. Retained features
 
 - Existing Explore functionality must remain.
 - Existing language URLs must remain supported.
-- Existing version 1 challenge links should continue to work when this remains
-  inexpensive, but they are best-effort compatibility rather than a permanent
-  product contract.
-- Legacy challenges must never be silently reinterpreted as curriculum quizzes.
-- The legacy manual three-letter-code interface may be removed if it conflicts
-  with the simplified product.
+- Version 2 curriculum challenge links open directly and record current
+  curriculum progress.
+- Unsupported challenge versions fail clearly and are never reinterpreted as
+  curriculum quizzes.
 
 ## 17. Explicitly out of scope for the first release
 

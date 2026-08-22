@@ -26,7 +26,6 @@
   const { countries, regionOptions } = data;
   const messages = Object.freeze({
     nb: Object.freeze({
-      loadError: "Hei verden! kunne ikke laste landdataene.",
       modeCountryFlagShort: "Flagg",
       modeFlagCountryShort: "Land",
       modeCountryCapitalShort: "Hovedsteder",
@@ -53,7 +52,6 @@
       chooseActivity: "Velg aktivitet",
       testYourself: "Test deg selv",
       explore: "Utforsk",
-      exploreCountries: "Utforsk land",
       flagsLicence: "Flagg fra flag-icons · MIT",
       globeLicence: "Jordklode fra Twemoji · CC BY 4.0",
       mapLicence: "Kart fra Natural Earth · public domain",
@@ -117,7 +115,6 @@
       roundComplete: "Runden er ferdig.",
       flashcardsSummaryBefore: "Du har gått gjennom",
       flashcardsSummaryAfter: "flagg fra",
-      restart: "Start på nytt",
       nextFlag: "Trykk igjen for neste flagg",
       revealInstruction:
         "Tenk på landet og hovedstaden – trykk for å se svaret",
@@ -141,7 +138,6 @@
         "Utforsk og test deg selv på 196 land, flagg, hovedsteder og regionale kart.",
     }),
     en: Object.freeze({
-      loadError: "Hello World! could not load the country data.",
       modeCountryFlagShort: "Flags",
       modeFlagCountryShort: "Countries",
       modeCountryCapitalShort: "Capitals",
@@ -168,7 +164,6 @@
       chooseActivity: "Choose activity",
       testYourself: "Test yourself",
       explore: "Explore",
-      exploreCountries: "Explore countries",
       flagsLicence: "Flags from flag-icons · MIT",
       globeLicence: "Globe from Twemoji · CC BY 4.0",
       mapLicence: "Maps from Natural Earth · public domain",
@@ -233,7 +228,6 @@
       roundComplete: "The round is complete.",
       flashcardsSummaryBefore: "You have reviewed",
       flashcardsSummaryAfter: "flags from",
-      restart: "Start again",
       nextFlag: "Press again for the next flag",
       revealInstruction:
         "Think of the country and its capital – press to reveal the answer",
@@ -351,27 +345,24 @@
     {
       id: "country-flag",
       shortLabelKey: "modeCountryFlagShort",
-      tone: "coral",
     },
     {
       id: "flag-country",
       shortLabelKey: "modeFlagCountryShort",
-      tone: "green",
-      choiceCount: 6,
     },
     {
       id: "country-capital",
       shortLabelKey: "modeCountryCapitalShort",
-      tone: "gold",
-      choiceCount: 6,
     },
     {
       id: "map-country",
       shortLabelKey: "modeMapCountryShort",
-      tone: "map",
-      choiceCount: 6,
     },
   ];
+  const modesById = new Map(modes.map((mode) => [mode.id, mode]));
+  const regionsById = new Map(
+    regionOptions.map((region) => [region.id, region]),
+  );
 
   const initialChallenge = challenge.readUrl(initialUrl, curriculum.quizById);
 
@@ -403,9 +394,7 @@
     mode: initialChallenge?.valid
       ? curriculum.quizById.get(initialChallenge.quizId)?.mode ?? "country-flag"
       : "country-flag",
-    region: regionOptions.some(
-            (region) => region.id === initialUrl.searchParams.get("region"),
-          )
+    region: regionsById.has(initialUrl.searchParams.get("region"))
         ? initialUrl.searchParams.get("region")
         : "world",
     challengeActive: initialChallenge?.valid === true,
@@ -464,8 +453,7 @@
   let suppressExploreMapClickUntil = 0;
   const exploreMapMaxZoom = 8;
   const exploreMapZoomLevels = [1, 1.5, 2, 3, 4, 6, 8];
-  const exploreMapGeometryShowSize = 5; // Codex originally set this to 12
-  const exploreMapGeometryHideSize = 5; // Codex originally set this to 10
+  const exploreMapGeometryReadableSize = 5;
   const keyboardHintIgnoredKeys = new Set([
     "Tab",
     "Escape",
@@ -508,7 +496,7 @@
   }
   function levelTitle(level) { return level?.title?.[state.locale] ?? ""; }
   function modeLabel(modeId) {
-    const mode = modes.find((candidate) => candidate.id === modeId);
+    const mode = modesById.get(modeId);
     return mode ? t(mode.shortLabelKey) : "";
   }
   function clearTransferFragment() {
@@ -573,7 +561,7 @@
   }
 
   function selectedRegion() {
-    return regionOptions.find((region) => region.id === state.region);
+    return regionsById.get(state.region);
   }
 
   function flagMarkup(country, className = "", revealName = false) {
@@ -746,7 +734,7 @@
   }
 
   function mapRegionMarkup(regionId, action = "map-region") {
-    const region = regionOptions.find((option) => option.id === regionId);
+    const region = regionsById.get(regionId);
     const count = countriesInRegion(regionId).length;
     const paths = mergedWorldRegionFeatures(regionId)
       .map(mapPathMarkup)
@@ -1067,7 +1055,7 @@
 
   function regionalQuestionMapMarkup(regionId, targetCode) {
     const view = mapData.quizRegions[regionId];
-    const region = regionOptions.find((option) => option.id === regionId);
+    const region = regionsById.get(regionId);
     const markerRadius = 3;
     const contextFeatures = view.backgroundFeatures ?? view.features.filter(
       (feature) => mapRegionForCode(feature.code) !== regionId,
@@ -1460,10 +1448,6 @@
     return `<p class="challenge-comparison">${message}</p>`;
   }
 
-  function resultMarkup() {
-    return curriculumResultMarkup();
-  }
-
   function curriculumResultMarkup() {
     const quiz = curriculumQuiz();
     const level = curriculumLevel();
@@ -1709,13 +1693,9 @@
       const readableSize = Number(
         markerControl.dataset.mapMarkerReadableSize,
       );
-      const threshold = markerControl.classList.contains(
-        "is-geometry-readable",
-      )
-        ? exploreMapGeometryHideSize
-        : exploreMapGeometryShowSize;
       const geometryReadable =
-        readableSize / Math.max(mapUnitsPerPixel, Number.EPSILON) >= threshold;
+        readableSize / Math.max(mapUnitsPerPixel, Number.EPSILON) >=
+        exploreMapGeometryReadableSize;
 
       markerControl.classList.toggle(
         "is-geometry-readable",
@@ -2296,40 +2276,6 @@
     `;
   }
 
-  function mapRegionPromptMarkup({
-    action,
-    description,
-    heading,
-    headingId,
-    kicker,
-  }) {
-    return `
-      <section class="map-region-prompt" aria-labelledby="${headingId}">
-        <p class="kicker">${escapeHtml(kicker)}</p>
-        <h2 id="${headingId}">${escapeHtml(heading)}</h2>
-        <p>${escapeHtml(description)}</p>
-        <div class="map-region-grid">
-          ${mapSelectableRegions
-            .map((regionId) => {
-              const region = regionOptions.find(
-                (option) => option.id === regionId,
-              );
-              return `
-                <button
-                  data-action="${action}"
-                  data-value="${regionId}"
-                >
-                  <strong>${escapeHtml(regionLabel(region))}</strong>
-                  <span>${countryCount(countriesInRegion(regionId).length)}</span>
-                </button>
-              `;
-            })
-            .join("")}
-        </div>
-      </section>
-    `;
-  }
-
   function exploreRegionPickerMarkup() {
     return `
       <section class="explore-region-picker" aria-labelledby="explore-region-picker-heading">
@@ -2349,9 +2295,7 @@
           <div class="explore-region-cards">
             ${mapSelectableRegions
               .map((regionId) => {
-                const option = regionOptions.find(
-                  (candidate) => candidate.id === regionId,
-                );
+                const option = regionsById.get(regionId);
                 return `
                   <button
                     type="button"
@@ -2409,9 +2353,7 @@
 
   function flashcardMarkup() {
     const region = selectedRegion();
-    const exploreScopeRegion = regionOptions.find(
-      (option) => option.id === state.flashcardExploreRegion,
-    );
+    const exploreScopeRegion = regionsById.get(state.flashcardExploreRegion);
     const scopeLabel =
       state.flashcardReturn === "explore"
         ? state.flashcardExploreOverview === "africa"
@@ -2707,7 +2649,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       case "challenge-error":
         return invalidChallengeMarkup();
       case "result":
-        return resultMarkup();
+        return curriculumResultMarkup();
       case "explore":
         return exploreMarkup();
       case "flashcards":
@@ -2992,7 +2934,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
   }
 
   function updateRegion(regionId) {
-    if (!regionOptions.some((region) => region.id === regionId)) return false;
+    if (!regionsById.has(regionId)) return false;
     if (state.region !== regionId) {
       state.exploreMapOverview = null;
       resetExploreMapInteraction();
@@ -3286,20 +3228,45 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  function finishImport(nextStore) {
+    persist(nextStore);
+    state.importProfiles = null;
+    state.importError = false;
+    clearTransferFragment();
+    state.screen = "setup";
+    renderAtTop();
+  }
+
   function importSingleProfile(imported) {
-    progressStore = progressStore.profiles[imported.id]
+    const nextStore = progressStore.profiles[imported.id]
       ? progress.mergeInto(progressStore, imported.id, imported)
       : progress.importAsNew(progressStore, imported);
-    persist(progressStore); state.importProfiles = null; state.importError = false; clearTransferFragment(); state.screen = "setup"; renderAtTop();
+    finishImport(nextStore);
   }
 
   function importAllProfiles() {
+    let nextStore = progressStore;
     for (const imported of state.importProfiles ?? []) {
-      progressStore = progressStore.profiles[imported.id]
-        ? progress.mergeInto(progressStore, imported.id, imported)
-        : progress.importAsNew(progressStore, imported);
+      nextStore = nextStore.profiles[imported.id]
+        ? progress.mergeInto(nextStore, imported.id, imported)
+        : progress.importAsNew(nextStore, imported);
     }
-    persist(progressStore); state.importProfiles = null; state.importError = false; clearTransferFragment(); state.screen = "setup"; renderAtTop();
+    finishImport(nextStore);
+  }
+
+  function startFlashcards(
+    flashcards,
+    returnTarget,
+    { exploreRegion = null, exploreOverview = null } = {},
+  ) {
+    state.flashcards = flashcards;
+    state.flashcardIndex = 0;
+    state.flashcardRevealed = false;
+    state.flashcardReturn = returnTarget;
+    state.flashcardExploreRegion = exploreRegion;
+    state.flashcardExploreOverview = exploreOverview;
+    state.screen = "flashcards";
+    renderAtTop({ focusFlashcard: true });
   }
 
   async function requestInstall() {
@@ -3405,13 +3372,56 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
 
     const action = control.dataset.action;
 
-    if (action === "continue-game") { const next = progress.continueSelection(currentProfile(), curriculum.levels); if (next.type === "quiz") startCurriculumQuiz(next.quiz.id); return; }
-    if (action === "surprise-quiz") { const quiz = progress.surpriseQuiz(currentProfile(), curriculum.levels); if (quiz) startCurriculumQuiz(quiz.id); return; }
-    if (action === "levels") { state.screen = "levels"; state.selectedLevelId = progress.continueSelection(currentProfile(), curriculum.levels).quiz?.levelId ?? curriculum.levels[0].id; renderAtTop(); return; }
-    if (action === "toggle-level") { state.selectedLevelId = state.selectedLevelId === control.dataset.levelId ? null : control.dataset.levelId; render(); return; }
-    if (action === "start-curriculum-quiz") { startCurriculumQuiz(control.dataset.quizId); return; }
-    if (action === "retry-curriculum-quiz") { startCurriculumQuiz(state.curriculumQuizId); return; }
-    if (action === "next-curriculum-quiz") { const quiz = progress.nextUnmastered(currentProfile(), curriculum.levels, state.curriculumQuizId); if (quiz) startCurriculumQuiz(quiz.id); else returnToSetup(); return; }
+    if (action === "continue-game") {
+      const next = progress.continueSelection(
+        currentProfile(),
+        curriculum.levels,
+      );
+      if (next.type === "quiz") startCurriculumQuiz(next.quiz.id);
+      return;
+    }
+    if (action === "surprise-quiz") {
+      const quiz = progress.surpriseQuiz(
+        currentProfile(),
+        curriculum.levels,
+      );
+      if (quiz) startCurriculumQuiz(quiz.id);
+      return;
+    }
+    if (action === "levels") {
+      state.screen = "levels";
+      state.selectedLevelId =
+        progress.continueSelection(currentProfile(), curriculum.levels).quiz
+          ?.levelId ?? curriculum.levels[0].id;
+      renderAtTop();
+      return;
+    }
+    if (action === "toggle-level") {
+      state.selectedLevelId =
+        state.selectedLevelId === control.dataset.levelId
+          ? null
+          : control.dataset.levelId;
+      render();
+      return;
+    }
+    if (action === "start-curriculum-quiz") {
+      startCurriculumQuiz(control.dataset.quizId);
+      return;
+    }
+    if (action === "retry-curriculum-quiz") {
+      startCurriculumQuiz(state.curriculumQuizId);
+      return;
+    }
+    if (action === "next-curriculum-quiz") {
+      const quiz = progress.nextUnmastered(
+        currentProfile(),
+        curriculum.levels,
+        state.curriculumQuizId,
+      );
+      if (quiz) startCurriculumQuiz(quiz.id);
+      else returnToSetup();
+      return;
+    }
     if (action === "view-recommended-level") {
       const next = progress.continueSelection(currentProfile(), curriculum.levels);
       const quiz = next.type === "quiz" ? next.quiz : null;
@@ -3421,10 +3431,34 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       render({ focusLevelTarget: quiz ? { quizId: quiz.id } : { levelId } });
       return;
     }
-    if (action === "resume-mastery") { const saved = currentProfile().savedMasteryAttempt; if (saved) startCurriculumQuiz(saved.quizId, { resume: true }); return; }
-    if (action === "review-missed-cards") { state.flashcards = [...new Map(state.wrongAnswers.map((country) => [country.code, country])).values()]; state.flashcardIndex = 0; state.flashcardRevealed = false; state.flashcardReturn = "result"; state.flashcardExploreRegion = null; state.flashcardExploreOverview = null; state.screen = "flashcards"; renderAtTop({ focusFlashcard: true }); return; }
-    if (action === "level-cards") { const level = curriculum.levelById.get(control.dataset.levelId); if (!level) return; state.flashcards = level.countryCodes.map((code) => countriesByCode.get(code)); state.flashcardIndex = 0; state.flashcardRevealed = false; state.flashcardReturn = "level"; state.flashcardExploreRegion = null; state.flashcardExploreOverview = null; state.activeLevelId = level.id; state.screen = "flashcards"; renderAtTop({ focusFlashcard: true }); return; }
-    if (action === "retry-from-cards") { startCurriculumQuiz(state.curriculumQuizId); return; }
+    if (action === "resume-mastery") {
+      const saved = currentProfile().savedMasteryAttempt;
+      if (saved) startCurriculumQuiz(saved.quizId, { resume: true });
+      return;
+    }
+    if (action === "review-missed-cards") {
+      const missedCountries = [
+        ...new Map(
+          state.wrongAnswers.map((country) => [country.code, country]),
+        ).values(),
+      ];
+      startFlashcards(missedCountries, "result");
+      return;
+    }
+    if (action === "level-cards") {
+      const level = curriculum.levelById.get(control.dataset.levelId);
+      if (!level) return;
+      state.activeLevelId = level.id;
+      startFlashcards(
+        level.countryCodes.map((code) => countriesByCode.get(code)),
+        "level",
+      );
+      return;
+    }
+    if (action === "retry-from-cards") {
+      startCurriculumQuiz(state.curriculumQuizId);
+      return;
+    }
     if (action === "back-from-cards") {
       if (state.flashcardReturn === "explore") {
         state.screen = "explore";
@@ -3437,14 +3471,10 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       return;
     }
     if (action === "explore-cards") {
-      state.flashcards = shuffle(countriesInExploreMapScope());
-      state.flashcardIndex = 0;
-      state.flashcardRevealed = false;
-      state.flashcardReturn = "explore";
-      state.flashcardExploreRegion = state.region;
-      state.flashcardExploreOverview = state.exploreMapOverview;
-      state.screen = "flashcards";
-      renderAtTop({ focusFlashcard: true });
+      startFlashcards(shuffle(countriesInExploreMapScope()), "explore", {
+        exploreRegion: state.region,
+        exploreOverview: state.exploreMapOverview,
+      });
       return;
     }
     if (action === "open-profile-panel") { state.profilePanelOpen = true; state.shareStatus = null; render({ focusProfilePanel: true }); return; }
@@ -3460,7 +3490,18 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     if (action === "share-progress") { void copyProgressShare(); return; }
     if (action === "copy-curriculum-challenge") { void copyCurriculumChallenge(); return; }
     if (action === "create-imported-profile") { if (state.importProfiles?.[0]) importSingleProfile(state.importProfiles[0]); return; }
-    if (action === "merge-import") { if (state.importProfiles?.[0]) { persist(progress.mergeInto(progressStore, control.dataset.profileId, state.importProfiles[0])); state.importProfiles = null; clearTransferFragment(); state.screen = "setup"; renderAtTop(); } return; }
+    if (action === "merge-import") {
+      if (state.importProfiles?.[0]) {
+        finishImport(
+          progress.mergeInto(
+            progressStore,
+            control.dataset.profileId,
+            state.importProfiles[0],
+          ),
+        );
+      }
+      return;
+    }
     if (action === "import-one") { const imported = state.importProfiles?.[Number(control.dataset.importIndex)]; if (imported) importSingleProfile(imported); return; }
     if (action === "import-all") { importAllProfiles(); return; }
     if (action === "cancel-import") { state.importProfiles = null; state.importError = false; clearTransferFragment(); state.screen = "setup"; renderAtTop(); return; }

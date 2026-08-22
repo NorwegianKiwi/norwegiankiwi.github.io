@@ -60,9 +60,8 @@
     let count = 0;
     for (const [quizId, raw] of Object.entries(value)) {
       if (count >= MAX_RECORDS || !/^[a-z0-9-]+:[a-z-]+$/.test(quizId)) continue;
-      const records = raw?.revisions && typeof raw.revisions === "object"
-        ? Object.values(raw.revisions)
-        : [raw];
+      if (!raw?.revisions || typeof raw.revisions !== "object" || Array.isArray(raw.revisions)) continue;
+      const records = Object.values(raw.revisions);
       const revisions = {};
       for (const candidate of records) {
         const record = normalizeRecord(candidate);
@@ -108,14 +107,9 @@
     };
   }
 
-  const migrations = Object.freeze({});
   function validateRoot(value, options = {}) {
     if (!value || typeof value !== "object") return null;
-    if (value.schemaVersion !== SCHEMA_VERSION) {
-      const migrate = migrations[value.schemaVersion];
-      if (!migrate) return null;
-      return validateRoot(migrate(value), options);
-    }
+    if (value.schemaVersion !== SCHEMA_VERSION) return null;
     const profiles = {};
     for (const [key, valueProfile] of Object.entries(value.profiles ?? {}).slice(0, MAX_PROFILES)) {
       const profile = normalizeProfile(valueProfile, key);
@@ -248,16 +242,26 @@
   }
   function compactProfile(profile) {
     const records = [];
-    for (const [quizId, entry] of Object.entries(profile.quizProgress ?? {})) for (const record of Object.values(entry.revisions ?? {})) records.push([quizId, record.revision, record.bestScore, record.total]);
+    for (const [quizId, entry] of Object.entries(profile.quizProgress ?? {})) {
+      for (const record of Object.values(entry.revisions ?? {})) {
+        records.push([
+          quizId,
+          record.revision,
+          record.bestScore,
+          record.total,
+          record.lastPlayedAt,
+        ]);
+      }
+    }
     return { i: profile.id, n: profile.name, c: profile.createdAt, u: profile.updatedAt, l: profile.lastQuizId, q: records };
   }
   function expandProfile(value) {
     if (!value || !Array.isArray(value.q)) return null;
     const quizProgress = {};
     for (const row of value.q.slice(0, MAX_RECORDS)) {
-      if (!Array.isArray(row) || row.length < 4) continue;
+      if (!Array.isArray(row) || row.length !== 5 || !validDate(row[4])) return null;
       const record = normalizeRecord({ revision: row[1], bestScore: row[2], total: row[3], lastPlayedAt: row[4] });
-      if (!record || !/^[a-z0-9-]+:[a-z-]+$/.test(row[0])) continue;
+      if (!record || !/^[a-z0-9-]+:[a-z-]+$/.test(row[0])) return null;
       const entry = quizProgress[row[0]] ?? { revisions: {} };
       entry.revisions[String(record.revision)] = record;
       quizProgress[row[0]] = entry;

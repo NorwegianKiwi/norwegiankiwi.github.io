@@ -33,10 +33,9 @@ The implementation should maintain clear boundaries:
 - `world-map.js`: regional maps and country silhouettes
 - A new curriculum data module: ordered levels, stable IDs, revisions, country
   sets, modes, seeds and alternative counts
-- A new progress module: profiles, persistence, migrations, import/export,
+- A new progress module: profiles, persistence, validation, import/export,
   merging and Continue selection
-- `challenge.js`: isolated legacy version 1 friend-challenge recipe plus the
-  explicitly versioned curriculum challenge recipe
+- `challenge.js`: the explicitly versioned curriculum challenge recipe
 - `app.js`: application state, rendering and interaction orchestration
 
 The exact filenames for new modules may change, but curriculum and progress
@@ -84,7 +83,8 @@ The initial definitions must match `CURRICULUM.md`.
 
 ## 4. Deterministic quiz construction
 
-Curriculum quizzes and legacy friend challenges are distinct recipes.
+Curriculum quizzes and version 2 friend challenges share the current
+curriculum identity and deterministic attempt construction.
 
 For a curriculum quiz revision:
 
@@ -104,10 +104,6 @@ If a generator change materially changes question difficulty or alternative
 membership, affected curriculum quiz revisions must be incremented. There is no
 requirement to keep an old curriculum revision playable; its historical score
 may remain stored but is not treated as current mastery.
-
-Legacy challenge version 1 remains isolated from curriculum construction. It
-should be preserved while inexpensive, but the progression architecture must
-not be distorted solely to retain legacy challenge UI.
 
 ## 5. Persistent storage
 
@@ -165,20 +161,19 @@ remain equivalent.
 - A default **Player 1** profile is created automatically when no valid profile
   exists. Initial play is not blocked by a naming form.
 
-## 6. Schema migration and recovery
+## 6. Schema validation and recovery
 
 - Every persisted or transferred payload has a schema version.
-- Load functions validate before normalising or migrating data.
-- Migrations are explicit functions from one known schema version to the next.
+- Load functions validate before normalising data.
 - Unknown future schema versions are not imported as if understood.
+- A future schema change must add an explicit migration when that version is
+  introduced; the initial version has no pre-release formats to preserve.
 - A storage failure should surface a concise, localised warning and leave the
   app usable without persistence.
 - Clearing progress removes quiz records for one profile but retains its ID,
   name and active selection.
 - Deleting a profile removes that profile. If it was active, another profile is
   selected or a default profile is created.
-- No migration from session-only historical quiz results is needed because the
-  current application has no persistent result records.
 
 ## 7. Derived progress state
 
@@ -229,9 +224,8 @@ Result recording is a pure update:
 5. Update `lastPlayedAt`, profile `updatedAt` and `lastQuizId`.
 6. Persist the validated root object.
 
-Friend-challenge results must not update curriculum progress unless the
-challenge explicitly identifies and faithfully reproduces a current curriculum
-quiz revision. Legacy version 1 regional challenges do not meet that condition.
+Friend-challenge results update curriculum progress only when the challenge
+identifies and faithfully reproduces a current curriculum quiz revision.
 
 ## 10. Saved mastery attempts
 
@@ -363,8 +357,7 @@ checkbox-selection workflow while supporting both needs.
 - Explore may continue to use `region` in the query string.
 - Transfer data uses the fragment so it does not conflict with query-based
   friend challenges.
-- Valid legacy challenge query strings retain their existing behaviour while
-  the best-effort version 1 reader remains present.
+- Only the version 2 curriculum challenge query shape is accepted.
 - Internal result-preview parameters remain testing conveniences and must not
   create stored progress.
 - Ordinary curriculum navigation need not expose active progress in the URL.
@@ -397,21 +390,6 @@ direct link. It must not contain profile-transfer data.
 Progress sharing is separate: generate a concise text achievement such as
 levels/quizzes mastered plus the ordinary game URL. It does not encode or grant
 access to saved progress.
-
-Version 1 challenge behaviour documented in `README.md` is best-effort legacy
-compatibility:
-
-- Existing three- and five-letter seeds remain accepted.
-- Existing URLs reproduce their original target order and alternative sets.
-- While supported, version 1 seeded generation, score proofs and golden vectors
-  remain unchanged.
-- The legacy manual-code entry UI may be removed.
-
-Do not retrofit curriculum rules into version 1. Preserve its URL reader when
-that remains inexpensive, but do not block or complicate the progression
-redesign solely for legacy compatibility. Update `README.md` during
-implementation so it no longer promises a stronger contract than the product
-owner intends.
 
 ## 17. Rendering and state separation
 
@@ -475,11 +453,10 @@ At minimum, add automated coverage for:
 - Merge is idempotent
 - Unknown IDs and old revisions are safe
 
-### Sharing and compatibility
+### Sharing and routing
 
 - Curriculum challenge recipe round trip and current-revision progress recording
 - Progress sharing never contains transfer payload data
-- Existing challenge version 1 golden vectors while legacy support remains
 - Existing language and challenge URL parsing
 - Result previews never persist progress
 - Explore remains usable if storage is unavailable
@@ -492,9 +469,8 @@ heavily completed profiles.
 
 1. Add machine-readable curriculum definitions and validation tests.
 2. Add pure progress/profile functions and tests.
-3. Add localStorage loading, migration and failure recovery.
-4. Adapt quiz construction to fixed curriculum sets without modifying
-   challenge version 1.
+3. Add localStorage loading, validation and failure recovery.
+4. Adapt quiz construction to fixed curriculum sets.
 5. Build the simplified home screen and level overview.
 6. Connect result recording, mastery displays and Continue behaviour.
 7. Add profile management.
@@ -502,7 +478,7 @@ heavily completed profiles.
 9. Add transfer-link import preview and merge.
 10. Add all-profile backup-file import/export.
 11. Add curriculum quiz challenges and progress sharing.
-12. Perform responsive, accessibility, bilingual and compatibility regression
+12. Perform responsive, accessibility, bilingual and routing regression
     testing.
 
 Implementation should remain incremental and keep the existing Explore surface
@@ -529,7 +505,6 @@ The first progression release is complete when:
 - All 196 countries are covered as specified.
 - Curriculum quiz challenges open directly and record valid current progress.
 - Progress achievements can be shared without exposing transferable progress.
-- Legacy version 1 links remain supported when preservation is inexpensive.
 - The application remains static, bilingual and dependency-free at runtime.
 
 ## 21. Remaining implementation choices

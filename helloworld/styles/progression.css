@@ -78,8 +78,6 @@
 .import-list span { color:#687272; margin-top:.2rem; }
 .import-actions { display:flex; flex-wrap:wrap; gap:.7rem; }
 
-.flashcard-silhouette { position:relative; inset:auto; width:8rem; height:6rem; margin:.7rem auto 0; pointer-events:none; }
-
 @media (max-width: 700px) {
   .setup-header-actions .site-home-link { display:none; }
   .home-hero { grid-template-columns:1fr auto; gap:.7rem; }
