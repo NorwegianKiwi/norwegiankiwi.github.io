@@ -212,6 +212,11 @@ assert.throws(() => challenge.createSeededRandom("ABCDE", 2));
     const edgeProof = await challenge.createScoreProof(edgeRecipe);
     assert.equal(await challenge.verifyScoreProof(edgeRecipe, edgeProof), true);
   }
+  const curriculumRecipe = { quizId: "pack-nordics:country-flag", revision: 1, score: 5 };
+  const curriculumProof = await challenge.createCurriculumScoreProof(curriculumRecipe);
+  assert.equal(curriculumProof, "U5VCUGVvI7k");
+  assert.equal(await challenge.verifyCurriculumScoreProof(curriculumRecipe, curriculumProof), true);
+  assert.equal(await challenge.verifyCurriculumScoreProof({ ...curriculumRecipe, score: 4 }, curriculumProof), false);
   console.log("Challenge compatibility tests passed.");
 })().catch((error) => {
   console.error(error);

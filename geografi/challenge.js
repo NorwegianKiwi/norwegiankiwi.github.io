@@ -227,6 +227,25 @@
     }
   }
 
+  function curriculumProofMessage({ quizId, revision, score }) {
+    return `hello-world-curriculum-challenge|2|${quizId}|${revision}|${score}`;
+  }
+
+  async function createCurriculumScoreProof(recipe, cryptoObject = globalThis.crypto) {
+    if (!cryptoObject?.subtle) throw new Error("Score proof requires Web Crypto");
+    const digest = await cryptoObject.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(curriculumProofMessage(recipe)),
+    );
+    return base64Url(new Uint8Array(digest).slice(0, 8));
+  }
+
+  async function verifyCurriculumScoreProof(recipe, proof, cryptoObject = globalThis.crypto) {
+    if (!/^[A-Za-z0-9_-]{11}$/.test(String(proof ?? ""))) return false;
+    try { return (await createCurriculumScoreProof(recipe, cryptoObject)) === proof; }
+    catch { return false; }
+  }
+
   return {
     VERSION,
     SEED_ALPHABET,
@@ -237,5 +256,7 @@
     randomizeChoiceOrder,
     createScoreProof,
     verifyScoreProof,
+    createCurriculumScoreProof,
+    verifyCurriculumScoreProof,
   };
 });
