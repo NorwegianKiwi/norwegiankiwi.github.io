@@ -45,6 +45,10 @@
       interactiveWorldMap: "Interaktivt verdenskart",
       shrinkShape: "Forminsk landformen",
       enlargeShape: "Forstørr landformen",
+      changeRegion: "Bytt region",
+      exploreOnMap: "Utforsk {name} på kartet",
+      backToResults: "Tilbake til resultatet",
+      closeCountryDetails: "Lukk landdetaljer",
       highlightedMap: "Kart over {region} med ett land uthevet",
       heroKicker: "Lek. Lær. Utforsk.",
       heroTitleBefore: "Verden",
@@ -115,9 +119,6 @@
       roundComplete: "Runden er ferdig.",
       flashcardsSummaryBefore: "Du har gått gjennom",
       flashcardsSummaryAfter: "flagg fra",
-      nextFlag: "Trykk igjen for neste flagg",
-      revealInstruction:
-        "Tenk på landet og hovedstaden – trykk for å se svaret",
       revealedFlashcard:
         "{name}, {capital}. Trykk for neste flagg.",
       hiddenFlashcard:
@@ -157,6 +158,10 @@
       interactiveWorldMap: "Interactive world map",
       shrinkShape: "Shrink the country shape",
       enlargeShape: "Enlarge the country shape",
+      changeRegion: "Change region",
+      exploreOnMap: "Explore {name} on the map",
+      backToResults: "Back to results",
+      closeCountryDetails: "Close country details",
       highlightedMap: "Map of {region} with one country highlighted",
       heroKicker: "Play. Learn. Explore.",
       heroTitleBefore: "The world",
@@ -228,9 +233,6 @@
       roundComplete: "The round is complete.",
       flashcardsSummaryBefore: "You have reviewed",
       flashcardsSummaryAfter: "flags from",
-      nextFlag: "Press again for the next flag",
-      revealInstruction:
-        "Think of the country and its capital – press to reveal the answer",
       revealedFlashcard:
         "{name}, {capital}. Press for the next flag.",
       hiddenFlashcard:
@@ -286,7 +288,7 @@
       reviewCards: "Øv med flashcards", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
       worldMastered: "Verden mestret", surpriseQuiz: "Spill en overraskelsesquiz", chooseLevel: "Velg nivå",
       shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre en venn",
-      cards: "Flashcards", questionsLong: "{count} spørsmål · lang utfordring",
+      cards: "Øv med flashcards", questionsLong: "{count} spørsmål · lang utfordring",
       resumeAttempt: "Fortsett lagret forsøk", abandonAttempt: "Et langt mestringsforsøk er lagret. Starte en annen quiz og forkaste forsøket?",
       savedAttempt: "Du har et lagret forsøk på {title}.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
       challengeQuizTitle: "Quizutfordring", scoreToBeat: "Resultat å slå", approximateTime: "Omtrent {minutes} min",
@@ -315,7 +317,7 @@
       reviewCards: "Review with flashcards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
       worldMastered: "World mastered", surpriseQuiz: "Play a surprise quiz", chooseLevel: "Choose a level",
       shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge a friend",
-      cards: "Flashcards", questionsLong: "{count} questions · long challenge",
+      cards: "Practice with flashcards", questionsLong: "{count} questions · long challenge",
       resumeAttempt: "Resume saved attempt", abandonAttempt: "A long mastery attempt is saved. Start another quiz and abandon it?",
       savedAttempt: "You have a saved attempt for {title}.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
       challengeQuizTitle: "Quiz challenge", scoreToBeat: "Score to beat", approximateTime: "About {minutes} min",
@@ -431,6 +433,7 @@
     flashcardIndex: 0,
     flashcardRevealed: false,
     modalCode: null,
+    exploreResultReturnCode: null,
     installHelpOpen: false,
     openChallengeOpen: false,
     openChallengeValue: "",
@@ -1304,7 +1307,7 @@
   function homeProgressMarkup(summaryValue) {
     const percentage = (summaryValue.masteredLevels / summaryValue.totalLevels) * 100;
     const allMastered = summaryValue.masteredLevels === summaryValue.totalLevels;
-    return `<div class="progress-globe-wrap"><div class="progress-globe-achievement"><div class="progress-globe" style="--progress:${percentage}%" aria-hidden="true"><img class="progress-globe-base" src="./favicon.svg" alt="" /><span class="progress-globe-fill"><img src="./favicon.svg" alt="" /></span></div>${allMastered ? `<span class="mastery-trophy world-mastery-trophy" aria-hidden="true">🏆</span>` : ""}</div><strong>${t("levelsMastered", { count: summaryValue.masteredLevels })}</strong></div>`;
+    return `<div class="progress-globe-wrap"><div class="progress-globe-achievement"><div class="progress-globe" style="--progress:${percentage}%" aria-hidden="true"><img class="progress-globe-base" src="./favicon.svg" alt="" /><img class="progress-globe-fill" src="./favicon.svg" alt="" /></div>${allMastered ? `<span class="mastery-trophy world-mastery-trophy" aria-hidden="true">🏆</span>` : ""}</div><strong>${t("levelsMastered", { count: summaryValue.masteredLevels })}</strong></div>`;
   }
 
   function setupMarkup() {
@@ -1360,10 +1363,10 @@
             <span class="level-number">${levelIndex + 1}</span><span><strong>${escapeHtml(levelTitle(level))}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : countryCount(level.countryCodes.length)}</small></span>
             <span class="level-state">${value.mastered === 4 ? `<span class="level-mastery-status" aria-label="4/4 ${t("mastered")}"><span>4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></span>` : value.played ? `${value.mastered}/4 ${t("mastered")}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span>
           </button>
-          ${state.selectedLevelId === level.id ? `<div class="quiz-list">${level.quizzes.map((baseQuiz) => {
+          ${state.selectedLevelId === level.id ? `<div class="quiz-list"><button class="level-practice-row" data-action="level-cards" data-level-id="${level.id}"><span class="level-practice-icon" aria-hidden="true"><span></span><span></span></span><span><strong>${t("cards")}</strong><small>${countryCount(level.countryCodes.length)}</small></span><span aria-hidden="true">→</span></button><div class="quiz-mode-list">${level.quizzes.map((baseQuiz) => {
             const quiz = curriculum.quizById.get(baseQuiz.id); const record = progress.currentRecord(profile, quiz); const status = progress.quizState(profile, quiz); const recommended = next.type === "quiz" && next.quiz.id === quiz.id;
             return `<button class="quiz-row ${recommended ? "is-recommended" : ""}" data-action="start-curriculum-quiz" data-quiz-id="${quiz.id}"><span>${escapeHtml(modeLabel(quiz.mode))}${recommended ? `<small>${t("recommended")}</small>` : ""}</span><span>${status === "mastered" ? `<span class="quiz-mastery-status" aria-label="${record.bestScore}/${record.total} · ${t("quizMastered")}"><span>${record.bestScore}/${record.total}</span><span class="mastery-check" aria-hidden="true">✓</span></span>` : status === "played" ? `${record.bestScore}/${record.total}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span></button>`;
-          }).join("")}<button class="quiet-button cards-level-button" data-action="level-cards" data-level-id="${level.id}">${t("cards")}</button></div>` : ""}
+          }).join("")}</div></div>` : ""}
         </section>`;
       }).join("")}</div></main>`;
   }
@@ -1378,23 +1381,30 @@
 
   function reviewMarkup() {
     if (state.wrongAnswers.length === 0) return "";
+    const missedCountries = [
+      ...new Map(
+        state.wrongAnswers.map((country) => [country.code, country]),
+      ).values(),
+    ];
 
     return `
       <section class="result-review" id="result-review" aria-labelledby="review-heading" tabindex="-1">
         <p class="kicker">${t("review")}</p>
         <h2 id="review-heading">${t("reviewHeading")}</h2>
-        <p>${t("reviewCount", { count: state.wrongAnswers.length })}</p>
+        <p>${t("reviewCount", { count: missedCountries.length })}</p>
+        <button class="secondary-button review-flashcards-button" data-action="review-missed-cards">${t("reviewCards")} <span aria-hidden="true">→</span></button>
         <div class="review-list">
-          ${state.wrongAnswers
+          ${missedCountries
             .map(
               (country) => `
-                <article class="review-row">
+                <button class="review-row" data-action="explore-result-country" data-code="${country.code}" data-review-code="${country.code}" aria-label="${escapeHtml(t("exploreOnMap", { name: countryName(country) }))}">
                   ${flagMarkup(country, "review-flag", true)}
                   <div>
                     <strong>${escapeHtml(countryName(country))}</strong>
                     <span>${escapeHtml(countryCapital(country))}</span>
                   </div>
-                </article>
+                  <span class="review-row-action" aria-hidden="true">↗</span>
+                </button>
               `,
             )
             .join("")}
@@ -1456,8 +1466,8 @@
     const best = record?.bestScore ?? state.score;
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header">${brandMarkup(true, false)}${homeButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score"><strong>${state.score}/${state.questions.length}</strong><span>${t("bestScore", { score: best, total: state.questions.length })}</span></div>${state.resultNewLevelMastery ? `<p class="level-mastered-callout" aria-label="${escapeHtml(levelTitle(level))} · 4/4 ${t("mastered")}"><span>${escapeHtml(levelTitle(level))} · 4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></p>` : ""}${challengeComparisonMarkup()}</div>
-      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? t("playAgain") : t("nextQuiz")}</button></div><div class="result-tertiary-actions"><button class="quiet-button" data-action="view-recommended-level">${t("chooseLevel")}</button>${state.wrongAnswers.length ? `<button class="quiet-button" data-action="review-missed-cards">${t("reviewCards")}</button>` : ""}</div></div>
-      <div class="challenge-share-actions"><button class="quiet-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}</button><button class="quiet-button" data-action="share-progress">${t("shareProgress")}</button></div><p class="profile-status" data-challenge-status aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p></div></section>${reviewMarkup()}</main>`;
+      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? t("playAgain") : t("nextQuiz")}</button></div><button class="secondary-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
+      <div class="challenge-share-actions"><button class="quiet-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}</button></div><p class="profile-status" data-challenge-status aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p></div></section>${reviewMarkup()}</main>`;
   }
 
   function exploreCountryStatusMarkup(countryCode) {
@@ -1507,6 +1517,7 @@
           ${languageSwitcherMarkup()}
         </div>
         <div class="flag-modal-card ${countryNote(country) ? "has-note" : ""}">
+          <button class="icon-close flag-modal-close" type="button" data-action="close-modal-button" aria-label="${escapeHtml(t("closeCountryDetails"))}">×</button>
           ${flagMarkup(country, "modal-flag", true)}
           <strong>${escapeHtml(countryName(country))}</strong>
           <span class="modal-capital">${escapeHtml(countryCapital(country))}</span>
@@ -2235,12 +2246,15 @@
             class="explore-region-control"
             data-action="open-explore-region-picker"
             aria-haspopup="true"
+            aria-label="${escapeHtml(t("changeRegion"))}: ${escapeHtml(scopeLabel)}"
           >
             <span>
               <strong>${escapeHtml(scopeLabel)}</strong>
               <small>${countryCount(sortedCountries.length)}</small>
             </span>
-            <span class="explore-region-control-arrow" aria-hidden="true">⌄</span>
+            <span class="explore-region-control-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M7 7h11m0 0-3-3m3 3-3 3M17 17H6m0 0 3 3m-3-3 3-3" /></svg>
+            </span>
           </button>
           <div class="scroll-affordance-frame" data-scroll-affordance-frame>
             <div class="explore-country-list" data-scroll-affordance>
@@ -2319,9 +2333,7 @@
 
   function exploreMarkup() {
     const region = selectedRegion();
-    const modalCountry = countries.find(
-      (country) => country.code === state.modalCode,
-    );
+    const modalCountry = countriesByCode.get(state.modalCode);
     const collator = new Intl.Collator(state.locale, { sensitivity: "base" });
     const showingAfricaOverview = state.exploreMapOverview === "africa";
     const scopedCountries = countriesInExploreMapScope();
@@ -2336,7 +2348,9 @@
             class="explore-context"
             tabindex="-1"
           >${escapeHtml(t("explore"))}</h1>
-          ${homeButtonMarkup()}
+          ${state.exploreResultReturnCode
+            ? `<button class="quiet-button home-button" data-action="back-to-result"><span aria-hidden="true">←</span>${escapeHtml(t("backToResults"))}</button>`
+            : homeButtonMarkup()}
         </header>
 
         <div class="explore-content">
@@ -2395,10 +2409,6 @@
 
     const country = state.flashcards[state.flashcardIndex];
     const progress = ((state.flashcardIndex + 1) / state.flashcards.length) * 100;
-    const instruction = state.flashcardRevealed
-      ? t("nextFlag")
-      : t("revealInstruction");
-
     return `
       <main class="quiz-shell flashcard-shell">
         <header class="quiz-header">
@@ -2434,18 +2444,11 @@
           }"
         >
           ${flagMarkup(country, "flashcard-flag", state.flashcardRevealed)}
-          <span class="flashcard-answer" aria-hidden="${!state.flashcardRevealed}">
-            ${
-              state.flashcardRevealed
-                ? `
-                  <strong>${escapeHtml(countryName(country))}</strong>
-                  <span>${escapeHtml(countryCapital(country))}</span>
-${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })}
-                `
-                : ""
-            }
+          <span class="flashcard-answer">
+            ${state.flashcardRevealed
+              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(countryCapital(country))}</span>`
+              : `<strong class="flashcard-question" aria-hidden="true">?</strong>`}
           </span>
-          <span class="flashcard-instruction">${instruction}</span>
         </button>
       </main>
     `;
@@ -2737,10 +2740,22 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     }
     if (options.focusProfilePanel) app.querySelector(".profile-panel")?.focus({ preventScroll: true });
     if (options.focusFlagCode) {
-      const flagButton = app.querySelector(
+      const target = app.querySelector(
         `.explore-country-status[data-code="${options.focusFlagCode}"]`,
       );
-      flagButton?.focus();
+      target?.focus();
+    }
+    if (options.focusReviewCode) {
+      const target = app.querySelector(
+        `[data-review-code="${options.focusReviewCode}"]`,
+      );
+      target?.focus({ preventScroll: true });
+      target?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "center",
+      });
     }
     if (options.focusFlashcard) {
       app.querySelector('[data-action="flashcard-toggle"]')?.focus();
@@ -2798,6 +2813,24 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
   function renderAtTop(options = {}) {
     render(options);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showRecommendedLevels() {
+    const next = progress.continueSelection(
+      currentProfile(),
+      curriculum.levels,
+    );
+    const quiz = next.type === "quiz" ? next.quiz : null;
+    const levelId = quiz?.levelId ?? state.activeLevelId ?? null;
+    state.selectedLevelId = levelId;
+    state.screen = "levels";
+    if (!levelId) {
+      renderAtTop();
+      return;
+    }
+    render({
+      focusLevelTarget: quiz ? { quizId: quiz.id } : { levelId },
+    });
   }
 
   function clearAutoAdvance() {
@@ -3080,15 +3113,52 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     state.silhouetteExpanded = false;
     state.wrongAnswers = [];
     state.modalCode = null;
+    state.exploreResultReturnCode = null;
     state.exploreRegionPickerOpen = !mapSelectableRegions.includes(state.region);
     resetExploreCountryState();
     renderAtTop();
   }
 
+  function showResultCountryInExplore(code) {
+    const country = countriesByCode.get(code);
+    if (!country) return;
+    clearAutoAdvance();
+    setKeyboardHintsVisible(false);
+    state.screen = "explore";
+    state.selectedCode = null;
+    state.answerStatus = "unanswered";
+    state.modalCode = null;
+    state.exploreResultReturnCode = code;
+    updateRegion(country.region);
+    resetExploreCountryState();
+    state.explorePinnedCode = code;
+    state.exploreRegionPickerOpen = false;
+    renderAtTop({ focusFlagCode: code });
+  }
+
+  function returnToResultFromExplore() {
+    const code = state.exploreResultReturnCode;
+    const quiz = curriculumQuiz();
+    if (quiz) {
+      const regions = new Set(
+        quiz.countryCodes.map((countryCode) => countriesByCode.get(countryCode)?.region),
+      );
+      updateRegion(quiz.region ?? (regions.size === 1 ? [...regions][0] : "world"));
+    }
+    state.exploreResultReturnCode = null;
+    state.modalCode = null;
+    state.silhouetteExpanded = false;
+    state.screen = "result";
+    render({ focusReviewCode: code });
+  }
+
   function closeFlagModal(options = {}) {
     const code = state.modalCode;
     state.modalCode = null;
-    render({ focusFlagCode: code, ...options });
+    render({
+      focusFlagCode: code,
+      ...options,
+    });
   }
 
   function closeInstallHelp() {
@@ -3265,6 +3335,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     state.flashcardReturn = returnTarget;
     state.flashcardExploreRegion = exploreRegion;
     state.flashcardExploreOverview = exploreOverview;
+    state.modalCode = null;
     state.screen = "flashcards";
     renderAtTop({ focusFlashcard: true });
   }
@@ -3305,6 +3376,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     state.flashcardExploreRegion = null;
     state.flashcardExploreOverview = null;
     state.exploreRegionPickerOpen = false;
+    state.exploreResultReturnCode = null;
     state.modalCode = null;
     state.installHelpOpen = false;
     state.openChallengeOpen = false;
@@ -3389,11 +3461,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       return;
     }
     if (action === "levels") {
-      state.screen = "levels";
-      state.selectedLevelId =
-        progress.continueSelection(currentProfile(), curriculum.levels).quiz
-          ?.levelId ?? curriculum.levels[0].id;
-      renderAtTop();
+      showRecommendedLevels();
       return;
     }
     if (action === "toggle-level") {
@@ -3423,12 +3491,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       return;
     }
     if (action === "view-recommended-level") {
-      const next = progress.continueSelection(currentProfile(), curriculum.levels);
-      const quiz = next.type === "quiz" ? next.quiz : null;
-      const levelId = quiz?.levelId ?? state.activeLevelId;
-      state.selectedLevelId = levelId;
-      state.screen = "levels";
-      render({ focusLevelTarget: quiz ? { quizId: quiz.id } : { levelId } });
+      showRecommendedLevels();
       return;
     }
     if (action === "resume-mastery") {
@@ -3551,6 +3614,16 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       return;
     }
 
+    if (action === "explore-result-country") {
+      showResultCountryInExplore(control.dataset.code);
+      return;
+    }
+
+    if (action === "back-to-result") {
+      returnToResultFromExplore();
+      return;
+    }
+
     if (action === "open-explore-region-picker") {
       state.exploreRegionPickerOpen = true;
       state.explorePreviewCode = null;
@@ -3648,6 +3721,12 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     }
 
     if (action === "close-modal") {
+      if (event.target !== control) return;
+      closeFlagModal({ suppressFlagFocusVisible: true });
+      return;
+    }
+
+    if (action === "close-modal-button") {
       closeFlagModal({ suppressFlagFocusVisible: true });
       return;
     }
@@ -3998,7 +4077,9 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
           ? app.querySelector(".install-help-dialog")
           : state.profilePanelOpen
             ? app.querySelector(".profile-panel")
-            : null;
+            : state.modalCode !== null
+              ? app.querySelector(".flag-modal")
+              : null;
     if (activeDialog && event.key === "Tab") {
       const dialog = activeDialog;
       const focusable = dialog

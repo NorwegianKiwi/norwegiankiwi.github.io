@@ -948,6 +948,7 @@ body.result-page {
 }
 
 .review-row {
+  width:100%;
   min-width: 0;
   margin: 0;
   padding: 12px;
@@ -955,10 +956,17 @@ body.result-page {
   border-radius: 13px;
   background: var(--card);
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-columns: 72px minmax(0, 1fr) auto;
   align-items: center;
   gap: 15px;
+  color:var(--ink);
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
 }
+
+.review-row:hover,.review-row:focus-visible { border-color:var(--green); box-shadow:0 8px 20px rgba(36,93,69,.1); }
+.review-row:focus-visible { outline:3px solid var(--coral); outline-offset:2px; }
 
 .review-flag {
   width: 72px;
@@ -982,3 +990,6 @@ body.result-page {
   font-size: 13px;
   line-height: 1.35;
 }
+
+.review-row .review-row-action { color:var(--green); font-size:18px; font-weight:800; }
+.review-flashcards-button { margin:0 0 18px; background:var(--green-soft); border-color:#bfd7ca; }

@@ -573,11 +573,16 @@
     font-size: 14px;
   }
 
+  .flag-modal-toolbar { top:10px; left:10px; right:auto; }
+  .flag-modal-card { width:100%; max-height:calc(100dvh - 32px); padding-inline:4px; gap:10px; }
+  .flag-modal-card strong { font-size:clamp(27px,9vw,38px); }
+  .flag-modal-close { top:8px; right:8px; }
+
   .flashcard-stage {
     height: calc(100vh - var(--phone-quiz-header-height) - 3px);
     height: calc(100dvh - var(--phone-quiz-header-height) - 3px);
     padding: 20px 6px max(20px, var(--phone-quiz-bottom-buffer));
-    grid-template-rows: minmax(0, 1fr) 116px auto;
+    grid-template-rows: minmax(0, 1fr) 116px;
   }
 
   .flashcard-flag {
@@ -717,9 +722,12 @@
  * changing portrait phones or regular-height tablets.
  */
 @media (orientation: landscape) and (max-height: 599px) {
-  .quiz-active,
-  .flashcard-shell,
-  .quiz-active .quiz-header .brand > span
+  .flashcard-shell {
+    min-height: 0;
+  }
+
+  .quiz-active .quiz-header .brand > span,
+  .flashcard-shell .quiz-header .brand > span,
   .result-shell .quiz-header .brand > span {
     display: none;
   }
@@ -902,15 +910,15 @@
     height: calc(100dvh - var(--short-header-height) - 3px);
     padding: 9px 8px var(--short-bottom-space);
     grid-template-columns: minmax(0, 1.35fr) minmax(190px, 0.85fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr);
     gap: 6px clamp(14px, 3vw, 32px);
   }
 
   .flashcard-flag {
+    grid-column: 1;
+    grid-row: 1;
     width: min(100%, 72dvh);
     max-height: 100%;
-    grid-column: 1;
-    grid-row: 1 / 3;
   }
 
   .flashcard-answer {
@@ -919,7 +927,8 @@
     min-height: 0;
     grid-column: 2;
     grid-row: 1;
-    align-self: end;
+    align-self: center;
+    text-align: center;
   }
 
   .flashcard-answer strong {
@@ -928,14 +937,6 @@
 
   .flashcard-answer span {
     font-size: clamp(14px, 4dvh, 18px);
-  }
-
-  .flashcard-instruction {
-    grid-column: 2;
-    grid-row: 2;
-    align-self: start;
-    padding-bottom: 5px;
-    text-align: center;
   }
 
   .flashcard-complete {

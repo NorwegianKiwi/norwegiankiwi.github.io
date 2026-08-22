@@ -406,9 +406,12 @@ body.explore-page {
 
 .explore-region-control-arrow {
   color: var(--green);
-  font-size: 22px;
-  font-weight: 800;
+  width:24px;
+  height:24px;
+  flex:none;
 }
+
+.explore-region-control-arrow svg { display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 
 .explore-region-control:hover {
   background: #dcece2;
@@ -685,7 +688,7 @@ body.modal-open {
   backdrop-filter: blur(7px);
   display: grid;
   place-items: center;
-  cursor: zoom-out;
+  cursor:default;
 }
 
 .flag-modal-toolbar {
@@ -701,14 +704,17 @@ body.modal-open {
 }
 
 .flag-modal-card {
+  position:relative;
   width: min(820px, 90vw);
   max-height: calc(100dvh - 56px);
+  padding: 8px 12px 14px;
+  overflow:auto;
   display: grid;
   justify-items: center;
   gap: 14px;
   color: #fff;
   text-align: center;
-  pointer-events: none;
+  pointer-events:auto;
 }
 
 .modal-flag {
@@ -742,3 +748,5 @@ body.modal-open {
   font-size: 15px;
   line-height: 1.5;
 }
+
+.flag-modal-close { position:absolute; z-index:2; top:14px; right:18px; display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:rgba(17,26,21,.72); color:#fff; }

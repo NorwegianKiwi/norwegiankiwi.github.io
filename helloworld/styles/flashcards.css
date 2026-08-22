@@ -14,9 +14,11 @@
   background: transparent;
   padding: clamp(20px, 4vh, 42px) 20px 24px;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) 112px auto;
+  grid-template-rows: minmax(0, 1fr) 112px;
   place-items: center;
   gap: clamp(12px, 2.5vh, 24px);
+  color: var(--ink);
+  font: inherit;
   cursor: pointer;
 }
 
@@ -29,6 +31,8 @@
 .flashcard-flag {
   width: min(720px, 82vw, 77vh);
   max-width: 100%;
+  max-height:100%;
+  object-fit:contain;
   align-self: center;
   box-shadow: 0 16px 42px rgba(24, 35, 29, 0.15);
   transition: box-shadow 180ms ease;
@@ -47,7 +51,9 @@
 .flashcard-answer {
   width: 100%;
   height: 112px;
+  min-width: 0;
   display: grid;
+  justify-items: center;
   align-content: center;
   gap: 5px;
   text-align: center;
@@ -66,10 +72,12 @@
   font-size: clamp(16px, 2vw, 20px);
 }
 
-.flashcard-instruction {
+.flashcard-answer .flashcard-question {
   color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(64px, 10vw, 104px);
+  font-weight: 400;
+  line-height: 1;
 }
 
 .flashcard-complete {
@@ -114,4 +122,3 @@
 .secondary-button:hover {
   border-color: var(--green);
 }
-
