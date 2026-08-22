@@ -431,8 +431,9 @@ The home progress globe and its numeric label both derive from mastered levels
 out of 47. Current-level progress derives from mastered quizzes out of four.
 They must not use different hidden denominators.
 
-Explore Flashcards are read-only learning state. A card front uses the flag; its
-revealed side uses country name, capital and the existing country silhouette.
+Explore Flashcards are read-only learning state. Their deck is derived from the
+current visible Explore scope, including the all-Africa overview. A card front
+uses the flag; its revealed side uses country name, capital and the existing country silhouette.
 Missed-country decks are constructed from the completed attempt's wrong-country
 codes and do not write quiz progress.
 
@@ -521,7 +522,8 @@ The first progression release is complete when:
 - A profile can be transferred by link and safely merged on another device.
 - A device backup can restore all profiles or selected individual profiles.
 - Regional and world mastery attempts resume without allowing answer changes.
-- Explore opens directly to its map and retains current capabilities.
+- Explore opens to a viewport-fitted regional map and internally scrolling
+  country list, with no document-level scrolling.
 - Explore includes unscored Flashcards, and missed-country card review returns to the
   result flow.
 - All 196 countries are covered as specified.

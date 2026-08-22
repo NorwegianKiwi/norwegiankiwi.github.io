@@ -78,11 +78,6 @@
 .import-list span { color:#687272; margin-top:.2rem; }
 .import-actions { display:flex; flex-wrap:wrap; gap:.7rem; }
 
-.explore-view-tabs { display:flex; gap:.35rem; justify-content:center; margin:0 auto 1.25rem; }
-.explore-view-tabs button { border:1px solid #d8d2c5; background:#fff; border-radius:999px; padding:.55rem 1rem; font:inherit; font-weight:750; }
-.explore-view-tabs button[aria-pressed="true"] { background:#173f48; color:#fff; border-color:#173f48; }
-.explore-cards-deck { max-width:42rem; margin:0 auto; text-align:center; }
-.explore-cards-deck .flashcard-stage { width:100%; }
 .flashcard-silhouette { position:relative; inset:auto; width:8rem; height:6rem; margin:.7rem auto 0; pointer-events:none; }
 
 @media (max-width: 700px) {

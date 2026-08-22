@@ -655,41 +655,6 @@
     min-height: 64px;
   }
 
-  .country-table-wrap {
-    margin-right: -4px;
-    margin-left: -4px;
-  }
-
-  .country-table {
-    font-size: 14px;
-  }
-
-  .country-table .flag-column {
-    width: 68px;
-  }
-
-  .country-table .country-column {
-    width: 41%;
-  }
-
-  .country-table th,
-  .country-table td {
-    padding: 10px 8px;
-  }
-
-  .country-table tbody th {
-    font-size: 16px;
-    line-height: 1.2;
-  }
-
-  .table-flag {
-    width: 50px;
-  }
-
-  .table-flag-button {
-    width: 50px;
-  }
-
   .flag-modal {
     padding: 16px;
   }
@@ -1492,6 +1457,243 @@
   .review-jump {
     padding-top: 3px;
     padding-bottom: 3px;
+  }
+}
+
+/* The unified Explore workspace always stays inside the viewport. */
+.explore-map-shell .explore-header {
+  height: var(--explore-header-height);
+  min-height: var(--explore-header-height);
+}
+
+.explore-map-shell .explore-content {
+  height: calc(100dvh - var(--explore-header-height));
+  min-height: 0;
+  margin: 0;
+  padding: 12px 0 max(10px, env(safe-area-inset-bottom));
+}
+
+.explore-map-shell .explore-map-layout,
+.explore-map-shell .explore-country-panel {
+  height: 100%;
+  min-height: 0;
+}
+
+body.standalone-mode .explore-map-shell .explore-content {
+  margin-bottom: 0;
+}
+
+body.standalone-mode .explore-map-shell .explore-country-panel {
+  height: 100%;
+}
+
+@media (max-width: 899px) {
+  .explore-map-shell .explore-map-layout {
+    height: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(190px, 44%) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .explore-map-shell .explore-country-panel {
+    height: auto;
+  }
+
+  .explore-region-picker-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(130px, 1fr) minmax(0, 1.15fr);
+    gap: 10px;
+  }
+
+  .explore-region-picker .region-map-card,
+  .explore-region-picker .region-map {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .explore-region-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .explore-region-cards .region-card {
+    min-height: 42px;
+    padding: 6px 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .explore-shell {
+    --explore-header-height: clamp(58px, 9dvh, 66px);
+  }
+
+  .explore-map-shell .explore-content {
+    padding-top: 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .explore-map-shell .explore-map-layout {
+    grid-template-rows: minmax(175px, 43%) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .explore-map-column {
+    gap: 7px;
+  }
+
+  .explore-country-status-wrap {
+    height: auto;
+    min-height: 60px;
+    padding: 6px 9px;
+  }
+
+  .explore-country-status {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .explore-country-status.is-empty {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-country-status strong,
+  .explore-region-control strong {
+    font-size: 16px;
+  }
+
+  .explore-country-status small,
+  .explore-region-control small {
+    font-size: 11px;
+  }
+
+  .explore-status-flag {
+    width: 40px;
+  }
+
+  .explore-region-control {
+    min-height: 52px;
+    padding: 7px 10px;
+  }
+
+  .explore-country-list {
+    padding: 6px;
+    gap: 5px;
+  }
+
+  .explore-country-card {
+    min-height: 48px;
+    padding: 5px 7px;
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  .explore-country-card strong {
+    font-size: 15px;
+  }
+
+  .explore-country-flag {
+    width: 36px;
+  }
+
+  .explore-flashcards-button {
+    min-height: 42px;
+    margin: 6px;
+    padding: 7px 9px;
+    font-size: 13px;
+  }
+
+  .explore-region-picker {
+    padding: 9px;
+    gap: 7px;
+  }
+
+  .explore-region-picker-heading h2 {
+    font-size: clamp(20px, 6vw, 28px);
+  }
+
+  .explore-region-picker-heading .kicker {
+    display: none;
+  }
+
+  .explore-region-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .explore-region-cards .region-card {
+    min-height: 40px;
+    padding: 4px 6px;
+  }
+
+  .explore-region-cards .region-card span {
+    font-size: 11px;
+  }
+
+  .explore-region-cards .region-card small {
+    font-size: 9px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 599px) {
+  .explore-shell {
+    --explore-header-height: 52px;
+  }
+
+  .explore-map-shell .explore-content {
+    padding: 7px 0 max(7px, env(safe-area-inset-bottom));
+  }
+
+  .explore-map-shell .explore-map-layout {
+    height: 100%;
+    grid-template-columns: minmax(0, 1fr) clamp(230px, 32vw, 290px);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .explore-map-shell .explore-country-panel {
+    height: 100%;
+  }
+
+  .explore-country-status-wrap {
+    min-height: 52px;
+    padding-block: 5px;
+  }
+
+  .explore-region-picker {
+    padding: 7px 10px;
+    gap: 6px;
+  }
+
+  .explore-region-picker-heading .kicker {
+    display: none;
+  }
+
+  .explore-region-picker-heading h2 {
+    font-size: clamp(19px, 6dvh, 26px);
+  }
+
+  .explore-region-picker-layout {
+    grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .explore-region-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .explore-region-cards .region-card {
+    min-height: 38px;
+    padding: 3px 5px;
+  }
+
+  .explore-region-cards .region-card span {
+    font-size: 10px;
+  }
+
+  .explore-region-cards .region-card small {
+    font-size: 8px;
   }
 }
 

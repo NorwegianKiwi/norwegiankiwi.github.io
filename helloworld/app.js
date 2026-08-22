@@ -40,7 +40,6 @@
       languageGroup: "Velg språk",
       languageNb: "Norsk",
       languageEn: "English",
-      worldSentence: "hele verden",
       countries: "{count} land",
       regionMapDescription:
         "Velg et område på kartet, eller bruk områdeknappene ved siden av.",
@@ -98,6 +97,8 @@
       challengeUrlWrongApp: "Lenken tilhører ikke denne geografiappen.",
       challengeUrlInvalid: "Dette er ikke en gyldig utfordringslenke.",
       chooseCountry: "Velg et land",
+      backToExplore: "Tilbake til Utforsk",
+      flashcardsForCountries: "Flashcards · {count} land",
       countryCapital: "{name}, hovedstad {capital}",
       interactiveRegionMap: "Interaktivt kart over {region}",
       countriesInRegion: "Land i regionen",
@@ -108,13 +109,8 @@
       africaOverview: "Afrika",
       viewAllAfrica: "Vis hele Afrika",
       showSelectedRegion: "Vis {region}",
-      exploreMapDescription:
-        "Regionkartet viser plasseringen og formen til hvert land.",
       exploreMapHeading: "Hvilket kart vil du utforske?",
       chooseSingleRegion: "Velg en enkelt region",
-      tableFlag: "Flagg",
-      tableCountry: "Land",
-      tableCapital: "Hovedstad",
       showLargeFlag: "Vis flagget til {name} stort",
       largeFlag: "Stort flagg: {name}",
       flashcardsComplete: "Flashcards fullført",
@@ -159,7 +155,6 @@
       languageGroup: "Choose language",
       languageNb: "Norsk",
       languageEn: "English",
-      worldSentence: "the whole world",
       countries: "{count} {count, plural, one {country} other {countries}}",
       regionMapDescription:
         "Choose an area on the map, or use the area buttons beside it.",
@@ -217,6 +212,9 @@
       challengeUrlWrongApp: "This link does not belong to this geography app.",
       challengeUrlInvalid: "This is not a valid challenge link.",
       chooseCountry: "Choose a country",
+      backToExplore: "Back to Explore",
+      flashcardsForCountries:
+        "Flashcards · {count} {count, plural, one {country} other {countries}}",
       countryCapital: "{name}, capital {capital}",
       interactiveRegionMap: "Interactive map of {region}",
       countriesInRegion: "Countries in the region",
@@ -227,13 +225,8 @@
       africaOverview: "Africa",
       viewAllAfrica: "View all Africa",
       showSelectedRegion: "Show {region}",
-      exploreMapDescription:
-        "The regional map shows the location and shape of each country.",
       exploreMapHeading: "Which map would you like to explore?",
       chooseSingleRegion: "Choose a single region",
-      tableFlag: "Flag",
-      tableCountry: "Country",
-      tableCapital: "Capital",
       showLargeFlag: "Show a large flag of {name}",
       largeFlag: "Large flag: {name}",
       flashcardsComplete: "Flashcards complete",
@@ -299,8 +292,7 @@
       reviewCards: "Øv med flashcards", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
       worldMastered: "Verden mestret", surpriseQuiz: "Spill en overraskelsesquiz", chooseLevel: "Velg nivå",
       shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre en venn",
-      cards: "Flashcards", mapsView: "Kart", listView: "Liste", revealCard: "Vis svar", nextCard: "Neste kort",
-      cardsComplete: "Flashcards fullført", questionsLong: "{count} spørsmål · lang utfordring",
+      cards: "Flashcards", questionsLong: "{count} spørsmål · lang utfordring",
       resumeAttempt: "Fortsett lagret forsøk", abandonAttempt: "Et langt mestringsforsøk er lagret. Starte en annen quiz og forkaste forsøket?",
       savedAttempt: "Du har et lagret forsøk på {title}.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
       challengeQuizTitle: "Quizutfordring", scoreToBeat: "Resultat å slå", approximateTime: "Omtrent {minutes} min",
@@ -329,8 +321,7 @@
       reviewCards: "Review with flashcards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
       worldMastered: "World mastered", surpriseQuiz: "Play a surprise quiz", chooseLevel: "Choose a level",
       shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge a friend",
-      cards: "Flashcards", mapsView: "Map", listView: "List", revealCard: "Reveal answer", nextCard: "Next card",
-      cardsComplete: "Flashcards complete", questionsLong: "{count} questions · long challenge",
+      cards: "Flashcards", questionsLong: "{count} questions · long challenge",
       resumeAttempt: "Resume saved attempt", abandonAttempt: "A long mastery attempt is saved. Start another quiz and abandon it?",
       savedAttempt: "You have a saved attempt for {title}.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
       challengeQuizTitle: "Quiz challenge", scoreToBeat: "Score to beat", approximateTime: "About {minutes} min",
@@ -430,6 +421,8 @@
     importError: transferError,
     selectedLevelId: null,
     flashcardReturn: "home",
+    flashcardExploreRegion: null,
+    flashcardExploreOverview: null,
     challengeTargetScore: null,
     challengeScoreVerified: false,
     challengeScoreWarning: initialChallenge?.valid === true,
@@ -453,8 +446,7 @@
     openChallengeOpen: false,
     openChallengeValue: "",
     openChallengeError: null,
-    exploreScrollTop: 0,
-    exploreView: "map",
+    exploreRegionPickerOpen: false,
     explorePinnedCode: null,
     explorePreviewCode: null,
     exploreMapViewport: null,
@@ -584,17 +576,12 @@
     return regionOptions.find((region) => region.id === state.region);
   }
 
-  function regionLabelInSentence(region) {
-    return region.id === "world" ? t("worldSentence") : regionLabel(region);
-  }
-
   function flagMarkup(country, className = "", revealName = false) {
     const name = escapeHtml(countryName(country));
     const alt = revealName ? escapeHtml(t("flagOf", { name })) : "";
-    const lazy = className === "table-flag" ? ' loading="lazy"' : "";
     return `
       <span class="flag-frame flag-code-${country.code} ${className}">
-        <img class="flag" src="./flags/${country.code}.svg" alt="${alt}" draggable="false"${lazy} />
+        <img class="flag" src="./flags/${country.code}.svg" alt="${alt}" draggable="false" />
       </span>
     `;
   }
@@ -704,7 +691,7 @@
   }
 
   function mapShapeIsActive(region) {
-    return regionMatches(region, state.region);
+    return region === state.region;
   }
 
   function mapPathMarkup(feature) {
@@ -758,7 +745,7 @@
     `;
   }
 
-  function mapRegionMarkup(regionId) {
+  function mapRegionMarkup(regionId, action = "map-region") {
     const region = regionOptions.find((option) => option.id === regionId);
     const count = countriesInRegion(regionId).length;
     const paths = mergedWorldRegionFeatures(regionId)
@@ -772,7 +759,7 @@
     return `
       <g
         class="map-region"
-        data-action="map-region"
+        data-action="${action}"
         data-value="${regionId}"
         data-map-region="${regionId}"
         role="button"
@@ -785,7 +772,7 @@
     `;
   }
 
-  function worldMapMarkup() {
+  function worldMapMarkup(action = "map-region") {
     const contextPaths = mapData.features
       .filter((feature) => mapRegionForCode(feature.code) === null)
       .map(mapPathMarkup)
@@ -806,7 +793,9 @@
         >
           <rect class="map-ocean" width="1000" height="500" rx="26" />
           <g class="map-context" aria-hidden="true">${contextPaths}</g>
-          ${mapSelectableRegions.map(mapRegionMarkup).join("")}
+          ${mapSelectableRegions
+            .map((regionId) => mapRegionMarkup(regionId, action))
+            .join("")}
         </svg>
       </div>
     `;
@@ -1487,10 +1476,6 @@
       <div class="challenge-share-actions"><button class="quiet-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}</button><button class="quiet-button" data-action="share-progress">${t("shareProgress")}</button></div><p class="profile-status" data-challenge-status aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p></div></section>${reviewMarkup()}</main>`;
   }
 
-  function activeExploreCountryCode() {
-    return state.explorePreviewCode ?? state.explorePinnedCode;
-  }
-
   function exploreCountryStatusMarkup(countryCode) {
     const country = countriesByCode.get(countryCode);
     if (!country) {
@@ -1502,12 +1487,51 @@
     }
 
     return `
-      <div class="explore-country-status">
+      <button
+        type="button"
+        class="explore-country-status"
+        data-action="open-flag"
+        data-code="${country.code}"
+        aria-label="${escapeHtml(t("showLargeFlag", {
+          name: countryName(country),
+        }))}"
+      >
         ${flagMarkup(country, "explore-status-flag", false)}
         <span>
           <strong>${escapeHtml(countryName(country))}</strong>
           <small>${escapeHtml(countryCapital(country))}</small>
         </span>
+        <span class="explore-country-status-action" aria-hidden="true">↗</span>
+      </button>
+    `;
+  }
+
+  function flagModalMarkup(country) {
+    if (!country) return "";
+    return `
+      <div
+        class="flag-modal"
+        data-action="close-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="${escapeHtml(t("largeFlag", {
+          name: countryName(country),
+        }))}"
+        tabindex="-1"
+      >
+        <div class="flag-modal-toolbar">
+          ${languageSwitcherMarkup()}
+        </div>
+        <div class="flag-modal-card ${countryNote(country) ? "has-note" : ""}">
+          ${flagMarkup(country, "modal-flag", true)}
+          <strong>${escapeHtml(countryName(country))}</strong>
+          <span class="modal-capital">${escapeHtml(countryCapital(country))}</span>
+          ${
+            countryNote(country)
+              ? `<p class="country-note">${escapeHtml(countryNote(country))}</p>`
+              : ""
+          }
+        </div>
       </div>
     `;
   }
@@ -2147,25 +2171,26 @@
 
     return `
       <div class="explore-map-layout">
-        <div class="explore-map-stage">
-          ${
-            africaRegionIds.has(state.region)
-              ? `<div class="explore-map-scope-controls">
-                  <button
-                    type="button"
-                    class="secondary-button explore-map-scope-button"
-                    data-action="toggle-africa-overview"
-                  >${
-                    showingAfricaOverview
-                      ? escapeHtml(t("showSelectedRegion", {
-                          region: regionLabel(selectedRegion()),
-                        }))
-                      : escapeHtml(t("viewAllAfrica"))
-                  }</button>
-                </div>`
-              : ""
-          }
-          <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
+        <div class="explore-map-column">
+          <div class="explore-map-stage">
+            ${
+              africaRegionIds.has(state.region)
+                ? `<div class="explore-map-scope-controls">
+                    <button
+                      type="button"
+                      class="secondary-button explore-map-scope-button"
+                      data-action="toggle-africa-overview"
+                    >${
+                      showingAfricaOverview
+                        ? escapeHtml(t("showSelectedRegion", {
+                            region: regionLabel(selectedRegion()),
+                          }))
+                        : escapeHtml(t("viewAllAfrica"))
+                    }</button>
+                  </div>`
+                : ""
+            }
+            <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
           <svg
             data-explore-map-svg
             viewBox="${serializeMapViewBox(mapViewport.view)}"
@@ -2217,13 +2242,26 @@
           <div class="explore-silhouette-overlay">
             ${exploreSilhouetteOverlayMarkup()}
           </div>
+            </div>
+          </div>
+          <div class="explore-country-status-wrap" aria-live="polite">
+            ${exploreCountryStatusMarkup(state.explorePinnedCode)}
           </div>
         </div>
 
         <aside class="explore-country-panel" aria-label="${escapeHtml(t("countriesInRegion"))}">
-          <div class="explore-country-status-wrap" aria-live="polite">
-            ${exploreCountryStatusMarkup(activeExploreCountryCode())}
-          </div>
+          <button
+            type="button"
+            class="explore-region-control"
+            data-action="open-explore-region-picker"
+            aria-haspopup="true"
+          >
+            <span>
+              <strong>${escapeHtml(scopeLabel)}</strong>
+              <small>${countryCount(sortedCountries.length)}</small>
+            </span>
+            <span class="explore-region-control-arrow" aria-hidden="true">⌄</span>
+          </button>
           <div class="scroll-affordance-frame" data-scroll-affordance-frame>
             <div class="explore-country-list" data-scroll-affordance>
               ${sortedCountries
@@ -2246,6 +2284,13 @@
                 .join("")}
             </div>
           </div>
+          <button
+            type="button"
+            class="primary-button explore-flashcards-button"
+            data-action="explore-cards"
+          >${escapeHtml(t("flashcardsForCountries", {
+            count: sortedCountries.length,
+          }))}</button>
         </aside>
       </div>
     `;
@@ -2285,91 +2330,46 @@
     `;
   }
 
-  function exploreMapRegionPromptMarkup() {
-    return mapRegionPromptMarkup({
-      action: "explore-map-region",
-      description: t("exploreMapDescription"),
-      heading: t("exploreMapHeading"),
-      headingId: "explore-map-region-heading",
-      kicker: t("chooseSingleRegion"),
-    });
-  }
-
-  function exploreListMarkup(sortedCountries, modalCountry) {
+  function exploreRegionPickerMarkup() {
     return `
-      <div class="country-table-wrap">
-        <table class="country-table">
-          <colgroup>
-            <col class="flag-column" />
-            <col class="country-column" />
-            <col />
-          </colgroup>
-          <thead>
-            <tr>
-              <th scope="col">${t("tableFlag")}</th>
-              <th scope="col">${t("tableCountry")}</th>
-              <th scope="col">${t("tableCapital")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${sortedCountries
-              .map(
-                (country) => `
-                  <tr
-                    data-action="open-flag"
-                    data-code="${country.code}"
+      <section class="explore-region-picker" aria-labelledby="explore-region-picker-heading">
+        <div class="explore-region-picker-heading">
+          <div>
+            <p class="kicker">${escapeHtml(t("chooseSingleRegion"))}</p>
+            <h2 id="explore-region-picker-heading">${escapeHtml(t("exploreMapHeading"))}</h2>
+          </div>
+          <button
+            type="button"
+            class="quiet-button"
+            data-action="${mapSelectableRegions.includes(state.region) ? "close-explore-region-picker" : "setup"}"
+          >${escapeHtml(t("cancel"))}</button>
+        </div>
+        <div class="explore-region-picker-layout">
+          ${worldMapMarkup("explore-map-region")}
+          <div class="explore-region-cards">
+            ${mapSelectableRegions
+              .map((regionId) => {
+                const option = regionOptions.find(
+                  (candidate) => candidate.id === regionId,
+                );
+                return `
+                  <button
+                    type="button"
+                    class="region-card ${state.region === regionId && state.exploreMapOverview !== "africa" ? "is-selected" : ""}"
+                    data-action="explore-map-region"
+                    data-value="${regionId}"
+                    data-map-region="${regionId}"
+                    aria-pressed="${state.region === regionId && state.exploreMapOverview !== "africa"}"
                   >
-                    <td>
-                      <button
-                        class="table-flag-button"
-                        data-action="open-flag"
-                        data-code="${country.code}"
-                        aria-label="${escapeHtml(t("showLargeFlag", {
-                          name: countryName(country),
-                        }))}"
-                      >
-                        ${flagMarkup(country, "table-flag", false)}
-                      </button>
-                    </td>
-                    <th scope="row">${escapeHtml(countryName(country))}</th>
-                    <td>${escapeHtml(countryCapital(country))}</td>
-                  </tr>
-                `,
-              )
+                    <span>${escapeHtml(regionLabel(option))}</span>
+                    <small>${countryCount(countriesInRegion(regionId).length)}</small>
+                  </button>
+                `;
+              })
               .join("")}
-          </tbody>
-        </table>
-      </div>
-      ${
-        modalCountry
-          ? `
-            <div
-              class="flag-modal"
-              data-action="close-modal"
-              role="dialog"
-              aria-modal="true"
-              aria-label="${escapeHtml(t("largeFlag", {
-                name: countryName(modalCountry),
-              }))}"
-              tabindex="-1"
-            >
-              <div class="flag-modal-toolbar">
-                ${languageSwitcherMarkup()}
-              </div>
-              <div class="flag-modal-card ${countryNote(modalCountry) ? "has-note" : ""}">
-                ${flagMarkup(modalCountry, "modal-flag", true)}
-                <strong>${escapeHtml(countryName(modalCountry))}</strong>
-                <span class="modal-capital">${escapeHtml(countryCapital(modalCountry))}</span>
-                ${
-                  countryNote(modalCountry)
-                    ? `<p class="country-note">${escapeHtml(countryNote(modalCountry))}</p>`
-                    : ""
-                }
-              </div>
-            </div>
-          `
-          : ""
-      }
+          </div>
+        </div>
+      </section>
     `;
   }
 
@@ -2379,66 +2379,45 @@
       (country) => country.code === state.modalCode,
     );
     const collator = new Intl.Collator(state.locale, { sensitivity: "base" });
-    const viewingMap = state.exploreView === "map";
-    const showingAfricaOverview =
-      viewingMap && state.exploreMapOverview === "africa";
-    const scopedCountries = showingAfricaOverview
-      ? countriesInExploreMapScope()
-      : countriesInRegion(state.region);
+    const showingAfricaOverview = state.exploreMapOverview === "africa";
+    const scopedCountries = countriesInExploreMapScope();
     const sortedCountries = [...scopedCountries].sort((a, b) =>
       collator.compare(countryName(a), countryName(b)),
     );
-    const mapAvailable = mapSelectableRegions.includes(state.region);
-    const scopeLabel = showingAfricaOverview
-      ? t("africaOverview")
-      : regionLabel(region);
-    const exploreLabel = `${t("explore")} · ${scopeLabel}`;
-
     return `
-      <main class="site-shell explore-shell explore-${state.exploreView}-shell">
+      <main class="site-shell explore-shell explore-map-shell">
         <header class="quiz-header explore-header">
           ${brandMarkup(true, false)}
           <h1
             class="explore-context"
-            aria-label="${escapeHtml(exploreLabel)}"
             tabindex="-1"
-          >
-            <span class="explore-context-prefix">${t("explore")} <span aria-hidden="true">·</span></span>
-            <span class="explore-context-region">${scopeLabel}</span>
-          </h1>
+          >${escapeHtml(t("explore"))}</h1>
           ${homeButtonMarkup()}
         </header>
 
         <div class="explore-content">
-          <div class="explore-view-tabs" role="group" aria-label="${escapeHtml(t("exploreCountries"))}">
-            <button data-action="explore-view" data-value="map" aria-pressed="${state.exploreView === "map"}">${t("mapsView")}</button>
-            <button data-action="explore-view" data-value="list" aria-pressed="${state.exploreView === "list"}">${t("listView")}</button>
-            <button data-action="explore-cards" aria-pressed="${state.exploreView === "cards"}">${t("cards")}</button>
-          </div>
           ${
-            viewingMap
-              ? mapAvailable
-                ? exploreRegionMapMarkup(sortedCountries)
-                : exploreMapRegionPromptMarkup()
-              : state.exploreView === "cards"
-                ? exploreCardsMarkup()
-                : exploreListMarkup(sortedCountries, modalCountry)
+            state.exploreRegionPickerOpen
+              ? exploreRegionPickerMarkup()
+              : exploreRegionMapMarkup(sortedCountries)
           }
         </div>
+        ${flagModalMarkup(modalCountry)}
       </main>
     `;
   }
 
-  function exploreCardsMarkup() {
-    if (!state.flashcards.length) state.flashcards = shuffle(countriesInRegion(state.region));
-    const complete = state.flashcardIndex >= state.flashcards.length;
-    if (complete) return `<section class="flashcard-complete"><h2>${t("cardsComplete")}</h2><button class="primary-button" data-action="restart-explore-cards">${t("restart")}</button></section>`;
-    const country = state.flashcards[state.flashcardIndex];
-    return `<section class="explore-cards-deck"><p>${state.flashcardIndex + 1} / ${state.flashcards.length}</p><button class="flashcard-stage ${state.flashcardRevealed ? "is-revealed" : ""}" data-action="flashcard-toggle">${flagMarkup(country, "flashcard-flag", state.flashcardRevealed)}<span class="flashcard-answer">${state.flashcardRevealed ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(countryCapital(country))}</span>${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })}` : ""}</span><span class="flashcard-instruction">${state.flashcardRevealed ? t("nextCard") : t("revealCard")}</span></button></section>`;
-  }
-
   function flashcardMarkup() {
     const region = selectedRegion();
+    const exploreScopeRegion = regionOptions.find(
+      (option) => option.id === state.flashcardExploreRegion,
+    );
+    const scopeLabel =
+      state.flashcardReturn === "explore"
+        ? state.flashcardExploreOverview === "africa"
+          ? t("africaOverview")
+          : regionLabel(exploreScopeRegion ?? region)
+        : regionLabel(region);
     const complete = state.flashcardIndex >= state.flashcards.length;
 
     if (complete) {
@@ -2446,7 +2425,11 @@
         <main class="quiz-shell flashcard-shell">
           <header class="quiz-header">
             ${brandMarkup(true, false)}
-            ${homeButtonMarkup()}
+            ${
+              state.flashcardReturn === "explore"
+                ? `<button class="quiet-button home-button" data-action="back-from-cards"><span aria-hidden="true">←</span>${escapeHtml(t("backToExplore"))}</button>`
+                : homeButtonMarkup()
+            }
           </header>
           <section class="flashcard-complete">
             <p class="kicker">${t("flashcardsComplete")}</p>
@@ -2454,10 +2437,14 @@
             <p>
               ${t("flashcardsSummaryBefore")} ${state.flashcards.length}
               ${t("flashcardsSummaryAfter")}
-              ${regionLabelInSentence(region)}.
+              ${escapeHtml(scopeLabel)}.
             </p>
             <div class="flashcard-actions">
-              ${state.flashcardReturn === "result" ? `<button class="primary-button" data-action="retry-from-cards">${t("retryQuiz")}</button><button class="secondary-button" data-action="back-from-cards">${t("backToLevel")}</button>` : `<button class="primary-button" data-action="back-from-cards">${t("backToLevel")}</button>`}
+              ${
+                state.flashcardReturn === "result"
+                  ? `<button class="primary-button" data-action="retry-from-cards">${t("retryQuiz")}</button><button class="secondary-button" data-action="back-from-cards">${t("backToLevel")}</button>`
+                  : `<button class="primary-button" data-action="back-from-cards">${state.flashcardReturn === "explore" ? t("backToExplore") : t("backToLevel")}</button>`
+              }
             </div>
           </section>
         </main>
@@ -2475,10 +2462,14 @@
         <header class="quiz-header">
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
-            <span>${regionLabel(region)}</span>
+            <span>${escapeHtml(scopeLabel)}</span>
             <strong>${state.flashcardIndex + 1} / ${state.flashcards.length}</strong>
           </div>
-          ${homeButtonMarkup()}
+          ${
+            state.flashcardReturn === "explore"
+              ? `<button class="quiet-button home-button" data-action="back-from-cards"><span aria-hidden="true">←</span>${escapeHtml(t("backToExplore"))}</button>`
+              : homeButtonMarkup()
+          }
         </header>
         <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="${
           state.flashcards.length
@@ -2772,9 +2763,10 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       state.screen === "challenge-intro" || state.screen === "challenge-error",
     );
     document.body?.classList.toggle("result-page", state.screen === "result");
+    document.body?.classList.toggle("explore-page", state.screen === "explore");
     scheduleScrollAffordanceUpdate();
     scheduleResponsiveRegionMaps();
-    if (state.screen === "explore" && state.exploreView === "map") {
+    if (state.screen === "explore" && !state.exploreRegionPickerOpen) {
       scheduleExploreMapZoomUi();
     }
     document.body?.classList.toggle(
@@ -2804,11 +2796,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     if (options.focusProfilePanel) app.querySelector(".profile-panel")?.focus({ preventScroll: true });
     if (options.focusFlagCode) {
       const flagButton = app.querySelector(
-        `.table-flag-button[data-code="${options.focusFlagCode}"]`,
-      );
-      flagButton?.classList.toggle(
-        "is-pointer-restored-focus",
-        options.suppressFlagFocusVisible === true,
+        `.explore-country-status[data-code="${options.focusFlagCode}"]`,
       );
       flagButton?.focus();
     }
@@ -2837,6 +2825,16 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     if (options.focusExploreOverviewToggle) {
       app
         .querySelector('[data-action="toggle-africa-overview"]')
+        ?.focus({ preventScroll: true });
+    }
+    if (options.focusExploreRegionControl) {
+      app
+        .querySelector('[data-action="open-explore-region-picker"]')
+        ?.focus({ preventScroll: true });
+    }
+    if (options.focusExploreFlashcards) {
+      app
+        .querySelector('[data-action="explore-cards"]')
         ?.focus({ preventScroll: true });
     }
     if (options.focusLanguage) {
@@ -2876,7 +2874,12 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
   }
 
   function setRegionPreview(regionId) {
-    if (state.screen !== "setup") return;
+    if (
+      state.screen !== "setup" &&
+      !(state.screen === "explore" && state.exploreRegionPickerOpen)
+    ) {
+      return;
+    }
 
     app.querySelectorAll("[data-map-region]").forEach((control) => {
       control.classList.toggle(
@@ -2909,7 +2912,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
   }
 
   function syncExploreCountryUi() {
-    if (state.screen !== "explore" || state.exploreView !== "map") return;
+    if (state.screen !== "explore" || state.exploreRegionPickerOpen) return;
 
     app.querySelectorAll("[data-explore-code]").forEach((control) => {
       const code = control.dataset.exploreCode;
@@ -2932,7 +2935,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     const status = app.querySelector(".explore-country-status-wrap");
     if (status) {
       status.innerHTML = exploreCountryStatusMarkup(
-        activeExploreCountryCode(),
+        state.explorePinnedCode,
       );
     }
 
@@ -2945,7 +2948,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
   function setExplorePreview(code) {
     if (
       state.screen !== "explore" ||
-      state.exploreView !== "map" ||
+      state.exploreRegionPickerOpen ||
       !mapSelectableRegions.includes(state.region)
     ) {
       return;
@@ -3125,7 +3128,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     renderAtTop({ focusCorrect: state.answerStatus === "correction" });
   }
 
-  function showExplore(initialView = "list") {
+  function showExplore() {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
     state.screen = "explore";
@@ -3135,7 +3138,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     state.silhouetteExpanded = false;
     state.wrongAnswers = [];
     state.modalCode = null;
-    state.exploreView = initialView === "map" ? "map" : "list";
+    state.exploreRegionPickerOpen = !mapSelectableRegions.includes(state.region);
     resetExploreCountryState();
     renderAtTop();
   }
@@ -3144,7 +3147,6 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     const code = state.modalCode;
     state.modalCode = null;
     render({ focusFlagCode: code, ...options });
-    window.scrollTo({ top: state.exploreScrollTop });
   }
 
   function closeInstallHelp() {
@@ -3333,6 +3335,9 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     state.flashcards = [];
     state.flashcardIndex = 0;
     state.flashcardRevealed = false;
+    state.flashcardExploreRegion = null;
+    state.flashcardExploreOverview = null;
+    state.exploreRegionPickerOpen = false;
     state.modalCode = null;
     state.installHelpOpen = false;
     state.openChallengeOpen = false;
@@ -3417,12 +3422,31 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       return;
     }
     if (action === "resume-mastery") { const saved = currentProfile().savedMasteryAttempt; if (saved) startCurriculumQuiz(saved.quizId, { resume: true }); return; }
-    if (action === "review-missed-cards") { state.flashcards = [...new Map(state.wrongAnswers.map((country) => [country.code, country])).values()]; state.flashcardIndex = 0; state.flashcardRevealed = false; state.flashcardReturn = "result"; state.screen = "flashcards"; renderAtTop({ focusFlashcard: true }); return; }
-    if (action === "level-cards") { const level = curriculum.levelById.get(control.dataset.levelId); if (!level) return; state.flashcards = level.countryCodes.map((code) => countriesByCode.get(code)); state.flashcardIndex = 0; state.flashcardRevealed = false; state.flashcardReturn = "level"; state.activeLevelId = level.id; state.screen = "flashcards"; renderAtTop({ focusFlashcard: true }); return; }
+    if (action === "review-missed-cards") { state.flashcards = [...new Map(state.wrongAnswers.map((country) => [country.code, country])).values()]; state.flashcardIndex = 0; state.flashcardRevealed = false; state.flashcardReturn = "result"; state.flashcardExploreRegion = null; state.flashcardExploreOverview = null; state.screen = "flashcards"; renderAtTop({ focusFlashcard: true }); return; }
+    if (action === "level-cards") { const level = curriculum.levelById.get(control.dataset.levelId); if (!level) return; state.flashcards = level.countryCodes.map((code) => countriesByCode.get(code)); state.flashcardIndex = 0; state.flashcardRevealed = false; state.flashcardReturn = "level"; state.flashcardExploreRegion = null; state.flashcardExploreOverview = null; state.activeLevelId = level.id; state.screen = "flashcards"; renderAtTop({ focusFlashcard: true }); return; }
     if (action === "retry-from-cards") { startCurriculumQuiz(state.curriculumQuizId); return; }
-    if (action === "back-from-cards") { state.selectedLevelId = state.activeLevelId; state.screen = "levels"; renderAtTop(); return; }
-    if (action === "explore-view") { state.exploreView = control.dataset.value; state.flashcards = []; state.flashcardIndex = 0; state.flashcardRevealed = false; resetExploreCountryState(); render(); return; }
-    if (action === "explore-cards" || action === "restart-explore-cards") { state.exploreView = "cards"; state.flashcards = shuffle(countriesInRegion(state.region)); state.flashcardIndex = 0; state.flashcardRevealed = false; resetExploreCountryState(); render(); return; }
+    if (action === "back-from-cards") {
+      if (state.flashcardReturn === "explore") {
+        state.screen = "explore";
+        render({ focusExploreFlashcards: true });
+      } else {
+        state.selectedLevelId = state.activeLevelId;
+        state.screen = "levels";
+        renderAtTop();
+      }
+      return;
+    }
+    if (action === "explore-cards") {
+      state.flashcards = shuffle(countriesInExploreMapScope());
+      state.flashcardIndex = 0;
+      state.flashcardRevealed = false;
+      state.flashcardReturn = "explore";
+      state.flashcardExploreRegion = state.region;
+      state.flashcardExploreOverview = state.exploreMapOverview;
+      state.screen = "flashcards";
+      renderAtTop({ focusFlashcard: true });
+      return;
+    }
     if (action === "open-profile-panel") { state.profilePanelOpen = true; state.shareStatus = null; render({ focusProfilePanel: true }); return; }
     if (action === "close-profile-panel") { if (event.target === control) { state.profilePanelOpen = false; render(); } return; }
     if (action === "close-profile-panel-button") { state.profilePanelOpen = false; render(); return; }
@@ -3482,13 +3506,27 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     }
 
     if (action === "explore") {
-      showExplore(control.dataset.value);
+      showExplore();
+      return;
+    }
+
+    if (action === "open-explore-region-picker") {
+      state.exploreRegionPickerOpen = true;
+      state.explorePreviewCode = null;
+      render({ focusExploreHeading: true });
+      return;
+    }
+
+    if (action === "close-explore-region-picker") {
+      state.exploreRegionPickerOpen = false;
+      render({ focusExploreRegionControl: true });
       return;
     }
 
     if (action === "explore-map-region") {
       if (!updateRegion(control.dataset.value)) return;
       resetExploreCountryState();
+      state.exploreRegionPickerOpen = false;
       render({ focusExploreHeading: true });
       return;
     }
@@ -3563,10 +3601,8 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     }
 
     if (action === "open-flag") {
-      state.exploreScrollTop = window.scrollY;
       state.modalCode = control.dataset.code;
       render({ focusModal: true });
-      window.scrollTo({ top: state.exploreScrollTop });
       return;
     }
 
@@ -3712,7 +3748,7 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
   window.addEventListener("resize", () => {
     scheduleScrollAffordanceUpdate();
     scheduleResponsiveRegionMaps();
-    if (state.screen === "explore" && state.exploreView === "map") {
+    if (state.screen === "explore" && !state.exploreRegionPickerOpen) {
       scheduleExploreMapZoomUi();
     }
   });
@@ -3810,13 +3846,6 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
   });
 
   app.addEventListener("keydown", (event) => {
-    const pointerRestoredFocus = event.target.closest(
-      ".table-flag-button.is-pointer-restored-focus",
-    );
-    if (pointerRestoredFocus && app.contains(pointerRestoredFocus)) {
-      pointerRestoredFocus.classList.remove("is-pointer-restored-focus");
-    }
-
     const countryControl = event.target.closest(
       '[data-action="explore-country"]',
     );
@@ -3833,7 +3862,9 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       return;
     }
 
-    const control = event.target.closest('[data-action="map-region"]');
+    const control = event.target.closest(
+      '[data-action="map-region"], [data-action="explore-map-region"]',
+    );
     if (
       !control ||
       !app.contains(control) ||
@@ -3843,7 +3874,13 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     }
     event.preventDefault();
     if (!updateRegion(control.dataset.value)) return;
-    render();
+    if (control.dataset.action === "explore-map-region") {
+      resetExploreCountryState();
+      state.exploreRegionPickerOpen = false;
+      render({ focusExploreHeading: true });
+    } else {
+      render();
+    }
   });
 
   document.addEventListener("keydown", (event) => {
@@ -3971,9 +4008,19 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
       return;
     }
 
+    if (state.screen === "explore" && state.exploreRegionPickerOpen) {
+      event.preventDefault();
+      if (mapSelectableRegions.includes(state.region)) {
+        state.exploreRegionPickerOpen = false;
+        render({ focusExploreRegionControl: true });
+      } else {
+        returnToSetup();
+      }
+      return;
+    }
+
     if (
       state.screen === "explore" &&
-      state.exploreView === "map" &&
       state.explorePinnedCode !== null
     ) {
       event.preventDefault();

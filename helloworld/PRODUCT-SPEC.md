@@ -78,8 +78,9 @@ never the only progress signal.
 
 ### Explore the world
 
-Activating it opens Explore directly in the map view. The country list remains
-available through a Map/List view control within Explore.
+Activating it opens the unified Explore workspace. The regional map and country
+list are visible together without page scrolling; only the country list itself
+scrolls.
 
 ### Secondary actions
 
@@ -266,11 +267,13 @@ The interface uses action-oriented labels such as **Download backup file** and
 ## 12. Explore
 
 - Explore remains available independently of profiles and game progress.
-- Explore opens in the map view from the home screen.
+- Explore opens in the unified map-and-list workspace from the home screen.
 - The existing regional map navigation, country selection, zoom, silhouettes,
   capital markers, notes and country list should be preserved.
-- Explore contains **Map**, **List** and **Flashcards** views. Map remains the
-  default.
+- The workspace stays within the viewport and exposes region selection, the
+  selected country's large flag and region-scoped Flashcards contextually.
+- Flashcards launched from Explore contain exactly the countries visible in the
+  list and return to the preserved Explore state.
 - Flashcards may be opened for a region, a curriculum level, or the missed
   countries from a completed quiz.
 - A card shows the flag on its front. Revealing it shows country name, capital

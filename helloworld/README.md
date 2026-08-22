@@ -3,7 +3,8 @@
 A static, bilingual geography progression game covering 196 countries in 47
 levels and 188 fixed single-mode quizzes. It includes multiple local profiles,
 best scores, resumable mastery challenges, progress transfer and backup, plus
-an independent Explore section with Map, List and Flashcards views.
+an independent, viewport-fitted Explore workspace with a regional map, country
+list and contextual Flashcards action.
 
 Open `index.html` directly in a browser. The site requires no installation,
 development server, build process, or third-party packages.
@@ -25,7 +26,7 @@ defaults and are omitted from the URL:
 - `?lang=en&region=europe` – English with Europe selected
 
 The language can be changed from anywhere without resetting an active quiz,
-card deck, saved mastery attempt, or Explore view. Game progress is stored in
+card deck, saved mastery attempt, or Explore workspace. Game progress is stored in
 versioned local profiles under the `hello-world-progress` localStorage key.
 First use creates Player 1 automatically.
 
@@ -155,7 +156,7 @@ are the silhouettes whose enlarged views add a dashed internal division guide.
 Cyprus follows the UN buffer zone, while Somalia's guide follows the shared
 Natural Earth boundary with Somaliland.
 
-The Maps view in Explore reuses the same regional azimuthal equidistant maps and
+Explore reuses the same regional azimuthal equidistant maps and
 silhouettes. Active countries with Natural Earth tiny-country locator points
 use 1:10m foreground geometry on regional maps, while other foreground and all
 background geography use 1:50m. A map is available for each of the nine
@@ -176,7 +177,10 @@ country codes rather than duplicating region membership.
 Explore maps support map-local touchscreen and trackpad pinch zoom,
 touchscreen two-finger panning, and desktop press-and-drag panning, with
 keyboard-accessible controls from 100% to 800%; the surrounding page remains
-at its normal scale.
+at its normal scale. The Explore workspace itself stays within the viewport;
+only its country list scrolls. The selected-country label below the map opens
+the large flag, while the region/count control opens the interactive world-map
+region picker. Flashcards use exactly the countries visible in the list.
 
 ## Globe
 
