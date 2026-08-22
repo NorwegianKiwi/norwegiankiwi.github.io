@@ -78,7 +78,8 @@
   .progression-home .brand-bar { align-items:flex-start; }
   .setup-header-actions .site-home-link { display:none; }
   .home-hero { grid-template-columns:1fr auto; gap:.7rem; }
-  .home-hero h1 { font-size:clamp(2.2rem,12vw,3.5rem); }
+  .home-hero .kicker { margin-bottom:.45rem; font-size:.625rem; letter-spacing:.12em; white-space:nowrap; }
+  .home-hero h1 { margin-top:0; font-size:clamp(2rem,10vw,3rem); }
   .progress-globe-wrap { max-width:7.5rem; font-size:.72rem; }
   .progress-globe { width:5.4rem; }
   .home-primary-actions { grid-template-columns:1fr; margin-top:1.5rem; }
