@@ -1,9 +1,10 @@
 # Hello World!
 
-A static, bilingual geography progression game covering 196 countries in 47
-levels and 188 fixed single-mode quizzes. It includes multiple local profiles,
-best scores, resumable mastery challenges, progress transfer and backup, plus
-an independent Explore section with Map, List and Cards views.
+A static geography site covering 196 countries, with local SVG flags, four
+quiz modes, flashcards, and an Explore section with an alphabetical list and
+interactive regional maps. The map quiz highlights one country on a regional
+map and provides six country names to choose from. When Whole world is
+selected, the user chooses a single region before starting the map quiz.
 
 Open `index.html` directly in a browser. The site requires no installation,
 development server, build process, or third-party packages.
@@ -17,35 +18,20 @@ Add to Home screen. The installed app is named “Hello World!” on every
 platform and still requires a network connection.
 
 The site is available in Norwegian and English. The language and selected
-Explore region are stored in the URL. Norwegian and Whole world are the
-defaults and are omitted from the URL:
+region are stored in the URL, while quiz progress is retained only in the
+open tab. Norwegian and Whole world are the defaults and are omitted from the
+URL:
 
 - `?lang=en` – English
 - `?region=europe` – Norwegian with Europe selected
 - `?lang=en&region=europe` – English with Europe selected
 
-The language can be changed from anywhere without resetting an active quiz,
-card deck, saved mastery attempt, or Explore view. Game progress is stored in
-versioned local profiles under the `hello-world-progress` localStorage key.
-First use creates Player 1 automatically.
-
-The complete ordered curriculum is defined in `CURRICULUM.md` and implemented
-in `curriculum.js`. Profile, persistence, transfer and backup behavior lives in
-`progress.js`. Both are dependency-free UMD modules so they work directly in a
-browser and in the Node-based domain tests.
+The language can be changed from anywhere on the site without resetting an
+active quiz, flashcard round, or Explore view.
 
 ## Friend challenges
 
-Curriculum quiz results can be shared as version 2 deterministic friend
-challenges. The recipe identifies the stable quiz and revision, plus the score
-to beat and a casual-tamper proof:
-
-`?cv=2&quiz=pack-nordics%3Acountry-flag&rev=1&score=5&proof=U5VCUGVvI7k`
-
-Valid current-revision curriculum challenges record normal progress for the
-active profile. They never include transferable profile data.
-
-Version 1 region challenges remain available as best-effort compatibility.
+Every scored quiz result can be shared as a deterministic friend challenge.
 An official challenge URL contains a recipe version, quiz mode, region,
 three- or legacy five-letter seed, score, and score proof, for example:
 
@@ -64,15 +50,38 @@ field, but it is not authentication: this is a static site and a determined
 person can recreate a valid proof. An invalid or missing score proof removes the
 score to beat but does not prevent the deterministic round from being played.
 
-The home screen offers **Open challenge** so installed-app users can paste a
-complete challenge URL when external-link capture is unavailable. Legacy
-code-only entry is no longer part of the progression interface because a seed
-alone does not identify its region or quiz mode.
+The setup page always offers **Open challenge** in both browser and installed
+app display modes. It accepts either a complete challenge URL, a current
+three-letter code, or a legacy five-letter code. Pasting a URL validates it with
+the same rules as a directly opened link, then reconstructs it on the current
+app origin before navigating. This lets an iPhone Home Screen installation open
+a link copied from Safari or a message without relying on unsupported
+external-link capture.
 
-While version 1 remains supported, its seeded generator, score proofs and
-golden vectors stay unchanged. The legacy setup UI is no longer part of the
-primary game flow and future product work is not constrained by version 1.
-Run the compatibility vectors with:
+A code alone is only the deterministic round seed; it does not
+contain the region, quiz mode, score, or score proof. Entering one therefore
+arms the next scored quiz on the setup page. The recipient chooses the region
+and quiz mode supplied by the sender, and the code is consumed when that quiz
+actually starts. It is not consumed by Explore, Flashcards, or the map quiz's
+region-selection step, and it is not stored in the URL or across reloads.
+
+The result screen's **Show code** dialog presents the code, region, quiz mode,
+and score for in-person sharing, and **Copy code** copies only the seed. Native
+share messages send the invitation, manual details, and canonical URL together
+as one text block so receiving apps retain the full challenge context. **Copy
+link** continues to copy only the URL. Code-only rounds reproduce the questions
+but do not show a verified score to beat. The active code is also shown in the
+quiz header for URL and manually entered challenges.
+
+Every valid challenge intro also offers a quiet **Copy challenge link** action
+below the primary Start button. It copies a canonical URL containing only the
+active language and challenge recipe, including an unverified score claim
+unchanged so that reopening it shows the same warning.
+
+Version 1 is a compatibility contract. Changes to the seeded random generator,
+region membership, distractor selection, or random-call order must introduce a
+new recipe version and keep the v1 implementation available. Run the immutable
+golden vectors with:
 
 ```sh
 node tests/challenge.test.js
@@ -103,16 +112,11 @@ not private or secure functionality.
 - `styles/` – presentation split into base, quiz, Explore, flashcard, and
   responsive stylesheets
 - `countries.js` – bilingual country and region data
-- `curriculum.js` – the 47 ordered levels, 188 quizzes, stable identities and
-  deterministic curriculum attempt construction
-- `progress.js` – local profiles, progress derivation, persistence, transfer,
-  backup and safe merging
 - `distractors.js` – curated relationships used by the two flag quizzes
 - `world-map.js` – local projected map data derived from Natural Earth
 - `MAP-DATA.md` – map-data verification and update procedure
 - `tools/` – machine-readable map manifest and dependency-free maintenance tools
-- `app.js` – application state, rendering, localization and interaction
-  orchestration
+- `app.js` – quiz logic, localization, URL state, and rendering
 - `favicon.svg` – globe used as the favicon and hero decoration
 - `flags/` – the 196 flags used by the quiz, with
   [source and update information](flags/README.md)

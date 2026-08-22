@@ -1,0 +1,277 @@
+{
+  "naturalEarthVersion": "5.1.1",
+  "boundaryView": "Natural Earth default de facto viewpoint",
+  "datasets": {
+    "countries50m": {
+      "file": "ne_50m_admin_0_countries.zip",
+      "url": "https://naciscdn.org/naturalearth/5.1.1/50m/cultural/ne_50m_admin_0_countries.zip",
+      "sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139"
+    },
+    "tinyCountries50m": {
+      "file": "ne_50m_admin_0_tiny_countries.zip",
+      "url": "https://naciscdn.org/naturalearth/5.1.1/50m/cultural/ne_50m_admin_0_tiny_countries.zip",
+      "sha256": "e6b63e61220a65a78dfddd67cdec3aadd1e335e904de12c98442e693e62ce9d2"
+    },
+    "countries10m": {
+      "file": "ne_10m_admin_0_countries.zip",
+      "url": "https://naciscdn.org/naturalearth/5.1.1/10m/cultural/ne_10m_admin_0_countries.zip",
+      "sha256": "ce1ac7036499a0edd641fbc093cd209a98f96a49d2eca8480aaacad35138a7f6"
+    },
+    "populatedPlaces10m": {
+      "file": "ne_10m_populated_places.zip",
+      "url": "https://naciscdn.org/naturalearth/5.1.2/10m/cultural/ne_10m_populated_places.zip",
+      "sha256": "cd149186f03d2603e0410da399b980a4357d0ac32d3a2305a49ed3dffcc41d7b",
+      "version": "5.1.2"
+    }
+  },
+  "countryCodeField": "ISO_A2_EH",
+  "countryCodeOverrides": {
+    "Kosovo": "xk"
+  },
+  "quizRegions": {
+    "europe": {
+      "centerLongitude": 15,
+      "bounds": [-25, 34, 45, 72]
+    },
+    "north-west-africa": {
+      "centerLongitude": 10,
+      "bounds": [-26, 0, 39, 38]
+    },
+    "east-south-africa": {
+      "centerLongitude": 30,
+      "bounds": [7, -36, 60, 24]
+    },
+    "west-central-asia": {
+      "centerLongitude": 52,
+      "bounds": [20, 8, 89, 58]
+    },
+    "east-south-asia": {
+      "centerLongitude": 115,
+      "bounds": [18, -12, 192, 83]
+    },
+    "oceania": {
+      "centerLongitude": 180,
+      "bounds": [110, -52, 290, 32]
+    },
+    "north-central-america": {
+      "centerLongitude": -105,
+      "bounds": [-170, 5, -55, 84]
+    },
+    "south-america": {
+      "centerLongitude": -61,
+      "bounds": [-92, -58, -30, 18]
+    },
+    "caribbean": {
+      "centerLongitude": -74,
+      "bounds": [-90, 5, -58, 30]
+    }
+  },
+  "overviewRegions": {
+    "africa": {
+      "centerLongitude": 17,
+      "bounds": [-25, -38, 58, 40],
+      "memberRegions": ["north-west-africa", "east-south-africa"]
+    }
+  },
+  "generatedOutput": {
+    "worldViewBox": "0 0 1000 500",
+    "worldProjection": "Equal Earth",
+    "quizProjection": "Azimuthal equidistant",
+    "silhouetteViewBox": "0 0 100 100",
+    "coordinatePrecision": 1
+  },
+  "capitalCountryCodeOverrides": {
+    "KOS": "xk"
+  },
+  "capitalExclusions": ["mc", "va"],
+  "capitalOverrides": {
+    "bi": {
+      "Gitega": {"sourceName": "Gitega"}
+    },
+    "et": {
+      "Addis Abeba": {"sourceName": "Addis Ababa"}
+    },
+    "id": {
+      "Nusantara": {"coordinates": [116.6993, -0.9649]}
+    },
+    "nr": {
+      "Yaren": {"coordinates": [166.9209, -0.5477]}
+    },
+    "ps": {
+      "East Jerusalem": {"coordinates": [35.2066, 31.7784]}
+    },
+    "pw": {
+      "Ngerulmud": {"coordinates": [134.6242, 7.5006]}
+    },
+    "tm": {
+      "Asjkhabad": {"sourceName": "Ashgabat"}
+    }
+  },
+  "markerOverrides": {
+    "sc": [55.45, -4.62]
+  },
+  "worldGeometryOverrides": {
+    "Somaliland": "so",
+    "Turkish Republic of Northern Cyprus": "cy"
+  },
+  "regionalGeometryOverrides": {
+    "cy": {
+      "includeSourceNames": ["Northern Cyprus"]
+    },
+    "so": {
+      "includeSourceNames": ["Somaliland"]
+    }
+  },
+  "silhouetteOverrides": {
+    "no": {
+      "main": [{"bounds": [4, 57, 35, 72]}],
+      "expandedMainFrame": [36, 4, 60, 92],
+      "insets": [
+        {"selection": [{"bounds": [8, 74, 36, 82]}], "frame": [4, 5, 28, 28]},
+        {"selection": [{"bounds": [-10, 70, -7, 72]}], "frame": [10, 43, 17, 25]}
+      ]
+    },
+    "fr": {
+      "main": [{"bounds": [-6, 41, 10, 52]}]
+    },
+    "es": {
+      "main": [
+        {"bounds": [-10, 36, 4, 44], "minArea": 1},
+        {"bounds": [1, 38, 5, 41]}
+      ],
+      "expandedMainFrame": [16, 4, 80, 64],
+      "insets": [
+        {"selection": [{"bounds": [-19, 27, -13, 30]}], "frame": [4, 72, 40, 23]}
+      ]
+    },
+    "pt": {
+      "main": [{"bounds": [-10, 36.8, -6, 42.3], "minArea": 1}],
+      "expandedMainFrame": [42, 4, 54, 92],
+      "insets": [
+        {"selection": [{"bounds": [-32, 36, -24, 40.5]}], "frame": [4, 14, 32, 28]},
+        {"selection": [{"bounds": [-18, 31.5, -15.5, 33.5]}], "frame": [10, 58, 25, 28]}
+      ]
+    },
+    "za": {
+      "main": [{"bounds": [15, -36, 34, -21]}]
+    },
+    "au": {
+      "main": [{"bounds": [110, -45, 155, -9], "sourceNames": ["Australia"]}]
+    },
+    "nz": {
+      "main": [{"bounds": [165, -48, 179, -33]}],
+      "expandedMainFrame": [4, 3, 59, 94],
+      "insets": [
+        {"selection": [{"bounds": [-178, -45, -175, -43]}], "frame": [68, 36, 27, 31]}
+      ]
+    },
+    "cr": {
+      "main": [{"bounds": [-86.5, 7, -82, 12]}]
+    },
+    "us": {
+      "main": [{"bounds": [-126, 24, -66, 50]}],
+      "expandedMainFrame": [31, 30, 65, 46],
+      "insets": [
+        {"selection": [{"bounds": [-180, 50, -126, 72]}, {"bounds": [170, 50, 180, 72]}], "frame": [4, 5, 37, 24]},
+        {"selection": [{"bounds": [-161, 18, -154, 23]}], "frame": [8, 76, 29, 18]}
+      ]
+    },
+    "cl": {
+      "main": [{"bounds": [-77, -57, -66, -17]}],
+      "expandedMainFrame": [42, 3, 54, 94],
+      "insets": [
+        {"selection": [{"bounds": [-82, -34.5, -78, -32.5]}], "frame": [16, 48, 23, 26]},
+        {"selection": [{"bounds": [-110, -28, -108, -26]}], "frame": [4, 16, 20, 22]}
+      ]
+    },
+    "ec": {
+      "main": [{"bounds": [-82, -6, -74, 2]}],
+      "expandedMainFrame": [40, 5, 56, 90],
+      "insets": [
+        {"selection": [{"bounds": [-93, -2, -89, 2]}], "frame": [4, 32, 31, 34]}
+      ]
+    },
+    "sc": {
+      "main": [{"bounds": [55.2, -4.9, 56, -3.7]}],
+      "expandedMainFrame": [34, 4, 62, 66],
+      "insets": [
+        {"selection": [{"bounds": [46, -10, 48, -9]}], "frame": [4, 67, 28, 29]}
+      ]
+    },
+    "mu": {
+      "main": [{"bounds": [57.2, -20.6, 57.9, -19.9]}],
+      "expandedMainFrame": [24, 30, 52, 66],
+      "insets": [
+        {"selection": [{"bounds": [56.4, -10.5, 56.7, -10.2]}], "frame": [4, 4, 24, 24]},
+        {"selection": [{"bounds": [63.2, -19.9, 63.6, -19.5]}], "frame": [72, 8, 24, 26]}
+      ]
+    },
+    "cy": {
+      "includeSourceNames": [
+        "Northern Cyprus",
+        "Cyprus No Mans Area",
+        "Akrotiri Sovereign Base Area",
+        "Dhekelia Sovereign Base Area"
+      ],
+      "main": [{"bounds": [32.2, 34.5, 34.7, 35.8]}],
+      "mergeStroke": true,
+      "expandedMainFrame": [4, 4, 92, 92],
+      "division": [{"bounds": [32.5, 34.9, 34.1, 35.3], "sourceNames": ["Cyprus No Mans Area"]}]
+    },
+    "so": {
+      "includeSourceNames": ["Somaliland"],
+      "main": [{"bounds": [40, -2, 52, 13]}],
+      "mergeStroke": true,
+      "expandedMainFrame": [4, 4, 92, 92],
+      "divisionSharedBoundary": {"sourceNames": ["Somalia", "Somaliland"]}
+    },
+    "fj": {
+      "main": [
+        {"bounds": [176, -21.2, 180, -15.8]},
+        {"bounds": [-180, -21.2, -177, -15.8]}
+      ],
+      "expandedMainFrame": [30, 26, 66, 70],
+      "insets": [
+        {"selection": [{"bounds": [176.8, -12.7, 177.3, -12.3]}], "frame": [4, 4, 24, 24]}
+      ]
+    },
+    "mh": {
+      "main": [{"bounds": [164, 4, 173, 15]}],
+      "forceCompactMarkers": true
+    },
+    "pw": {
+      "main": [{"bounds": [134, 6.7, 135, 8.3]}],
+      "expandedMainFrame": [38, 4, 58, 66],
+      "insets": [
+        {"selection": [{"bounds": [131.8, 4.8, 132.5, 5.6]}], "frame": [8, 48, 26, 20]},
+        {"selection": [{"bounds": [130.8, 2.6, 132, 3.3]}], "frame": [4, 73, 30, 23]}
+      ]
+    },
+    "to": {
+      "main": [{"bounds": [-177, -23, -173, -15]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [-175.6, -21.7, -174.7, -20.8]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "tv": {
+      "main": [{"bounds": [175, -10, 181, -5]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [178.9, -8.7, 179.4, -8.3]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    }
+  },
+  "policy": {
+    "quizCountryList": "countries.js is authoritative; Natural Earth does not decide which entities are quiz countries",
+    "quizRegionMembership": "countries.js is the only source of region membership",
+    "russia": "Pedagogical exception: Russia belongs to East and South Asia; both its regional map and silhouette show the complete country",
+    "somalia": "Pedagogical exception: Somaliland is included in Somalia on regional maps and silhouettes; the enlarged silhouette marks their shared de facto boundary",
+    "transcontinentalCountries": "Each quiz country has exactly one canonical region",
+    "territories": "Natural Earth features not present in countries.js are non-selectable context",
+    "disputedBoundaries": "Use the unmodified Natural Earth default de facto viewpoint, not a country-specific POV download",
+    "manualReview": "Every regenerated candidate must be visually compared with the checked-in map before replacement"
+  }
+}
