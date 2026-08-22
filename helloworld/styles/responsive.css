@@ -1183,9 +1183,8 @@
 
   .result-card {
     min-height: calc(100dvh - var(--result-header-height));
-    padding: 9px 0 max(9px, env(safe-area-inset-bottom));
-    align-content: space-evenly;
-    gap: 12px;
+    padding: 18px 16px max(18px, env(safe-area-inset-bottom));
+    gap: 18px;
   }
 
   .result-overview {
@@ -1225,8 +1224,7 @@
   }
 
   .challenge-share-actions {
-    justify-content: flex-end;
-    flex-wrap: nowrap;
+    justify-content: center;
     gap: 4px;
   }
 
@@ -1238,7 +1236,7 @@
   }
 
   .result-actions {
-    gap: 1px;
+    gap: 10px;
   }
 
   .result-actions .primary-button {
@@ -1272,8 +1270,8 @@
   .result-card {
     width: min(820px, 100%);
     min-height: calc(100dvh - var(--result-header-height));
-    padding: 14px 0 max(14px, env(safe-area-inset-bottom));
-    gap: 18px;
+    padding: 14px 24px max(14px, env(safe-area-inset-bottom));
+    gap: 14px;
   }
 
   .has-review .result-card {
@@ -1318,8 +1316,7 @@
   }
 
   .challenge-share-actions {
-    justify-content: flex-end;
-    flex-wrap: nowrap;
+    justify-content: center;
     gap: 6px;
   }
 
@@ -1331,7 +1328,7 @@
   }
 
   .result-actions {
-    gap: 1px;
+    gap: 8px;
   }
 
   .result-actions .primary-button {
@@ -1362,11 +1359,11 @@
     width: min(1020px, 100%);
     height: calc(100dvh - var(--result-header-height));
     min-height: 0;
-    padding: 10px 0 max(8px, env(safe-area-inset-bottom));
+    padding: 10px 24px max(8px, env(safe-area-inset-bottom));
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
     gap: clamp(20px, 5vw, 62px);
     align-items: center;
-    text-align: left;
+    text-align: center;
   }
 
   .result-overview {
@@ -1407,7 +1404,7 @@
   }
 
   .challenge-share-actions {
-    justify-content: flex-end;
+    justify-content: center;
     gap: 5px;
   }
 
@@ -1419,12 +1416,11 @@
   }
 
   .result-actions {
-    justify-items: stretch;
-    gap: 1px;
+    justify-items: center;
+    gap: 6px;
   }
 
   .result-actions .primary-button {
-    width: 100%;
     min-height: 42px;
   }
 
@@ -1456,7 +1452,8 @@
 
   .result-card {
     padding-top: 5px;
-    gap: 14px;
+    padding-inline: 16px;
+    gap: 10px;
   }
 
   .result-overview {

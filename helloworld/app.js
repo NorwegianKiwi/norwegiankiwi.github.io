@@ -295,12 +295,12 @@
       storageReadFailed: "Lagret fremgang kunne ikke leses. Du kan fortsatt utforske og spille.",
       storageWriteFailed: "Fremgangen kunne ikke lagres på denne enheten.",
       quizMastered: "Quiz mestret", quizNotMastered: "Ikke helt ennå", bestScore: "Beste resultat: {score}/{total}",
-      nextQuiz: "Neste quiz", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen", viewLevel: "Se nivå",
-      reviewCards: "Repeter disse kortene", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
+      nextQuiz: "Neste quiz", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
+      reviewCards: "Øv med flashcards", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
       worldMastered: "Verden mestret", surpriseQuiz: "Spill en overraskelsesquiz", chooseLevel: "Velg nivå",
-      shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre noen",
-      cards: "Kort", mapsView: "Kart", listView: "Liste", revealCard: "Vis svar", nextCard: "Neste kort",
-      cardsComplete: "Kortstokken er ferdig", questionsLong: "{count} spørsmål · lang utfordring",
+      shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre en venn",
+      cards: "Flashcards", mapsView: "Kart", listView: "Liste", revealCard: "Vis svar", nextCard: "Neste kort",
+      cardsComplete: "Flashcards fullført", questionsLong: "{count} spørsmål · lang utfordring",
       resumeAttempt: "Fortsett lagret forsøk", abandonAttempt: "Et langt mestringsforsøk er lagret. Starte en annen quiz og forkaste forsøket?",
       savedAttempt: "Du har et lagret forsøk på {title}.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
       challengeQuizTitle: "Quizutfordring", scoreToBeat: "Resultat å slå", approximateTime: "Omtrent {minutes} min",
@@ -325,12 +325,12 @@
       storageReadFailed: "Saved progress could not be read. You can still explore and play.",
       storageWriteFailed: "Progress could not be saved on this device.",
       quizMastered: "Quiz mastered", quizNotMastered: "Not quite yet", bestScore: "Best score: {score}/{total}",
-      nextQuiz: "Next quiz", tryAgainAction: "Try again", playAgain: "Play again", viewLevel: "View level",
-      reviewCards: "Review these cards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
+      nextQuiz: "Next quiz", tryAgainAction: "Try again", playAgain: "Play again",
+      reviewCards: "Review with flashcards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
       worldMastered: "World mastered", surpriseQuiz: "Play a surprise quiz", chooseLevel: "Choose a level",
-      shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge this quiz",
-      cards: "Cards", mapsView: "Map", listView: "List", revealCard: "Reveal answer", nextCard: "Next card",
-      cardsComplete: "Card deck complete", questionsLong: "{count} questions · long challenge",
+      shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge a friend",
+      cards: "Flashcards", mapsView: "Map", listView: "List", revealCard: "Reveal answer", nextCard: "Next card",
+      cardsComplete: "Flashcards complete", questionsLong: "{count} questions · long challenge",
       resumeAttempt: "Resume saved attempt", abandonAttempt: "A long mastery attempt is saved. Start another quiz and abandon it?",
       savedAttempt: "You have a saved attempt for {title}.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
       challengeQuizTitle: "Quiz challenge", scoreToBeat: "Score to beat", approximateTime: "About {minutes} min",
@@ -1483,7 +1483,7 @@
     const best = record?.bestScore ?? state.score;
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header">${brandMarkup(true, false)}${homeButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score"><strong>${state.score}/${state.questions.length}</strong><span>${t("bestScore", { score: best, total: state.questions.length })}</span></div>${state.resultNewLevelMastery ? `<p class="level-mastered-callout" aria-label="${escapeHtml(levelTitle(level))} · 4/4 ${t("mastered")}"><span>${escapeHtml(levelTitle(level))} · 4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></p>` : ""}${challengeComparisonMarkup()}</div>
-      <div class="result-summary-support"><div class="result-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? t("playAgain") : t("nextQuiz")}</button><button class="quiet-button" data-action="view-active-level">${t("viewLevel")}</button>${state.wrongAnswers.length ? `<button class="quiet-button" data-action="review-missed-cards">${t("reviewCards")}</button>` : ""}</div>
+      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? t("playAgain") : t("nextQuiz")}</button></div><div class="result-tertiary-actions"><button class="quiet-button" data-action="view-recommended-level">${t("chooseLevel")}</button>${state.wrongAnswers.length ? `<button class="quiet-button" data-action="review-missed-cards">${t("reviewCards")}</button>` : ""}</div></div>
       <div class="challenge-share-actions"><button class="quiet-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}</button><button class="quiet-button" data-action="share-progress">${t("shareProgress")}</button></div><p class="profile-status" data-challenge-status aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p></div></section>${reviewMarkup()}</main>`;
   }
 
@@ -2815,6 +2815,22 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     if (options.focusFlashcard) {
       app.querySelector('[data-action="flashcard-toggle"]')?.focus();
     }
+    if (options.focusLevelTarget) {
+      const target = options.focusLevelTarget.quizId
+        ? [...app.querySelectorAll(".quiz-row")].find(
+          (row) => row.dataset.quizId === options.focusLevelTarget.quizId,
+        )
+        : [...app.querySelectorAll(".level-heading")].find(
+          (heading) => heading.dataset.levelId === options.focusLevelTarget.levelId,
+        );
+      target?.focus({ preventScroll: true });
+      target?.closest(".level-card")?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "center",
+      });
+    }
     if (options.focusExploreHeading) {
       app.querySelector(".explore-context")?.focus({ preventScroll: true });
     }
@@ -3391,7 +3407,15 @@ ${countrySilhouetteMarkup(country.code, { interactive: false, expanded: false })
     if (action === "start-curriculum-quiz") { startCurriculumQuiz(control.dataset.quizId); return; }
     if (action === "retry-curriculum-quiz") { startCurriculumQuiz(state.curriculumQuizId); return; }
     if (action === "next-curriculum-quiz") { const quiz = progress.nextUnmastered(currentProfile(), curriculum.levels, state.curriculumQuizId); if (quiz) startCurriculumQuiz(quiz.id); else returnToSetup(); return; }
-    if (action === "view-active-level") { state.selectedLevelId = state.activeLevelId; state.screen = "levels"; renderAtTop(); return; }
+    if (action === "view-recommended-level") {
+      const next = progress.continueSelection(currentProfile(), curriculum.levels);
+      const quiz = next.type === "quiz" ? next.quiz : null;
+      const levelId = quiz?.levelId ?? state.activeLevelId;
+      state.selectedLevelId = levelId;
+      state.screen = "levels";
+      render({ focusLevelTarget: quiz ? { quizId: quiz.id } : { levelId } });
+      return;
+    }
     if (action === "resume-mastery") { const saved = currentProfile().savedMasteryAttempt; if (saved) startCurriculumQuiz(saved.quizId, { resume: true }); return; }
     if (action === "review-missed-cards") { state.flashcards = [...new Map(state.wrongAnswers.map((country) => [country.code, country])).values()]; state.flashcardIndex = 0; state.flashcardRevealed = false; state.flashcardReturn = "result"; state.screen = "flashcards"; renderAtTop({ focusFlashcard: true }); return; }
     if (action === "level-cards") { const level = curriculum.levelById.get(control.dataset.levelId); if (!level) return; state.flashcards = level.countryCodes.map((code) => countriesByCode.get(code)); state.flashcardIndex = 0; state.flashcardRevealed = false; state.flashcardReturn = "level"; state.activeLevelId = level.id; state.screen = "flashcards"; renderAtTop({ focusFlashcard: true }); return; }

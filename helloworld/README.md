@@ -3,7 +3,7 @@
 A static, bilingual geography progression game covering 196 countries in 47
 levels and 188 fixed single-mode quizzes. It includes multiple local profiles,
 best scores, resumable mastery challenges, progress transfer and backup, plus
-an independent Explore section with Map, List and Cards views.
+an independent Explore section with Map, List and Flashcards views.
 
 Open `index.html` directly in a browser. The site requires no installation,
 development server, build process, or third-party packages.

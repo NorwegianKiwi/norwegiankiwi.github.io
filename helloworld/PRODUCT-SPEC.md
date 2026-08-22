@@ -189,21 +189,24 @@ After a perfect result:
 - A green checkmark recognises quiz mastery.
 - **Next quiz** is the primary action.
 - **Play again** is secondary.
-- **View level** is a quiet tertiary action.
+- **Choose a level** is a quiet tertiary action that opens the recommended
+  quiz on the level overview.
 
 After a non-perfect result:
 
 - **Try again** is the primary action.
 - **Next quiz** is secondary.
-- **View level** is a quiet tertiary action.
+- **Choose a level** is a quiet tertiary action that opens the recommended
+  quiz on the level overview.
 
 The result must state whether the quiz was mastered, show the current score and
 best score, and acknowledge newly earned level mastery with the same trophy used
 on the level overview. Wrong-answer review may remain available, but must not
 displace the primary next action.
 
-After a non-perfect result, an additional quiet **Review these cards** action
-opens an optional temporary flashcard deck containing only missed countries.
+After a non-perfect result, an additional quiet **Review with flashcards**
+action opens an optional temporary flashcard deck containing only missed
+countries.
 Completing that deck offers **Retry quiz** and **Back to level**. Card review
 does not alter scores or mastery.
 
@@ -266,14 +269,15 @@ The interface uses action-oriented labels such as **Download backup file** and
 - Explore opens in the map view from the home screen.
 - The existing regional map navigation, country selection, zoom, silhouettes,
   capital markers, notes and country list should be preserved.
-- Explore contains **Map**, **List** and **Cards** views. Map remains the default.
-- Cards may be opened for a region, a curriculum level, or the missed countries
-  from a completed quiz.
+- Explore contains **Map**, **List** and **Flashcards** views. Map remains the
+  default.
+- Flashcards may be opened for a region, a curriculum level, or the missed
+  countries from a completed quiz.
 - A card shows the flag on its front. Revealing it shows country name, capital
   and a small map silhouette when that remains visually clear at the available
   size. The silhouette may move below the textual answer on narrow screens; it
   must not make the answer side cluttered.
-- Cards are unscored and do not create mastery or persistent quiz progress.
+- Flashcards are unscored and do not create mastery or persistent quiz progress.
 - No level or mastery requirement restricts Explore content.
 - Explore may later offer a contextual **Quiz me on these countries** action,
   but this is not required for the first progression release.
@@ -321,7 +325,7 @@ The player competes against their own previous results and the curriculum.
 
 The redesigned sharing model has two purposes:
 
-### Challenge this quiz
+### Challenge a friend
 
 From a curriculum quiz result, the player can challenge someone to the same
 stable quiz ID and revision with a score to beat. The message states the quiz,

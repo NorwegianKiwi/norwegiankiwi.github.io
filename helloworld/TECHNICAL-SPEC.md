@@ -431,7 +431,7 @@ The home progress globe and its numeric label both derive from mastered levels
 out of 47. Current-level progress derives from mastered quizzes out of four.
 They must not use different hidden denominators.
 
-Explore Cards are read-only learning state. A card front uses the flag; its
+Explore Flashcards are read-only learning state. A card front uses the flag; its
 revealed side uses country name, capital and the existing country silhouette.
 Missed-country decks are constructed from the completed attempt's wrong-country
 codes and do not write quiz progress.
@@ -522,7 +522,7 @@ The first progression release is complete when:
 - A device backup can restore all profiles or selected individual profiles.
 - Regional and world mastery attempts resume without allowing answer changes.
 - Explore opens directly to its map and retains current capabilities.
-- Explore includes unscored Cards, and missed-country card review returns to the
+- Explore includes unscored Flashcards, and missed-country card review returns to the
   result flow.
 - All 196 countries are covered as specified.
 - Curriculum quiz challenges open directly and record valid current progress.
