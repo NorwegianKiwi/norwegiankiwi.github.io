@@ -75,7 +75,6 @@
 .flashcard-silhouette { position:relative; inset:auto; width:8rem; height:6rem; margin:.7rem auto 0; pointer-events:none; }
 
 @media (max-width: 700px) {
-  .progression-home .brand-bar { align-items:flex-start; }
   .setup-header-actions .site-home-link { display:none; }
   .home-hero { grid-template-columns:1fr auto; gap:.7rem; }
   .home-hero .kicker { margin-bottom:.45rem; font-size:.625rem; letter-spacing:.12em; white-space:nowrap; }
@@ -90,6 +89,16 @@
   .level-number { width:2rem; height:2rem; }
   .level-state { font-size:.82rem; }
   .saved-attempt-card { align-items:flex-start; flex-direction:column; }
+}
+
+@media (max-width: 600px) {
+  .progression-home .brand { font-size:clamp(1.25rem,6.15vw,1.5rem); }
+  .progression-home .brand > span { white-space:nowrap; }
+  .profile-control { width:2.7rem; height:2.7rem; justify-content:center; gap:0; padding:.3rem; }
+  .profile-control .profile-name { display:none; }
+  .home-secondary-actions { width:100%; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.25rem .75rem; }
+  .home-secondary-actions .secondary-button { grid-column:1 / -1; justify-self:center; }
+  .home-secondary-actions .quiet-button { padding:.6rem .25rem; text-align:center; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1321,7 +1321,7 @@
 
   function profileControlMarkup() {
     const profile = currentProfile();
-    return `<button class="profile-control" data-action="open-profile-panel" aria-label="${escapeHtml(t("profileMenu"))}"><span class="profile-avatar" aria-hidden="true">${escapeHtml(profile.name.charAt(0).toUpperCase())}</span><span>${escapeHtml(profile.name)}</span><span aria-hidden="true">⌄</span></button>`;
+    return `<button class="profile-control" data-action="open-profile-panel" aria-label="${escapeHtml(t("profileMenu"))}"><span class="profile-avatar" aria-hidden="true">${escapeHtml(profile.name.charAt(0).toUpperCase())}</span><span class="profile-name">${escapeHtml(profile.name)}</span></button>`;
   }
 
   function homeProgressMarkup(summaryValue) {
