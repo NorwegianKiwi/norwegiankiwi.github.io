@@ -106,17 +106,17 @@ The overview must make these states immediately legible.
 
 - **Unplayed:** an unread-style dot and no score
 - **Played:** the best result, for example `3/5`
-- **Mastered:** a perfect result and checkmark, for example `5/5 ✓`
+- **Mastered:** a perfect result and green checkmark, for example `5/5 ✓`
 
 ### Level states
 
 - **Unplayed:** an unread-style dot
 - **In progress:** mastered count, for example `2/4 mastered`
-- **Mastered:** `4/4 ✓`
+- **Mastered:** `4/4` with a trophy and subtle green card background
 
-The unread dot and checkmarks are the primary collection mechanics. The first
-version must not add stars, experience points, currencies, loot, leagues or a
-large badge system.
+The unread dot, green quiz checkmarks and level trophies are the primary
+collection mechanics. The first version must not add stars, experience points,
+currencies, loot, leagues or a large badge system.
 
 The level screen should make the recommended next quiz visually clear while
 allowing any other quiz to be selected.
@@ -186,6 +186,7 @@ The result screen must minimise decision-making.
 
 After a perfect result:
 
+- A green checkmark recognises quiz mastery.
 - **Next quiz** is the primary action.
 - **Play again** is secondary.
 - **View level** is a quiet tertiary action.
@@ -197,8 +198,9 @@ After a non-perfect result:
 - **View level** is a quiet tertiary action.
 
 The result must state whether the quiz was mastered, show the current score and
-best score, and acknowledge newly earned level mastery. Wrong-answer review may
-remain available, but must not displace the primary next action.
+best score, and acknowledge newly earned level mastery with the same trophy used
+on the level overview. Wrong-answer review may remain available, but must not
+displace the primary next action.
 
 After a non-perfect result, an additional quiet **Review these cards** action
 opens an optional temporary flashcard deck containing only missed countries.
@@ -375,6 +377,10 @@ achievement rather than suggesting that progress be erased:
 
 > **World mastered**
 > 47 of 47 levels · 188 of 188 quizzes
+
+The completed progress globe carries a static trophy badge as an additional
+visual celebration; the heading and counts remain the accessible statement of
+the achievement.
 
 The primary action is **Play a surprise quiz**, selecting a mastered quiz that
 has not been played recently. **Choose a level** is secondary. Creating another
