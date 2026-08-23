@@ -1021,8 +1021,18 @@
     padding-top: 14px;
   }
 
+  .review-header {
+    grid-template-columns:minmax(0, 1fr);
+    align-items:start;
+    gap:12px;
+  }
+
+  .review-header .review-flashcards-button {
+    justify-self:start;
+  }
+
   .has-review .result-card {
-    min-height: calc(100dvh - var(--result-header-height) - 28px);
+    min-height: calc(100dvh - var(--result-header-height) - 112px);
   }
 }
 
@@ -1044,7 +1054,7 @@
   }
 
   .has-review .result-card {
-    min-height: calc(100dvh - var(--result-header-height) - 48px);
+    min-height: calc(100dvh - var(--result-header-height) - 128px);
   }
 
   .result-card h1 {
@@ -1137,7 +1147,7 @@
   }
 
   .has-review .result-card {
-    height: calc(100dvh - var(--result-header-height) - 28px);
+    height: calc(100dvh - var(--result-header-height) - 80px);
   }
 }
 

@@ -69,8 +69,7 @@
         "Åpne denne siden i Safari for å legge den til på Hjem-skjermen. Trykk deretter på Del, velg «Legg til på Hjem-skjermen», slå på «Åpne som webapp», og trykk «Legg til».",
       closeInstallHelp: "Lukk",
       review: "Gjennomgang",
-      reviewHeading: "Dette kan du øve mer på",
-      reviewCount: "{count} land å se nærmere på.",
+      reviewHeading: "{count} land å øve på",
       questionsLabel: "Spørsmål",
       startChallenge: "Start utfordringen",
       unverifiedScore:
@@ -103,7 +102,6 @@
       backToExplore: "Tilbake til Utforsk",
       flashcards: "Flashcards",
       exploreTheseCountries: "Utforsk disse landene",
-      exploreMissedCountries: "Utforsk landene",
       missedCountries: "Land å øve på",
       wholeWorld: "Hele verden",
       countryCapital: "{name}, hovedstad {capital}",
@@ -188,9 +186,8 @@
         "Open this page in Safari to add it to your Home Screen. Then tap Share, choose “Add to Home Screen”, turn on “Open as Web App”, and tap “Add”.",
       closeInstallHelp: "Close",
       review: "Review",
-      reviewHeading: "Here is what you can practise",
-      reviewCount:
-        "{count} {count, plural, one {country} other {countries}} to revisit.",
+      reviewHeading:
+        "{count} {count, plural, one {country} other {countries}} to review",
       questionsLabel: "Questions",
       startChallenge: "Start challenge",
       unverifiedScore:
@@ -222,7 +219,6 @@
       backToExplore: "Back to Explore",
       flashcards: "Flashcards",
       exploreTheseCountries: "Explore these countries",
-      exploreMissedCountries: "Explore missed countries",
       missedCountries: "Countries to revisit",
       wholeWorld: "Whole world",
       countryCapital: "{name}, capital {capital}",
@@ -1420,9 +1416,10 @@
     return `
       <section class="result-review" id="result-review" aria-labelledby="review-heading" tabindex="-1">
         <p class="kicker">${t("review")}</p>
-        <h2 id="review-heading">${t("reviewHeading")}</h2>
-        <p>${t("reviewCount", { count: missedCountries.length })}</p>
-        <div class="review-group-actions"><button class="secondary-button review-explore-button" data-action="explore-missed-countries">${t("exploreMissedCountries")} <span aria-hidden="true">↗</span></button><button class="secondary-button review-flashcards-button" data-action="review-missed-cards">${t("reviewCards")} <span aria-hidden="true">→</span></button></div>
+        <div class="review-header">
+          <h2 id="review-heading">${t("reviewHeading", { count: missedCountries.length })}</h2>
+          <button class="secondary-button review-flashcards-button" data-action="review-missed-cards">${t("reviewCards")} <span aria-hidden="true">→</span></button>
+        </div>
         <div class="review-list">
           ${missedCountries
             .map(
@@ -2814,11 +2811,6 @@
         block: "center",
       });
     }
-    if (options.focusResultExplore) {
-      app
-        .querySelector('[data-action="explore-missed-countries"]')
-        ?.focus({ preventScroll: true });
-    }
     if (options.focusFlashcard) {
       app.querySelector('[data-action="flashcard-toggle"]')?.focus();
     }
@@ -3236,7 +3228,7 @@
     );
   }
 
-  function showResultCountryInExplore(code = null) {
+  function showResultCountryInExplore(code) {
     const missedCodes = exploreState.uniqueCodes(
       state.wrongAnswers.map((country) => country.code),
     );
@@ -3255,11 +3247,7 @@
     state.silhouetteExpanded = false;
     if (returnTarget?.screen === "result") {
       state.screen = "result";
-      render(
-        returnTarget.reviewCode
-          ? { focusReviewCode: returnTarget.reviewCode }
-          : { focusResultExplore: true },
-      );
+      render({ focusReviewCode: returnTarget.reviewCode });
       return;
     }
     if (returnTarget?.screen === "levels") {
@@ -3640,10 +3628,6 @@
         contextualExploreScope(level.title, level.countryCodes),
         { screen: "levels", levelId: level.id },
       );
-      return;
-    }
-    if (action === "explore-missed-countries") {
-      showResultCountryInExplore();
       return;
     }
     if (action === "retry-from-cards") {

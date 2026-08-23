@@ -830,7 +830,7 @@ body.result-page {
 }
 
 .has-review .result-card {
-  min-height: calc(100dvh - var(--result-header-height) - 48px);
+  min-height: calc(100dvh - var(--result-header-height) - 128px);
 }
 
 .result-summary-main,
@@ -992,7 +992,12 @@ body.result-page {
 }
 
 .review-row .review-row-action { color:var(--green); font-size:18px; font-weight:800; }
-.review-group-actions { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
-.review-group-actions .secondary-button { margin:0; }
+.review-header {
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) auto;
+  align-items:center;
+  gap:16px;
+  margin:0 0 18px;
+}
+.review-header .review-flashcards-button { justify-self:end; margin:0; white-space:nowrap; }
 .review-flashcards-button { background:var(--green-soft); border-color:#bfd7ca; }
-.review-explore-button { background:var(--coral-soft); border-color:#e2bfb2; }
