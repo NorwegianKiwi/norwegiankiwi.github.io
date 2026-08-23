@@ -85,7 +85,7 @@
       challengeMissed:
         "Du fikk {score} poeng; resultatet å matche var {target}.",
       challengeLinkCopied: "Utfordringslenken er kopiert.",
-      challengeShareFailed: "Kunne ikke dele lenken. Prøv å kopiere den.",
+      challengeShareFailed: "Kunne ikke dele eller kopiere lenken.",
       close: "Lukk",
       openChallenge: "Åpne utfordring",
       openChallengePrompt: "Har du fått en utfordring?",
@@ -202,7 +202,7 @@
         "Perfect! You matched the challenge with a full score.",
       challengeMissed: "You scored {score}; the score to match was {target}.",
       challengeLinkCopied: "Challenge link copied.",
-      challengeShareFailed: "Could not share the link. Try copying it instead.",
+      challengeShareFailed: "Could not share or copy the link.",
       close: "Close",
       openChallenge: "Open challenge",
       openChallengePrompt: "Have you received a challenge?",
@@ -296,11 +296,12 @@
       reviewCards: "Øv med flashcards", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
       worldMastered: "Verden mestret", surpriseQuiz: "Spill en overraskelsesquiz", chooseLevel: "Velg nivå",
       shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre en venn",
+      nextShort: "Neste", goToRecommended: "Gå til anbefalt neste quiz",
       cards: "Øv med flashcards", questionsLong: "{count} spørsmål · lang utfordring",
       resumeAttempt: "Fortsett lagret forsøk", abandonAttempt: "Et langt mestringsforsøk er lagret. Starte en annen quiz og forkaste forsøket?",
       savedAttempt: "Du har et lagret forsøk på {title}.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
       challengeQuizTitle: "Quizutfordring", scoreToBeat: "Resultat å slå", approximateTime: "Omtrent {minutes} min",
-      shareUnavailable: "Deling er ikke tilgjengelig akkurat nå.", profilePrivacy: "Fremgangen lagres bare på denne enheten.",
+      shareUnavailable: "Kunne ikke dele eller kopiere akkurat nå.", profilePrivacy: "Fremgangen lagres bare på denne enheten.",
     }),
     en: Object.freeze({
       startGame: "Start game", continueGame: "Continue game", exploreWorld: "Explore the world",
@@ -325,11 +326,12 @@
       reviewCards: "Review with flashcards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
       worldMastered: "World mastered", surpriseQuiz: "Play a surprise quiz", chooseLevel: "Choose a level",
       shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge a friend",
+      nextShort: "Next", goToRecommended: "Go to the recommended next quiz",
       cards: "Practice with flashcards", questionsLong: "{count} questions · long challenge",
       resumeAttempt: "Resume saved attempt", abandonAttempt: "A long mastery attempt is saved. Start another quiz and abandon it?",
       savedAttempt: "You have a saved attempt for {title}.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
       challengeQuizTitle: "Quiz challenge", scoreToBeat: "Score to beat", approximateTime: "About {minutes} min",
-      shareUnavailable: "Sharing is not available right now.", profilePrivacy: "Progress is stored only on this device.",
+      shareUnavailable: "Could not share or copy right now.", profilePrivacy: "Progress is stored only on this device.",
     }),
   });
   const mapSelectableRegions = [
@@ -427,7 +429,6 @@
       ? initialChallenge.scoreParam
       : null,
     challengeProof: initialChallenge?.valid ? initialChallenge.proof : null,
-    shareStatus: null,
     questions: [],
     questionIndex: 0,
     selectedCode: null,
@@ -453,6 +454,8 @@
   };
   let deferredInstallPrompt = null;
   let autoAdvanceTimer = null;
+  const actionFeedbackTimers = new WeakMap();
+  let actionFeedbackToastTimer = null;
   let keyboardHintsVisible = false;
   const exploreMapPointers = new Map();
   let exploreMapGesture = null;
@@ -664,6 +667,13 @@
         <span aria-hidden="true">←</span>
         ${t("home")}
       </button>
+    `;
+  }
+
+  function actionFeedbackMarkup() {
+    return `
+      <span class="action-feedback-icon" aria-hidden="true"></span>
+      <span class="sr-only action-feedback-announcement" aria-live="polite"></span>
     `;
   }
 
@@ -1309,8 +1319,7 @@
           </div>
           <hr />
           <h3>${t("transferProfile")}</h3>
-          <button class="primary-button" data-action="copy-transfer">${t("copyTransferLink")}</button>
-          <p class="profile-status" aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p>
+          <button class="primary-button action-feedback-button" data-action="copy-transfer">${t("copyTransferLink")}${actionFeedbackMarkup()}</button>
           <h3>${t("backupDevice")}</h3>
           <div class="profile-actions">
             <button class="secondary-button" data-action="download-backup">${t("downloadBackup")}</button>
@@ -1355,7 +1364,7 @@
     const installAction = installActionMarkup();
     return `
       <div class="setup-page progression-home"><main class="site-shell setup-shell">
-        <header class="brand-bar">${brandMarkup(false, false)}<div class="setup-header-actions">${profileControlMarkup()}${siteHomeLinkMarkup()}</div></header>
+        <header class="brand-bar app-header app-header-sticky">${brandMarkup(false, false)}<div class="setup-header-actions">${profileControlMarkup()}${siteHomeLinkMarkup()}</div></header>
         ${storageWarning ? `<p class="storage-warning" role="status">${t(storageWarning)}</p>` : ""}
         ${hasUpdatedQuiz ? `<p class="storage-warning" role="status">${t("updatedQuizzes")}</p>` : ""}
         <section class="home-hero" id="top">
@@ -1371,7 +1380,7 @@
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${countryCount(196)}</small></span></button>
         </section>
-        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button" data-action="share-progress">${t("shareProgress")}</button><button class="quiet-button" data-action="open-challenge">${t("openChallenge")}</button></nav>
+        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button action-feedback-button" data-action="share-progress">${t("shareProgress")}${actionFeedbackMarkup()}</button><button class="quiet-button" data-action="open-challenge">${t("openChallenge")}</button></nav>
         <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a><a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a><a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a></span></footer>
         ${profilePanelMarkup()}${installHelpMarkup()}${openChallengeMarkup()}
       </main>${installAction}</div>`;
@@ -1380,7 +1389,10 @@
   function levelsMarkup() {
     const profile = currentProfile();
     const next = progress.continueSelection(profile, curriculum.levels);
-    return `<main class="site-shell levels-shell"><header class="quiz-header">${brandMarkup(true, false)}<h1>${t("levels")}</h1>${homeButtonMarkup()}</header>
+    const recommendedControl = next.type === "quiz"
+      ? `<button class="quiet-button levels-recommended-button" data-action="show-recommended-next" aria-label="${escapeHtml(t("goToRecommended"))}"><span class="levels-recommended-wide">${t("recommended")}</span><span class="levels-recommended-short">${t("nextShort")}</span><span aria-hidden="true">↓</span></button>`
+      : "";
+    return `<main class="site-shell levels-shell"><header class="quiz-header app-header app-header-sticky levels-header">${brandMarkup(true, false)}<h1 class="levels-header-title">${t("levels")}</h1><div class="levels-header-actions">${recommendedControl}${homeButtonMarkup()}</div></header>
       <div class="levels-list">${curriculum.levels.map((level, levelIndex) => {
         const value = progress.levelProgress(profile, level);
         const isMastery = level.kind.includes("mastery");
@@ -1398,8 +1410,8 @@
   }
 
   function importMarkup() {
-    if (state.importError || !state.importProfiles?.length) return `<main class="quiz-shell challenge-shell"><section class="challenge-card"><h1>${t("invalidImport")}</h1><button class="primary-button" data-action="cancel-import">${t("home")}</button></section></main>`;
-    return `<main class="quiz-shell challenge-shell"><section class="challenge-card import-card"><p class="kicker">${t("importProgress")}</p><h1>${state.importProfiles.length === 1 ? escapeHtml(state.importProfiles[0].name) : t("backupDevice")}</h1>
+    if (state.importError || !state.importProfiles?.length) return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup("cancel-import")}</header><section class="challenge-card"><h1>${t("invalidImport")}</h1><button class="primary-button" data-action="cancel-import">${t("home")}</button></section></main>`;
+    return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup("cancel-import")}</header><section class="challenge-card import-card"><p class="kicker">${t("importProgress")}</p><h1>${state.importProfiles.length === 1 ? escapeHtml(state.importProfiles[0].name) : t("backupDevice")}</h1>
       <div class="import-list">${state.importProfiles.map((profile, index) => { const totals = progress.summary(profile, curriculum.levels); return `<article><div><strong>${escapeHtml(profile.name)}</strong><span>${t("playedAndMastered", { played: totals.playedQuizzes, mastered: totals.masteredQuizzes })}</span></div><button class="secondary-button" data-action="import-one" data-import-index="${index}">${t("importOne")}</button></article>`; }).join("")}</div>
       <div class="import-actions">${state.importProfiles.length > 1 ? `<button class="primary-button" data-action="import-all">${t("importAll")}</button>` : `<button class="primary-button" data-action="create-imported-profile">${t("createProfile")}</button>${Object.values(progressStore.profiles).map((profile) => `<button class="secondary-button" data-action="merge-import" data-profile-id="${escapeHtml(profile.id)}">${t("mergeInto", { name: profile.name })}</button>`).join("")}`}<button class="quiet-button" data-action="cancel-import">${t("importCancel")}</button></div>
     </section></main>`;
@@ -1444,7 +1456,7 @@
     const quiz = curriculumQuiz();
     const level = quiz ? curriculum.levelById.get(quiz.levelId) : null;
     if (!quiz || !level) return invalidChallengeMarkup();
-    return `<main class="quiz-shell challenge-shell"><header class="quiz-header">${brandMarkup(true, false)}${homeButtonMarkup()}</header>
+    return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup()}</header>
       <section class="challenge-card challenge-intro-card"><p class="kicker">${t("challengeQuizTitle")}</p><h1>${escapeHtml(levelTitle(level))}</h1>
       <div class="challenge-details"><div><span>${t("testYourself")}</span><strong>${escapeHtml(modeLabel(quiz.mode))}</strong></div><div><span>${t("questionsLabel")}</span><strong>${quiz.countryCodes.length}</strong></div><div><span>${t("approximateTime", { minutes: Math.max(2, Math.ceil(quiz.countryCodes.length / 4)) })}</span><strong>${state.challengeScoreVerified ? `${t("scoreToBeat")}: ${state.challengeTargetScore}/${quiz.countryCodes.length}` : ""}</strong></div></div>
       ${state.challengeScoreWarning ? `<p class="challenge-warning" role="status">${t("unverifiedScore")}</p>` : ""}
@@ -1454,7 +1466,7 @@
   function invalidChallengeMarkup() {
     return `
       <main class="quiz-shell challenge-shell">
-        <header class="quiz-header">${brandMarkup(true, false)}</header>
+        <header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}</header>
         <section class="challenge-card challenge-error-card">
           <p class="kicker">${t("invalidChallengeKicker")}</p>
           <h1>${t("invalidChallengeTitle")}</h1>
@@ -1491,10 +1503,10 @@
     const perfect = state.score === state.questions.length;
     const record = progress.currentRecord(currentProfile(), quiz);
     const best = record?.bestScore ?? state.score;
-    return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header">${brandMarkup(true, false)}${homeButtonMarkup()}</header>
+    return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score"><strong>${state.score}/${state.questions.length}</strong><span>${t("bestScore", { score: best, total: state.questions.length })}</span></div>${state.resultNewLevelMastery ? `<p class="level-mastered-callout" aria-label="${escapeHtml(levelTitle(level))} · 4/4 ${t("mastered")}"><span>${escapeHtml(levelTitle(level))} · 4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></p>` : ""}${challengeComparisonMarkup()}</div>
       <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? t("playAgain") : t("nextQuiz")}</button></div><button class="secondary-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
-      <div class="challenge-share-actions"><button class="quiet-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}</button></div><p class="profile-status" data-challenge-status aria-live="polite">${state.shareStatus ? t(state.shareStatus) : ""}</p></div></section>${reviewMarkup()}</main>`;
+      <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}</main>`;
   }
 
   function exploreCountryStatusMarkup(countryCode) {
@@ -2395,7 +2407,7 @@
       .map((code) => scopedByCode.get(code));
     return `
       <main class="site-shell explore-shell explore-map-shell">
-        <header class="quiz-header explore-header"${backgroundState}>
+        <header class="quiz-header app-header explore-header"${backgroundState}>
           ${brandMarkup(true, false)}
           <h1
             class="explore-context"
@@ -2436,7 +2448,7 @@
     if (complete) {
       return `
         <main class="quiz-shell flashcard-shell">
-          <header class="quiz-header">
+          <header class="quiz-header app-header">
             ${brandMarkup(true, false)}
           </header>
           <section class="flashcard-complete">
@@ -2459,7 +2471,7 @@
     const progress = ((state.flashcardIndex + 1) / state.flashcards.length) * 100;
     return `
       <main class="quiz-shell flashcard-shell">
-        <header class="quiz-header">
+        <header class="quiz-header app-header">
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
             <span>${escapeHtml(scopeLabel)}</span>
@@ -2651,7 +2663,7 @@
 
     return `
       <main class="quiz-shell quiz-active mode-${state.mode} ${keyboardHintsVisible ? "show-keyboard-hints" : ""}">
-        <header class="quiz-header">
+        <header class="quiz-header app-header app-header-mobile-sticky">
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
             <span>${escapeHtml(levelTitle(curriculumLevel()))}</span>
@@ -3161,7 +3173,7 @@
     const regions = new Set(quiz.countryCodes.map((code) => countriesByCode.get(code)?.region));
     state.region = quiz.region ?? (regions.size === 1 ? [...regions][0] : "world");
     state.silhouetteExpanded = false; state.resultRecorded = false; state.resultNewLevelMastery = false;
-    state.shareStatus = null; state.screen = "quiz";
+    state.screen = "quiz";
     if (savedAttempt && savedAttempt.questionIndex >= state.questions.length && !savedAttempt.correctionPending) {
       state.questionIndex = state.questions.length - 1; state.resultRecorded = false; finishCurriculumAttempt(); state.screen = "result";
     }
@@ -3357,37 +3369,124 @@
     if (!copied) throw new Error("Copy failed");
   }
 
-  async function copyTransferLink() {
+  function clearActionFeedback(control) {
+    if (!control?.isConnected) return;
+    const timer = actionFeedbackTimers.get(control);
+    if (timer) window.clearTimeout(timer);
+    actionFeedbackTimers.delete(control);
+    control.classList.remove("is-copied");
+    control.disabled = false;
+    control.removeAttribute("aria-busy");
+    const announcement = control.querySelector(".action-feedback-announcement");
+    if (announcement) announcement.textContent = "";
+  }
+
+  function beginActionFeedback(control) {
+    clearActionFeedback(control);
+    if (!control?.isConnected) return;
+    control.disabled = true;
+    control.setAttribute("aria-busy", "true");
+  }
+
+  function showCopiedFeedback(control, messageKey) {
+    if (!control?.isConnected) return;
+    control.disabled = false;
+    control.removeAttribute("aria-busy");
+    control.classList.add("is-copied");
+    const announcement = control.querySelector(".action-feedback-announcement");
+    if (announcement) announcement.textContent = t(messageKey);
+    const timer = window.setTimeout(() => clearActionFeedback(control), 2400);
+    actionFeedbackTimers.set(control, timer);
+  }
+
+  function showActionFeedbackError(control, messageKey) {
+    clearActionFeedback(control);
+    document.querySelector(".action-feedback-toast")?.remove();
+    if (actionFeedbackToastTimer) window.clearTimeout(actionFeedbackToastTimer);
+    const toast = document.createElement("div");
+    toast.className = "action-feedback-toast";
+    toast.setAttribute("role", "alert");
+    toast.textContent = t(messageKey);
+    document.body.append(toast);
+    actionFeedbackToastTimer = window.setTimeout(() => {
+      toast.remove();
+      actionFeedbackToastTimer = null;
+    }, 4200);
+  }
+
+  async function copyWithFeedback(control, value, copiedKey, failedKey) {
+    beginActionFeedback(control);
+    try {
+      await copyText(value);
+      showCopiedFeedback(control, copiedKey);
+    } catch {
+      showActionFeedbackError(control, failedKey);
+    }
+  }
+
+  async function shareWithClipboardFallback(control, shareData, copyValue, copiedKey, failedKey) {
+    beginActionFeedback(control);
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        clearActionFeedback(control);
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          clearActionFeedback(control);
+          return;
+        }
+      }
+    }
+    try {
+      await copyText(copyValue);
+      showCopiedFeedback(control, copiedKey);
+    } catch {
+      showActionFeedbackError(control, failedKey);
+    }
+  }
+
+  async function copyTransferLink(control) {
     const url = new URL(window.location.href);
     url.search = state.locale === "en" ? "?lang=en" : "";
     url.hash = `progress=${progress.encodeTransfer(currentProfile())}`;
-    try { await copyText(url.href); state.shareStatus = "transferCopied"; } catch { state.shareStatus = "transferFailed"; }
-    render({ focusProfilePanel: true });
+    await copyWithFeedback(control, url.href, "transferCopied", "transferFailed");
   }
 
-  async function copyProgressShare() {
+  async function copyProgressShare(control) {
     const totals = progress.summary(currentProfile(), curriculum.levels);
     const url = new URL(window.location.href); url.search = state.locale === "en" ? "?lang=en" : ""; url.hash = "";
     const text = totals.masteredQuizzes === 188
       ? `${state.locale === "en" ? "I have mastered all 188 geography quizzes in Hello World!" : "Jeg har mestret alle 188 geografiquizene i Hei verden!"}\n${url.href}`
       : `${state.locale === "en" ? `I have mastered ${totals.masteredLevels} of 47 levels in Hello World!` : `Jeg har mestret ${totals.masteredLevels} av 47 nivåer i Hei verden!`}\n${url.href}`;
-    try { if (navigator.share) await navigator.share({ title: t("brandName"), text }); else await copyText(text); state.shareStatus = "progressCopied"; }
-    catch (error) { if (error?.name !== "AbortError") state.shareStatus = "shareUnavailable"; }
-    render();
+    await shareWithClipboardFallback(
+      control,
+      { title: t("brandName"), text },
+      text,
+      "progressCopied",
+      "shareUnavailable",
+    );
   }
 
-  async function copyCurriculumChallenge() {
+  async function copyCurriculumChallenge(control) {
     const quiz = curriculumQuiz(); if (!quiz) return;
+    beginActionFeedback(control);
     try {
       const recipe = { quizId: quiz.id, revision: quiz.revision, score: state.score };
       const proof = await challenge.createScoreProof(recipe);
       const url = challenge.createUrl(window.location.href, { ...recipe, proof }, state.locale);
       const level = curriculumLevel();
       const message = `${levelTitle(level)} · ${modeLabel(quiz.mode)}\n${state.score}/${quiz.countryCodes.length} · ${t("approximateTime", { minutes: Math.max(2, Math.ceil(quiz.countryCodes.length / 4)) })}\n${url.href}`;
-      if (navigator.share) await navigator.share({ title: t("challengeQuizTitle"), text: message }); else await copyText(message);
-      state.shareStatus = "challengeLinkCopied";
-    } catch (error) { if (error?.name !== "AbortError") state.shareStatus = "challengeShareFailed"; }
-    render();
+      await shareWithClipboardFallback(
+        control,
+        { title: t("challengeQuizTitle"), text: message },
+        message,
+        "challengeLinkCopied",
+        "challengeShareFailed",
+      );
+    } catch {
+      showActionFeedbackError(control, "challengeShareFailed");
+    }
   }
 
   function downloadBackup() {
@@ -3488,7 +3587,6 @@
     state.challengeScoreWarning = false;
     state.challengeScoreParam = null;
     state.challengeProof = null;
-    state.shareStatus = null;
     resetExploreCountryState();
     syncUrlState();
     renderAtTop();
@@ -3557,6 +3655,10 @@
       return;
     }
     if (action === "levels") {
+      showRecommendedLevels();
+      return;
+    }
+    if (action === "show-recommended-next") {
       showRecommendedLevels();
       return;
     }
@@ -3639,7 +3741,7 @@
       startFlashcards(shuffle(countriesInExploreMapScope()), "explore");
       return;
     }
-    if (action === "open-profile-panel") { state.profilePanelOpen = true; state.shareStatus = null; render({ focusProfilePanel: true }); return; }
+    if (action === "open-profile-panel") { state.profilePanelOpen = true; render({ focusProfilePanel: true }); return; }
     if (action === "close-profile-panel") { if (event.target === control) { state.profilePanelOpen = false; render(); } return; }
     if (action === "close-profile-panel-button") { state.profilePanelOpen = false; render(); return; }
     if (action === "switch-profile") { persist(progress.switchProfile(progressStore, control.dataset.profileId)); state.profilePanelOpen = false; renderAtTop(); return; }
@@ -3647,10 +3749,10 @@
     if (action === "rename-profile") { const name = window.prompt(t("renamePrompt"), currentProfile().name); if (name !== null) { persist(progress.renameProfile(progressStore, progressStore.activeProfileId, name)); render({ focusProfilePanel: true }); } return; }
     if (action === "clear-profile") { if (window.confirm(t("clearConfirm"))) { persist(progress.clearProgress(progressStore, progressStore.activeProfileId)); state.profilePanelOpen = false; renderAtTop(); } return; }
     if (action === "delete-profile") { if (window.confirm(t("deleteConfirm"))) { persist(progress.deleteProfile(progressStore, progressStore.activeProfileId)); state.profilePanelOpen = false; renderAtTop(); } return; }
-    if (action === "copy-transfer") { void copyTransferLink(); return; }
+    if (action === "copy-transfer") { void copyTransferLink(control); return; }
     if (action === "download-backup") { downloadBackup(); return; }
-    if (action === "share-progress") { void copyProgressShare(); return; }
-    if (action === "copy-curriculum-challenge") { void copyCurriculumChallenge(); return; }
+    if (action === "share-progress") { void copyProgressShare(control); return; }
+    if (action === "copy-curriculum-challenge") { void copyCurriculumChallenge(control); return; }
     if (action === "create-imported-profile") { if (state.importProfiles?.[0]) importSingleProfile(state.importProfiles[0]); return; }
     if (action === "merge-import") {
       if (state.importProfiles?.[0]) {

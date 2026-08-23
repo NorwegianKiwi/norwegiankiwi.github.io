@@ -257,6 +257,12 @@
     min-height: 72px;
   }
 
+  .app-header-mobile-sticky {
+    position: sticky;
+    z-index: 30;
+    top: 0;
+  }
+
   .quiz-active .quiz-header,
   .flashcard-shell .quiz-header {
     min-height: var(--phone-quiz-header-height);
@@ -728,6 +734,12 @@
  * changing portrait phones or regular-height tablets.
  */
 @media (orientation: landscape) and (max-height: 599px) {
+  .app-header-mobile-sticky {
+    position: sticky;
+    z-index: 30;
+    top: 0;
+  }
+
   .flashcard-shell {
     min-height: 0;
   }

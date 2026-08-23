@@ -152,6 +152,10 @@
   gap: var(--answer-gap);
 }
 
+.quiz-active .answer-card {
+  scroll-margin-top: 5rem;
+}
+
 .answer-grid-stage {
   display: contents;
 }
@@ -884,14 +888,6 @@ body.result-page {
   margin-top: 12px;
 }
 
-.result-summary-support > .profile-status {
-  margin: 6px 0 0;
-}
-
-.result-summary-support > .profile-status:empty {
-  display: none;
-}
-
 .primary-button:disabled,
 .secondary-button:disabled {
   cursor: wait;
@@ -904,6 +900,11 @@ body.result-page {
   margin: 0 auto 80px;
   padding-top: 58px;
   border-top: 1px solid var(--line);
+  scroll-margin-top: 6rem;
+}
+
+.result-review button {
+  scroll-margin-top: 6rem;
 }
 
 .has-review .result-review {
