@@ -679,7 +679,7 @@ body.modal-open {
   background: #194a37;
 }
 
-.flag-modal {
+.country-details-dialog {
   position: fixed;
   z-index: 100;
   inset: 0;
@@ -688,52 +688,44 @@ body.modal-open {
   backdrop-filter: blur(7px);
   display: grid;
   place-items: center;
-  cursor:default;
+  cursor: zoom-out;
 }
 
-.flag-modal-toolbar {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  cursor: default;
+.country-details-dialog:focus {
+  outline: none;
 }
 
-.flag-modal-toolbar .language-switcher {
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(17, 26, 21, 0.72);
-}
-
-.flag-modal-card {
-  position:relative;
+.country-details-card {
   width: min(820px, 90vw);
   max-height: calc(100dvh - 56px);
   padding: 8px 12px 14px;
-  overflow:auto;
+  overflow: auto;
   display: grid;
   justify-items: center;
   gap: 14px;
   color: #fff;
   text-align: center;
-  pointer-events:auto;
 }
 
-.modal-flag {
+.country-details-flag {
   width: min(760px, 86vw, 93vh);
   box-shadow: 0 20px 70px rgba(0, 0, 0, 0.42);
 }
 
-.flag-modal-card.has-note .modal-flag {
+.country-details-card.has-note .country-details-flag {
   width: min(700px, 82vw, 68vh);
 }
 
-.flag-modal-card strong {
+.country-details-card h2 {
+  margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(30px, 5vw, 52px);
   font-weight: 400;
+  line-height: 1.05;
 }
 
-.modal-capital {
-  margin-top: -8px;
+.country-details-capital {
+  margin: -8px 0 0;
   color: rgba(255, 255, 255, 0.78);
   font-size: clamp(14px, 2vw, 18px);
 }
@@ -748,5 +740,3 @@ body.modal-open {
   font-size: 15px;
   line-height: 1.5;
 }
-
-.flag-modal-close { position:absolute; z-index:2; top:14px; right:18px; display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:rgba(17,26,21,.72); color:#fff; }

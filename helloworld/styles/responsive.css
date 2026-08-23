@@ -555,15 +555,15 @@
     width: 40px;
   }
 
-  .flag-modal {
+  .country-details-dialog {
     padding: 16px;
   }
 
-  .modal-flag {
+  .country-details-flag {
     width: min(90vw, 82vh);
   }
 
-  .flag-modal-card.has-note .modal-flag {
+  .country-details-card.has-note .country-details-flag {
     width: min(90vw, 60vh);
   }
 
@@ -573,10 +573,16 @@
     font-size: 14px;
   }
 
-  .flag-modal-toolbar { top:10px; left:10px; right:auto; }
-  .flag-modal-card { width:100%; max-height:calc(100dvh - 32px); padding-inline:4px; gap:10px; }
-  .flag-modal-card strong { font-size:clamp(27px,9vw,38px); }
-  .flag-modal-close { top:8px; right:8px; }
+  .country-details-card {
+    width: 100%;
+    max-height: calc(100dvh - 32px);
+    padding-inline: 4px;
+    gap: 10px;
+  }
+
+  .country-details-card h2 {
+    font-size: clamp(27px, 9vw, 38px);
+  }
 
   .flashcard-stage {
     height: calc(100vh - var(--phone-quiz-header-height) - 3px);

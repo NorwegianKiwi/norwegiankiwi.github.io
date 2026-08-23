@@ -48,7 +48,6 @@
       changeRegion: "Bytt region",
       exploreOnMap: "Utforsk {name} på kartet",
       backToResults: "Tilbake til resultatet",
-      closeCountryDetails: "Lukk landdetaljer",
       highlightedMap: "Kart over {region} med ett land uthevet",
       heroKicker: "Lek. Lær. Utforsk.",
       heroTitleBefore: "Verden",
@@ -113,8 +112,8 @@
       showSelectedRegion: "Vis {region}",
       exploreMapHeading: "Hvilket kart vil du utforske?",
       chooseSingleRegion: "Velg en enkelt region",
-      showLargeFlag: "Vis flagget til {name} stort",
-      largeFlag: "Stort flagg: {name}",
+      showCountryDetails: "Vis detaljer for {name}",
+      countryDetails: "Landdetaljer: {name}",
       flashcardsComplete: "Flashcards fullført",
       roundComplete: "Runden er ferdig.",
       flashcardsSummaryBefore: "Du har gått gjennom",
@@ -161,7 +160,6 @@
       changeRegion: "Change region",
       exploreOnMap: "Explore {name} on the map",
       backToResults: "Back to results",
-      closeCountryDetails: "Close country details",
       highlightedMap: "Map of {region} with one country highlighted",
       heroKicker: "Play. Learn. Explore.",
       heroTitleBefore: "The world",
@@ -227,8 +225,8 @@
       showSelectedRegion: "Show {region}",
       exploreMapHeading: "Which map would you like to explore?",
       chooseSingleRegion: "Choose a single region",
-      showLargeFlag: "Show a large flag of {name}",
-      largeFlag: "Large flag: {name}",
+      showCountryDetails: "Show details for {name}",
+      countryDetails: "Country details: {name}",
       flashcardsComplete: "Flashcards complete",
       roundComplete: "The round is complete.",
       flashcardsSummaryBefore: "You have reviewed",
@@ -432,7 +430,7 @@
     flashcards: [],
     flashcardIndex: 0,
     flashcardRevealed: false,
-    modalCode: null,
+    countryDetailsCode: null,
     exploreResultReturnCode: null,
     installHelpOpen: false,
     openChallengeOpen: false,
@@ -1484,9 +1482,9 @@
       <button
         type="button"
         class="explore-country-status"
-        data-action="open-flag"
+        data-action="open-country-details"
         data-code="${country.code}"
-        aria-label="${escapeHtml(t("showLargeFlag", {
+        aria-label="${escapeHtml(t("showCountryDetails", {
           name: countryName(country),
         }))}"
       >
@@ -1500,27 +1498,26 @@
     `;
   }
 
-  function flagModalMarkup(country) {
+  function countryDetailsDialogMarkup(country) {
     if (!country) return "";
     return `
       <div
-        class="flag-modal"
-        data-action="close-modal"
+        class="country-details-dialog"
+        data-action="close-country-details"
         role="dialog"
         aria-modal="true"
-        aria-label="${escapeHtml(t("largeFlag", {
-          name: countryName(country),
-        }))}"
+        aria-labelledby="country-details-title"
         tabindex="-1"
       >
-        <div class="flag-modal-toolbar">
-          ${languageSwitcherMarkup()}
-        </div>
-        <div class="flag-modal-card ${countryNote(country) ? "has-note" : ""}">
-          <button class="icon-close flag-modal-close" type="button" data-action="close-modal-button" aria-label="${escapeHtml(t("closeCountryDetails"))}">×</button>
-          ${flagMarkup(country, "modal-flag", true)}
-          <strong>${escapeHtml(countryName(country))}</strong>
-          <span class="modal-capital">${escapeHtml(countryCapital(country))}</span>
+        <div class="country-details-card ${countryNote(country) ? "has-note" : ""}">
+          ${flagMarkup(country, "country-details-flag", true)}
+          <h2 id="country-details-title">
+            <span class="sr-only">${escapeHtml(t("countryDetails", {
+              name: countryName(country),
+            }))}</span>
+            <span aria-hidden="true">${escapeHtml(countryName(country))}</span>
+          </h2>
+          <p class="country-details-capital">${escapeHtml(countryCapital(country))}</p>
           ${
             countryNote(country)
               ? `<p class="country-note">${escapeHtml(countryNote(country))}</p>`
@@ -2333,7 +2330,8 @@
 
   function exploreMarkup() {
     const region = selectedRegion();
-    const modalCountry = countriesByCode.get(state.modalCode);
+    const detailsCountry = countriesByCode.get(state.countryDetailsCode);
+    const backgroundState = detailsCountry ? ' inert aria-hidden="true"' : "";
     const collator = new Intl.Collator(state.locale, { sensitivity: "base" });
     const showingAfricaOverview = state.exploreMapOverview === "africa";
     const scopedCountries = countriesInExploreMapScope();
@@ -2342,7 +2340,7 @@
     );
     return `
       <main class="site-shell explore-shell explore-map-shell">
-        <header class="quiz-header explore-header">
+        <header class="quiz-header explore-header"${backgroundState}>
           ${brandMarkup(true, false)}
           <h1
             class="explore-context"
@@ -2353,14 +2351,14 @@
             : homeButtonMarkup()}
         </header>
 
-        <div class="explore-content">
+        <div class="explore-content"${backgroundState}>
           ${
             state.exploreRegionPickerOpen
               ? exploreRegionPickerMarkup()
               : exploreRegionMapMarkup(sortedCountries)
           }
         </div>
-        ${flagModalMarkup(modalCountry)}
+        ${countryDetailsDialogMarkup(detailsCountry)}
       </main>
     `;
   }
@@ -2716,14 +2714,16 @@
     }
     document.body?.classList.toggle(
       "modal-open",
-      state.modalCode !== null ||
+      state.countryDetailsCode !== null ||
         state.installHelpOpen ||
         state.openChallengeOpen ||
         state.profilePanelOpen,
     );
 
     if (options.focusCorrect) app.querySelector(".is-correction")?.focus();
-    if (options.focusModal) app.querySelector(".flag-modal")?.focus();
+    if (options.focusCountryDetails) {
+      app.querySelector(".country-details-dialog")?.focus();
+    }
     if (options.focusInstallHelp) {
       app.querySelector(".install-help-close")?.focus();
     }
@@ -2739,9 +2739,9 @@
       app.querySelector('[data-action="open-challenge"]')?.focus();
     }
     if (options.focusProfilePanel) app.querySelector(".profile-panel")?.focus({ preventScroll: true });
-    if (options.focusFlagCode) {
+    if (options.focusCountryDetailsTriggerCode) {
       const target = app.querySelector(
-        `.explore-country-status[data-code="${options.focusFlagCode}"]`,
+        `.explore-country-status[data-code="${options.focusCountryDetailsTriggerCode}"]`,
       );
       target?.focus();
     }
@@ -2795,13 +2795,6 @@
         ?.focus({ preventScroll: true });
     }
     if (options.focusLanguage) {
-      const modalLanguageControl = app.querySelector(
-        `.flag-modal [data-action="language"][data-value="${options.focusLanguage}"]`,
-      );
-      if (modalLanguageControl) {
-        modalLanguageControl.focus({ preventScroll: true });
-        return;
-      }
       app
         .querySelector(
           `[data-action="language"][data-value="${options.focusLanguage}"]`,
@@ -3112,7 +3105,7 @@
     state.answerStatus = "unanswered";
     state.silhouetteExpanded = false;
     state.wrongAnswers = [];
-    state.modalCode = null;
+    state.countryDetailsCode = null;
     state.exploreResultReturnCode = null;
     state.exploreRegionPickerOpen = !mapSelectableRegions.includes(state.region);
     resetExploreCountryState();
@@ -3127,13 +3120,13 @@
     state.screen = "explore";
     state.selectedCode = null;
     state.answerStatus = "unanswered";
-    state.modalCode = null;
+    state.countryDetailsCode = null;
     state.exploreResultReturnCode = code;
     updateRegion(country.region);
     resetExploreCountryState();
     state.explorePinnedCode = code;
     state.exploreRegionPickerOpen = false;
-    renderAtTop({ focusFlagCode: code });
+    renderAtTop({ focusCountryDetailsTriggerCode: code });
   }
 
   function returnToResultFromExplore() {
@@ -3146,18 +3139,17 @@
       updateRegion(quiz.region ?? (regions.size === 1 ? [...regions][0] : "world"));
     }
     state.exploreResultReturnCode = null;
-    state.modalCode = null;
+    state.countryDetailsCode = null;
     state.silhouetteExpanded = false;
     state.screen = "result";
     render({ focusReviewCode: code });
   }
 
-  function closeFlagModal(options = {}) {
-    const code = state.modalCode;
-    state.modalCode = null;
+  function closeCountryDetails() {
+    const code = state.countryDetailsCode;
+    state.countryDetailsCode = null;
     render({
-      focusFlagCode: code,
-      ...options,
+      focusCountryDetailsTriggerCode: code,
     });
   }
 
@@ -3335,7 +3327,7 @@
     state.flashcardReturn = returnTarget;
     state.flashcardExploreRegion = exploreRegion;
     state.flashcardExploreOverview = exploreOverview;
-    state.modalCode = null;
+    state.countryDetailsCode = null;
     state.screen = "flashcards";
     renderAtTop({ focusFlashcard: true });
   }
@@ -3377,7 +3369,7 @@
     state.flashcardExploreOverview = null;
     state.exploreRegionPickerOpen = false;
     state.exploreResultReturnCode = null;
-    state.modalCode = null;
+    state.countryDetailsCode = null;
     state.installHelpOpen = false;
     state.openChallengeOpen = false;
     state.openChallengeValue = "";
@@ -3714,20 +3706,14 @@
       return;
     }
 
-    if (action === "open-flag") {
-      state.modalCode = control.dataset.code;
-      render({ focusModal: true });
+    if (action === "open-country-details") {
+      state.countryDetailsCode = control.dataset.code;
+      render({ focusCountryDetails: true });
       return;
     }
 
-    if (action === "close-modal") {
-      if (event.target !== control) return;
-      closeFlagModal({ suppressFlagFocusVisible: true });
-      return;
-    }
-
-    if (action === "close-modal-button") {
-      closeFlagModal({ suppressFlagFocusVisible: true });
+    if (action === "close-country-details") {
+      closeCountryDetails();
       return;
     }
 
@@ -4077,8 +4063,8 @@
           ? app.querySelector(".install-help-dialog")
           : state.profilePanelOpen
             ? app.querySelector(".profile-panel")
-            : state.modalCode !== null
-              ? app.querySelector(".flag-modal")
+            : state.countryDetailsCode !== null
+              ? app.querySelector(".country-details-dialog")
               : null;
     if (activeDialog && event.key === "Tab") {
       const dialog = activeDialog;
@@ -4124,9 +4110,9 @@
       return;
     }
 
-    if (state.modalCode !== null) {
+    if (state.countryDetailsCode !== null) {
       event.preventDefault();
-      closeFlagModal();
+      closeCountryDetails();
       return;
     }
 
