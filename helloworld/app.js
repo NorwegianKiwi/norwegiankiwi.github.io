@@ -2426,6 +2426,11 @@
       state.flashcardReturn === "explore"
         ? exploreScopeLabel()
         : regionLabel(region);
+    const returnLabel = state.flashcardReturn === "explore"
+      ? t("backToExplore")
+      : state.flashcardReturn === "result"
+        ? t("backToResults")
+        : t("backToLevels");
     const complete = state.flashcardIndex >= state.flashcards.length;
 
     if (complete) {
@@ -2433,11 +2438,6 @@
         <main class="quiz-shell flashcard-shell">
           <header class="quiz-header">
             ${brandMarkup(true, false)}
-            ${
-              state.flashcardReturn === "explore"
-                ? `<button class="quiet-button home-button" data-action="back-from-cards"><span aria-hidden="true">←</span>${escapeHtml(t("backToExplore"))}</button>`
-                : homeButtonMarkup()
-            }
           </header>
           <section class="flashcard-complete">
             <p class="kicker">${t("flashcardsComplete")}</p>
@@ -2448,11 +2448,7 @@
               ${escapeHtml(scopeLabel)}.
             </p>
             <div class="flashcard-actions">
-              ${
-                state.flashcardReturn === "result"
-                  ? `<button class="primary-button" data-action="retry-from-cards">${t("retryQuiz")}</button><button class="secondary-button" data-action="back-from-cards">${t("backToLevel")}</button>`
-                  : `<button class="primary-button" data-action="back-from-cards">${state.flashcardReturn === "explore" ? t("backToExplore") : t("backToLevel")}</button>`
-              }
+              <button class="primary-button" data-action="back-from-cards">${escapeHtml(returnLabel)}</button>
             </div>
           </section>
         </main>
@@ -2469,11 +2465,7 @@
             <span>${escapeHtml(scopeLabel)}</span>
             <strong>${state.flashcardIndex + 1} / ${state.flashcards.length}</strong>
           </div>
-          ${
-            state.flashcardReturn === "explore"
-              ? `<button class="quiet-button home-button" data-action="back-from-cards"><span aria-hidden="true">←</span>${escapeHtml(t("backToExplore"))}</button>`
-              : homeButtonMarkup()
-          }
+          <button class="quiet-button home-button" data-action="back-from-cards"><span aria-hidden="true">←</span>${escapeHtml(returnLabel)}</button>
         </header>
         <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="${
           state.flashcards.length
@@ -2814,6 +2806,9 @@
     if (options.focusFlashcard) {
       app.querySelector('[data-action="flashcard-toggle"]')?.focus();
     }
+    if (options.focusResultFlashcards) {
+      app.querySelector('[data-action="review-missed-cards"]')?.focus();
+    }
     if (options.focusLevelTarget) {
       const target = options.focusLevelTarget.quizId
         ? [...app.querySelectorAll(".quiz-row")].find(
@@ -2871,13 +2866,13 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function showRecommendedLevels() {
+  function showRecommendedLevels(fallbackLevelId = state.activeLevelId) {
     const next = progress.continueSelection(
       currentProfile(),
       curriculum.levels,
     );
     const quiz = next.type === "quiz" ? next.quiz : null;
-    const levelId = quiz?.levelId ?? state.activeLevelId ?? null;
+    const levelId = quiz?.levelId ?? fallbackLevelId ?? null;
     state.selectedLevelId = levelId;
     state.screen = "levels";
     if (!levelId) {
@@ -3251,9 +3246,7 @@
       return;
     }
     if (returnTarget?.screen === "levels") {
-      state.selectedLevelId = returnTarget.levelId;
-      state.screen = "levels";
-      render({ focusLevelExplore: returnTarget.levelId });
+      showRecommendedLevels(returnTarget.levelId);
       return;
     }
     returnToSetup();
@@ -3630,18 +3623,15 @@
       );
       return;
     }
-    if (action === "retry-from-cards") {
-      startCurriculumQuiz(state.curriculumQuizId);
-      return;
-    }
     if (action === "back-from-cards") {
       if (state.flashcardReturn === "explore") {
         state.screen = "explore";
         render({ focusExploreFlashcards: true });
+      } else if (state.flashcardReturn === "result") {
+        state.screen = "result";
+        render({ focusResultFlashcards: true });
       } else {
-        state.selectedLevelId = state.activeLevelId;
-        state.screen = "levels";
-        renderAtTop();
+        showRecommendedLevels(state.activeLevelId);
       }
       return;
     }

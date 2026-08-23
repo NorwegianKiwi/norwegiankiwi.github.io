@@ -207,9 +207,9 @@ displace the primary next action.
 
 After a non-perfect result, an additional quiet **Review with flashcards**
 action opens an optional temporary flashcard deck containing only missed
-countries.
-Completing that deck offers **Retry quiz** and **Back to level**. Card review
-does not alter scores or mastery.
+countries. Leaving or completing that deck returns to the preserved result,
+where retry and next-quiz decisions remain available. Card review does not
+alter scores or mastery.
 
 Celebration should be proportional: a subtle response for a correct answer,
 more visible recognition for quiz mastery, and a distinctive moment for level,
@@ -284,6 +284,8 @@ The interface uses action-oriented labels such as **Download backup file** and
   country list.
 - Flashcards may be opened for a region, a curriculum level, or the missed
   countries from a completed quiz.
+- Leaving or completing Flashcards offers one return action to its source:
+  Explore, the result screen, or the level overview.
 - A card shows the flag on its front. Revealing it shows country name, capital
   and a small map silhouette when that remains visually clear at the available
   size. The silhouette may move below the textual answer on narrow screens; it
