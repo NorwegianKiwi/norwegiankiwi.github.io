@@ -992,4 +992,7 @@ body.result-page {
 }
 
 .review-row .review-row-action { color:var(--green); font-size:18px; font-weight:800; }
-.review-flashcards-button { margin:0 0 18px; background:var(--green-soft); border-color:#bfd7ca; }
+.review-group-actions { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
+.review-group-actions .secondary-button { margin:0; }
+.review-flashcards-button { background:var(--green-soft); border-color:#bfd7ca; }
+.review-explore-button { background:var(--coral-soft); border-color:#e2bfb2; }

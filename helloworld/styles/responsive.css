@@ -1310,7 +1310,7 @@ body.standalone-mode .explore-map-shell .explore-country-panel {
 
   .explore-flashcards-button {
     min-height: 42px;
-    margin: 6px;
+    margin: 0;
     padding: 7px 9px;
     font-size: 13px;
   }
@@ -1344,6 +1344,28 @@ body.standalone-mode .explore-map-shell .explore-country-panel {
 
   .explore-region-cards .region-card small {
     font-size: 9px;
+  }
+}
+
+@media (max-width: 420px) {
+  .explore-list-controls {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .explore-flashcards-button {
+    min-height: 100%;
+    padding-inline: 8px;
+    font-size: 11px;
+  }
+
+  .explore-map-scope-controls {
+    max-width: calc(100% - 145px);
+  }
+
+  .explore-map-scope-button {
+    min-height: 32px;
+    padding: 5px 9px;
+    font-size: 10px;
   }
 }
 

@@ -268,12 +268,20 @@ The interface uses action-oriented labels such as **Download backup file** and
 
 - Explore remains available independently of profiles and game progress.
 - Explore opens in the unified map-and-list workspace from the home screen.
+- Whole world is a selectable workspace with all 196 countries alphabetically.
+- Levels and result review may open temporary, session-only country scopes;
+  these scopes do not add saved lists or URL state.
 - The existing regional map navigation, country selection, zoom, silhouettes,
   capital markers, notes and country list should be preserved.
 - The workspace stays within the viewport and exposes region selection, the
   selected country's large flag and region-scoped Flashcards contextually.
 - Flashcards launched from Explore contain exactly the countries visible in the
   list and return to the preserved Explore state.
+- The selected-country summary belongs with the map, while scope selection and
+  Flashcards belong with the list. On mobile these groups stack in that order.
+- Geographic map navigation is separate from geometric zoom. World, all-Africa,
+  and detailed regional extents may be traversed without changing the visible
+  country list.
 - Flashcards may be opened for a region, a curriculum level, or the missed
   countries from a completed quiz.
 - A card shows the flag on its front. Revealing it shows country name, capital

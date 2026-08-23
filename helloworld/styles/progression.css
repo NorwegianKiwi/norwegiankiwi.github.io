@@ -67,7 +67,11 @@
 .level-card { scroll-margin-block:1.5rem; }
 .quiz-row > span:first-child { display:grid; }
 .quiz-row small { color:#286052; font-weight:700; margin-top:.15rem; }
-.level-practice-row { width:100%; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.8rem; margin:0 0 .55rem; padding:.8rem .9rem; border:1px solid #c7ddd2; border-radius:.8rem; background:#e5f1ec; color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+.level-practice-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem; margin-bottom:.55rem; }
+.level-practice-row { width:100%; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.8rem; margin:0; padding:.8rem .9rem; border:1px solid #c7ddd2; border-radius:.8rem; background:#e5f1ec; color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+.level-explore-row { border-color:#d7c2cb; background:#f3e7ec; }
+.level-explore-row:hover,.level-explore-row:focus-visible { border-color:#a34d67; background:#ecdbe2; }
+.level-practice-map-icon { display:grid; place-items:center; width:2.1rem; height:1.7rem; color:#8b3f58; font-size:1.45rem; }
 .level-practice-row:hover,.level-practice-row:focus-visible { border-color:var(--green); background:#dcece4; }
 .level-practice-row:focus-visible { outline:3px solid var(--coral); outline-offset:2px; }
 .level-practice-row > span:nth-child(2) { display:grid; gap:.14rem; }
@@ -111,6 +115,7 @@
   .result-mastery-title { gap:.55rem; }
   .result-mastery-check { width:2.15rem; height:2.15rem; font-size:1.35rem; }
   .saved-attempt-card { align-items:flex-start; flex-direction:column; }
+  .level-practice-actions { grid-template-columns:1fr; }
 }
 
 @media (max-width: 600px) {

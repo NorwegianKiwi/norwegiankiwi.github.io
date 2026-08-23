@@ -11,11 +11,12 @@
   const data = window.GEOGRAFI_QUIZ_DATA;
   const mapData = window.GEOGRAFI_QUIZ_MAP_DATA;
   const challenge = window.GEOGRAFI_CHALLENGE;
+  const exploreState = window.GEOGRAFI_EXPLORE_STATE;
   const curriculum = window.GEOGRAFI_CURRICULUM;
   const progress = window.GEOGRAFI_PROGRESS;
   const app = document.getElementById("app");
 
-  if (!data || !mapData || !challenge || !curriculum || !progress || !app) {
+  if (!data || !mapData || !challenge || !exploreState || !curriculum || !progress || !app) {
     throw new Error(
       initialLocale === "en"
         ? "Hello World! could not load the country data."
@@ -48,6 +49,7 @@
       changeRegion: "Bytt region",
       exploreOnMap: "Utforsk {name} på kartet",
       backToResults: "Tilbake til resultatet",
+      backToLevels: "Tilbake til nivåene",
       highlightedMap: "Kart over {region} med ett land uthevet",
       heroKicker: "Lek. Lær. Utforsk.",
       heroTitleBefore: "Verden",
@@ -99,7 +101,11 @@
       challengeUrlInvalid: "Dette er ikke en gyldig utfordringslenke.",
       chooseCountry: "Velg et land",
       backToExplore: "Tilbake til Utforsk",
-      flashcardsForCountries: "Flashcards · {count} land",
+      flashcards: "Flashcards",
+      exploreTheseCountries: "Utforsk disse landene",
+      exploreMissedCountries: "Utforsk landene",
+      missedCountries: "Land å øve på",
+      wholeWorld: "Hele verden",
       countryCapital: "{name}, hovedstad {capital}",
       interactiveRegionMap: "Interaktivt kart over {region}",
       countriesInRegion: "Land i regionen",
@@ -110,6 +116,8 @@
       africaOverview: "Afrika",
       viewAllAfrica: "Vis hele Afrika",
       showSelectedRegion: "Vis {region}",
+      viewWorld: "Vis verden",
+      mapAreaControls: "Bytt kartutsnitt",
       exploreMapHeading: "Hvilket kart vil du utforske?",
       chooseSingleRegion: "Velg en enkelt region",
       showCountryDetails: "Vis detaljer for {name}",
@@ -160,6 +168,7 @@
       changeRegion: "Change region",
       exploreOnMap: "Explore {name} on the map",
       backToResults: "Back to results",
+      backToLevels: "Back to levels",
       highlightedMap: "Map of {region} with one country highlighted",
       heroKicker: "Play. Learn. Explore.",
       heroTitleBefore: "The world",
@@ -211,8 +220,11 @@
       challengeUrlInvalid: "This is not a valid challenge link.",
       chooseCountry: "Choose a country",
       backToExplore: "Back to Explore",
-      flashcardsForCountries:
-        "Flashcards · {count} {count, plural, one {country} other {countries}}",
+      flashcards: "Flashcards",
+      exploreTheseCountries: "Explore these countries",
+      exploreMissedCountries: "Explore missed countries",
+      missedCountries: "Countries to revisit",
+      wholeWorld: "Whole world",
       countryCapital: "{name}, capital {capital}",
       interactiveRegionMap: "Interactive map of {region}",
       countriesInRegion: "Countries in the region",
@@ -223,6 +235,8 @@
       africaOverview: "Africa",
       viewAllAfrica: "View all Africa",
       showSelectedRegion: "Show {region}",
+      viewWorld: "View world",
+      mapAreaControls: "Change map area",
       exploreMapHeading: "Which map would you like to explore?",
       chooseSingleRegion: "Choose a single region",
       showCountryDetails: "Show details for {name}",
@@ -410,8 +424,6 @@
     importError: transferError,
     selectedLevelId: null,
     flashcardReturn: "home",
-    flashcardExploreRegion: null,
-    flashcardExploreOverview: null,
     challengeTargetScore: null,
     challengeScoreVerified: false,
     challengeScoreWarning: initialChallenge?.valid === true,
@@ -431,7 +443,8 @@
     flashcardIndex: 0,
     flashcardRevealed: false,
     countryDetailsCode: null,
-    exploreResultReturnCode: null,
+    exploreScope: null,
+    exploreReturn: null,
     installHelpOpen: false,
     openChallengeOpen: false,
     openChallengeValue: "",
@@ -440,7 +453,7 @@
     explorePinnedCode: null,
     explorePreviewCode: null,
     exploreMapViewport: null,
-    exploreMapOverview: null,
+    exploreMapExtent: null,
   };
   let deferredInstallPrompt = null;
   let autoAdvanceTimer = null;
@@ -555,10 +568,29 @@
   }
 
   function countriesInExploreMapScope() {
-    if (state.exploreMapOverview === "africa") {
-      return countries.filter((country) => africaRegionIds.has(country.region));
+    if (state.exploreScope?.kind === "contextual") {
+      return state.exploreScope.countryCodes
+        .map((code) => countriesByCode.get(code))
+        .filter(Boolean);
     }
     return countriesInRegion(state.region);
+  }
+
+  function exploreScopeLabel() {
+    if (state.exploreScope?.kind === "contextual") {
+      return state.exploreScope.title[state.locale];
+    }
+    return state.region === "world"
+      ? t("wholeWorld")
+      : regionLabel(selectedRegion());
+  }
+
+  function initialExploreMapExtent(countryCodes) {
+    return exploreState.initialExtent(
+      countryCodes,
+      mapRegionForCode,
+      africaRegionIds,
+    );
   }
 
   function selectedRegion() {
@@ -1361,7 +1393,7 @@
             <span class="level-number">${levelIndex + 1}</span><span><strong>${escapeHtml(levelTitle(level))}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : countryCount(level.countryCodes.length)}</small></span>
             <span class="level-state">${value.mastered === 4 ? `<span class="level-mastery-status" aria-label="4/4 ${t("mastered")}"><span>4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></span>` : value.played ? `${value.mastered}/4 ${t("mastered")}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span>
           </button>
-          ${state.selectedLevelId === level.id ? `<div class="quiz-list"><button class="level-practice-row" data-action="level-cards" data-level-id="${level.id}"><span class="level-practice-icon" aria-hidden="true"><span></span><span></span></span><span><strong>${t("cards")}</strong><small>${countryCount(level.countryCodes.length)}</small></span><span aria-hidden="true">→</span></button><div class="quiz-mode-list">${level.quizzes.map((baseQuiz) => {
+          ${state.selectedLevelId === level.id ? `<div class="quiz-list"><div class="level-practice-actions"><button class="level-practice-row" data-action="level-cards" data-level-id="${level.id}"><span class="level-practice-icon" aria-hidden="true"><span></span><span></span></span><span><strong>${t("cards")}</strong></span><span aria-hidden="true">→</span></button><button class="level-practice-row level-explore-row" data-action="explore-level" data-level-id="${level.id}"><span class="level-practice-map-icon" aria-hidden="true">◎</span><span><strong>${t("exploreTheseCountries")}</strong></span><span aria-hidden="true">→</span></button></div><div class="quiz-mode-list">${level.quizzes.map((baseQuiz) => {
             const quiz = curriculum.quizById.get(baseQuiz.id); const record = progress.currentRecord(profile, quiz); const status = progress.quizState(profile, quiz); const recommended = next.type === "quiz" && next.quiz.id === quiz.id;
             return `<button class="quiz-row ${recommended ? "is-recommended" : ""}" data-action="start-curriculum-quiz" data-quiz-id="${quiz.id}"><span>${escapeHtml(modeLabel(quiz.mode))}${recommended ? `<small>${t("recommended")}</small>` : ""}</span><span>${status === "mastered" ? `<span class="quiz-mastery-status" aria-label="${record.bestScore}/${record.total} · ${t("quizMastered")}"><span>${record.bestScore}/${record.total}</span><span class="mastery-check" aria-hidden="true">✓</span></span>` : status === "played" ? `${record.bestScore}/${record.total}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span></button>`;
           }).join("")}</div></div>` : ""}
@@ -1390,7 +1422,7 @@
         <p class="kicker">${t("review")}</p>
         <h2 id="review-heading">${t("reviewHeading")}</h2>
         <p>${t("reviewCount", { count: missedCountries.length })}</p>
-        <button class="secondary-button review-flashcards-button" data-action="review-missed-cards">${t("reviewCards")} <span aria-hidden="true">→</span></button>
+        <div class="review-group-actions"><button class="secondary-button review-explore-button" data-action="explore-missed-countries">${t("exploreMissedCountries")} <span aria-hidden="true">↗</span></button><button class="secondary-button review-flashcards-button" data-action="review-missed-cards">${t("reviewCards")} <span aria-hidden="true">→</span></button></div>
         <div class="review-list">
           ${missedCountries
             .map(
@@ -1614,7 +1646,7 @@
             class="${classes}"
             data-action="explore-country"
             data-explore-code="${marker.code}"
-            data-map-marker-readable-size="${marker.readableSize}"
+            data-map-marker-readable-size="${marker.readableSize ?? 0}"
             aria-hidden="true"
           >
             <circle
@@ -2127,69 +2159,100 @@
     scheduleExploreMapZoomUi();
   }
 
-  function exploreRegionMapMarkup(sortedCountries) {
-    const showingAfricaOverview = state.exploreMapOverview === "africa";
-    const scopeId = showingAfricaOverview
-      ? "africa"
-      : state.region;
-    const scopeLabel = showingAfricaOverview
-      ? t("africaOverview")
-      : regionLabel(selectedRegion());
-    const view = showingAfricaOverview
+  function exploreMapView(extent) {
+    if (extent === "world") {
+      return {
+        viewBox: mapData.viewBox,
+        features: mapData.features,
+        markers: mapData.markers,
+      };
+    }
+    return extent === "africa"
       ? mapData.overviewRegions.africa
-      : mapData.quizRegions[state.region];
+      : mapData.quizRegions[extent];
+  }
+
+  function exploreMapExtentLabel(extent) {
+    if (extent === "world") return t("wholeWorld");
+    if (extent === "africa") return t("africaOverview");
+    return regionLabel(regionsById.get(extent));
+  }
+
+  function exploreMapAreaControlsContentMarkup() {
+    const extent = state.exploreMapExtent;
+    const selectedRegion = mapRegionForCode(state.explorePinnedCode);
+    const zoomInExtent = exploreState.zoomInExtent(
+      extent,
+      selectedRegion,
+      africaRegionIds,
+    );
+    const zoomOutExtent = exploreState.zoomOutExtent(extent, africaRegionIds);
+    const controls = [];
+    if (zoomOutExtent !== extent) {
+      controls.push(`<button type="button" class="secondary-button explore-map-scope-button" data-action="explore-map-area" data-value="${zoomOutExtent}"><span aria-hidden="true">−</span> ${escapeHtml(zoomOutExtent === "world" ? t("viewWorld") : t("viewAllAfrica"))}</button>`);
+    }
+    if (zoomInExtent !== extent) {
+      controls.push(`<button type="button" class="secondary-button explore-map-scope-button" data-action="explore-map-area" data-value="${zoomInExtent}">${escapeHtml(zoomInExtent === "africa" ? t("viewAllAfrica") : t("showSelectedRegion", { region: exploreMapExtentLabel(zoomInExtent) }))} <span aria-hidden="true">+</span></button>`);
+    }
+    return controls.join("");
+  }
+
+  function exploreMapAreaControlsMarkup() {
+    return `<div class="explore-map-scope-controls" role="group" aria-label="${escapeHtml(t("mapAreaControls"))}">${exploreMapAreaControlsContentMarkup()}</div>`;
+  }
+
+  function exploreRegionMapMarkup(sortedCountries) {
+    const extent = state.exploreMapExtent ?? "world";
+    const scopeLabel = exploreScopeLabel();
+    const extentLabel = exploreMapExtentLabel(extent);
+    const view = exploreMapView(extent);
     const mapViewport = getExploreMapViewport(
       view.viewBox,
-      scopeId,
+      extent,
     );
     const zoom = exploreMapZoom(mapViewport);
     const zoomPercent = Math.round(zoom * 100);
-    const contextPaths = (view.backgroundFeatures ?? view.features)
-      .filter((feature) => {
-        if (view.backgroundFeatures) return true;
-        const region = mapRegionForCode(feature.code);
-        return showingAfricaOverview
-          ? !africaRegionIds.has(region)
-          : region !== state.region;
-      })
+    const scopedCodes = new Set(sortedCountries.map((country) => country.code));
+    const contextFeatures = [
+      ...(view.backgroundFeatures ?? []),
+      ...view.features.filter((feature) => !scopedCodes.has(feature.code)),
+    ];
+    const contextPaths = contextFeatures
       .map((feature) =>
         regionalMapPathMarkup(feature, "explore-map-context-shape"),
+      )
+      .join("");
+    const contextMarkers = view.markers
+      .filter((marker) => !scopedCodes.has(marker.code))
+      .map((marker) =>
+        regionalMapMarkerMarkup(
+          marker,
+          "explore-map-context-marker",
+          2.4,
+        ),
       )
       .join("");
 
     return `
       <div class="explore-map-layout">
         <div class="explore-map-column">
+          <div class="explore-country-status-wrap" aria-live="polite">
+            ${exploreCountryStatusMarkup(state.explorePinnedCode)}
+          </div>
           <div class="explore-map-stage">
-            ${
-              africaRegionIds.has(state.region)
-                ? `<div class="explore-map-scope-controls">
-                    <button
-                      type="button"
-                      class="secondary-button explore-map-scope-button"
-                      data-action="toggle-africa-overview"
-                    >${
-                      showingAfricaOverview
-                        ? escapeHtml(t("showSelectedRegion", {
-                            region: regionLabel(selectedRegion()),
-                          }))
-                        : escapeHtml(t("viewAllAfrica"))
-                    }</button>
-                  </div>`
-                : ""
-            }
+            ${exploreMapAreaControlsMarkup()}
             <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
           <svg
             data-explore-map-svg
             viewBox="${serializeMapViewBox(mapViewport.view)}"
             role="group"
             aria-label="${escapeHtml(t("interactiveRegionMap", {
-              region: scopeLabel,
+              region: extentLabel,
             }))}"
             preserveAspectRatio="xMidYMid meet"
           >
             <rect class="question-map-ocean" x="-10000" y="-10000" width="20000" height="20000" />
-            <g aria-hidden="true">${contextPaths}</g>
+            <g aria-hidden="true">${contextPaths}${contextMarkers}</g>
             ${sortedCountries
               .map((country) =>
                 exploreMapCountryMarkup(country, view),
@@ -2232,27 +2295,27 @@
           </div>
             </div>
           </div>
-          <div class="explore-country-status-wrap" aria-live="polite">
-            ${exploreCountryStatusMarkup(state.explorePinnedCode)}
-          </div>
         </div>
 
         <aside class="explore-country-panel" aria-label="${escapeHtml(t("countriesInRegion"))}">
-          <button
-            type="button"
-            class="explore-region-control"
-            data-action="open-explore-region-picker"
-            aria-haspopup="true"
-            aria-label="${escapeHtml(t("changeRegion"))}: ${escapeHtml(scopeLabel)}"
-          >
-            <span>
-              <strong>${escapeHtml(scopeLabel)}</strong>
-              <small>${countryCount(sortedCountries.length)}</small>
-            </span>
-            <span class="explore-region-control-arrow" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false"><path d="M7 7h11m0 0-3-3m3 3-3 3M17 17H6m0 0 3 3m-3-3 3-3" /></svg>
-            </span>
-          </button>
+          <div class="explore-list-controls">
+            <button
+              type="button"
+              class="explore-region-control"
+              data-action="open-explore-region-picker"
+              aria-haspopup="true"
+              aria-label="${escapeHtml(t("changeRegion"))}: ${escapeHtml(scopeLabel)}"
+            >
+              <span>
+                <strong>${escapeHtml(scopeLabel)}</strong>
+                <small>${countryCount(sortedCountries.length)}</small>
+              </span>
+              <span class="explore-region-control-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M7 7h11m0 0-3-3m3 3-3 3M17 17H6m0 0 3 3m-3-3 3-3" /></svg>
+              </span>
+            </button>
+            <button type="button" class="primary-button explore-flashcards-button" data-action="explore-cards">${escapeHtml(t("flashcards"))}</button>
+          </div>
           <div class="scroll-affordance-frame" data-scroll-affordance-frame>
             <div class="explore-country-list" data-scroll-affordance>
               ${sortedCountries
@@ -2275,13 +2338,6 @@
                 .join("")}
             </div>
           </div>
-          <button
-            type="button"
-            class="primary-button explore-flashcards-button"
-            data-action="explore-cards"
-          >${escapeHtml(t("flashcardsForCountries", {
-            count: sortedCountries.length,
-          }))}</button>
         </aside>
       </div>
     `;
@@ -2298,25 +2354,25 @@
           <button
             type="button"
             class="quiet-button"
-            data-action="${mapSelectableRegions.includes(state.region) ? "close-explore-region-picker" : "setup"}"
+            data-action="close-explore-region-picker"
           >${escapeHtml(t("cancel"))}</button>
         </div>
         <div class="explore-region-picker-layout">
           ${worldMapMarkup("explore-map-region")}
           <div class="explore-region-cards">
-            ${mapSelectableRegions
+            ${["world", ...mapSelectableRegions]
               .map((regionId) => {
                 const option = regionsById.get(regionId);
                 return `
                   <button
                     type="button"
-                    class="region-card ${state.region === regionId && state.exploreMapOverview !== "africa" ? "is-selected" : ""}"
+                    class="region-card ${state.exploreScope === null && state.region === regionId ? "is-selected" : ""}"
                     data-action="explore-map-region"
                     data-value="${regionId}"
-                    data-map-region="${regionId}"
-                    aria-pressed="${state.region === regionId && state.exploreMapOverview !== "africa"}"
+                    ${regionId === "world" ? "" : `data-map-region="${regionId}"`}
+                    aria-pressed="${state.exploreScope === null && state.region === regionId}"
                   >
-                    <span>${escapeHtml(regionLabel(option))}</span>
+                    <span>${escapeHtml(regionId === "world" ? t("wholeWorld") : regionLabel(option))}</span>
                     <small>${countryCount(countriesInRegion(regionId).length)}</small>
                   </button>
                 `;
@@ -2329,15 +2385,17 @@
   }
 
   function exploreMarkup() {
-    const region = selectedRegion();
     const detailsCountry = countriesByCode.get(state.countryDetailsCode);
     const backgroundState = detailsCountry ? ' inert aria-hidden="true"' : "";
-    const collator = new Intl.Collator(state.locale, { sensitivity: "base" });
-    const showingAfricaOverview = state.exploreMapOverview === "africa";
     const scopedCountries = countriesInExploreMapScope();
-    const sortedCountries = [...scopedCountries].sort((a, b) =>
-      collator.compare(countryName(a), countryName(b)),
-    );
+    const scopedByCode = new Map(scopedCountries.map((country) => [country.code, country]));
+    const sortedCountries = exploreState
+      .sortCodes(
+        scopedCountries.map((country) => country.code),
+        (code) => countryName(scopedByCode.get(code)),
+        state.locale,
+      )
+      .map((code) => scopedByCode.get(code));
     return `
       <main class="site-shell explore-shell explore-map-shell">
         <header class="quiz-header explore-header"${backgroundState}>
@@ -2346,9 +2404,11 @@
             class="explore-context"
             tabindex="-1"
           >${escapeHtml(t("explore"))}</h1>
-          ${state.exploreResultReturnCode
-            ? `<button class="quiet-button home-button" data-action="back-to-result"><span aria-hidden="true">←</span>${escapeHtml(t("backToResults"))}</button>`
-            : homeButtonMarkup()}
+          ${state.exploreReturn?.screen === "result"
+            ? `<button class="quiet-button home-button" data-action="back-from-explore"><span aria-hidden="true">←</span>${escapeHtml(t("backToResults"))}</button>`
+            : state.exploreReturn?.screen === "levels"
+              ? `<button class="quiet-button home-button" data-action="back-from-explore"><span aria-hidden="true">←</span>${escapeHtml(t("backToLevels"))}</button>`
+              : homeButtonMarkup()}
         </header>
 
         <div class="explore-content"${backgroundState}>
@@ -2365,12 +2425,9 @@
 
   function flashcardMarkup() {
     const region = selectedRegion();
-    const exploreScopeRegion = regionsById.get(state.flashcardExploreRegion);
     const scopeLabel =
       state.flashcardReturn === "explore"
-        ? state.flashcardExploreOverview === "africa"
-          ? t("africaOverview")
-          : regionLabel(exploreScopeRegion ?? region)
+        ? exploreScopeLabel()
         : regionLabel(region);
     const complete = state.flashcardIndex >= state.flashcards.length;
 
@@ -2757,6 +2814,11 @@
         block: "center",
       });
     }
+    if (options.focusResultExplore) {
+      app
+        .querySelector('[data-action="explore-missed-countries"]')
+        ?.focus({ preventScroll: true });
+    }
     if (options.focusFlashcard) {
       app.querySelector('[data-action="flashcard-toggle"]')?.focus();
     }
@@ -2776,12 +2838,21 @@
         block: "center",
       });
     }
+    if (options.focusLevelExplore) {
+      const target = app.querySelector(
+        `[data-action="explore-level"][data-level-id="${options.focusLevelExplore}"]`,
+      );
+      target?.focus({ preventScroll: true });
+      target?.closest(".level-card")?.scrollIntoView({ block: "center" });
+    }
     if (options.focusExploreHeading) {
       app.querySelector(".explore-context")?.focus({ preventScroll: true });
     }
-    if (options.focusExploreOverviewToggle) {
+    if (options.focusExploreMapArea) {
       app
-        .querySelector('[data-action="toggle-africa-overview"]')
+        .querySelector(
+          `[data-action="explore-map-area"][data-value="${options.focusExploreMapArea}"]`,
+        )
         ?.focus({ preventScroll: true });
     }
     if (options.focusExploreRegionControl) {
@@ -2874,7 +2945,6 @@
   function resetExploreCountryState() {
     state.explorePinnedCode = null;
     state.explorePreviewCode = null;
-    state.exploreMapOverview = null;
     state.silhouetteExpanded = false;
     resetExploreMapInteraction();
   }
@@ -2911,13 +2981,17 @@
     if (overlay) {
       overlay.innerHTML = exploreSilhouetteOverlayMarkup();
     }
+
+    const areaControls = app.querySelector(".explore-map-scope-controls");
+    if (areaControls) {
+      areaControls.innerHTML = exploreMapAreaControlsContentMarkup();
+    }
   }
 
   function setExplorePreview(code) {
     if (
       state.screen !== "explore" ||
-      state.exploreRegionPickerOpen ||
-      !mapSelectableRegions.includes(state.region)
+      state.exploreRegionPickerOpen
     ) {
       return;
     }
@@ -2948,6 +3022,18 @@
     state.explorePinnedCode = code;
     state.explorePreviewCode = null;
     if (changed) state.silhouetteExpanded = false;
+    const regionId = mapRegionForCode(code);
+    const extent = state.exploreMapExtent;
+    const visibleOnMap =
+      extent === "world" ||
+      extent === regionId ||
+      (extent === "africa" && africaRegionIds.has(regionId));
+    if (!visibleOnMap) {
+      state.exploreMapExtent = "world";
+      resetExploreMapInteraction();
+      render({ focusCountryDetailsTriggerCode: code });
+      return;
+    }
     syncExploreCountryUi();
 
     if (scrollCard) {
@@ -2962,7 +3048,6 @@
   function updateRegion(regionId) {
     if (!regionsById.has(regionId)) return false;
     if (state.region !== regionId) {
-      state.exploreMapOverview = null;
       resetExploreMapInteraction();
     }
     state.region = regionId;
@@ -3106,43 +3191,84 @@
     state.silhouetteExpanded = false;
     state.wrongAnswers = [];
     state.countryDetailsCode = null;
-    state.exploreResultReturnCode = null;
-    state.exploreRegionPickerOpen = !mapSelectableRegions.includes(state.region);
+    state.exploreScope = null;
+    state.exploreReturn = null;
+    state.exploreMapExtent = state.region;
+    state.exploreRegionPickerOpen = false;
     resetExploreCountryState();
     renderAtTop();
   }
 
-  function showResultCountryInExplore(code) {
-    const country = countriesByCode.get(code);
-    if (!country) return;
+  function contextualExploreScope(title, countryCodes) {
+    return {
+      kind: "contextual",
+      title,
+      countryCodes: exploreState.uniqueCodes(countryCodes).filter((code) =>
+        countriesByCode.has(code),
+      ),
+    };
+  }
+
+  function localizedExploreTitle(key) {
+    return { nb: messages.nb[key], en: messages.en[key] };
+  }
+
+  function showContextualExplore(scope, returnTarget, pinnedCode = null) {
+    if (!scope.countryCodes.length) return;
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
     state.screen = "explore";
     state.selectedCode = null;
     state.answerStatus = "unanswered";
     state.countryDetailsCode = null;
-    state.exploreResultReturnCode = code;
-    updateRegion(country.region);
+    state.exploreScope = scope;
+    state.exploreReturn = returnTarget;
+    state.exploreMapExtent = initialExploreMapExtent(scope.countryCodes);
     resetExploreCountryState();
-    state.explorePinnedCode = code;
+    state.explorePinnedCode = scope.countryCodes.includes(pinnedCode)
+      ? pinnedCode
+      : null;
     state.exploreRegionPickerOpen = false;
-    renderAtTop({ focusCountryDetailsTriggerCode: code });
+    renderAtTop(
+      state.explorePinnedCode
+        ? { focusCountryDetailsTriggerCode: state.explorePinnedCode }
+        : {},
+    );
   }
 
-  function returnToResultFromExplore() {
-    const code = state.exploreResultReturnCode;
-    const quiz = curriculumQuiz();
-    if (quiz) {
-      const regions = new Set(
-        quiz.countryCodes.map((countryCode) => countriesByCode.get(countryCode)?.region),
-      );
-      updateRegion(quiz.region ?? (regions.size === 1 ? [...regions][0] : "world"));
-    }
-    state.exploreResultReturnCode = null;
+  function showResultCountryInExplore(code = null) {
+    const missedCodes = exploreState.uniqueCodes(
+      state.wrongAnswers.map((country) => country.code),
+    );
+    showContextualExplore(
+      contextualExploreScope(localizedExploreTitle("missedCountries"), missedCodes),
+      { screen: "result", reviewCode: code },
+      code,
+    );
+  }
+
+  function returnFromExplore() {
+    const returnTarget = state.exploreReturn;
+    state.exploreScope = null;
+    state.exploreReturn = null;
     state.countryDetailsCode = null;
     state.silhouetteExpanded = false;
-    state.screen = "result";
-    render({ focusReviewCode: code });
+    if (returnTarget?.screen === "result") {
+      state.screen = "result";
+      render(
+        returnTarget.reviewCode
+          ? { focusReviewCode: returnTarget.reviewCode }
+          : { focusResultExplore: true },
+      );
+      return;
+    }
+    if (returnTarget?.screen === "levels") {
+      state.selectedLevelId = returnTarget.levelId;
+      state.screen = "levels";
+      render({ focusLevelExplore: returnTarget.levelId });
+      return;
+    }
+    returnToSetup();
   }
 
   function closeCountryDetails() {
@@ -3319,14 +3445,11 @@
   function startFlashcards(
     flashcards,
     returnTarget,
-    { exploreRegion = null, exploreOverview = null } = {},
   ) {
     state.flashcards = flashcards;
     state.flashcardIndex = 0;
     state.flashcardRevealed = false;
     state.flashcardReturn = returnTarget;
-    state.flashcardExploreRegion = exploreRegion;
-    state.flashcardExploreOverview = exploreOverview;
     state.countryDetailsCode = null;
     state.screen = "flashcards";
     renderAtTop({ focusFlashcard: true });
@@ -3365,10 +3488,10 @@
     state.flashcards = [];
     state.flashcardIndex = 0;
     state.flashcardRevealed = false;
-    state.flashcardExploreRegion = null;
-    state.flashcardExploreOverview = null;
     state.exploreRegionPickerOpen = false;
-    state.exploreResultReturnCode = null;
+    state.exploreScope = null;
+    state.exploreReturn = null;
+    state.exploreMapExtent = null;
     state.countryDetailsCode = null;
     state.installHelpOpen = false;
     state.openChallengeOpen = false;
@@ -3510,6 +3633,19 @@
       );
       return;
     }
+    if (action === "explore-level") {
+      const level = curriculum.levelById.get(control.dataset.levelId);
+      if (!level) return;
+      showContextualExplore(
+        contextualExploreScope(level.title, level.countryCodes),
+        { screen: "levels", levelId: level.id },
+      );
+      return;
+    }
+    if (action === "explore-missed-countries") {
+      showResultCountryInExplore();
+      return;
+    }
     if (action === "retry-from-cards") {
       startCurriculumQuiz(state.curriculumQuizId);
       return;
@@ -3526,10 +3662,7 @@
       return;
     }
     if (action === "explore-cards") {
-      startFlashcards(shuffle(countriesInExploreMapScope()), "explore", {
-        exploreRegion: state.region,
-        exploreOverview: state.exploreMapOverview,
-      });
+      startFlashcards(shuffle(countriesInExploreMapScope()), "explore");
       return;
     }
     if (action === "open-profile-panel") { state.profilePanelOpen = true; state.shareStatus = null; render({ focusProfilePanel: true }); return; }
@@ -3611,8 +3744,8 @@
       return;
     }
 
-    if (action === "back-to-result") {
-      returnToResultFromExplore();
+    if (action === "back-from-explore") {
+      returnFromExplore();
       return;
     }
 
@@ -3631,21 +3764,24 @@
 
     if (action === "explore-map-region") {
       if (!updateRegion(control.dataset.value)) return;
+      state.exploreScope = null;
+      state.exploreMapExtent = state.region;
       resetExploreCountryState();
       state.exploreRegionPickerOpen = false;
       render({ focusExploreHeading: true });
       return;
     }
 
-    if (action === "toggle-africa-overview") {
-      if (!africaRegionIds.has(state.region)) return;
-      state.exploreMapOverview =
-        state.exploreMapOverview === "africa" ? null : "africa";
-      state.explorePinnedCode = null;
-      state.explorePreviewCode = null;
-      state.silhouetteExpanded = false;
+    if (action === "explore-map-area") {
+      const extent = control.dataset.value;
+      if (
+        extent !== "world" &&
+        extent !== "africa" &&
+        !mapSelectableRegions.includes(extent)
+      ) return;
+      state.exploreMapExtent = extent;
       resetExploreMapInteraction();
-      render({ focusExploreOverviewToggle: true });
+      render({ focusExploreMapArea: extent });
       return;
     }
 
@@ -4118,12 +4254,8 @@
 
     if (state.screen === "explore" && state.exploreRegionPickerOpen) {
       event.preventDefault();
-      if (mapSelectableRegions.includes(state.region)) {
-        state.exploreRegionPickerOpen = false;
-        render({ focusExploreRegionControl: true });
-      } else {
-        returnToSetup();
-      }
+      state.exploreRegionPickerOpen = false;
+      render({ focusExploreRegionControl: true });
       return;
     }
 

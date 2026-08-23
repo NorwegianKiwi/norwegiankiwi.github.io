@@ -415,6 +415,12 @@ uses the flag; its revealed side uses country name, capital and the existing cou
 Missed-country decks are constructed from the completed attempt's wrong-country
 codes and do not write quiz progress.
 
+Explore may also hold a session-only contextual scope with a localized title,
+country codes and a return target. Map extent is independent of this membership:
+the world, Africa overview and detailed regional maps may be traversed while the
+scope list remains fixed. Contextual scopes are neither persisted nor encoded in
+the URL.
+
 ## 18. Tests and validation
 
 At minimum, add automated coverage for:

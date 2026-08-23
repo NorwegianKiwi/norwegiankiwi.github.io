@@ -3,8 +3,8 @@
 A static, bilingual geography progression game covering 196 countries in 47
 levels and 188 fixed single-mode quizzes. It includes multiple local profiles,
 best scores, resumable mastery challenges, progress transfer and backup, plus
-an independent, viewport-fitted Explore workspace with a regional map, country
-list and contextual Flashcards action.
+an independent, viewport-fitted Explore workspace with world, regional, and
+contextual country maps plus a country list and Flashcards action.
 
 Open `index.html` directly in a browser. The site requires no installation,
 development server, build process, or third-party packages.
@@ -89,6 +89,7 @@ node tests/challenge.test.js
   deterministic curriculum attempt construction
 - `progress.js` – local profiles, progress derivation, persistence, transfer,
   backup and safe merging
+- `explore-state.js` – session-only Explore scope and geographic map-extent rules
 - `fixtures/test-profiles-backup.json` – importable browser test profiles ranging
   from brand new to every level mastered; regenerate it with
   `node tools/generate_test_profiles_backup.js`

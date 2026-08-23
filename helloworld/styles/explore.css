@@ -70,7 +70,7 @@ body.explore-page {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 10px;
 }
 
@@ -89,6 +89,10 @@ body.explore-page {
   z-index: 4;
   top: 8px;
   left: 8px;
+  max-width: calc(100% - 185px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
 .explore-map-scope-button {
@@ -125,6 +129,12 @@ body.explore-page {
   stroke: rgba(73, 91, 80, 0.16);
   stroke-width: 0.7;
   vector-effect: non-scaling-stroke;
+}
+
+.explore-map-context-marker {
+  fill: rgba(112, 129, 118, 0.42);
+  stroke: var(--card);
+  stroke-width: 0.7;
 }
 
 .explore-map-context-shape.is-crop-edge,
@@ -301,7 +311,16 @@ body.explore-page {
   border-radius: 15px;
   background: var(--card);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.explore-list-controls {
+  min-width: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--green-soft);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
 }
 
 .explore-country-status-wrap {
@@ -374,7 +393,7 @@ body.explore-page {
   min-height: 66px;
   padding: 10px 13px;
   border: 0;
-  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
   color: var(--ink);
   background: var(--green-soft);
   display: flex;
@@ -547,10 +566,14 @@ body.explore-page {
 }
 
 .explore-flashcards-button {
-  width: calc(100% - 16px);
-  min-height: 46px;
-  margin: 8px;
-  padding: 9px 12px;
+  width: auto;
+  min-height: 100%;
+  margin: 0;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 12px;
 }
 
 .explore-region-picker {
