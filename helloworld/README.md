@@ -106,9 +106,9 @@ node tests/challenge.test.js
 ## World map
 
 The interactive world map is generated from Natural Earth 1:50m Admin 0
-Countries and Tiny Country Points, version 5.1.1. It uses the Equal Earth
-projection and is simplified for browser display. Natural Earth data is
-public domain; its source and terms are documented in
+Countries and Tiny Country Points, version 5.1.1. It uses the Natural Earth
+compromise projection and is simplified for browser display. Natural Earth
+data is public domain; its source and terms are documented in
 `licenses/natural-earth-public-domain.txt`.
 
 `world-map.js` also contains pregenerated region-centred azimuthal equidistant

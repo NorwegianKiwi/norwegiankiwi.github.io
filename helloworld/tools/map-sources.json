@@ -74,8 +74,8 @@
     }
   },
   "generatedOutput": {
-    "worldViewBox": "0 0 1000 500",
-    "worldProjection": "Equal Earth",
+    "worldViewBox": "0 0 1000 520",
+    "worldProjection": "Natural Earth",
     "quizProjection": "Azimuthal equidistant",
     "silhouetteViewBox": "0 0 100 100",
     "coordinatePrecision": 1

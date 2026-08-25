@@ -83,6 +83,7 @@ body.explore-page {
 }
 
 .explore-map-stage > .explore-region-map {
+  width: 100%;
   height: 100%;
 }
 
@@ -90,7 +91,7 @@ body.explore-page {
   width: 100%;
   height: auto;
   max-height: 100%;
-  aspect-ratio: 2 / 1;
+  aspect-ratio: var(--world-map-aspect, 25 / 13);
 }
 
 .explore-map-scope-controls {
@@ -105,7 +106,7 @@ body.explore-page {
 }
 
 .explore-map-scope-button {
-  min-height: 36px;
+  min-height: 44px;
   padding: 7px 12px;
   border-radius: 999px;
   background: rgba(255, 253, 247, 0.94);
@@ -123,6 +124,7 @@ body.explore-page {
   border-radius: 15px;
   background: var(--blue-soft);
   box-shadow: 0 8px 24px rgba(24, 35, 29, 0.08);
+  container: explore-map / size;
 }
 
 .explore-region-map > svg {
@@ -279,9 +281,15 @@ body.explore-page {
   opacity: 0;
 }
 
+.explore-region-map.has-expanded-silhouette .explore-map-scope-controls {
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
 .explore-map-zoom-controls button {
-  min-width: 34px;
-  height: 32px;
+  min-width: 44px;
+  height: 44px;
   padding: 0 8px;
   border: 0;
   border-radius: 7px;
@@ -310,6 +318,17 @@ body.explore-page {
 
 .explore-silhouette-overlay {
   display: contents;
+}
+
+.explore-region-map .country-silhouette-inset:not(.is-expanded) {
+  --silhouette-size: clamp(76px, min(15cqw, 30cqh), 104px);
+  --silhouette-edge: clamp(8px, 2cqh, 14px);
+}
+
+@container explore-map (max-height: 360px) {
+  .country-silhouette-inset:not(.is-expanded) {
+    --silhouette-size: clamp(76px, min(15cqw, 30cqh), 92px);
+  }
 }
 
 .country-silhouette-inset.is-preview-only {
@@ -675,7 +694,7 @@ body.explore-page {
 
 .explore-region-picker .region-map-card {
   width: min(100%, 760px);
-  aspect-ratio: 2 / 1;
+  aspect-ratio: var(--world-map-aspect, 25 / 13);
   max-height: 100%;
   display: grid;
   place-items: center;

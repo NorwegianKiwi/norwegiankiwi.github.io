@@ -520,8 +520,8 @@
   }
 
   .explore-map-zoom-controls button {
-    min-width: 32px;
-    height: 30px;
+    min-width: 44px;
+    height: 44px;
   }
 
   .explore-map-zoom-controls .explore-map-zoom-reset {
@@ -613,7 +613,7 @@
 
 @media (max-width: 440px) {
   .explore-map-scope-button {
-    min-height: 38px;
+    min-height: 44px;
     padding: 6px 10px;
     font-size: 11px;
   }
@@ -1387,7 +1387,7 @@ body.standalone-mode .explore-map-shell .explore-country-panel {
   }
 
   .explore-map-scope-button {
-    min-height: 32px;
+    min-height: 44px;
     padding: 5px 9px;
     font-size: 10px;
   }

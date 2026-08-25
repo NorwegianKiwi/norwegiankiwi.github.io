@@ -96,7 +96,7 @@ documented expected counts together.
 
 The committed geometry consists of three separate products:
 
-1. World map: 1:50m, Equal Earth, `0 0 1000 500`.
+1. World map: 1:50m, Natural Earth, `0 0 1000 520`.
 2. Region maps: 1:50m, north-up, region-centered azimuthal equidistant
    projection with an automatically fitted camera based on active countries.
    Active countries with a Natural Earth tiny-country point use 1:10m geometry,
@@ -168,7 +168,7 @@ python3 tools/map_maintenance.py validate \
   --map-file /tmp/world-map.candidate.js
 ```
 
-When region maps change, preserve the existing Equal Earth world map and shape
+When region maps change, preserve the existing Natural Earth world map and shape
 insets with `--base-map`. All region maps and the Africa overview are always
 regenerated through the same azimuthal-equidistant pipeline:
 
@@ -179,9 +179,20 @@ python3 tools/generate_map_data.py \
   --base-map world-map.js
 ```
 
-When the shape insets must also be regenerated without changing the Equal Earth
-world map, add `--refresh-silhouettes`. Without this flag, `--base-map` retains
-the existing shape insets:
+To reproject only the world map while retaining every regional view and
+silhouette byte-for-byte, add `--refresh-world`:
+
+```sh
+python3 tools/generate_map_data.py \
+  /tmp/geografi-map-sources \
+  /tmp/world-map.candidate.js \
+  --base-map world-map.js \
+  --refresh-world
+```
+
+When the shape insets must also be regenerated without changing the Natural
+Earth world map, add `--refresh-silhouettes`. Without this flag, `--base-map`
+retains the existing shape insets:
 
 ```sh
 python3 tools/generate_map_data.py \

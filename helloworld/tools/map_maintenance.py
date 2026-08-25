@@ -945,8 +945,18 @@ def validate_local_data(map_path=None):
         errors.append(
             f"world-map.js oppgir ikke manifestversjonen {version!r}: {source!r}"
         )
-    if map_data.get("projection") != "Equal Earth":
-        errors.append("Verdenskartets projeksjon er ikke Equal Earth")
+    expected_world_projection = manifest["generatedOutput"]["worldProjection"]
+    if map_data.get("projection") != expected_world_projection:
+        errors.append(
+            "Verdenskartets projeksjon er ikke "
+            + expected_world_projection
+        )
+    expected_world_view_box = manifest["generatedOutput"]["worldViewBox"]
+    if map_data.get("viewBox") != expected_world_view_box:
+        errors.append(
+            "Verdenskartets viewBox er ikke "
+            + expected_world_view_box
+        )
     if map_data.get("quizProjection") != "Azimuthal equidistant":
         errors.append(
             "Kartquizens projeksjon er ikke Azimuthal equidistant"

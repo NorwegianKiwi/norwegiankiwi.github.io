@@ -858,13 +858,16 @@
   }
 
   function worldMapMarkup(action = "map-region") {
+    const [worldX, worldY, worldWidth, worldHeight] = mapData.viewBox
+      .split(/\s+/)
+      .map(Number);
     const contextPaths = mapData.features
       .filter((feature) => mapRegionForCode(feature.code) === null)
       .map(mapPathMarkup)
       .join("");
 
     return `
-      <div class="region-map-card">
+      <div class="region-map-card" style="--world-map-aspect: ${worldWidth} / ${worldHeight}">
         <p class="sr-only" id="region-map-description">
           ${t("regionMapDescription")}
         </p>
@@ -876,7 +879,7 @@
           aria-describedby="region-map-description"
           preserveAspectRatio="xMidYMid meet"
         >
-          <rect class="map-ocean" width="1000" height="500" rx="26" />
+          <rect class="map-ocean" x="${worldX}" y="${worldY}" width="${worldWidth}" height="${worldHeight}" rx="26" />
           <g class="map-context" aria-hidden="true">${contextPaths}</g>
           ${mapSelectableRegions
             .map((regionId) => mapRegionMarkup(regionId, action))
@@ -1939,6 +1942,7 @@
     if (zoomIn) zoomIn.disabled = zoom >= exploreMapMaxZoom - 0.001;
     map?.classList.toggle("is-zoomed", zoom > 1.001);
     if (reset) {
+      reset.hidden = zoom <= 1.001;
       reset.textContent = `${percent}%`;
       const label = t("resetMapZoom", { percent });
       reset.setAttribute("aria-label", label);
@@ -2307,6 +2311,11 @@
     );
     const zoom = exploreMapZoom(mapViewport);
     const zoomPercent = Math.round(zoom * 100);
+    const worldViewBox = parseMapViewBox(mapData.viewBox);
+    const worldAspectStyle =
+      extent === "world"
+        ? ` style="--world-map-aspect: ${worldViewBox.width} / ${worldViewBox.height}"`
+        : "";
     const scopedCodes = new Set(sortedCountries.map((country) => country.code));
     const contextFeatures = [
       ...(view.backgroundFeatures ?? []),
@@ -2335,8 +2344,8 @@
             ${exploreCountryStatusMarkup(state.explorePinnedCode)}
           </div>
           <div class="explore-map-stage">
-            ${exploreMapAreaControlsMarkup()}
-            <div class="explore-region-map${extent === "world" ? " is-world-extent" : ""}${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
+            <div class="explore-region-map${extent === "world" ? " is-world-extent" : ""}${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}"${worldAspectStyle}>
+          ${exploreMapAreaControlsMarkup()}
           <svg
             data-explore-map-svg
             viewBox="${serializeMapViewBox(mapViewport.view)}"
@@ -2376,6 +2385,7 @@
               data-action="explore-map-zoom-reset"
               aria-label="${escapeHtml(t("resetMapZoom", { percent: zoomPercent }))}"
               title="${escapeHtml(t("resetMapZoom", { percent: zoomPercent }))}"
+              ${zoom <= 1.001 ? "hidden" : ""}
             >${zoomPercent}%</button>
             <button
               type="button"

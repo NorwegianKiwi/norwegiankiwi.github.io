@@ -24,7 +24,7 @@ from map_maintenance import (
 )
 
 
-WORLD_SIZE = (1000, 500)
+WORLD_SIZE = (1000, 520)
 QUIZ_SIZE = (1000, 650)
 SILHOUETTE_MARKER_LIMIT = 8
 PADDING = 8
@@ -207,20 +207,24 @@ def path_from_polylines(lines, precision=1):
     return "".join(commands)
 
 
-def equal_earth(longitude, latitude):
-    a1, a2, a3, a4 = 1.340264, -0.081106, 0.000893, 0.003796
+def natural_earth(longitude, latitude):
+    """Project a world point with the original Natural Earth projection."""
     radians = math.pi / 180
     lon = longitude * radians
     lat = max(-89.999, min(89.999, latitude)) * radians
-    theta = math.asin(math.sqrt(3) / 2 * math.sin(lat))
-    theta2 = theta * theta
-    theta6 = theta2 * theta2 * theta2
-    denominator = (
-        math.sqrt(3)
-        * (a1 + 3 * a2 * theta2 + theta6 * (7 * a3 + 9 * a4 * theta2))
+    lat2 = lat * lat
+    lat4 = lat2 * lat2
+    x = lon * (
+        0.8707
+        - 0.131979 * lat2
+        + lat4
+        * (-0.013791 + lat4 * (0.003971 * lat2 - 0.001529 * lat4))
     )
-    x = 2 * math.sqrt(3) * lon * math.cos(theta) / denominator
-    y = theta * (a1 + a2 * theta2 + theta6 * (a3 + a4 * theta2))
+    y = lat * (
+        1.007226
+        + lat2
+        * (0.015085 + lat4 * (-0.044475 + 0.028874 * lat2 - 0.005916 * lat4))
+    )
     return x, -y
 
 
@@ -344,14 +348,14 @@ def project_feature_rings(features, projection, transform, tolerance):
 def build_world(features, tiny_features, local_names, marker_overrides=None):
     marker_overrides = marker_overrides or {}
     raw_points = [
-        equal_earth(*point)
+        natural_earth(*point)
         for feature in features
         for ring in feature["rings"]
         for point in ring
     ]
     transform = fitted_transform(raw_points, *WORLD_SIZE, padding=12)
     output_features = project_feature_rings(
-        features, equal_earth, transform, tolerance=0.22
+        features, natural_earth, transform, tolerance=0.22
     )
     for feature in output_features:
         if feature["code"] in local_names:
@@ -361,7 +365,7 @@ def build_world(features, tiny_features, local_names, marker_overrides=None):
         if not feature["point"]:
             continue
         marker_point = marker_overrides.get(feature["code"], feature["point"])
-        x, y = transform(equal_earth(*marker_point))
+        x, y = transform(natural_earth(*marker_point))
         markers.append(
             {
                 "code": feature["code"],
@@ -1613,6 +1617,14 @@ def main():
             "objects while preserving every other datum from --base-map."
         ),
     )
+    parser.add_argument(
+        "--refresh-world",
+        action="store_true",
+        help=(
+            "Regenerate only world geometry and markers while preserving "
+            "regional views and silhouettes from --base-map."
+        ),
+    )
     args = parser.parse_args()
     if args.refresh_silhouette_overrides and not args.base_map:
         parser.error("--refresh-silhouette-overrides krever --base-map")
@@ -1620,12 +1632,22 @@ def main():
         parser.error("Velg bare én metode for å regenerere silhuetter")
     if args.refresh_world_overrides and not args.base_map:
         parser.error("--refresh-world-overrides krever --base-map")
+    if args.refresh_world and not args.base_map:
+        parser.error("--refresh-world krever --base-map")
+    if args.refresh_world and args.refresh_world_overrides:
+        parser.error("Velg bare én metode for å regenerere verdenskartet")
     if args.refresh_world_overrides and (
         args.refresh_silhouettes or args.refresh_silhouette_overrides
     ):
         parser.error(
             "--refresh-world-overrides kan ikke kombineres med "
             "silhuettoppdatering"
+        )
+    if args.refresh_world and (
+        args.refresh_silhouettes or args.refresh_silhouette_overrides
+    ):
+        parser.error(
+            "--refresh-world kan ikke kombineres med silhuettoppdatering"
         )
     if args.output.resolve() == (ROOT / "world-map.js").resolve():
         parser.error(
@@ -1688,7 +1710,16 @@ def main():
             if args.base_map
             else load_generated_map()
         )
-        if args.base_map:
+        if args.refresh_world:
+            world_features, world_markers = build_world(
+                countries50, tiny50, local_names, marker_overrides
+            )
+            world_features = apply_world_geometry_overrides(
+                world_features,
+                manifest.get("worldGeometryOverrides", {}),
+                local_names,
+            )
+        elif args.base_map:
             world_features = existing["features"]
             world_markers = existing["markers"]
             if args.refresh_world_overrides:
@@ -1738,6 +1769,7 @@ def main():
         if (
             args.refresh_silhouette_overrides
             or args.refresh_world_overrides
+            or args.refresh_world
         ):
             quiz_regions = existing["quizRegions"]
             overview_regions = existing["overviewRegions"]
@@ -1783,7 +1815,7 @@ def main():
             )
         silhouette_capitals = (
             existing["silhouetteCapitals"]
-            if args.refresh_world_overrides
+            if args.refresh_world_overrides or args.refresh_world
             else build_silhouette_capitals(
                 countries10,
                 country_codes,
@@ -1794,22 +1826,22 @@ def main():
         data = {
             "base": {
                 "viewBox": (
-                    existing["viewBox"]
-                    if args.base_map
-                    else manifest["generatedOutput"]["worldViewBox"]
+                    manifest["generatedOutput"]["worldViewBox"]
+                    if args.refresh_world or not args.base_map
+                    else existing["viewBox"]
                 ),
                 "source": (
-                    existing["source"]
-                    if args.base_map
-                    else (
+                    (
                         "Natural Earth 1:50m Admin 0, version "
                         + manifest["naturalEarthVersion"]
                     )
+                    if args.refresh_world or not args.base_map
+                    else existing["source"]
                 ),
                 "projection": (
-                    existing["projection"]
-                    if args.base_map
-                    else manifest["generatedOutput"]["worldProjection"]
+                    manifest["generatedOutput"]["worldProjection"]
+                    if args.refresh_world or not args.base_map
+                    else existing["projection"]
                 ),
                 "features": world_features,
                 "markers": world_markers,
