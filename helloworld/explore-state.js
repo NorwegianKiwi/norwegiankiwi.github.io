@@ -46,5 +46,21 @@
     return africaRegionIds.has(extent) ? "africa" : "world";
   }
 
-  return Object.freeze({ uniqueCodes, sortCodes, initialExtent, zoomInExtent, zoomOutExtent });
+  function extentForSelection(extent, selectedRegion, africaRegionIds) {
+    if (!selectedRegion || extent === "world") return extent;
+    if (extent === selectedRegion) return extent;
+    if (extent === "africa" && africaRegionIds.has(selectedRegion)) {
+      return extent;
+    }
+    return selectedRegion;
+  }
+
+  return Object.freeze({
+    uniqueCodes,
+    sortCodes,
+    initialExtent,
+    zoomInExtent,
+    zoomOutExtent,
+    extentForSelection,
+  });
 });

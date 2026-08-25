@@ -35,6 +35,23 @@ assert.equal(exploreState.zoomOutExtent("africa", africa), "world");
 assert.equal(exploreState.zoomOutExtent("europe", africa), "world");
 assert.equal(exploreState.zoomOutExtent("world", africa), "world");
 
+assert.equal(exploreState.extentForSelection("world", "europe", africa), "world");
+assert.equal(exploreState.extentForSelection("europe", "europe", africa), "europe");
+assert.equal(
+  exploreState.extentForSelection("europe", "east-south-asia", africa),
+  "east-south-asia",
+);
+assert.equal(
+  exploreState.extentForSelection("north-west-africa", "east-south-africa", africa),
+  "east-south-africa",
+);
+assert.equal(
+  exploreState.extentForSelection("africa", "east-south-africa", africa),
+  "africa",
+);
+assert.equal(exploreState.extentForSelection("africa", "europe", africa), "europe");
+assert.equal(exploreState.extentForSelection("europe", null, africa), "europe");
+
 const countryCodes = new Set(
   global.GEOGRAFI_QUIZ_DATA.places.map((country) => country.code),
 );

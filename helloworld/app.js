@@ -122,7 +122,7 @@
       resetMapZoom: "Tilbakestill kartzoom, {percent} prosent",
       africaOverview: "Afrika",
       viewAllAfrica: "Vis hele Afrika",
-      showSelectedRegion: "Vis {region}",
+      showRegion: "Vis region",
       viewWorld: "Vis verden",
       mapAreaControls: "Bytt kartutsnitt",
       exploreMapHeading: "Hvilket kart vil du utforske?",
@@ -247,7 +247,7 @@
       resetMapZoom: "Reset map zoom, {percent} per cent",
       africaOverview: "Africa",
       viewAllAfrica: "View all Africa",
-      showSelectedRegion: "Show {region}",
+      showRegion: "Show region",
       viewWorld: "View world",
       mapAreaControls: "Change map area",
       exploreMapHeading: "Which map would you like to explore?",
@@ -2263,7 +2263,7 @@
       controls.push(`<button type="button" class="secondary-button explore-map-scope-button" data-action="explore-map-area" data-value="${zoomOutExtent}"><span aria-hidden="true">−</span> ${escapeHtml(zoomOutExtent === "world" ? t("viewWorld") : t("viewAllAfrica"))}</button>`);
     }
     if (zoomInExtent !== extent) {
-      controls.push(`<button type="button" class="secondary-button explore-map-scope-button" data-action="explore-map-area" data-value="${zoomInExtent}">${escapeHtml(zoomInExtent === "africa" ? t("viewAllAfrica") : t("showSelectedRegion", { region: exploreMapExtentLabel(zoomInExtent) }))} <span aria-hidden="true">+</span></button>`);
+      controls.push(`<button type="button" class="secondary-button explore-map-scope-button" data-action="explore-map-area" data-value="${zoomInExtent}">${escapeHtml(t("showRegion"))} <span aria-hidden="true">+</span></button>`);
     }
     return controls.join("");
   }
@@ -3091,12 +3091,13 @@
     if (changed) state.silhouetteExpanded = false;
     const regionId = mapRegionForCode(code);
     const extent = state.exploreMapExtent;
-    const visibleOnMap =
-      extent === "world" ||
-      extent === regionId ||
-      (extent === "africa" && africaRegionIds.has(regionId));
-    if (!visibleOnMap) {
-      state.exploreMapExtent = "world";
+    const nextExtent = exploreState.extentForSelection(
+      extent,
+      regionId,
+      africaRegionIds,
+    );
+    if (nextExtent !== extent) {
+      state.exploreMapExtent = nextExtent;
       resetExploreMapInteraction();
       render({ focusCountryDetailsTriggerCode: code });
       return;
