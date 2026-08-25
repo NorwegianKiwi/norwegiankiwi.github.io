@@ -1,0 +1,22 @@
+Local representative flags
+==========================
+
+The following established local or unofficial representative flags are used
+instead of the French tricolour so that each learnable place has a distinct
+visual identity. Source files are from Wikimedia Commons.
+
+French Guiana — "Flag of French Guiana.svg"
+https://commons.wikimedia.org/wiki/File:Flag_of_French_Guiana.svg
+Public domain (released by the author).
+
+Guadeloupe — "Unofficial flag of Guadeloupe (local).svg"
+https://commons.wikimedia.org/wiki/File:Unofficial_flag_of_Guadeloupe_(local).svg
+Public domain (ineligible simple design).
+
+Réunion — "Proposed flag of Réunion (VAR).svg" (Lö Mahavéli)
+https://commons.wikimedia.org/wiki/File:Proposed_flag_of_R%C3%A9union_(VAR).svg
+Public domain (released by the author).
+
+Mayotte — "Flag of Mayotte (local).svg"
+https://commons.wikimedia.org/wiki/File:Flag_of_Mayotte_(local).svg
+Public domain (Xrmap flag collection).

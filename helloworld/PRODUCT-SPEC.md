@@ -46,7 +46,7 @@ The game contains:
 - **Progress:** a best score and mastery state for every quiz.
 - **Explore:** the existing interactive maps and country list.
 
-The exact 47-level, 188-quiz journey is defined in `CURRICULUM.md`, which is the
+The exact 53-level, 212-quiz journey is defined in `CURRICULUM.md`, which is the
 content source of truth.
 
 ## 4. Home screen and information hierarchy
@@ -68,10 +68,10 @@ required choice screen.
 The Continue card also shows overall and current-level progress:
 
 - A globe that fills with colour in proportion to mastered levels
-- An explicit accessible count such as **12 of 47 levels mastered**
+- An explicit accessible count such as **12 of 53 levels mastered**
 - Current-level progress such as **2 of 4 quizzes mastered**
 
-The globe and overall number must represent the same measurement. At 47/47 the
+The globe and overall number must represent the same measurement. At 53/53 the
 globe becomes fully coloured and may receive a subtle gold completion treatment.
 The number remains the authoritative accessible representation; the globe is
 never the only progress signal.
@@ -149,7 +149,8 @@ different level at any time.
 - A regular country-pack quiz asks about every country in that pack once.
 - A World Tour asks about every country in its tour set once.
 - Regional mastery asks about every country in that region once.
-- Whole-world mastery asks about all 196 countries once.
+- Combined whole-world mastery asks about all 227 places once; separate world
+  masteries cover the 197 countries and 30 other places.
 - The question countries and available alternatives are fixed for a quiz
   revision.
 - Question order and answer positions are shuffled for each attempt.
@@ -173,10 +174,10 @@ Ordinary short quizzes restart when abandoned.
 - A quiz is mastered by answering every question correctly in one attempt.
 - A level is mastered when all four of its quizzes are mastered.
 - Mastery is intentionally difficult in regional and world challenges.
-- The four ultimate challenges each require all 196 answers correct in one
+- The four combined ultimate challenges each require all 227 answers correct in one
   attempt. That attempt may be safely resumed, but previous answers cannot be
   changed.
-- A non-perfect best score remains visible, including results such as `155/196`.
+- A non-perfect best score remains visible, including results such as `200/227`.
 - Playing again can improve but never lower the stored best result.
 - Time may be shown as session information later, but the first version does
   not rank mastery by speed.
@@ -268,7 +269,8 @@ The interface uses action-oriented labels such as **Download backup file** and
 
 - Explore remains available independently of profiles and game progress.
 - Explore opens in the unified map-and-list workspace from the home screen.
-- Whole world is a selectable workspace with all 196 countries alphabetically.
+- Whole world is a selectable workspace with 197 countries and 30 other places,
+  alphabetized within their two groups.
 - Levels and result review may open temporary, session-only country scopes;
   these scopes do not add saved lists or URL state.
 - The existing regional map navigation, country selection, zoom, silhouettes,
@@ -353,8 +355,8 @@ profile later.
 
 The profile or completed-world surface can share a concise achievement such as:
 
-- **I have mastered 18 of 47 levels in Hello World!**
-- **I have mastered all 188 geography quizzes.**
+- **I have mastered 18 of 53 levels in Hello World!**
+- **I have mastered all 212 geography quizzes.**
 
 This shares an invitation to the game, not the transferable profile payload.
 Profile transfer remains a separate private action.
@@ -387,11 +389,11 @@ These may be reconsidered after observing actual use.
 
 ## 18. Completed-world state
 
-After all 188 quizzes are mastered, the home screen celebrates the retained
+After all 212 quizzes are mastered, the home screen celebrates the retained
 achievement rather than suggesting that progress be erased:
 
 > **World mastered**
-> 47 of 47 levels · 188 of 188 quizzes
+> 53 of 53 levels · 212 of 212 quizzes
 
 The completed progress globe carries a static trophy badge as an additional
 visual celebration; the heading and counts remain the accessible statement of

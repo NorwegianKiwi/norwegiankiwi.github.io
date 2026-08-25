@@ -75,7 +75,8 @@ Requirements:
 - Every systematic pack country appears in exactly one systematic pack.
 - World Tour repetition is intentional and allowed.
 - Regional mastery sets exactly match the current primary-region membership.
-- World mastery contains all 196 countries.
+- World masteries contain exactly 197 countries, 30 other places, and all 227
+  places respectively.
 - Displayed order is array order, not an encoded numeric prefix in the stable
   ID.
 
@@ -406,7 +407,7 @@ persistent progress. UI elements must not independently mutate stored objects
 without going through validated progress functions.
 
 The home progress globe and its numeric label both derive from mastered levels
-out of 47. Current-level progress derives from mastered quizzes out of four.
+out of 53. Current-level progress derives from mastered quizzes out of four.
 They must not use different hidden denominators.
 
 Explore Flashcards are read-only learning state. Their deck is derived from the
@@ -427,14 +428,14 @@ At minimum, add automated coverage for:
 
 ### Curriculum
 
-- 47 unique ordered level IDs
+- 53 unique ordered level IDs
 - Exactly four unique canonical modes per level
-- 188 unique quiz IDs
+- 212 unique quiz IDs
 - Valid positive revisions and fixed seeds
 - All referenced country codes exist
-- Exactly 196 unique systematic-pack assignments
+- Exactly 227 unique systematic-pack assignments
 - Exact regional mastery membership
-- Exact 196-country world mastery membership
+- Exact 197-country, 30-other-place, and 227-place world mastery memberships
 - Choice counts do not exceed valid candidate pools
 
 ### Progress
@@ -497,7 +498,7 @@ The first progression release is complete when:
 - A new player can start Level 1 from the first viewport with one primary click;
   Player 1 is created automatically.
 - A returning player can continue the correct quiz from the home screen.
-- All 188 quizzes can be selected directly and record independent best scores.
+- All 212 quizzes can be selected directly and record independent best scores.
 - Quiz and level mastery are accurately derived and displayed.
 - Multiple local profiles remain separated.
 - Clear progress works for one profile without affecting others.
@@ -508,7 +509,7 @@ The first progression release is complete when:
   country list, with no document-level scrolling.
 - Explore includes unscored Flashcards, and missed-country card review returns to the
   result flow.
-- All 196 countries are covered as specified.
+- All 227 learnable places are covered as specified.
 - Curriculum quiz challenges open directly and record valid current progress.
 - Progress achievements can be shared without exposing transferable progress.
 - The application remains static, bilingual and dependency-free at runtime.

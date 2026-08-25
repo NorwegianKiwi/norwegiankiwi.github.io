@@ -119,6 +119,57 @@
   box-shadow: 0 2px 5px rgba(24, 35, 29, 0.1);
 }
 
+.flag-with-relationship {
+  position: relative;
+  display: block;
+}
+
+.flag-with-relationship > .flag-frame {
+  width: 100%;
+  height: 100%;
+}
+
+.relationship-badge {
+  position: absolute;
+  z-index: 3;
+  right: -4%;
+  bottom: -7%;
+  width: clamp(18px, 18%, 58px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  padding: 2px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(24, 35, 29, 0.35);
+  display: grid;
+  place-items: center;
+}
+
+.relationship-badge img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(24, 35, 29, 0.15);
+}
+
+.relationship-badge-special {
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  color: var(--ink);
+  background: #fffdf8;
+}
+
+.relationship-badge-special svg {
+  width: 72%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
 .flag-frame::after {
   content: "";
   position: absolute;
@@ -132,8 +183,8 @@
 .flag {
   display: block;
   width: 100%;
-  height: auto;
-  object-fit: contain;
+  height: 100%;
+  object-fit: fill;
 }
 
 .flag-code-np .flag {
@@ -404,6 +455,17 @@
   stroke-linejoin: round;
   paint-order: stroke fill;
   vector-effect: non-scaling-stroke;
+}
+
+.country-silhouette-capital.is-secondary {
+  fill: var(--gold);
+  stroke-width: 1.2;
+}
+
+.country-silhouette-capital.is-planned {
+  fill: transparent;
+  stroke: var(--gold);
+  stroke-dasharray: 1.4 1;
 }
 
 .country-silhouette-inset.is-expanded .country-silhouette-capital {

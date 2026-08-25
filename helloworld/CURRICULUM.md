@@ -1,8 +1,7 @@
-# Geography game curriculum — draft 1
+# Geography game curriculum
 
 This document defines the proposed progression game built on top of the
-existing 196-country dataset. It is a product and content specification, not
-yet an implementation contract.
+the 227-place dataset: 197 countries and 30 other places.
 
 ## Design principles
 
@@ -24,7 +23,8 @@ yet an implementation contract.
 - A level is mastered when all four quizzes in it are mastered.
 - Progress records the best score for each quiz revision.
 - The final challenges are intentionally difficult. Regional challenges use
-  every country in the region; world challenges use all 196 countries.
+  every country in the region; the three world masteries use 197 countries,
+  30 other places, and all 227 places respectively.
 
 ## The four quiz modes
 
@@ -60,7 +60,7 @@ seed used to select its answer alternatives.
 - Regular-level alternatives come from the current country pack, so an
   introductory quiz does not require knowledge of countries not yet introduced.
 - Regional mastery alternatives come from the relevant region.
-- World mastery alternatives come from all 196 countries.
+- World mastery alternatives come from the complete 227-place dataset.
 
 This keeps attempts equivalent without teaching the player that "Sweden is
 always the second button."
@@ -78,7 +78,7 @@ Difficulty increases slowly through the recommended journey:
 | World Tours 1–2 | Easy mixed review | 3 | 9–10 |
 | World Tours 3–5 | Mixed review | 4 | 10–12 |
 | Regional mastery | Mastery | 9 for Find the flag; 6 for other modes | Entire region |
-| World mastery | Ultimate | 9 for Find the flag; 6 for other modes | 196 |
+| World mastery | Ultimate | 9 for Find the flag; 6 for other modes | 30–227 |
 
 If a pack contains fewer countries than the configured alternative count, the
 alternative count is capped at the pack size. Difficulty can later be tuned per
@@ -117,7 +117,7 @@ only from the tour's country set.
 | 17 | `pack-atlantic-west-africa` | Atlantic West Africa | Cape Verde (`cv`), Gambia (`gm`), Guinea (`gn`), Guinea-Bissau (`gw`), Sierra Leone (`sl`), Liberia (`lr`), Côte d’Ivoire (`ci`) | 7 | 5 |
 | 18 | `pack-gulf-guinea` | Gulf of Guinea and Central Africa | Ghana (`gh`), Togo (`tg`), Benin (`bj`), Nigeria (`ng`), Cameroon (`cm`), Central African Republic (`cf`), Equatorial Guinea (`gq`), São Tomé and Príncipe (`st`) | 8 | 5 |
 | 19 | `tour-island-world` | Island world | Iceland (`is`), Ireland (`ie`), Cuba (`cu`), Barbados (`bb`), Madagascar (`mg`), Mauritius (`mu`), Sri Lanka (`lk`), Indonesia (`id`), Japan (`jp`), New Zealand (`nz`), Fiji (`fj`) | 11 | 4 |
-| 20 | `pack-east-asia` | East Asia | China (`cn`), Japan (`jp`), South Korea (`kr`), North Korea (`kp`), Mongolia (`mn`), Russia (`ru`) | 6 | 5 |
+| 20 | `pack-east-asia` | East Asia | China (`cn`), Japan (`jp`), South Korea (`kr`), North Korea (`kp`), Mongolia (`mn`), Russia (`ru`), Taiwan (`tw`) | 7 | 5 |
 | 21 | `pack-south-asia` | South Asia | Afghanistan (`af`), Pakistan (`pk`), India (`in`), Bangladesh (`bd`), Nepal (`np`), Bhutan (`bt`), Sri Lanka (`lk`), Maldives (`mv`) | 8 | 5 |
 | 22 | `pack-mainland-southeast-asia` | Mainland Southeast Asia | Myanmar (`mm`), Thailand (`th`), Laos (`la`), Cambodia (`kh`), Vietnam (`vn`), Malaysia (`my`) | 6 | 5 |
 | 23 | `pack-maritime-southeast-asia` | Maritime Southeast Asia | Indonesia (`id`), Philippines (`ph`), Singapore (`sg`), Brunei (`bn`), Timor-Leste (`tl`) | 5 | 5 |
@@ -135,6 +135,10 @@ only from the tour's country set.
 | 35 | `pack-lesser-antilles` | The Lesser Antilles | Barbados (`bb`), Antigua and Barbuda (`ag`), Dominica (`dm`), Grenada (`gd`), Saint Kitts and Nevis (`kn`), Saint Lucia (`lc`), Saint Vincent and the Grenadines (`vc`) | 7 | 6 |
 | 36 | `pack-australia-western-pacific` | Australia, New Zealand and the Pacific gateways | Australia (`au`), New Zealand (`nz`), Papua New Guinea (`pg`), Fiji (`fj`), Solomon Islands (`sb`), Vanuatu (`vu`), Samoa (`ws`) | 7 | 6 |
 | 37 | `pack-pacific-islands` | Pacific island states | Tonga (`to`), Tuvalu (`tv`), Kiribati (`ki`), Nauru (`nr`), Marshall Islands (`mh`), Micronesia (`fm`), Palau (`pw`) | 7 | 6 |
+| 38 | `pack-north-atlantic-autonomies` | North Atlantic autonomies | Greenland (`gl`), Faroe Islands (`fo`), Åland (`ax`), Isle of Man (`im`), Jersey (`je`), Guernsey (`gg`), Gibraltar (`gi`), Bermuda (`bm`) | 8 | 6 |
+| 39 | `pack-caribbean-territories` | Caribbean territories | Puerto Rico (`pr`), US Virgin Islands (`vi`), Aruba (`aw`), Curaçao (`cw`), Sint Maarten (`sx`), Guadeloupe (`gp`), Martinique (`mq`), Cayman Islands (`ky`) | 8 | 6 |
+| 40 | `pack-pacific-associated-territories` | Pacific associated places and territories | Cook Islands (`ck`), Niue (`nu`), Guam (`gu`), Northern Mariana Islands (`mp`), American Samoa (`as`), New Caledonia (`nc`), French Polynesia (`pf`) | 7 | 6 |
+| 41 | `pack-world-special-regions` | Special regions around the world | French Guiana (`gf`), Falkland Islands (`fk`), Western Sahara (`eh`), Réunion (`re`), Mayotte (`yt`), Hong Kong (`hk`), Macau (`mo`) | 7 | 6 |
 
 The opening World Tour is based on familiarity rather than strict
 representation of the app's nine organisational regions. It spans every
@@ -159,41 +163,43 @@ quizzes. Perfect scores are intentionally required for mastery.
 
 | No. | Stable level ID | Challenge | Countries per quiz | Total questions across four quizzes |
 |---:|---|---|---:|---:|
-| 38 | `mastery-europe` | Europe mastery | 44 | 176 |
-| 39 | `mastery-north-central-america` | North and Central America mastery | 10 | 40 |
-| 40 | `mastery-south-america` | South America mastery | 12 | 48 |
-| 41 | `mastery-north-west-africa` | North and West Africa mastery | 26 | 104 |
-| 42 | `mastery-east-south-asia` | East and South Asia mastery | 25 | 100 |
-| 43 | `mastery-east-south-africa` | East and South Africa mastery | 28 | 112 |
-| 44 | `mastery-west-central-asia` | West and Central Asia mastery | 24 | 96 |
-| 45 | `mastery-caribbean` | Caribbean mastery | 13 | 52 |
-| 46 | `mastery-oceania` | Oceania mastery | 14 | 56 |
-| 47 | `mastery-whole-world` | Whole world mastery | 196 | 784 |
+| 42 | `mastery-europe` | Europe mastery | 44 | 176 |
+| 43 | `mastery-north-central-america` | North and Central America mastery | 10 | 40 |
+| 44 | `mastery-south-america` | South America mastery | 12 | 48 |
+| 45 | `mastery-north-west-africa` | North and West Africa mastery | 26 | 104 |
+| 46 | `mastery-east-south-asia` | East and South Asia mastery | 26 | 104 |
+| 47 | `mastery-east-south-africa` | East and South Africa mastery | 28 | 112 |
+| 48 | `mastery-west-central-asia` | West and Central Asia mastery | 24 | 96 |
+| 49 | `mastery-caribbean` | Caribbean mastery | 13 | 52 |
+| 50 | `mastery-oceania` | Oceania mastery | 14 | 56 |
+| 51 | `mastery-countries-world` | Countries of the world | 197 | 788 |
+| 52 | `mastery-other-places-world` | Other places of the world | 30 | 120 |
+| 53 | `mastery-whole-world` | The whole world | 227 | 908 |
 
-The whole-world level therefore contains the four ultimate challenges:
+The combined whole-world level contains the four ultimate challenges:
 
-1. Find all 196 flags.
-2. Name all 196 countries from their flags.
-3. Name all 196 countries on the map.
-4. Find all 196 capitals.
+1. Find all 227 flags.
+2. Name all 227 places from their flags.
+3. Name all 227 places on the map.
+4. Find all 227 capitals or principal civic centres.
 
-Each challenge is clearly labelled **196 questions · long challenge** before
-the player starts. A best score such as `155/196` remains visible even when the
+Each challenge is clearly labelled **227 questions · long challenge** before
+the player starts. A best score such as `200/227` remains visible even when the
 challenge has not been mastered.
 
 ## Curriculum totals
 
-- 32 learning levels
+- 36 systematic learning levels
 - 5 World Tour interludes
-- 10 mastery levels
-- 47 levels in total
-- 128 short learning quizzes
+- 12 mastery levels
+- 53 levels in total
+- 144 short learning quizzes
 - 20 World Tour quizzes
 - 36 regional mastery quizzes
-- 4 whole-world ultimate quizzes
-- 188 quizzes in total
-- 196 countries, each assigned to exactly one systematic country pack
-- Every country practised in all four quiz modes before the mastery section
+- 12 world-mastery quizzes
+- 212 quizzes in total
+- 227 places, each assigned to exactly one systematic pack
+- Every place practised in all four quiz modes before the mastery section
 
 ## Progress display and next action
 
@@ -231,7 +237,7 @@ Progress is stored against `quiz-id@revision`.
 
 ## Playtesting and tuning boundaries
 
-The 47-level order, country assignments, four single-mode quizzes per level and
+The 53-level order, place assignments, four single-mode quizzes per level and
 mastery structure are the approved initial curriculum. Playtesting may tune
 presentation details such as answer-feedback timing, card layout and responsive
 density without changing quiz identity.
@@ -240,4 +246,4 @@ Changing a country set, choice count, fixed alternatives or other material
 difficulty requires deliberate curriculum review and the revision handling
 described above. Missed countries are reviewed through the optional Explore
 Cards flow defined in `PRODUCT-SPEC.md`; additional review levels are not part
-of the initial 47-level curriculum.
+of the initial 53-level curriculum.

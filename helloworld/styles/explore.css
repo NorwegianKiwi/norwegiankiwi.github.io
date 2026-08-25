@@ -78,10 +78,19 @@ body.explore-page {
   position: relative;
   min-width: 0;
   min-height: 0;
+  display: grid;
+  place-items: center;
 }
 
 .explore-map-stage > .explore-region-map {
   height: 100%;
+}
+
+.explore-map-stage > .explore-region-map.is-world-extent {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 2 / 1;
 }
 
 .explore-map-scope-controls {
@@ -177,6 +186,12 @@ body.explore-page {
     opacity 150ms ease;
 }
 
+.explore-map-country.is-other-place .explore-map-country-shape {
+  fill: #e8ddc8;
+  stroke: #8b7657;
+  stroke-dasharray: 2.5 1.5;
+}
+
 .explore-map-country.has-locator-marker.is-locator-hidden
   .explore-map-country-shape {
   opacity: 0;
@@ -192,6 +207,11 @@ body.explore-page {
     stroke 150ms ease,
     filter 150ms ease,
     opacity 150ms ease;
+}
+
+.explore-map-marker-control.is-other-place .explore-map-country-marker {
+  fill: #c4a66f;
+  stroke: #fffdf8;
 }
 
 .explore-map-marker-hit {
@@ -324,6 +344,7 @@ body.explore-page {
 }
 
 .explore-country-status-wrap {
+  height: 74px;
   min-height: 74px;
   padding: 9px 12px;
   border: 1px solid var(--line);
@@ -331,6 +352,7 @@ body.explore-page {
   background: var(--green-soft);
   display: grid;
   align-items: center;
+  overflow: hidden;
 }
 
 .explore-country-status {
@@ -360,7 +382,9 @@ body.explore-page {
 }
 
 .explore-country-status strong {
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 19px;
   font-weight: 400;
@@ -368,8 +392,11 @@ body.explore-page {
 }
 
 .explore-country-status small {
+  overflow: hidden;
   color: var(--muted);
   font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .explore-country-status-action {
@@ -496,6 +523,31 @@ body.explore-page {
   gap: 7px;
 }
 
+.explore-place-group {
+  display: grid;
+  gap: 7px;
+}
+
+.explore-place-group + .explore-place-group {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.explore-place-group h3 {
+  margin: 0;
+  padding: 1px 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.explore-place-group h3 span {
+  font-variant-numeric: tabular-nums;
+}
+
 .explore-country-card {
   width: 100%;
   min-width: 0;
@@ -515,6 +567,10 @@ body.explore-page {
     background 150ms ease,
     border-color 150ms ease,
     transform 150ms ease;
+}
+
+.explore-country-card.is-other-place {
+  background: #fffaf0;
 }
 
 .explore-country-card.is-preview {
@@ -619,10 +675,15 @@ body.explore-page {
 
 .explore-region-picker .region-map-card {
   width: min(100%, 760px);
+  aspect-ratio: 2 / 1;
   max-height: 100%;
+  display: grid;
+  place-items: center;
 }
 
 .explore-region-picker .region-map {
+  width: 100%;
+  height: auto;
   max-height: 100%;
 }
 
@@ -751,6 +812,78 @@ body.modal-open {
   margin: -8px 0 0;
   color: rgba(255, 255, 255, 0.78);
   font-size: clamp(14px, 2vw, 18px);
+}
+
+.place-relationship-chip {
+  width: fit-content;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: inherit;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.place-relationship-chip img,
+.relationship-chip-special {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.relationship-chip-special {
+  display: grid;
+  place-items: center;
+}
+
+.explore-country-status .place-relationship-chip {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.explore-country-status .place-relationship-chip img,
+.explore-country-status .relationship-chip-special {
+  width: 17px;
+  height: 17px;
+  border-color: #fff;
+}
+
+.place-centres {
+  width: min(640px, 86vw);
+  margin: -5px 0 0;
+  display: grid;
+  gap: 5px;
+}
+
+.place-centre {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  line-height: 1.3;
+}
+
+.place-centre dt {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.place-centre dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.place-centre-planned dd::before {
+  content: "○ ";
+  color: var(--gold);
+}
+
+.place-flag-status {
+  margin: -4px 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
 }
 
 .country-note {

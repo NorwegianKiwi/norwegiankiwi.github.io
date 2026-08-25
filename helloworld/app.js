@@ -24,7 +24,8 @@
     );
   }
 
-  const { countries, regionOptions } = data;
+  const { countries: officialCountries, places = officialCountries, regionOptions } = data;
+  const countries = places;
   const messages = Object.freeze({
     nb: Object.freeze({
       modeCountryFlagShort: "Flagg",
@@ -41,6 +42,13 @@
       languageNb: "Norsk",
       languageEn: "English",
       countries: "{count} land",
+      otherPlaces: "{count} andre steder",
+      places: "{count} steder",
+      placeBreakdown: "{countries} land · {otherPlaces} andre steder",
+      countriesHeading: "Land",
+      otherPlacesHeading: "Andre steder",
+      otherCompactHeading: "Andre",
+      establishedLocalFlag: "Etablert lokalt flagg",
       regionMapDescription:
         "Velg et område på kartet, eller bruk områdeknappene ved siden av.",
       interactiveWorldMap: "Interaktivt verdenskart",
@@ -58,6 +66,7 @@
       testYourself: "Test deg selv",
       explore: "Utforsk",
       flagsLicence: "Flagg fra flag-icons · MIT",
+      localFlagsLicence: "Lokale flagg · kildeinfo",
       globeLicence: "Jordklode fra Twemoji · CC BY 4.0",
       mapLicence: "Kart fra Natural Earth · public domain",
       installApp: "Legg til på Hjem-skjermen",
@@ -98,15 +107,15 @@
       challengeUrlMalformed: "Dette er ikke en gyldig nettadresse.",
       challengeUrlWrongApp: "Lenken tilhører ikke denne geografiappen.",
       challengeUrlInvalid: "Dette er ikke en gyldig utfordringslenke.",
-      chooseCountry: "Velg et land",
+      chooseCountry: "Velg et sted",
       backToExplore: "Tilbake til Utforsk",
       flashcards: "Flashcards",
-      exploreTheseCountries: "Utforsk disse landene",
-      missedCountries: "Land å øve på",
+      exploreTheseCountries: "Utforsk disse stedene",
+      missedCountries: "Steder å øve på",
       wholeWorld: "Hele verden",
       countryCapital: "{name}, hovedstad {capital}",
       interactiveRegionMap: "Interaktivt kart over {region}",
-      countriesInRegion: "Land i regionen",
+      countriesInRegion: "Steder i regionen",
       mapZoomControls: "Kartzoom",
       zoomOutMap: "Zoom ut på kartet",
       zoomInMap: "Zoom inn på kartet",
@@ -119,7 +128,7 @@
       exploreMapHeading: "Hvilket kart vil du utforske?",
       chooseSingleRegion: "Velg en enkelt region",
       showCountryDetails: "Vis detaljer for {name}",
-      countryDetails: "Landdetaljer: {name}",
+      countryDetails: "Stedsdetaljer: {name}",
       flashcardsComplete: "Flashcards fullført",
       roundComplete: "Runden er ferdig.",
       flashcardsSummaryBefore: "Du har gått gjennom",
@@ -129,7 +138,7 @@
       hiddenFlashcard:
         "Flashcard {current} av {total}. Trykk for å vise svaret.",
       findFlag: "Finn flagget til",
-      whichCountry: "Hvilket land?",
+      whichCountry: "Hvilket sted?",
       findCapital: "Finn hovedstaden til",
       option: "Alternativ {number}",
       flagOption: "Flaggalternativ {number}",
@@ -141,7 +150,7 @@
         "Feil. Riktig svar er {answer}. Aktiver det markerte alternativet for å gå videre.",
       metaTitle: "Hei verden! – lær land, flagg, hovedsteder og kart",
       metaDescription:
-        "Utforsk og test deg selv på 196 land, flagg, hovedsteder og regionale kart.",
+        "Utforsk og test deg selv på 197 land og 30 andre steder, med flagg, hovedsteder og regionale kart.",
     }),
     en: Object.freeze({
       modeCountryFlagShort: "Flags",
@@ -158,6 +167,13 @@
       languageNb: "Norsk",
       languageEn: "English",
       countries: "{count} {count, plural, one {country} other {countries}}",
+      otherPlaces: "{count} {count, plural, one {other place} other {other places}}",
+      places: "{count} places",
+      placeBreakdown: "{countries} countries · {otherPlaces} other places",
+      countriesHeading: "Countries",
+      otherPlacesHeading: "Other places",
+      otherCompactHeading: "Other",
+      establishedLocalFlag: "Established local flag",
       regionMapDescription:
         "Choose an area on the map, or use the area buttons beside it.",
       interactiveWorldMap: "Interactive world map",
@@ -175,6 +191,7 @@
       testYourself: "Test yourself",
       explore: "Explore",
       flagsLicence: "Flags from flag-icons · MIT",
+      localFlagsLicence: "Local flags · source details",
       globeLicence: "Globe from Twemoji · CC BY 4.0",
       mapLicence: "Maps from Natural Earth · public domain",
       installApp: "Add to Home Screen",
@@ -215,15 +232,15 @@
       challengeUrlMalformed: "This is not a valid web address.",
       challengeUrlWrongApp: "This link does not belong to this geography app.",
       challengeUrlInvalid: "This is not a valid challenge link.",
-      chooseCountry: "Choose a country",
+      chooseCountry: "Choose a place",
       backToExplore: "Back to Explore",
       flashcards: "Flashcards",
-      exploreTheseCountries: "Explore these countries",
-      missedCountries: "Countries to revisit",
+      exploreTheseCountries: "Explore these places",
+      missedCountries: "Places to revisit",
       wholeWorld: "Whole world",
       countryCapital: "{name}, capital {capital}",
       interactiveRegionMap: "Interactive map of {region}",
-      countriesInRegion: "Countries in the region",
+      countriesInRegion: "Places in the region",
       mapZoomControls: "Map zoom",
       zoomOutMap: "Zoom out of the map",
       zoomInMap: "Zoom into the map",
@@ -236,7 +253,7 @@
       exploreMapHeading: "Which map would you like to explore?",
       chooseSingleRegion: "Choose a single region",
       showCountryDetails: "Show details for {name}",
-      countryDetails: "Country details: {name}",
+      countryDetails: "Place details: {name}",
       flashcardsComplete: "Flashcards complete",
       roundComplete: "The round is complete.",
       flashcardsSummaryBefore: "You have reviewed",
@@ -246,7 +263,7 @@
       hiddenFlashcard:
         "Flashcard {current} of {total}. Press to reveal the answer.",
       findFlag: "Find the flag of",
-      whichCountry: "Which country?",
+      whichCountry: "Which place?",
       findCapital: "Find the capital of",
       option: "Option {number}",
       flagOption: "Flag option {number}",
@@ -258,7 +275,7 @@
         "Incorrect. The correct answer is {answer}. Activate the highlighted option to continue.",
       metaTitle: "Hello World! – learn countries, flags, capitals and maps",
       metaDescription:
-        "Explore and test yourself on 196 countries, flags, capitals and regional maps.",
+        "Explore and test yourself on 197 countries and 30 other places, with flags, capitals and regional maps.",
     }),
   });
   const messageKeys = Object.keys(messages.nb);
@@ -276,7 +293,7 @@
     nb: Object.freeze({
       startGame: "Start spillet", continueGame: "Fortsett spillet", exploreWorld: "Utforsk verden",
       viewLevels: "Se alle nivåer", levels: "Nivåer", level: "Nivå {number}",
-      levelsMastered: "{count} av 47 nivåer mestret", quizzesMastered: "{count} av 4 quizer mestret",
+      levelsMastered: "{count} av {total} nivåer mestret", quizzesMastered: "{count} av 4 quizer mestret",
       mastered: "mestret", unplayed: "Ikke spilt", recommended: "Anbefalt neste",
       profileMenu: "Profil og innstillinger", addProfile: "Legg til profil", renameProfile: "Gi profilen nytt navn",
       switchProfile: "Bytt profil", clearProgress: "Nullstill fremgang", deleteProfile: "Slett profil",
@@ -306,7 +323,7 @@
     en: Object.freeze({
       startGame: "Start game", continueGame: "Continue game", exploreWorld: "Explore the world",
       viewLevels: "View all levels", levels: "Levels", level: "Level {number}",
-      levelsMastered: "{count} of 47 levels mastered", quizzesMastered: "{count} of 4 quizzes mastered",
+      levelsMastered: "{count} of {total} levels mastered", quizzesMastered: "{count} of 4 quizzes mastered",
       mastered: "mastered", unplayed: "Unplayed", recommended: "Recommended next",
       profileMenu: "Profile and settings", addProfile: "Add profile", renameProfile: "Rename profile",
       switchProfile: "Switch profile", clearProgress: "Clear progress", deleteProfile: "Delete profile",
@@ -537,6 +554,28 @@
     return t("countries", { count });
   }
 
+  function placeCounts(items) {
+    return items.reduce((counts, place) => {
+      counts[place.category === "other-place" ? "otherPlaces" : "countries"] += 1;
+      return counts;
+    }, { countries: 0, otherPlaces: 0 });
+  }
+
+  function placeCountLabel(items) {
+    const counts = placeCounts(items);
+    return counts.otherPlaces
+      ? t("placeBreakdown", counts)
+      : countryCount(counts.countries);
+  }
+
+  function placeStatus(place) {
+    return place.status?.[state.locale] ?? null;
+  }
+
+  function centreRole(centre) {
+    return centre.role?.[state.locale] ?? "";
+  }
+
   function escapeHtml(value) {
     return String(value)
       .replaceAll("&", "&amp;")
@@ -596,14 +635,33 @@
     return regionsById.get(state.region);
   }
 
-  function flagMarkup(country, className = "", revealName = false) {
+  function relationshipBadgeMarkup(country) {
+    if (country.category !== "other-place") return "";
+    if (country.relatedCountryCode) {
+      return `<span class="relationship-badge" aria-hidden="true"><img src="./flags/${country.relatedCountryCode}.svg" alt="" draggable="false" /></span>`;
+    }
+    return `<span class="relationship-badge relationship-badge-special" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16"/></svg></span>`;
+  }
+
+  function flagMarkup(country, className = "", revealName = false, showRelationship = false) {
     const name = escapeHtml(countryName(country));
     const alt = revealName ? escapeHtml(t("flagOf", { name })) : "";
-    return `
-      <span class="flag-frame flag-code-${country.code} ${className}">
+    const hasRelationshipWrapper = showRelationship && country.category === "other-place";
+    const frame = `<span class="flag-frame flag-code-${country.code} ${hasRelationshipWrapper ? "" : className}">
         <img class="flag" src="./flags/${country.code}.svg" alt="${alt}" draggable="false" />
-      </span>
-    `;
+      </span>`;
+    return hasRelationshipWrapper
+      ? `<span class="flag-with-relationship ${className}">${frame}${relationshipBadgeMarkup(country)}</span>`
+      : frame;
+  }
+
+  function relationshipChipMarkup(country) {
+    const status = placeStatus(country);
+    if (!status) return "";
+    const icon = country.relatedCountryCode
+      ? `<img src="./flags/${country.relatedCountryCode}.svg" alt="" aria-hidden="true" draggable="false" />`
+      : `<span class="relationship-chip-special" aria-hidden="true">◎</span>`;
+    return `<span class="place-relationship-chip">${icon}<span>${escapeHtml(status)}</span></span>`;
   }
 
   function siteHomeLinkMarkup() {
@@ -774,7 +832,7 @@
 
   function mapRegionMarkup(regionId, action = "map-region") {
     const region = regionsById.get(regionId);
-    const count = countriesInRegion(regionId).length;
+    const regionPlaces = countriesInRegion(regionId);
     const paths = mergedWorldRegionFeatures(regionId)
       .map(mapPathMarkup)
       .join("");
@@ -791,7 +849,7 @@
         data-map-region="${regionId}"
         role="button"
         tabindex="0"
-        aria-label="${escapeHtml(`${regionLabel(region)}, ${countryCount(count)}`)}"
+        aria-label="${escapeHtml(`${regionLabel(region)}, ${placeCountLabel(regionPlaces)}`)}"
       >
         ${paths}
         ${markers}
@@ -885,14 +943,12 @@
 
   function silhouetteCapitalMarkup(points = []) {
     return points
-      .map(
-        (point) => `
+      .map((point) => point.kind === "quiz" ? `
           <path
             class="country-silhouette-capital"
             d="${silhouetteCapitalPath(point)}"
           />
-        `,
-      )
+        ` : `<circle class="country-silhouette-capital is-${point.kind}" cx="${point.x}" cy="${point.y}" r="${point.kind === "planned" ? 1.7 : 1.45}" />`)
       .join("");
   }
 
@@ -1342,7 +1398,7 @@
   function homeProgressMarkup(summaryValue) {
     const percentage = (summaryValue.masteredLevels / summaryValue.totalLevels) * 100;
     const allMastered = summaryValue.masteredLevels === summaryValue.totalLevels;
-    return `<div class="progress-globe-wrap"><div class="progress-globe-achievement"><div class="progress-globe" style="--progress:${percentage}%" aria-hidden="true"><img class="progress-globe-base" src="./favicon.svg" alt="" /><img class="progress-globe-fill" src="./favicon.svg" alt="" /></div>${allMastered ? `<span class="mastery-trophy world-mastery-trophy" aria-hidden="true">🏆</span>` : ""}</div><strong>${t("levelsMastered", { count: summaryValue.masteredLevels })}</strong></div>`;
+    return `<div class="progress-globe-wrap"><div class="progress-globe-achievement"><div class="progress-globe" style="--progress:${percentage}%" aria-hidden="true"><img class="progress-globe-base" src="./favicon.svg" alt="" /><img class="progress-globe-fill" src="./favicon.svg" alt="" /></div>${allMastered ? `<span class="mastery-trophy world-mastery-trophy" aria-hidden="true">🏆</span>` : ""}</div><strong>${t("levelsMastered", { count: summaryValue.masteredLevels, total: summaryValue.totalLevels })}</strong></div>`;
   }
 
   function setupMarkup() {
@@ -1376,12 +1432,12 @@
           <button class="home-action-card continue-card" data-action="${allMastered ? "surprise-quiz" : "continue-game"}">
             <span class="home-action-icon" aria-hidden="true">${allMastered ? "✦" : "→"}</span>
             <span><strong>${allMastered ? t("surpriseQuiz") : hasPlayed ? t("continueGame") : t("startGame")}</strong>
-            ${quiz ? `<small>${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(levelTitle(level))}<br>${escapeHtml(modeLabel(quiz.mode))} · ${levelValue.mastered}/4 ${t("mastered")}</small>` : `<small>47 / 47 · 188 / 188</small>`}</span>
+            ${quiz ? `<small>${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(levelTitle(level))}<br>${escapeHtml(modeLabel(quiz.mode))} · ${levelValue.mastered}/4 ${t("mastered")}</small>` : `<small>${curriculum.levels.length} / ${curriculum.levels.length} · ${curriculum.levels.length * 4} / ${curriculum.levels.length * 4}</small>`}</span>
           </button>
-          <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${countryCount(196)}</small></span></button>
+          <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
         <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button action-feedback-button" data-action="share-progress">${t("shareProgress")}${actionFeedbackMarkup()}</button><button class="quiet-button" data-action="open-challenge">${t("openChallenge")}</button></nav>
-        <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a><a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a><a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a></span></footer>
+        <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a><a href="./licenses/local-flags.txt">${t("localFlagsLicence")}</a><a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a><a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a></span></footer>
         ${profilePanelMarkup()}${installHelpMarkup()}${openChallengeMarkup()}
       </main>${installAction}</div>`;
   }
@@ -1398,7 +1454,7 @@
         const isMastery = level.kind.includes("mastery");
         return `<section class="level-card ${value.mastered === 4 ? "is-mastered" : value.played ? "is-progress" : "is-unplayed"}" id="level-${escapeHtml(level.id)}">
           <button class="level-heading" data-action="toggle-level" data-level-id="${level.id}" aria-expanded="${state.selectedLevelId === level.id}">
-            <span class="level-number">${levelIndex + 1}</span><span><strong>${escapeHtml(levelTitle(level))}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : countryCount(level.countryCodes.length)}</small></span>
+            <span class="level-number">${levelIndex + 1}</span><span><strong>${escapeHtml(levelTitle(level))}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : placeCountLabel(level.countryCodes.map((code) => countriesByCode.get(code)).filter(Boolean))}</small></span>
             <span class="level-state">${value.mastered === 4 ? `<span class="level-mastery-status" aria-label="4/4 ${t("mastered")}"><span>4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></span>` : value.played ? `${value.mastered}/4 ${t("mastered")}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span>
           </button>
           ${state.selectedLevelId === level.id ? `<div class="quiz-list"><div class="level-practice-actions"><button class="level-practice-row" data-action="level-cards" data-level-id="${level.id}"><span class="level-practice-icon" aria-hidden="true"><span></span><span></span></span><span><strong>${t("cards")}</strong></span><span aria-hidden="true">→</span></button><button class="level-practice-row level-explore-row" data-action="explore-level" data-level-id="${level.id}"><span class="level-practice-map-icon" aria-hidden="true">◎</span><span><strong>${t("exploreTheseCountries")}</strong></span><span aria-hidden="true">→</span></button></div><div class="quiz-mode-list">${level.quizzes.map((baseQuiz) => {
@@ -1529,7 +1585,7 @@
           name: countryName(country),
         }))}"
       >
-        ${flagMarkup(country, "explore-status-flag", false)}
+        ${flagMarkup(country, "explore-status-flag", false, true)}
         <span>
           <strong>${escapeHtml(countryName(country))}</strong>
           <small>${escapeHtml(countryCapital(country))}</small>
@@ -1550,15 +1606,19 @@
         aria-labelledby="country-details-title"
         tabindex="-1"
       >
-        <div class="country-details-card ${countryNote(country) ? "has-note" : ""}">
-          ${flagMarkup(country, "country-details-flag", true)}
+        <div class="country-details-card ${countryNote(country) || country.category === "other-place" ? "has-note" : ""}">
+          ${flagMarkup(country, "country-details-flag", true, true)}
           <h2 id="country-details-title">
             <span class="sr-only">${escapeHtml(t("countryDetails", {
               name: countryName(country),
             }))}</span>
             <span aria-hidden="true">${escapeHtml(countryName(country))}</span>
           </h2>
-          <p class="country-details-capital">${escapeHtml(countryCapital(country))}</p>
+          ${relationshipChipMarkup(country)}
+          <dl class="place-centres">
+            ${country.centres.map((centre) => `<div class="place-centre place-centre-${centre.kind}"><dt>${escapeHtml(centreRole(centre))}</dt><dd>${escapeHtml(centre.name[state.locale])}</dd></div>`).join("")}
+          </dl>
+          ${country.flagStatus === "established-local" ? `<p class="place-flag-status">${escapeHtml(t("establishedLocalFlag"))}</p>` : ""}
           ${
             countryNote(country)
               ? `<p class="country-note">${escapeHtml(countryNote(country))}</p>`
@@ -1607,6 +1667,7 @@
       .join("");
     const classes = [
       "explore-map-country",
+      country.category === "other-place" ? "is-other-place" : "",
       state.explorePinnedCode === country.code ? "is-pinned" : "",
       state.explorePreviewCode === country.code ? "is-preview" : "",
       hasLocatorMarker ? "has-locator-marker is-locator-hidden" : "",
@@ -1646,6 +1707,7 @@
           "explore-map-marker-control",
           state.explorePinnedCode === marker.code ? "is-pinned" : "",
           state.explorePreviewCode === marker.code ? "is-preview" : "",
+          countriesByCode.get(marker.code)?.category === "other-place" ? "is-other-place" : "",
         ]
           .filter(Boolean)
           .join(" ");
@@ -2210,6 +2272,30 @@
     return `<div class="explore-map-scope-controls" role="group" aria-label="${escapeHtml(t("mapAreaControls"))}">${exploreMapAreaControlsContentMarkup()}</div>`;
   }
 
+  function explorePlaceGroupMarkup(sortedPlaces, category) {
+    const group = sortedPlaces.filter((place) => place.category === category);
+    if (!group.length) return "";
+    const heading = category === "country" ? t("countriesHeading") : t("otherCompactHeading");
+    return `
+      <section class="explore-place-group" aria-labelledby="explore-group-${category}">
+        <h3 id="explore-group-${category}">${escapeHtml(heading)}: <span>${group.length}</span></h3>
+        ${group.map((country) => `
+          <button
+            class="explore-country-card${country.category === "other-place" ? " is-other-place" : ""}${state.explorePinnedCode === country.code ? " is-pinned" : ""}${state.explorePreviewCode === country.code ? " is-preview" : ""}"
+            data-action="explore-country"
+            data-explore-code="${country.code}"
+            aria-pressed="${state.explorePinnedCode === country.code}"
+          >
+            ${flagMarkup(country, "explore-country-flag", false, true)}
+            <span>
+              <strong>${escapeHtml(countryName(country))}</strong>
+              <small>${escapeHtml(countryCapital(country))}</small>
+            </span>
+          </button>
+        `).join("")}
+      </section>`;
+  }
+
   function exploreRegionMapMarkup(sortedCountries) {
     const extent = state.exploreMapExtent ?? "world";
     const scopeLabel = exploreScopeLabel();
@@ -2250,7 +2336,7 @@
           </div>
           <div class="explore-map-stage">
             ${exploreMapAreaControlsMarkup()}
-            <div class="explore-region-map${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
+            <div class="explore-region-map${extent === "world" ? " is-world-extent" : ""}${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
           <svg
             data-explore-map-svg
             viewBox="${serializeMapViewBox(mapViewport.view)}"
@@ -2317,7 +2403,6 @@
             >
               <span>
                 <strong>${escapeHtml(scopeLabel)}</strong>
-                <small>${countryCount(sortedCountries.length)}</small>
               </span>
               <span class="explore-region-control-arrow" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false"><path d="M7 7h11m0 0-3-3m3 3-3 3M17 17H6m0 0 3 3m-3-3 3-3" /></svg>
@@ -2327,24 +2412,8 @@
           </div>
           <div class="scroll-affordance-frame" data-scroll-affordance-frame>
             <div class="explore-country-list" data-scroll-affordance>
-              ${sortedCountries
-                .map(
-                  (country) => `
-                    <button
-                      class="explore-country-card${state.explorePinnedCode === country.code ? " is-pinned" : ""}${state.explorePreviewCode === country.code ? " is-preview" : ""}"
-                      data-action="explore-country"
-                      data-explore-code="${country.code}"
-                      aria-pressed="${state.explorePinnedCode === country.code}"
-                    >
-                      ${flagMarkup(country, "explore-country-flag", false)}
-                      <span>
-                        <strong>${escapeHtml(countryName(country))}</strong>
-                        <small>${escapeHtml(countryCapital(country))}</small>
-                      </span>
-                    </button>
-                  `,
-                )
-                .join("")}
+              ${explorePlaceGroupMarkup(sortedCountries, "country")}
+              ${explorePlaceGroupMarkup(sortedCountries, "other-place")}
             </div>
           </div>
         </aside>
@@ -2382,7 +2451,6 @@
                     aria-pressed="${state.exploreScope === null && state.region === regionId}"
                   >
                     <span>${escapeHtml(regionId === "world" ? t("wholeWorld") : regionLabel(option))}</span>
-                    <small>${countryCount(countriesInRegion(regionId).length)}</small>
                   </button>
                 `;
               })
@@ -2489,20 +2557,20 @@
           data-action="flashcard-toggle"
           aria-label="${
             state.flashcardRevealed
-              ? escapeHtml(t("revealedFlashcard", {
+              ? escapeHtml(`${t("revealedFlashcard", {
                   name: countryName(country),
                   capital: countryCapital(country),
-                }))
+                })}${country.category === "other-place" ? ` ${placeStatus(country)}.` : ""}`)
               : escapeHtml(t("hiddenFlashcard", {
                   current: state.flashcardIndex + 1,
                   total: state.flashcards.length,
                 }))
           }"
         >
-          ${flagMarkup(country, "flashcard-flag", state.flashcardRevealed)}
+          ${flagMarkup(country, "flashcard-flag", state.flashcardRevealed, true)}
           <span class="flashcard-answer">
             ${state.flashcardRevealed
-              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(countryCapital(country))}</span>`
+              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(countryCapital(country))}</span>${country.category === "other-place" ? `<span class="flashcard-relationship">${escapeHtml(placeStatus(country))}</span>` : ""}`
               : `<strong class="flashcard-question" aria-hidden="true">?</strong>`}
           </span>
         </button>
@@ -3456,9 +3524,9 @@
   async function copyProgressShare(control) {
     const totals = progress.summary(currentProfile(), curriculum.levels);
     const url = new URL(window.location.href); url.search = state.locale === "en" ? "?lang=en" : ""; url.hash = "";
-    const text = totals.masteredQuizzes === 188
-      ? `${state.locale === "en" ? "I have mastered all 188 geography quizzes in Hello World!" : "Jeg har mestret alle 188 geografiquizene i Hei verden!"}\n${url.href}`
-      : `${state.locale === "en" ? `I have mastered ${totals.masteredLevels} of 47 levels in Hello World!` : `Jeg har mestret ${totals.masteredLevels} av 47 nivåer i Hei verden!`}\n${url.href}`;
+    const text = totals.masteredQuizzes === totals.totalQuizzes
+      ? `${state.locale === "en" ? `I have mastered all ${totals.totalQuizzes} geography quizzes in Hello World!` : `Jeg har mestret alle ${totals.totalQuizzes} geografiquizene i Hei verden!`}\n${url.href}`
+      : `${state.locale === "en" ? `I have mastered ${totals.masteredLevels} of ${totals.totalLevels} levels in Hello World!` : `Jeg har mestret ${totals.masteredLevels} av ${totals.totalLevels} nivåer i Hei verden!`}\n${url.href}`;
     await shareWithClipboardFallback(
       control,
       { title: t("brandName"), text },

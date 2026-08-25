@@ -15,6 +15,45 @@ const primaryRegions = new Set([
 ]);
 const countryCodes = new Set();
 
+const centreOverrides = Object.freeze({
+  za: [
+    { name: { nb: "Pretoria", en: "Pretoria" }, role: { nb: "Administrativ hovedstad", en: "Administrative capital" }, kind: "quiz" },
+    { name: { nb: "Cape Town", en: "Cape Town" }, role: { nb: "Lovgivende hovedstad", en: "Legislative capital" }, kind: "quiz" },
+    { name: { nb: "Bloemfontein", en: "Bloemfontein" }, role: { nb: "Juridisk hovedstad", en: "Judicial capital" }, kind: "quiz" },
+  ],
+  lk: [
+    { name: { nb: "Sri Jayawardenepura Kotte", en: "Sri Jayawardenepura Kotte" }, role: { nb: "Lovgivende hovedstad", en: "Legislative capital" }, kind: "quiz" },
+    { name: { nb: "Colombo", en: "Colombo" }, role: { nb: "Kommersielt sentrum", en: "Commercial centre" }, kind: "secondary" },
+  ],
+  bo: [
+    { name: { nb: "Sucre", en: "Sucre" }, role: { nb: "Konstitusjonell hovedstad", en: "Constitutional capital" }, kind: "quiz" },
+    { name: { nb: "La Paz", en: "La Paz" }, role: { nb: "Regjeringssete", en: "Seat of government" }, kind: "secondary" },
+  ],
+  sz: [
+    { name: { nb: "Mbabane", en: "Mbabane" }, role: { nb: "Administrativ hovedstad", en: "Administrative capital" }, kind: "quiz" },
+    { name: { nb: "Lobamba", en: "Lobamba" }, role: { nb: "Kongelig og lovgivende hovedstad", en: "Royal and legislative capital" }, kind: "quiz" },
+  ],
+  my: [
+    { name: { nb: "Kuala Lumpur", en: "Kuala Lumpur" }, role: { nb: "Nasjonal hovedstad", en: "National capital" }, kind: "quiz" },
+    { name: { nb: "Putrajaya", en: "Putrajaya" }, role: { nb: "Administrativt sentrum", en: "Administrative centre" }, kind: "secondary" },
+  ],
+  ps: [
+    { name: { nb: "Øst-Jerusalem", en: "East Jerusalem" }, role: { nb: "Krevd hovedstad", en: "Claimed capital" }, kind: "quiz" },
+    { name: { nb: "Ramallah", en: "Ramallah" }, role: { nb: "Administrativt sentrum", en: "Administrative centre" }, kind: "quiz" },
+  ],
+  nr: [
+    { name: { nb: "Yaren", en: "Yaren" }, role: { nb: "De facto regjeringssete", en: "De facto seat of government" }, kind: "quiz" },
+  ],
+  id: [
+    { name: { nb: "Jakarta", en: "Jakarta" }, role: { nb: "Hovedstad", en: "Capital" }, kind: "quiz" },
+    { name: { nb: "Nusantara", en: "Nusantara" }, role: { nb: "Planlagt framtidig hovedstad", en: "Planned future capital" }, kind: "planned" },
+  ],
+  eh: [
+    { name: { nb: "El Aaiún", en: "El Aaiún" }, role: { nb: "Største administrative sentrum", en: "Largest administrative centre" }, kind: "quiz" },
+    { name: { nb: "Tifariti", en: "Tifariti" }, role: { nb: "Midlertidig krevd hovedstad", en: "Temporary claimed capital" }, kind: "secondary" },
+  ],
+});
+
 function defineCountry(country) {
   if (countryCodes.has(country.code)) {
     throw new Error(`Duplicate country code in countries.js: ${country.code}`);
@@ -40,10 +79,22 @@ function defineCountry(country) {
   });
 
   countryCodes.add(country.code);
+  const centres = centreOverrides[country.code] ?? [
+    { name: country.capital, role: { nb: "Hovedstad", en: "Capital" }, kind: "quiz" },
+  ];
   return Object.freeze({
     ...country,
+    category: country.category ?? "country",
+    status: country.status ? Object.freeze(country.status) : null,
+    relatedCountryCode: country.relatedCountryCode ?? null,
+    flagStatus: country.flagStatus ?? "official",
     name: Object.freeze(country.name),
     capital: Object.freeze(country.capital),
+    centres: Object.freeze(centres.map((centre) => Object.freeze({
+      ...centre,
+      name: Object.freeze(centre.name),
+      role: Object.freeze(centre.role),
+    }))),
     note: country.note ? Object.freeze(country.note) : null,
   });
 }
@@ -150,7 +201,7 @@ const countries = [
   { code: "cy", region: "west-central-asia", name: { nb: "Kypros", en: "Cyprus" }, capital: { nb: "Nikosia", en: "Nicosia" }, note: { nb: "FN plasserer Kypros i Vest-Asia i M49-inndelingen, mens landet har vært medlem av EU siden 2004.", en: "The UN places Cyprus in Western Asia in its M49 classification, while the country has been an EU member since 2004." } },
   { code: "ge", region: "west-central-asia", name: { nb: "Georgia", en: "Georgia" }, capital: { nb: "Tbilisi", en: "Tbilisi" } },
   { code: "in", region: "east-south-asia", name: { nb: "India", en: "India" }, capital: { nb: "New Delhi", en: "New Delhi" } },
-  { code: "id", region: "east-south-asia", name: { nb: "Indonesia", en: "Indonesia" }, capital: { nb: "Jakarta / Nusantara", en: "Jakarta / Nusantara" } },
+  { code: "id", region: "east-south-asia", name: { nb: "Indonesia", en: "Indonesia" }, capital: { nb: "Jakarta", en: "Jakarta" } },
   { code: "ir", region: "west-central-asia", name: { nb: "Iran", en: "Iran" }, capital: { nb: "Teheran", en: "Tehran" } },
   { code: "iq", region: "west-central-asia", name: { nb: "Irak", en: "Iraq" }, capital: { nb: "Bagdad", en: "Baghdad" } },
   { code: "il", region: "west-central-asia", name: { nb: "Israel", en: "Israel" }, capital: { nb: "Jerusalem", en: "Jerusalem" } },
@@ -161,7 +212,7 @@ const countries = [
   { code: "kg", region: "west-central-asia", name: { nb: "Kirgisistan", en: "Kyrgyzstan" }, capital: { nb: "Bisjkek", en: "Bishkek" } },
   { code: "la", region: "east-south-asia", name: { nb: "Laos", en: "Laos" }, capital: { nb: "Vientiane", en: "Vientiane" } },
   { code: "lb", region: "west-central-asia", name: { nb: "Libanon", en: "Lebanon" }, capital: { nb: "Beirut", en: "Beirut" } },
-  { code: "my", region: "east-south-asia", name: { nb: "Malaysia", en: "Malaysia" }, capital: { nb: "Kuala Lumpur / Putrajaya", en: "Kuala Lumpur / Putrajaya" } },
+  { code: "my", region: "east-south-asia", name: { nb: "Malaysia", en: "Malaysia" }, capital: { nb: "Kuala Lumpur", en: "Kuala Lumpur" } },
   { code: "mv", region: "east-south-asia", name: { nb: "Maldivene", en: "Maldives" }, capital: { nb: "Malé", en: "Malé" } },
   { code: "mn", region: "east-south-asia", name: { nb: "Mongolia", en: "Mongolia" }, capital: { nb: "Ulaanbaatar", en: "Ulaanbaatar" } },
   { code: "mm", region: "east-south-asia", name: { nb: "Myanmar", en: "Myanmar" }, capital: { nb: "Naypyidaw", en: "Naypyidaw" } },
@@ -176,7 +227,7 @@ const countries = [
   { code: "sa", region: "west-central-asia", name: { nb: "Saudi-Arabia", en: "Saudi Arabia" }, capital: { nb: "Riyadh", en: "Riyadh" } },
   { code: "sg", region: "east-south-asia", name: { nb: "Singapore", en: "Singapore" }, capital: { nb: "Singapore", en: "Singapore" } },
   { code: "kr", region: "east-south-asia", name: { nb: "Sør-Korea", en: "South Korea" }, capital: { nb: "Seoul", en: "Seoul" } },
-  { code: "lk", region: "east-south-asia", name: { nb: "Sri Lanka", en: "Sri Lanka" }, capital: { nb: "Sri Jayawardenepura Kotte / Colombo", en: "Sri Jayawardenepura Kotte / Colombo" } },
+  { code: "lk", region: "east-south-asia", name: { nb: "Sri Lanka", en: "Sri Lanka" }, capital: { nb: "Sri Jayawardenepura Kotte", en: "Sri Jayawardenepura Kotte" } },
   { code: "sy", region: "west-central-asia", name: { nb: "Syria", en: "Syria" }, capital: { nb: "Damaskus", en: "Damascus" } },
   { code: "tj", region: "west-central-asia", name: { nb: "Tadsjikistan", en: "Tajikistan" }, capital: { nb: "Dusjanbe", en: "Dushanbe" } },
   { code: "th", region: "east-south-asia", name: { nb: "Thailand", en: "Thailand" }, capital: { nb: "Bangkok", en: "Bangkok" } },
@@ -245,13 +296,83 @@ const countries = [
   { code: "to", region: "oceania", name: { nb: "Tonga", en: "Tonga" }, capital: { nb: "Nukuʻalofa", en: "Nukuʻalofa" } },
   { code: "tv", region: "oceania", name: { nb: "Tuvalu", en: "Tuvalu" }, capital: { nb: "Funafuti", en: "Funafuti" } },
   { code: "vu", region: "oceania", name: { nb: "Vanuatu", en: "Vanuatu" }, capital: { nb: "Port Vila", en: "Port Vila" } },
+  { code: "tw", region: "east-south-asia", name: { nb: "Taiwan", en: "Taiwan" }, capital: { nb: "Taipei", en: "Taipei" } },
 ].map(defineCountry);
 
-if (countries.length !== 196) {
+const otherPlaces = [
+  { code: "ax", region: "europe", name: { nb: "Åland", en: "Åland" }, capital: { nb: "Mariehamn", en: "Mariehamn" }, status: { nb: "Selvstyrt del av Finland", en: "Autonomous part of Finland" }, relatedCountryCode: "fi" },
+  { code: "fo", region: "europe", name: { nb: "Færøyene", en: "Faroe Islands" }, capital: { nb: "Tórshavn", en: "Tórshavn" }, status: { nb: "Selvstyrt del av Kongeriket Danmark", en: "Self-governing part of the Kingdom of Denmark" }, relatedCountryCode: "dk" },
+  { code: "im", region: "europe", name: { nb: "Man", en: "Isle of Man" }, capital: { nb: "Douglas", en: "Douglas" }, status: { nb: "Britisk kronbesittelse, ikke en del av Storbritannia", en: "Crown dependency, not part of the United Kingdom" }, relatedCountryCode: "gb" },
+  { code: "je", region: "europe", name: { nb: "Jersey", en: "Jersey" }, capital: { nb: "Saint Helier", en: "Saint Helier" }, status: { nb: "Britisk kronbesittelse, ikke en del av Storbritannia", en: "Crown dependency, not part of the United Kingdom" }, relatedCountryCode: "gb" },
+  { code: "gg", region: "europe", name: { nb: "Guernsey", en: "Guernsey" }, capital: { nb: "Saint Peter Port", en: "Saint Peter Port" }, status: { nb: "Britisk kronbesittelse, ikke en del av Storbritannia", en: "Crown dependency, not part of the United Kingdom" }, relatedCountryCode: "gb" },
+  { code: "gi", region: "europe", name: { nb: "Gibraltar", en: "Gibraltar" }, capital: { nb: "Gibraltar", en: "Gibraltar" }, status: { nb: "Britisk oversjøisk territorium", en: "British Overseas Territory" }, relatedCountryCode: "gb" },
+  { code: "gl", region: "north-central-america", name: { nb: "Grønland", en: "Greenland" }, capital: { nb: "Nuuk", en: "Nuuk" }, status: { nb: "Selvstyrt territorium i Kongeriket Danmark", en: "Autonomous territory within the Kingdom of Denmark" }, relatedCountryCode: "dk" },
+  { code: "bm", region: "north-central-america", name: { nb: "Bermuda", en: "Bermuda" }, capital: { nb: "Hamilton", en: "Hamilton" }, status: { nb: "Britisk oversjøisk territorium", en: "British Overseas Territory" }, relatedCountryCode: "gb" },
+  { code: "pr", region: "caribbean", name: { nb: "Puerto Rico", en: "Puerto Rico" }, capital: { nb: "San Juan", en: "San Juan" }, status: { nb: "Selvstyrt amerikansk territorium", en: "Self-governing United States territory" }, relatedCountryCode: "us" },
+  { code: "vi", region: "caribbean", name: { nb: "De amerikanske Jomfruøyene", en: "US Virgin Islands" }, capital: { nb: "Charlotte Amalie", en: "Charlotte Amalie" }, status: { nb: "Amerikansk territorium", en: "United States territory" }, relatedCountryCode: "us" },
+  { code: "aw", region: "caribbean", name: { nb: "Aruba", en: "Aruba" }, capital: { nb: "Oranjestad", en: "Oranjestad" }, status: { nb: "Konstituerende land i Kongeriket Nederlandene", en: "Constituent country within the Kingdom of the Netherlands" }, relatedCountryCode: "nl" },
+  { code: "cw", region: "caribbean", name: { nb: "Curaçao", en: "Curaçao" }, capital: { nb: "Willemstad", en: "Willemstad" }, status: { nb: "Konstituerende land i Kongeriket Nederlandene", en: "Constituent country within the Kingdom of the Netherlands" }, relatedCountryCode: "nl" },
+  { code: "sx", region: "caribbean", name: { nb: "Sint Maarten", en: "Sint Maarten" }, capital: { nb: "Philipsburg", en: "Philipsburg" }, status: { nb: "Konstituerende land i Kongeriket Nederlandene", en: "Constituent country within the Kingdom of the Netherlands" }, relatedCountryCode: "nl" },
+  { code: "gp", region: "caribbean", name: { nb: "Guadeloupe", en: "Guadeloupe" }, capital: { nb: "Basse-Terre", en: "Basse-Terre" }, status: { nb: "Oversjøisk region i Frankrike", en: "Overseas region of France" }, relatedCountryCode: "fr", flagStatus: "established-local" },
+  { code: "mq", region: "caribbean", name: { nb: "Martinique", en: "Martinique" }, capital: { nb: "Fort-de-France", en: "Fort-de-France" }, status: { nb: "Oversjøisk region i Frankrike", en: "Overseas region of France" }, relatedCountryCode: "fr" },
+  { code: "ky", region: "caribbean", name: { nb: "Caymanøyene", en: "Cayman Islands" }, capital: { nb: "George Town", en: "George Town" }, status: { nb: "Britisk oversjøisk territorium", en: "British Overseas Territory" }, relatedCountryCode: "gb" },
+  { code: "gf", region: "south-america", name: { nb: "Fransk Guyana", en: "French Guiana" }, capital: { nb: "Cayenne", en: "Cayenne" }, status: { nb: "Oversjøisk region i Frankrike", en: "Overseas region of France" }, relatedCountryCode: "fr", flagStatus: "established-local" },
+  { code: "fk", region: "south-america", name: { nb: "Falklandsøyene", en: "Falkland Islands" }, capital: { nb: "Stanley", en: "Stanley" }, status: { nb: "Britisk oversjøisk territorium; kreves av Argentina", en: "British Overseas Territory; claimed by Argentina" }, relatedCountryCode: "gb" },
+  { code: "eh", region: "north-west-africa", name: { nb: "Vest-Sahara", en: "Western Sahara" }, capital: { nb: "El Aaiún / Tifariti", en: "El Aaiún / Tifariti" }, status: { nb: "Omstridt territorium", en: "Disputed territory" }, note: { nb: "El Aaiún er det største administrative sentrumet. Saharawiske myndigheter regner Tifariti som en midlertidig hovedstad.", en: "El Aaiún is the largest administrative centre. Sahrawi authorities identify Tifariti as a temporary capital." } },
+  { code: "re", region: "east-south-africa", name: { nb: "Réunion", en: "Réunion" }, capital: { nb: "Saint-Denis", en: "Saint-Denis" }, status: { nb: "Oversjøisk region i Frankrike", en: "Overseas region of France" }, relatedCountryCode: "fr", flagStatus: "established-local" },
+  { code: "yt", region: "east-south-africa", name: { nb: "Mayotte", en: "Mayotte" }, capital: { nb: "Mamoudzou", en: "Mamoudzou" }, status: { nb: "Oversjøisk departement i Frankrike; kreves av Komorene", en: "Overseas department of France; claimed by Comoros" }, relatedCountryCode: "fr", flagStatus: "established-local" },
+  { code: "hk", region: "east-south-asia", name: { nb: "Hongkong", en: "Hong Kong" }, capital: { nb: "Hongkong", en: "Hong Kong" }, status: { nb: "Spesiell administrativ region i Kina", en: "Special administrative region of China" }, relatedCountryCode: "cn" },
+  { code: "mo", region: "east-south-asia", name: { nb: "Macao", en: "Macau" }, capital: { nb: "Macao", en: "Macau" }, status: { nb: "Spesiell administrativ region i Kina", en: "Special administrative region of China" }, relatedCountryCode: "cn" },
+  { code: "ck", region: "oceania", name: { nb: "Cookøyene", en: "Cook Islands" }, capital: { nb: "Avarua", en: "Avarua" }, status: { nb: "Selvstyrt stat i fri assosiasjon med New Zealand", en: "Self-governing state in free association with New Zealand" }, relatedCountryCode: "nz" },
+  { code: "nu", region: "oceania", name: { nb: "Niue", en: "Niue" }, capital: { nb: "Alofi", en: "Alofi" }, status: { nb: "Selvstyrt stat i fri assosiasjon med New Zealand", en: "Self-governing state in free association with New Zealand" }, relatedCountryCode: "nz" },
+  { code: "gu", region: "oceania", name: { nb: "Guam", en: "Guam" }, capital: { nb: "Hagåtña", en: "Hagåtña" }, status: { nb: "Amerikansk territorium", en: "United States territory" }, relatedCountryCode: "us" },
+  { code: "mp", region: "oceania", name: { nb: "Nord-Marianene", en: "Northern Mariana Islands" }, capital: { nb: "Saipan", en: "Saipan" }, status: { nb: "Samvelde i politisk union med USA", en: "Commonwealth in political union with the United States" }, relatedCountryCode: "us" },
+  { code: "as", region: "oceania", name: { nb: "Amerikansk Samoa", en: "American Samoa" }, capital: { nb: "Pago Pago", en: "Pago Pago" }, status: { nb: "Amerikansk territorium", en: "United States territory" }, relatedCountryCode: "us" },
+  { code: "nc", region: "oceania", name: { nb: "Ny-Caledonia", en: "New Caledonia" }, capital: { nb: "Nouméa", en: "Nouméa" }, status: { nb: "Fransk særkollektivitet", en: "Special collectivity of France" }, relatedCountryCode: "fr" },
+  { code: "pf", region: "oceania", name: { nb: "Fransk Polynesia", en: "French Polynesia" }, capital: { nb: "Papeete", en: "Papeete" }, status: { nb: "Oversjøisk land i Frankrike", en: "Overseas country of France" }, relatedCountryCode: "fr" },
+].map((place) => defineCountry({ ...place, category: "other-place" }));
+
+const places = [...countries, ...otherPlaces];
+
+if (countries.length !== 197) {
   throw new Error(
-    `Expected 196 countries in countries.js, found ${countries.length}`,
+    `Expected 197 countries in countries.js, found ${countries.length}`,
   );
 }
+if (otherPlaces.length !== 30 || places.length !== 227) {
+  throw new Error(`Expected 30 other places and 227 total places, found ${otherPlaces.length} and ${places.length}`);
+}
+const officialCountryCodes = new Set(countries.map((country) => country.code));
+places.forEach((place) => {
+  if (!new Set(["country", "other-place"]).has(place.category)) {
+    throw new Error(`Invalid category for place code: ${place.code}`);
+  }
+  if (!new Set(["official", "established-local"]).has(place.flagStatus)) {
+    throw new Error(`Invalid flag status for place code: ${place.code}`);
+  }
+  if (place.category === "country" && (place.status || place.relatedCountryCode)) {
+    throw new Error(`Countries cannot have relationship metadata: ${place.code}`);
+  }
+  if (place.category === "other-place" && !place.status) {
+    throw new Error(`Other place is missing status metadata: ${place.code}`);
+  }
+  if (place.relatedCountryCode && !officialCountryCodes.has(place.relatedCountryCode)) {
+    throw new Error(`Unknown related country for place code: ${place.code}`);
+  }
+  if (!place.centres.length) {
+    throw new Error(`Place is missing civic centres: ${place.code}`);
+  }
+  place.centres.forEach((centre) => {
+    if (!new Set(["quiz", "secondary", "planned"]).has(centre.kind)) {
+      throw new Error(`Invalid civic-centre kind for place code: ${place.code}`);
+    }
+    supportedLocales.forEach((locale) => {
+      if (!centre.name[locale]?.trim() || !centre.role[locale]?.trim()) {
+        throw new Error(`Incomplete ${locale} civic-centre data for place code: ${place.code}`);
+      }
+    });
+  });
+});
 
 const regionOptions = [
   { id: "world", label: { nb: "Hele verden", en: "Whole world" } },
@@ -298,6 +419,8 @@ const regionOptions = [
 
 window.GEOGRAFI_QUIZ_DATA = Object.freeze({
   countries: Object.freeze(countries),
+  otherPlaces: Object.freeze(otherPlaces),
+  places: Object.freeze(places),
   regionOptions: Object.freeze(regionOptions),
 });
 })();

@@ -13,6 +13,7 @@
   const MAX_TRANSFER_CHARS = 100_000;
   const MAX_PROFILES = 50;
   const MAX_RECORDS = 2_000;
+  const MAX_QUIZ_PLACES = 227;
 
   function now() { return new Date().toISOString(); }
   function validDate(value) { return typeof value === "string" && Number.isFinite(Date.parse(value)); }
@@ -50,7 +51,7 @@
     const revision = Number(value.revision);
     const bestScore = Number(value.bestScore);
     const total = Number(value.total);
-    if (!Number.isSafeInteger(revision) || revision < 1 || !Number.isSafeInteger(total) || total < 1 || total > 196 || !Number.isSafeInteger(bestScore) || bestScore < 0 || bestScore > total) return null;
+    if (!Number.isSafeInteger(revision) || revision < 1 || !Number.isSafeInteger(total) || total < 1 || total > MAX_QUIZ_PLACES || !Number.isSafeInteger(bestScore) || bestScore < 0 || bestScore > total) return null;
     return { revision, bestScore, total, lastPlayedAt: validDate(value.lastPlayedAt) ? value.lastPlayedAt : null };
   }
 
@@ -77,7 +78,7 @@
     const revision = Number(value.revision);
     const questionIndex = Number(value.questionIndex);
     const score = Number(value.score);
-    if (!/^[a-z0-9-]+:[a-z-]+$/.test(value.quizId ?? "") || !Number.isSafeInteger(revision) || revision < 1 || typeof value.attemptSeed !== "string" || value.attemptSeed.length > 100 || !Number.isSafeInteger(questionIndex) || questionIndex < 0 || questionIndex > 196 || !Number.isSafeInteger(score) || score < 0 || score > questionIndex || !Array.isArray(value.answers) || value.answers.length !== questionIndex) return null;
+    if (!/^[a-z0-9-]+:[a-z-]+$/.test(value.quizId ?? "") || !Number.isSafeInteger(revision) || revision < 1 || typeof value.attemptSeed !== "string" || value.attemptSeed.length > 100 || !Number.isSafeInteger(questionIndex) || questionIndex < 0 || questionIndex > MAX_QUIZ_PLACES || !Number.isSafeInteger(score) || score < 0 || score > questionIndex || !Array.isArray(value.answers) || value.answers.length !== questionIndex) return null;
     const answers = value.answers.map((answer) => ({
       targetCode: String(answer?.targetCode ?? ""),
       selectedCode: String(answer?.selectedCode ?? ""),

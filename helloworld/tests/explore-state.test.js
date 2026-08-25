@@ -36,7 +36,7 @@ assert.equal(exploreState.zoomOutExtent("europe", africa), "world");
 assert.equal(exploreState.zoomOutExtent("world", africa), "world");
 
 const countryCodes = new Set(
-  global.GEOGRAFI_QUIZ_DATA.countries.map((country) => country.code),
+  global.GEOGRAFI_QUIZ_DATA.places.map((country) => country.code),
 );
 const worldGeometryCodes = new Set(
   global.GEOGRAFI_QUIZ_MAP_DATA.features
@@ -46,7 +46,7 @@ const worldGeometryCodes = new Set(
 const worldMarkerCodes = new Set(
   global.GEOGRAFI_QUIZ_MAP_DATA.markers.map((marker) => marker.code),
 );
-assert.equal(countryCodes.size, 196);
+assert.equal(countryCodes.size, 227);
 for (const code of countryCodes) {
   assert.ok(
     worldGeometryCodes.has(code) || worldMarkerCodes.has(code),

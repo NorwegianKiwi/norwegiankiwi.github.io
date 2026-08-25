@@ -145,10 +145,10 @@ for (const level of curriculum.levels) {
     completedStore = progress.recordResult(completedStore, "complete-profile", quiz, quiz.countryCodes.length);
   }
 }
-assert.equal(progress.summary(progress.activeProfile(completedStore), curriculum.levels).masteredQuizzes, 188);
+assert.equal(progress.summary(progress.activeProfile(completedStore), curriculum.levels).masteredQuizzes, 212);
 assert.deepEqual(progress.continueSelection(progress.activeProfile(completedStore), curriculum.levels), { type: "all-mastered" });
 assert.ok(progress.surpriseQuiz(progress.activeProfile(completedStore), curriculum.levels));
-assert.ok(progress.encodeTransfer(progress.activeProfile(completedStore)).length < 20_000);
+assert.ok(progress.encodeTransfer(progress.activeProfile(completedStore)).length < 25_000);
 
 const cleared = progress.clearProgress(store, originalId);
 assert.equal(cleared.profiles[originalId].name, "Lance");

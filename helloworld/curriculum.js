@@ -1,10 +1,12 @@
 (function (root, factory) {
   "use strict";
 
-  const api = factory(root?.GEOGRAFI_QUIZ_DATA?.countries ?? []);
+  const api = factory(
+    root?.GEOGRAFI_QUIZ_DATA?.places ?? root?.GEOGRAFI_QUIZ_DATA?.countries ?? [],
+  );
   if (typeof module === "object" && module.exports) module.exports = api;
   if (root) root.GEOGRAFI_CURRICULUM = Object.freeze(api);
-})(typeof window !== "undefined" ? window : globalThis, function (countries) {
+})(typeof window !== "undefined" ? window : globalThis, function (places) {
   "use strict";
 
   const MODES = Object.freeze([
@@ -34,7 +36,7 @@
     ["pack-atlantic-west-africa", "pack", "Atlanterhavskysten i Vest-Afrika", "Atlantic West Africa", "cv gm gn gw sl lr ci", 5],
     ["pack-gulf-guinea", "pack", "Guineabukta og Sentral-Afrika", "Gulf of Guinea and Central Africa", "gh tg bj ng cm cf gq st", 5],
     ["tour-island-world", "tour", "Øyverden", "Island world", "is ie cu bb mg mu lk id jp nz fj", 4],
-    ["pack-east-asia", "pack", "Øst-Asia", "East Asia", "cn jp kr kp mn ru", 5],
+    ["pack-east-asia", "pack", "Øst-Asia", "East Asia", "cn jp kr kp mn ru tw", 5],
     ["pack-south-asia", "pack", "Sør-Asia", "South Asia", "af pk in bd np bt lk mv", 5],
     ["pack-mainland-southeast-asia", "pack", "Fastlands-Sørøst-Asia", "Mainland Southeast Asia", "mm th la kh vn my", 5],
     ["pack-maritime-southeast-asia", "pack", "Maritime Sørøst-Asia", "Maritime Southeast Asia", "id ph sg bn tl", 5],
@@ -52,19 +54,25 @@
     ["pack-lesser-antilles", "pack", "De små Antiller", "The Lesser Antilles", "bb ag dm gd kn lc vc", 6],
     ["pack-australia-western-pacific", "pack", "Australia, New Zealand og stillehavsportalene", "Australia, New Zealand and the Pacific gateways", "au nz pg fj sb vu ws", 6],
     ["pack-pacific-islands", "pack", "Stillehavsstatene", "Pacific island states", "to tv ki nr mh fm pw", 6],
+    ["pack-north-atlantic-autonomies", "pack", "Selvstyrte områder i Nord-Atlanteren", "North Atlantic autonomies", "gl fo ax im je gg gi bm", 6],
+    ["pack-caribbean-territories", "pack", "Karibiske territorier", "Caribbean territories", "pr vi aw cw sx gp mq ky", 6],
+    ["pack-pacific-associated-territories", "pack", "Tilknyttede områder og territorier i Stillehavet", "Pacific associated places and territories", "ck nu gu mp as nc pf", 6],
+    ["pack-world-special-regions", "pack", "Særlige områder i verden", "Special regions around the world", "gf fk eh re yt hk mo", 6],
   ];
 
   const mastery = [
-    ["mastery-europe", "Europa-mestring", "Europe mastery", "europe"],
-    ["mastery-north-central-america", "Nord- og Mellom-Amerika-mestring", "North and Central America mastery", "north-central-america"],
-    ["mastery-south-america", "Sør-Amerika-mestring", "South America mastery", "south-america"],
-    ["mastery-north-west-africa", "Nord- og Vest-Afrika-mestring", "North and West Africa mastery", "north-west-africa"],
-    ["mastery-east-south-asia", "Øst- og Sør-Asia-mestring", "East and South Asia mastery", "east-south-asia"],
-    ["mastery-east-south-africa", "Øst- og Sør-Afrika-mestring", "East and South Africa mastery", "east-south-africa"],
-    ["mastery-west-central-asia", "Vest- og Sentral-Asia-mestring", "West and Central Asia mastery", "west-central-asia"],
-    ["mastery-caribbean", "Karibia-mestring", "Caribbean mastery", "caribbean"],
-    ["mastery-oceania", "Oseania-mestring", "Oceania mastery", "oceania"],
-    ["mastery-whole-world", "Hele verden-mestring", "Whole world mastery", "world"],
+    ["mastery-europe", "Europa-mestring", "Europe mastery", "region", "europe"],
+    ["mastery-north-central-america", "Nord- og Mellom-Amerika-mestring", "North and Central America mastery", "region", "north-central-america"],
+    ["mastery-south-america", "Sør-Amerika-mestring", "South America mastery", "region", "south-america"],
+    ["mastery-north-west-africa", "Nord- og Vest-Afrika-mestring", "North and West Africa mastery", "region", "north-west-africa"],
+    ["mastery-east-south-asia", "Øst- og Sør-Asia-mestring", "East and South Asia mastery", "region", "east-south-asia"],
+    ["mastery-east-south-africa", "Øst- og Sør-Afrika-mestring", "East and South Africa mastery", "region", "east-south-africa"],
+    ["mastery-west-central-asia", "Vest- og Sentral-Asia-mestring", "West and Central Asia mastery", "region", "west-central-asia"],
+    ["mastery-caribbean", "Karibia-mestring", "Caribbean mastery", "region", "caribbean"],
+    ["mastery-oceania", "Oseania-mestring", "Oceania mastery", "region", "oceania"],
+    ["mastery-countries-world", "Verdens land", "Countries of the world", "category", "country"],
+    ["mastery-other-places-world", "Andre steder i verden", "Other places of the world", "category", "other-place"],
+    ["mastery-whole-world", "Hele verden", "The whole world", "all", "world"],
   ];
 
   function quizzesFor(levelId, choiceCount, kind) {
@@ -88,13 +96,17 @@
     });
   });
 
-  for (const [id, nb, en, region] of mastery) {
-    const countryCodes = region === "world"
-      ? countries.map((country) => country.code)
-      : countries.filter((country) => country.region === region).map((country) => country.code);
-    const kind = region === "world" ? "world-mastery" : "regional-mastery";
+  for (const [id, nb, en, selector, value] of mastery) {
+    const countryCodes = selector === "all"
+      ? places.map((place) => place.code)
+      : selector === "category"
+        ? places.filter((place) => place.category === value).map((place) => place.code)
+        : places.filter((place) => place.category === "country" && place.region === value).map((place) => place.code);
+    const kind = selector === "region" ? "regional-mastery" : "world-mastery";
     levels.push(Object.freeze({
-      id, kind, region, title: Object.freeze({ nb, en }),
+      id, kind, region: selector === "region" ? value : null,
+      category: selector === "category" ? value : null,
+      title: Object.freeze({ nb, en }),
       countryCodes: Object.freeze(countryCodes),
       quizzes: Object.freeze(quizzesFor(id, null, kind)),
     }));
@@ -141,7 +153,7 @@
 
   function fixedAlternativeCodes(quiz) {
     const candidates = quiz.kind === "world-mastery"
-      ? countries.map((country) => country.code)
+      ? places.map((place) => place.code)
       : quiz.countryCodes;
     const count = Math.min(quiz.choiceCount, candidates.length);
     return Object.fromEntries(quiz.countryCodes.map((targetCode) => {

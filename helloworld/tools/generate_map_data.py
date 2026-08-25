@@ -1164,9 +1164,48 @@ def project_silhouette_capitals(capitals, projection):
                 -capital["latitude"],
             )
         )
-        output.append(
-            {"x": round(projected[0], 1), "y": round(projected[1], 1)}
-        )
+        output.append({
+            "x": round(projected[0], 1),
+            "y": round(projected[1], 1),
+            "kind": capital.get("kind", "quiz"),
+        })
+    return output
+
+
+def apply_ring_code_overrides(features, rules, local_names):
+    """Promote geographically separate rings embedded in a parent feature."""
+    if not rules:
+        return features
+    output = []
+    promoted = {rule["targetCode"]: [] for rule in rules}
+    for feature in features:
+        matching_rules = [
+            rule for rule in rules if rule["sourceCode"] == feature["code"]
+        ]
+        if not matching_rules:
+            output.append(feature)
+            continue
+        remaining = []
+        for ring in feature["rings"]:
+            longitude = sum(point[0] for point in ring) / len(ring)
+            latitude = sum(point[1] for point in ring) / len(ring)
+            target = next((
+                rule["targetCode"]
+                for rule in matching_rules
+                if rule["bounds"][0] <= longitude <= rule["bounds"][2]
+                and rule["bounds"][1] <= latitude <= rule["bounds"][3]
+            ), None)
+            (promoted[target] if target else remaining).append(ring)
+        output.append({**feature, "rings": remaining})
+    for code, rings in promoted.items():
+        if not rings:
+            raise ValueError(f"Fant ingen ringer for områdeoverstyringen {code}")
+        output.append({
+            "code": code,
+            "name": local_names[code],
+            "rings": rings,
+            "point": None,
+        })
     return output
 
 
@@ -1611,6 +1650,13 @@ def main():
         countries10 = load_source_features(
             args.source_directory, "countries10m"
         )
+        ring_rules = manifest.get("ringCodeOverrides", [])
+        countries50 = apply_ring_code_overrides(
+            countries50, ring_rules, local_names
+        )
+        countries10 = apply_ring_code_overrides(
+            countries10, ring_rules, local_names
+        )
         populated_places_dataset = manifest["datasets"]["populatedPlaces10m"]
         populated_places_stem = Path(populated_places_dataset["file"]).stem
         populated_places = read_dbf(
@@ -1667,6 +1713,11 @@ def main():
         else:
             world_features, world_markers = build_world(
                 countries50, tiny50, local_names, marker_overrides
+            )
+            world_features = apply_world_geometry_overrides(
+                world_features,
+                manifest.get("worldGeometryOverrides", {}),
+                local_names,
             )
         quiz_active_codes = {
             region: {

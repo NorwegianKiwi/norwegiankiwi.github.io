@@ -21,6 +21,12 @@ Later targeted updates:
 - Panama was updated from
   [source commit `086f7e97`](https://github.com/lipis/flag-icons/commit/086f7e97d657358203916dbe84f61c2bccaa81eb)
   (April 7, 2026), which removes an unintended white border.
+- The 31 flags added for the 227-place curriculum were imported from
+  [source commit `40daebaa`](https://github.com/lipis/flag-icons/commit/40daebaa74b023fe63fb9f82489c022dc2c63b9d).
+- French Guiana, Guadeloupe, Réunion, and Mayotte use distinct established
+  local representative flags from Wikimedia Commons instead of identical
+  French tricolours. Their sources and licenses are recorded in
+  [`../licenses/local-flags.txt`](../licenses/local-flags.txt).
 
 ## Updating flags or countries
 

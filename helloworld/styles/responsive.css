@@ -594,7 +594,7 @@
     height: calc(100vh - var(--phone-quiz-header-height) - 3px);
     height: calc(100dvh - var(--phone-quiz-header-height) - 3px);
     padding: 20px 6px max(20px, var(--phone-quiz-bottom-buffer));
-    grid-template-rows: minmax(0, 1fr) 116px;
+    grid-template-rows: minmax(0, 1fr) 140px;
   }
 
   .flashcard-flag {
@@ -602,7 +602,7 @@
   }
 
   .flashcard-answer {
-    height: 116px;
+    height: 140px;
     min-height: 0;
   }
 
@@ -1236,19 +1236,21 @@ body.standalone-mode .explore-map-shell .explore-country-panel {
 
   .explore-region-picker-layout {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(130px, 1fr) minmax(0, 1.15fr);
+    grid-template-rows: auto minmax(0, 1fr);
     gap: 10px;
   }
 
   .explore-region-picker .region-map-card,
   .explore-region-picker .region-map {
     width: 100%;
-    height: 100%;
+    height: auto;
     min-height: 0;
   }
 
   .explore-region-cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: start;
+    align-self: start;
   }
 
   .explore-region-cards .region-card {
@@ -1277,7 +1279,7 @@ body.standalone-mode .explore-map-shell .explore-country-panel {
   }
 
   .explore-country-status-wrap {
-    height: auto;
+    height: 60px;
     min-height: 60px;
     padding: 6px 9px;
   }
@@ -1412,6 +1414,7 @@ body.standalone-mode .explore-map-shell .explore-country-panel {
   }
 
   .explore-country-status-wrap {
+    height: 52px;
     min-height: 52px;
     padding-block: 5px;
   }

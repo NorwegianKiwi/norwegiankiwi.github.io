@@ -16,8 +16,9 @@ here are maintenance tools and are not part of the runtime.
 
 ## Authoritative sources and division of responsibility
 
-- `countries.js` determines which 196 countries are included in the quiz,
-  their Norwegian names and capitals, and exactly one quiz region per country.
+- `countries.js` determines which 197 countries and 30 other places are
+  learnable, their Norwegian names and civic centres, and exactly one quiz
+  region per place.
 - Natural Earth determines map outlines and geographic context, but must never
   automatically add or remove quiz countries.
 - `tools/map-sources.json` is the machine-readable manifest for the data
@@ -43,12 +44,12 @@ python3 tools/map_maintenance.py validate
 The validation requires only the Python 3 standard library and verifies, among
 other things:
 
-- 196 countries and unique codes
+- 227 learnable places and unique codes
 - valid single-region assignments
-- one local SVG flag per country
-- map geometry or a marker for every quiz country
-- one silhouette per country
-- the expected 202 capital markers across 194 silhouettes
+- one local SVG flag per place
+- map geometry or a marker for every learnable place
+- one silhouette per place
+- the expected 234 civic-centre markers across 225 silhouettes
 - complete coverage in each of the nine quiz-region maps and the Africa
   overview map
 - the expected Natural Earth version and projections
@@ -295,8 +296,8 @@ components do not automatically make the main region unreadable.
 Before replacing `world-map.js`:
 
 - Run local validation with the candidate data connected.
-- Confirm 196 countries, 196 flags, and 196 silhouettes.
-- Confirm 202 capital markers across 194 silhouettes, with none for Monaco or
+- Confirm 197 countries, 30 other places, 227 flags, and 227 silhouettes.
+- Confirm 234 civic-centre markers across 225 silhouettes, with none for Monaco or
   Vatican City.
 - Confirm that unavailable territories are map context and cannot be selected.
 - Check that Russia appears only in East and South Asia, and Cyprus and Türkiye

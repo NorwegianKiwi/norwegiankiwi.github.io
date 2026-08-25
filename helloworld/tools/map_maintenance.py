@@ -33,19 +33,33 @@ VALID_REGIONS = {
     "caribbean",
 }
 EXPECTED_REGION_COUNTS = {
-    "europe": 44,
-    "north-west-africa": 26,
-    "east-south-africa": 28,
+    "europe": 50,
+    "north-west-africa": 27,
+    "east-south-africa": 30,
     "west-central-asia": 24,
-    "east-south-asia": 25,
-    "oceania": 14,
-    "north-central-america": 10,
-    "south-america": 12,
-    "caribbean": 13,
+    "east-south-asia": 28,
+    "oceania": 21,
+    "north-central-america": 12,
+    "south-america": 14,
+    "caribbean": 21,
 }
-EXPECTED_CAPITAL_COUNTRIES = 194
-EXPECTED_CAPITAL_MARKERS = 202
+EXPECTED_CAPITAL_COUNTRIES = 225
+EXPECTED_CAPITAL_MARKERS = 234
 EXPECTED_CAPITAL_EXCLUSIONS = {"mc", "va"}
+
+ADDITIONAL_CENTRES = {
+    "id": [("Nusantara", "planned")],
+    "lk": [("Colombo", "secondary")],
+    "my": [("Putrajaya", "secondary")],
+}
+
+CENTRE_KINDS = {
+    "bo": {"La Paz": "secondary"},
+    "eh": {"Tifariti": "secondary"},
+    "id": {"Nusantara": "planned"},
+    "lk": {"Colombo": "secondary"},
+    "my": {"Putrajaya": "secondary"},
+}
 
 
 def valid_silhouette_frame(frame):
@@ -84,9 +98,13 @@ def load_countries():
         }
         for match in pattern.finditer(text)
     ]
-    if len(rows) != 196:
+    for row in rows:
+        row["capitals"].extend(
+            name for name, _kind in ADDITIONAL_CENTRES.get(row["code"], [])
+        )
+    if len(rows) != 227:
         raise ValueError(
-            f"Fant {len(rows)} landrader i countries.js; forventet 196. "
+            f"Fant {len(rows)} stedsrader i countries.js; forventet 227. "
             "Oppdater parseren hvis filformatet bevisst er endret."
         )
     return rows
@@ -164,6 +182,7 @@ def resolve_capital_points(rows, countries, manifest):
                         "name": capital,
                         "longitude": float(longitude),
                         "latitude": float(latitude),
+                        "kind": CENTRE_KINDS.get(code, {}).get(capital, "quiz"),
                     }
                 )
                 continue
@@ -217,6 +236,7 @@ def resolve_capital_points(rows, countries, manifest):
                     "name": capital,
                     "longitude": longitude,
                     "latitude": latitude,
+                    "kind": CENTRE_KINDS.get(code, {}).get(capital, "quiz"),
                 }
             )
         resolved[code] = points
@@ -610,6 +630,7 @@ def validate_local_data(map_path=None):
         changed_without_override = sorted(
             code
             for code in untouched_silhouette_codes
+            if code in checked_in["silhouettes"]
             if checked_in["silhouettes"].get(code)
             != map_data["silhouettes"].get(code)
         )

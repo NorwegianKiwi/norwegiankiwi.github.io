@@ -1,7 +1,7 @@
 # Hello World!
 
-A static, bilingual geography progression game covering 196 countries in 47
-levels and 188 fixed single-mode quizzes. It includes multiple local profiles,
+A static, bilingual geography progression game covering 197 countries and 30
+other places in 53 levels and 212 fixed single-mode quizzes. It includes multiple local profiles,
 best scores, resumable mastery challenges, progress transfer and backup, plus
 an independent, viewport-fitted Explore workspace with world, regional, and
 contextual country maps plus a country list and Flashcards action.
@@ -40,7 +40,7 @@ browser and in the Node-based domain tests.
 Import `fixtures/test-profiles-backup.json` through **Settings → Import backup
 file → Import all profiles** to add ten switchable test profiles. They cover a
 new player, played and partially mastered states, progression milestones, all
-regular levels complete, all but whole-world mastery, and all 188 quizzes
+regular levels complete, all but whole-world mastery, and all 212 quizzes
 mastered. Their IDs begin with `test-`, so importing the file again safely
 merges the same profiles instead of creating duplicates. Because imports never
 reduce progress, delete the existing `Test · …` profiles before re-importing if
@@ -84,8 +84,8 @@ node tests/challenge.test.js
 - `manifest.webmanifest` and `icons/` – installable web-app metadata and icons
 - `styles/` – presentation split into base, quiz, Explore, flashcard, and
   responsive stylesheets
-- `countries.js` – bilingual country and region data
-- `curriculum.js` – the 47 ordered levels, 188 quizzes, stable identities and
+- `countries.js` – bilingual place, relationship, civic-centre, and region data
+- `curriculum.js` – the 53 ordered levels, 212 quizzes, stable identities and
   deterministic curriculum attempt construction
 - `progress.js` – local profiles, progress derivation, persistence, transfer,
   backup and safe merging
@@ -99,7 +99,7 @@ node tests/challenge.test.js
 - `app.js` – application state, rendering, localization and interaction
   orchestration
 - `favicon.svg` – globe used as the favicon and hero decoration
-- `flags/` – the 196 flags used by the quiz, with
+- `flags/` – the 227 flags used by the quiz, with
   [source and update information](flags/README.md)
 - `licenses/` – licences for the flags, globe, and map sources
 
