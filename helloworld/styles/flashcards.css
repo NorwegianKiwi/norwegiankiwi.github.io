@@ -74,8 +74,8 @@
 
 .flashcard-answer .flashcard-relationship {
   max-width: min(680px, 92vw);
-  color: var(--green);
-  font-size: clamp(13px, 1.7vw, 17px);
+  color: var(--muted);
+  font-size: clamp(12px, 1.5vw, 15px);
   line-height: 1.2;
 }
 

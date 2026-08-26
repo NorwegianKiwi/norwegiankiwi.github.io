@@ -136,6 +136,8 @@
       flashcardsSummaryAfter: "flagg fra",
       revealedFlashcard:
         "{name}, {capital}. Trykk for neste flagg.",
+      revealedRelatedFlashcard:
+        "{name}, {capital} ({relationship}). Trykk for neste flagg.",
       hiddenFlashcard:
         "Flashcard {current} av {total}. Trykk for å vise svaret.",
       findFlag: "Finn flagget til",
@@ -261,6 +263,8 @@
       flashcardsSummaryAfter: "flags from",
       revealedFlashcard:
         "{name}, {capital}. Press for the next flag.",
+      revealedRelatedFlashcard:
+        "{name}, {capital} ({relationship}). Press for the next flag.",
       hiddenFlashcard:
         "Flashcard {current} of {total}. Press to reveal the answer.",
       findFlag: "Find the flag of",
@@ -587,6 +591,22 @@
 
   function placeStatus(place) {
     return place.status?.[state.locale] ?? null;
+  }
+
+  function placeRelationshipLabel(place) {
+    if (place.relatedCountryCode) {
+      const relatedCountry = countriesByCode.get(place.relatedCountryCode);
+      if (relatedCountry) return countryName(relatedCountry);
+    }
+    return placeStatus(place);
+  }
+
+  function hasSpecialCentres(place) {
+    return (
+      place.centres.length !== 1 ||
+      place.centres[0].role.en !== "Capital" ||
+      place.centres[0].role.nb !== "Hovedstad"
+    );
   }
 
   function centreRole(centre) {
@@ -1716,6 +1736,10 @@
 
   function countryDetailsDialogMarkup(country) {
     if (!country) return "";
+    const note = countryNote(country);
+    const showCentreExplanation = hasSpecialCentres(country) && !note;
+    const hasSupportingContent =
+      country.category === "other-place" || showCentreExplanation || Boolean(note);
     return `
       <div
         class="country-details-dialog"
@@ -1725,7 +1749,7 @@
         aria-labelledby="country-details-title"
         tabindex="-1"
       >
-        <div class="country-details-card ${countryNote(country) || country.category === "other-place" ? "has-note" : ""}">
+        <div class="country-details-card ${hasSupportingContent ? "has-supporting-content" : ""}">
           ${flagMarkup(country, "country-details-flag", true, true)}
           <h2 id="country-details-title">
             <span class="sr-only">${escapeHtml(t("countryDetails", {
@@ -1733,16 +1757,12 @@
             }))}</span>
             <span aria-hidden="true">${escapeHtml(countryName(country))}</span>
           </h2>
-          ${relationshipChipMarkup(country)}
-          <dl class="place-centres">
+          <p class="country-details-capital">${escapeHtml(countryCapital(country))}</p>
+          ${country.category === "other-place" ? `<div class="place-metadata">${relationshipChipMarkup(country)}${country.flagStatus === "established-local" ? `<p class="place-flag-status">${escapeHtml(t("establishedLocalFlag"))}</p>` : ""}</div>` : ""}
+          ${showCentreExplanation ? `<dl class="place-centres place-centres-explanation">
             ${country.centres.map((centre) => `<div class="place-centre place-centre-${centre.kind}"><dt>${escapeHtml(centreRole(centre))}</dt><dd>${escapeHtml(centre.name[state.locale])}</dd></div>`).join("")}
-          </dl>
-          ${country.flagStatus === "established-local" ? `<p class="place-flag-status">${escapeHtml(t("establishedLocalFlag"))}</p>` : ""}
-          ${
-            countryNote(country)
-              ? `<p class="country-note">${escapeHtml(countryNote(country))}</p>`
-              : ""
-          }
+          </dl>` : ""}
+          ${note ? `<p class="country-note">${escapeHtml(note)}</p>` : ""}
         </div>
       </div>
     `;
@@ -2662,6 +2682,9 @@
     }
 
     const country = state.flashcards[state.flashcardIndex];
+    const relationshipLabel = country.category === "other-place"
+      ? placeRelationshipLabel(country)
+      : null;
     const progress = ((state.flashcardIndex + 1) / state.flashcards.length) * 100;
     return `
       <main class="quiz-shell flashcard-shell">
@@ -2683,10 +2706,14 @@
           data-action="flashcard-toggle"
           aria-label="${
             state.flashcardRevealed
-              ? escapeHtml(`${t("revealedFlashcard", {
-                  name: countryName(country),
-                  capital: countryCapital(country),
-                })}${country.category === "other-place" ? ` ${placeStatus(country)}.` : ""}`)
+              ? escapeHtml(t(
+                  relationshipLabel ? "revealedRelatedFlashcard" : "revealedFlashcard",
+                  {
+                    name: countryName(country),
+                    capital: countryCapital(country),
+                    relationship: relationshipLabel,
+                  },
+                ))
               : escapeHtml(t("hiddenFlashcard", {
                   current: state.flashcardIndex + 1,
                   total: state.flashcards.length,
@@ -2696,7 +2723,7 @@
           ${flagMarkup(country, "flashcard-flag", state.flashcardRevealed, true)}
           <span class="flashcard-answer">
             ${state.flashcardRevealed
-              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(countryCapital(country))}</span>${country.category === "other-place" ? `<span class="flashcard-relationship">${escapeHtml(placeStatus(country))}</span>` : ""}`
+              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(countryCapital(country))}</span>${relationshipLabel ? `<span class="flashcard-relationship">(${escapeHtml(relationshipLabel)})</span>` : ""}`
               : `<strong class="flashcard-question" aria-hidden="true">?</strong>`}
           </span>
         </button>

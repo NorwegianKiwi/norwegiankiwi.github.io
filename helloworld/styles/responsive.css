@@ -569,7 +569,7 @@
     width: min(90vw, 82vh);
   }
 
-  .country-details-card.has-note .country-details-flag {
+  .country-details-card.has-supporting-content .country-details-flag {
     width: min(90vw, 60vh);
   }
 
@@ -734,6 +734,34 @@
  * changing portrait phones or regular-height tablets.
  */
 @media (orientation: landscape) and (max-height: 599px) {
+  .country-details-dialog {
+    padding: 8px;
+  }
+
+  .country-details-card {
+    max-height: calc(100dvh - 16px);
+    gap: 7px;
+  }
+
+  .country-details-card.has-supporting-content .country-details-flag {
+    width: min(82vw, 52vh);
+  }
+
+  .country-details-card h2 {
+    font-size: clamp(28px, 9dvh, 36px);
+  }
+
+  .country-details-capital {
+    margin-top: -4px;
+    font-size: clamp(14px, 4.5dvh, 18px);
+  }
+
+  .place-centres-explanation,
+  .country-note {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
   .app-header-mobile-sticky {
     position: sticky;
     z-index: 30;

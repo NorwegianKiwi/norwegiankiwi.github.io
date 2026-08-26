@@ -8,6 +8,7 @@ const curriculum = require("../curriculum.js");
 const { countries, otherPlaces, places } = global.GEOGRAFI_QUIZ_DATA;
 const countryCodes = new Set(countries.map((country) => country.code));
 const placeCodes = new Set(places.map((place) => place.code));
+const placesByCode = new Map(places.map((place) => [place.code, place]));
 const levels = curriculum.levels;
 const quizzes = levels.flatMap((level) => level.quizzes.map((quiz) => ({ ...quiz, level })));
 
@@ -68,6 +69,32 @@ assert.deepEqual(
   otherPlaces.map((place) => place.code).sort(),
 );
 assert.equal(curriculum.levelById.get("mastery-whole-world").countryCodes.length, 227);
+
+const relationshipLabel = (place, locale) =>
+  place.relatedCountryCode
+    ? placesByCode.get(place.relatedCountryCode).name[locale]
+    : place.status[locale];
+assert.equal(relationshipLabel(placesByCode.get("gl"), "en"), "Denmark");
+assert.equal(relationshipLabel(placesByCode.get("gl"), "nb"), "Danmark");
+assert.equal(relationshipLabel(placesByCode.get("eh"), "en"), "Disputed territory");
+assert.equal(relationshipLabel(placesByCode.get("eh"), "nb"), "Omstridt territorium");
+
+const hasSpecialCentres = (place) =>
+  place.centres.length !== 1 ||
+  place.centres[0].role.en !== "Capital" ||
+  place.centres[0].role.nb !== "Hovedstad";
+assert.deepEqual(
+  places.filter(hasSpecialCentres).map((place) => place.code).sort(),
+  ["bo", "eh", "id", "lk", "my", "nr", "ps", "sz", "za"],
+);
+assert.equal(placesByCode.get("za").note, null);
+assert.deepEqual(
+  placesByCode.get("za").centres.map((centre) => centre.role.en),
+  ["Administrative capital", "Legislative capital", "Judicial capital"],
+);
+assert.ok(placesByCode.get("eh").note?.en);
+assert.equal(placesByCode.get("yt").relatedCountryCode, "fr");
+assert.equal(placesByCode.get("yt").flagStatus, "established-local");
 
 const quiz = curriculum.quizById.get("pack-nordics:country-flag");
 assert.deepEqual(curriculum.fixedAlternativeCodes(quiz), curriculum.fixedAlternativeCodes(quiz));

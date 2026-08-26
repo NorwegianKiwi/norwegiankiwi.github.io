@@ -145,7 +145,7 @@ const countries = [
   { code: "sc", region: "east-south-africa", name: { nb: "Seychellene", en: "Seychelles" }, capital: { nb: "Victoria", en: "Victoria" } },
   { code: "sl", region: "north-west-africa", name: { nb: "Sierra Leone", en: "Sierra Leone" }, capital: { nb: "Freetown", en: "Freetown" } },
   { code: "so", region: "east-south-africa", name: { nb: "Somalia", en: "Somalia" }, capital: { nb: "Mogadishu", en: "Mogadishu" } },
-  { code: "za", region: "east-south-africa", name: { nb: "Sør-Afrika", en: "South Africa" }, capital: { nb: "Pretoria / Cape Town / Bloemfontein", en: "Pretoria / Cape Town / Bloemfontein" }, note: { nb: "Sør-Afrika har tre hovedsteder: Pretoria er administrativ hovedstad, Cape Town er lovgivende hovedstad, og Bloemfontein er juridisk hovedstad.", en: "South Africa has three capitals: Pretoria is the administrative capital, Cape Town is the legislative capital, and Bloemfontein is the judicial capital." } },
+  { code: "za", region: "east-south-africa", name: { nb: "Sør-Afrika", en: "South Africa" }, capital: { nb: "Pretoria / Cape Town / Bloemfontein", en: "Pretoria / Cape Town / Bloemfontein" } },
   { code: "ss", region: "east-south-africa", name: { nb: "Sør-Sudan", en: "South Sudan" }, capital: { nb: "Juba", en: "Juba" } },
   { code: "sd", region: "east-south-africa", name: { nb: "Sudan", en: "Sudan" }, capital: { nb: "Khartoum", en: "Khartoum" } },
   { code: "tz", region: "east-south-africa", name: { nb: "Tanzania", en: "Tanzania" }, capital: { nb: "Dodoma", en: "Dodoma" } },

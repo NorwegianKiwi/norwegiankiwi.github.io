@@ -815,7 +815,7 @@ body.modal-open {
   box-shadow: 0 20px 70px rgba(0, 0, 0, 0.42);
 }
 
-.country-details-card.has-note .country-details-flag {
+.country-details-card.has-supporting-content .country-details-flag {
   width: min(700px, 82vw, 68vh);
 }
 
@@ -830,7 +830,14 @@ body.modal-open {
 .country-details-capital {
   margin: -8px 0 0;
   color: rgba(255, 255, 255, 0.78);
-  font-size: clamp(14px, 2vw, 18px);
+  font-size: clamp(16px, 2.2vw, 21px);
+  line-height: 1.25;
+}
+
+.place-metadata {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
 }
 
 .place-relationship-chip {
@@ -846,15 +853,20 @@ body.modal-open {
 
 .place-relationship-chip img,
 .relationship-chip-special {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 20px;
   flex: none;
   border: 2px solid rgba(255, 255, 255, 0.72);
-  border-radius: 50%;
-  object-fit: cover;
+  border-radius: 4px;
+  background: #fff;
+  object-fit: contain;
 }
 
 .relationship-chip-special {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: transparent;
   display: grid;
   place-items: center;
 }
@@ -866,9 +878,17 @@ body.modal-open {
 
 .explore-country-status .place-relationship-chip img,
 .explore-country-status .relationship-chip-special {
+  border-color: #fff;
+}
+
+.explore-country-status .place-relationship-chip img {
+  width: 22px;
+  height: 16px;
+}
+
+.explore-country-status .relationship-chip-special {
   width: 17px;
   height: 17px;
-  border-color: #fff;
 }
 
 .place-centres {
@@ -876,6 +896,13 @@ body.modal-open {
   margin: -5px 0 0;
   display: grid;
   gap: 5px;
+}
+
+.place-centres-explanation {
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .place-centre {
@@ -900,7 +927,7 @@ body.modal-open {
 }
 
 .place-flag-status {
-  margin: -4px 0 0;
+  margin: 0;
   color: rgba(255, 255, 255, 0.62);
   font-size: 12px;
 }
