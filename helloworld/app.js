@@ -293,6 +293,7 @@
     nb: Object.freeze({
       startGame: "Start spillet", continueGame: "Fortsett spillet", exploreWorld: "Utforsk verden",
       viewLevels: "Se alle nivåer", levels: "Nivåer", level: "Nivå {number}",
+      levelRange: "Nivå {start}–{end}",
       levelsMastered: "{count} av {total} nivåer mestret", quizzesMastered: "{count} av 4 quizer mestret",
       mastered: "mestret", unplayed: "Ikke spilt", recommended: "Anbefalt neste",
       profileMenu: "Profil og innstillinger", addProfile: "Legg til profil", renameProfile: "Gi profilen nytt navn",
@@ -323,6 +324,7 @@
     en: Object.freeze({
       startGame: "Start game", continueGame: "Continue game", exploreWorld: "Explore the world",
       viewLevels: "View all levels", levels: "Levels", level: "Level {number}",
+      levelRange: "Levels {start}–{end}",
       levelsMastered: "{count} of {total} levels mastered", quizzesMastered: "{count} of 4 quizzes mastered",
       mastered: "mastered", unplayed: "Unplayed", recommended: "Recommended next",
       profileMenu: "Profile and settings", addProfile: "Add profile", renameProfile: "Rename profile",
@@ -1382,7 +1384,7 @@
           <h3>${t("backupDevice")}</h3>
           <div class="profile-actions">
             <button class="secondary-button" data-action="download-backup">${t("downloadBackup")}</button>
-            <label class="secondary-button file-button">${t("importBackup")}<input type="file" accept="application/json,.json,.hello-world-backup" data-backup-input /></label>
+            <label class="secondary-button file-button" role="button" tabindex="0">${t("importBackup")}<input type="file" tabindex="-1" accept="application/json,.json,.hello-world-backup" data-backup-input /></label>
           </div>
           <hr />
           <div class="profile-danger-actions">
@@ -1411,7 +1413,6 @@
     const allMastered = next.type === "all-mastered";
     const quiz = allMastered ? null : curriculum.quizById.get(next.quiz.id);
     const level = quiz ? curriculum.levels[quiz.levelIndex] : null;
-    const levelValue = level ? progress.levelProgress(profile, level) : null;
     const hasPlayed = totals.playedQuizzes > 0;
     const hasUpdatedQuiz = curriculum.levels.some((candidateLevel) => candidateLevel.quizzes.some((baseQuiz) => {
       const quiz = curriculum.quizById.get(baseQuiz.id);
@@ -1435,7 +1436,7 @@
           <button class="home-action-card continue-card" data-action="${allMastered ? "surprise-quiz" : "continue-game"}">
             <span class="home-action-icon" aria-hidden="true">${allMastered ? "✦" : "→"}</span>
             <span><strong>${allMastered ? t("surpriseQuiz") : hasPlayed ? t("continueGame") : t("startGame")}</strong>
-            ${quiz ? `<small>${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(levelTitle(level))}<br>${escapeHtml(modeLabel(quiz.mode))} · ${levelValue.mastered}/4 ${t("mastered")}</small>` : `<small>${curriculum.levels.length} / ${curriculum.levels.length} · ${curriculum.levels.length * 4} / ${curriculum.levels.length * 4}</small>`}</span>
+            ${quiz ? `<small>${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(modeLabel(quiz.mode))}</small>` : ""}</span>
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
@@ -1451,8 +1452,7 @@
     const recommendedControl = next.type === "quiz"
       ? `<button class="quiet-button levels-recommended-button" data-action="show-recommended-next" aria-label="${escapeHtml(t("goToRecommended"))}"><span class="levels-recommended-wide">${t("recommended")}</span><span class="levels-recommended-short">${t("nextShort")}</span><span aria-hidden="true">↓</span></button>`
       : "";
-    return `<main class="site-shell levels-shell"><header class="quiz-header app-header app-header-sticky levels-header">${brandMarkup(true, false)}<h1 class="levels-header-title">${t("levels")}</h1><div class="levels-header-actions">${recommendedControl}${homeButtonMarkup()}</div></header>
-      <div class="levels-list">${curriculum.levels.map((level, levelIndex) => {
+    const levelMarkup = (level, levelIndex) => {
         const value = progress.levelProgress(profile, level);
         const isMastery = level.kind.includes("mastery");
         return `<section class="level-card ${value.mastered === 4 ? "is-mastered" : value.played ? "is-progress" : "is-unplayed"}" id="level-${escapeHtml(level.id)}">
@@ -1464,6 +1464,18 @@
             const quiz = curriculum.quizById.get(baseQuiz.id); const record = progress.currentRecord(profile, quiz); const status = progress.quizState(profile, quiz); const recommended = next.type === "quiz" && next.quiz.id === quiz.id;
             return `<button class="quiz-row ${recommended ? "is-recommended" : ""}" data-action="start-curriculum-quiz" data-quiz-id="${quiz.id}"><span>${escapeHtml(modeLabel(quiz.mode))}${recommended ? `<small>${t("recommended")}</small>` : ""}</span><span>${status === "mastered" ? `<span class="quiz-mastery-status" aria-label="${record.bestScore}/${record.total} · ${t("quizMastered")}"><span>${record.bestScore}/${record.total}</span><span class="mastery-check" aria-hidden="true">✓</span></span>` : status === "played" ? `${record.bestScore}/${record.total}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span></button>`;
           }).join("")}</div></div>` : ""}
+        </section>`;
+      };
+    return `<main class="site-shell levels-shell"><header class="quiz-header app-header app-header-sticky levels-header">${brandMarkup(true, false)}<h1 class="levels-header-title">${t("levels")}</h1><div class="levels-header-actions">${recommendedControl}${homeButtonMarkup()}</div></header>
+      <div class="levels-list">${curriculum.sections.map((section) => {
+        const headingId = `level-section-${section.id}`;
+        return `<section class="level-section level-section-${escapeHtml(section.id)}" aria-labelledby="${headingId}">
+          <header class="level-section-heading" id="${headingId}">
+            <span class="level-section-icon" aria-hidden="true">${section.icon}</span>
+            <span class="level-section-copy"><strong>${escapeHtml(section.title[state.locale])}</strong><small>${escapeHtml(section.description[state.locale])}</small></span>
+            <span class="level-section-range">${t("levelRange", { start: section.startLevel, end: section.endLevel })}</span>
+          </header>
+          <div class="level-section-list">${curriculum.levels.slice(section.startLevel - 1, section.endLevel).map((level, offset) => levelMarkup(level, section.startLevel - 1 + offset)).join("")}</div>
         </section>`;
       }).join("")}</div></main>`;
   }
@@ -4035,6 +4047,13 @@
       state.importProfiles = progress.parseBackup(await event.target.files[0].text());
       state.importError = false; state.profilePanelOpen = false; state.screen = "import"; renderAtTop();
     } catch { state.importProfiles = null; state.importError = true; state.profilePanelOpen = false; state.screen = "import"; renderAtTop(); }
+  });
+
+  app.addEventListener("keydown", (event) => {
+    const fileButton = event.target.closest?.(".file-button");
+    if (!fileButton || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    fileButton.querySelector("[data-backup-input]")?.click();
   });
 
   app.addEventListener("keydown", (event) => {

@@ -19,6 +19,25 @@ assert.equal(new Set(levels.map((level) => level.id)).size, 53);
 assert.equal(quizzes.length, 212);
 assert.equal(new Set(quizzes.map((quiz) => quiz.id)).size, 212);
 
+assert.deepEqual(
+  curriculum.sections.map(({ id, startLevel, endLevel }) => [id, startLevel, endLevel]),
+  [
+    ["traveller", 1, 4],
+    ["explorer", 5, 14],
+    ["navigator", 15, 33],
+    ["globetrotter", 34, 41],
+    ["world-master", 42, 53],
+  ],
+);
+const sectionLevelNumbers = curriculum.sections.flatMap((section) =>
+  Array.from({ length: section.endLevel - section.startLevel + 1 }, (_, index) => section.startLevel + index),
+);
+assert.deepEqual(sectionLevelNumbers, Array.from({ length: levels.length }, (_, index) => index + 1));
+for (const section of curriculum.sections) {
+  assert.ok(section.title.nb && section.title.en, section.id);
+  assert.ok(section.description.nb && section.description.en, section.id);
+}
+
 for (const level of levels) {
   assert.equal(level.quizzes.length, 4, level.id);
   assert.deepEqual(level.quizzes.map((quiz) => quiz.mode), curriculum.MODES, level.id);
