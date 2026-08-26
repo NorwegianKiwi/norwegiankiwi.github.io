@@ -672,12 +672,16 @@
     return regionsById.get(state.region);
   }
 
+  function relationshipSpecialIconMarkup(className) {
+    return `<span class="${className}" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16"/></svg></span>`;
+  }
+
   function relationshipBadgeMarkup(country) {
     if (country.category !== "other-place") return "";
     if (country.relatedCountryCode) {
       return `<span class="relationship-badge" aria-hidden="true"><img src="./flags/${country.relatedCountryCode}.svg" alt="" draggable="false" /></span>`;
     }
-    return `<span class="relationship-badge relationship-badge-special" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16"/></svg></span>`;
+    return relationshipSpecialIconMarkup("relationship-badge relationship-badge-special");
   }
 
   function flagMarkup(country, className = "", revealName = false, showRelationship = false) {
@@ -697,7 +701,7 @@
     if (!status) return "";
     const icon = country.relatedCountryCode
       ? `<img src="./flags/${country.relatedCountryCode}.svg" alt="" aria-hidden="true" draggable="false" />`
-      : `<span class="relationship-chip-special" aria-hidden="true">◎</span>`;
+      : relationshipSpecialIconMarkup("relationship-chip-special");
     return `<span class="place-relationship-chip">${icon}<span>${escapeHtml(status)}</span></span>`;
   }
 

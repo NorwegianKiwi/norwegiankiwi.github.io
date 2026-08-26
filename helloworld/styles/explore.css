@@ -851,24 +851,31 @@ body.modal-open {
   line-height: 1.25;
 }
 
-.place-relationship-chip img,
-.relationship-chip-special {
-  width: 28px;
-  height: 20px;
+.place-relationship-chip img {
+  width: 24px;
+  height: 18px;
   flex: none;
-  border: 2px solid rgba(255, 255, 255, 0.72);
-  border-radius: 4px;
-  background: #fff;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   object-fit: contain;
 }
 
 .relationship-chip-special {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: transparent;
+  width: 17px;
+  height: 17px;
+  flex: none;
   display: grid;
   place-items: center;
+  color: currentColor;
+}
+
+.relationship-chip-special svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
 }
 
 .explore-country-status .place-relationship-chip {
@@ -876,19 +883,40 @@ body.modal-open {
   font-size: 11px;
 }
 
-.explore-country-status .place-relationship-chip img,
-.explore-country-status .relationship-chip-special {
-  border-color: #fff;
-}
-
 .explore-country-status .place-relationship-chip img {
-  width: 22px;
-  height: 16px;
+  width: 20px;
+  height: 15px;
 }
 
 .explore-country-status .relationship-chip-special {
   width: 17px;
   height: 17px;
+}
+
+.explore-status-flag .relationship-badge {
+  width: 22px;
+  border-width: 1px;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(24, 35, 29, 0.28);
+}
+
+.explore-country-flag .relationship-badge {
+  width: 20px;
+  border-width: 1px;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(24, 35, 29, 0.24);
+}
+
+.explore-status-flag .relationship-badge-special {
+  width: 18px;
+  border: 0;
+  box-shadow: none;
+}
+
+.explore-country-flag .relationship-badge-special {
+  width: 16px;
+  border: 0;
+  box-shadow: none;
 }
 
 .place-centres {
