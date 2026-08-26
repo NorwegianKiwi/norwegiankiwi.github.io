@@ -314,7 +314,8 @@
       playedAndMastered: "{played} quizer spilt · {mastered} mestret", invalidImport: "Lenken eller sikkerhetskopien er ugyldig.",
       storageReadFailed: "Lagret fremgang kunne ikke leses. Du kan fortsatt utforske og spille.",
       storageWriteFailed: "Fremgangen kunne ikke lagres på denne enheten.",
-      quizMastered: "Quiz mestret", quizNotMastered: "Ikke helt ennå", bestScore: "Beste resultat: {score}/{total}",
+      quizMastered: "Quiz mestret", quizNotMastered: "Ikke helt ennå", scoreOutOf: "av {total}",
+      scoreAnnouncement: "{score} av {total}", newRecord: "Ny rekord!", recordScore: "Rekord: {score} av {total}",
       nextQuiz: "Neste quiz", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
       reviewCards: "Øv med flashcards", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
       worldMastered: "Verden mestret", surpriseQuiz: "Overraskelsesquiz", chooseLevel: "Velg nivå",
@@ -345,7 +346,8 @@
       playedAndMastered: "{played} quizzes played · {mastered} mastered", invalidImport: "This link or backup file is invalid.",
       storageReadFailed: "Saved progress could not be read. You can still explore and play.",
       storageWriteFailed: "Progress could not be saved on this device.",
-      quizMastered: "Quiz mastered", quizNotMastered: "Not quite yet", bestScore: "Best score: {score}/{total}",
+      quizMastered: "Quiz mastered", quizNotMastered: "Not quite yet", scoreOutOf: "of {total}",
+      scoreAnnouncement: "{score} of {total}", newRecord: "New record!", recordScore: "Record: {score} of {total}",
       nextQuiz: "Next quiz", tryAgainAction: "Try again", playAgain: "Play again",
       reviewCards: "Review with flashcards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
       worldMastered: "World mastered", surpriseQuiz: "Surprise quiz", chooseLevel: "Choose a level",
@@ -446,7 +448,10 @@
     attemptAnswers: [],
     resultRecorded: false,
     resultBestScore: null,
+    resultPreviousBestScore: null,
+    resultNewQuizMastery: false,
     resultNewLevelMastery: false,
+    resultCelebrationPending: false,
     profilePanelOpen: false,
     importProfiles: transferPreview,
     importError: transferError,
@@ -1700,11 +1705,20 @@
     const quiz = curriculumQuiz();
     const level = curriculumLevel();
     const perfect = state.score === state.questions.length;
-    const record = progress.currentRecord(currentProfile(), quiz);
-    const best = record?.bestScore ?? state.score;
+    const best = state.resultBestScore ?? state.score;
+    const isNewRecord = !perfect && state.resultPreviousBestScore !== null && state.score > state.resultPreviousBestScore;
+    const recordMarkup = isNewRecord
+      ? `<span class="result-record is-new-record">${t("newRecord")}</span>`
+      : best > state.score
+        ? `<span class="result-record">${t("recordScore", { score: best, total: state.questions.length })}</span>`
+        : "";
+    const replayIcon = `<span class="result-replay-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M20 11a8 8 0 1 0-2.35 5.65M20 4v7h-7" /></svg></span>`;
+    const levelMasteryMarkup = state.resultNewLevelMastery
+      ? `<div class="level-mastered-celebration ${state.resultCelebrationPending ? "is-celebrating" : ""}"><p class="level-mastered-callout" aria-label="${escapeHtml(levelTitle(level))} · 4/4 ${t("mastered")}"><span>${escapeHtml(levelTitle(level))} · 4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></p><span class="mastery-sparkles" aria-hidden="true">${Array.from({ length: 8 }, (_, index) => `<i style="--spark-index:${index}"></i>`).join("")}</span></div>`
+      : "";
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
-      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score"><strong>${state.score}/${state.questions.length}</strong><span>${t("bestScore", { score: best, total: state.questions.length })}</span></div>${state.resultNewLevelMastery ? `<p class="level-mastered-callout" aria-label="${escapeHtml(levelTitle(level))} · 4/4 ${t("mastered")}"><span>${escapeHtml(levelTitle(level))} · 4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></p>` : ""}${challengeComparisonMarkup()}</div>
-      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? t("playAgain") : t("nextQuiz")}</button></div><button class="secondary-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
+      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
+      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button result-replay-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? `${replayIcon}${t("playAgain")}` : t("nextQuiz")}</button></div><button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
       <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}</main>`;
   }
 
@@ -3013,6 +3027,7 @@
       : null;
     updateDocumentMetadata();
     app.innerHTML = screenMarkup();
+    if (state.screen === "result") state.resultCelebrationPending = false;
     if (exploreListScrollTop !== null) {
       const exploreList = app.querySelector(".explore-country-list");
       if (exploreList) exploreList.scrollTop = exploreListScrollTop;
@@ -3485,12 +3500,17 @@
     const quiz = curriculumQuiz();
     if (!quiz || state.resultRecorded) return;
     const level = curriculumLevel();
+    const previousRecord = progress.currentRecord(currentProfile(), quiz);
+    const previousQuizState = progress.quizState(currentProfile(), quiz);
     const before = progress.levelProgress(currentProfile(), level).mastered;
+    state.resultPreviousBestScore = previousRecord?.bestScore ?? null;
     progressStore = progress.recordResult(progressStore, progressStore.activeProfileId, quiz, state.score);
     if (isMasteryQuiz(quiz)) progressStore = progress.abandonMasteryAttempt(progressStore, progressStore.activeProfileId);
     persist(progressStore);
     state.resultBestScore = progress.currentRecord(currentProfile(), quiz)?.bestScore ?? state.score;
+    state.resultNewQuizMastery = previousQuizState !== "mastered" && state.score === quiz.countryCodes.length;
     state.resultNewLevelMastery = before < 4 && progress.levelProgress(currentProfile(), level).mastered === 4;
+    state.resultCelebrationPending = state.resultNewQuizMastery || state.resultNewLevelMastery;
     state.resultRecorded = true;
   }
 
@@ -3532,7 +3552,9 @@
     }
     const regions = new Set(quiz.countryCodes.map((code) => countriesByCode.get(code)?.region));
     state.region = quiz.region ?? (regions.size === 1 ? [...regions][0] : "world");
-    state.silhouetteExpanded = false; state.resultRecorded = false; state.resultNewLevelMastery = false;
+    state.silhouetteExpanded = false; state.resultRecorded = false; state.resultBestScore = null;
+    state.resultPreviousBestScore = null; state.resultNewQuizMastery = false; state.resultNewLevelMastery = false;
+    state.resultCelebrationPending = false;
     state.screen = "quiz";
     if (savedAttempt && savedAttempt.questionIndex >= state.questions.length && !savedAttempt.correctionPending) {
       state.questionIndex = state.questions.length - 1; state.resultRecorded = false; finishCurriculumAttempt(); state.screen = "result";

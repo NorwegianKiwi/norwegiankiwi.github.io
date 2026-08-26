@@ -101,14 +101,40 @@
 .level-practice-icon span { position:absolute; inset:.2rem .05rem .05rem .35rem; border:1.5px solid var(--green); border-radius:.3rem; background:#fff; transform:rotate(4deg); }
 .level-practice-icon span:first-child { inset:.05rem .3rem .2rem .05rem; background:#f8fbf9; transform:rotate(-5deg); }
 
-.curriculum-result-score { display:flex; align-items:baseline; justify-content:center; flex-wrap:wrap; gap:.8rem; margin:1.4rem 0; }
-.curriculum-result-score strong { font-size:clamp(3rem,8vw,6rem); line-height:1; }
-.curriculum-result-score span { color:var(--muted); font-weight:650; }
+.curriculum-result-score { width:min(22rem,100%); margin:1.35rem auto; padding:1rem 1.25rem .9rem; border:1px solid rgba(36,93,69,.18); border-radius:1.35rem; background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(223,236,227,.56)); box-shadow:0 12px 30px rgba(36,93,69,.09); }
+.result-score-value { display:flex; align-items:baseline; justify-content:center; gap:.5rem; line-height:1; }
+.result-score-value strong { font-size:clamp(4rem,10vw,7rem); letter-spacing:-.065em; }
+.result-score-value span { color:var(--muted); font-size:clamp(1rem,2.5vw,1.35rem); font-weight:750; }
+.result-record { display:block; width:fit-content; margin:.55rem auto 0; color:var(--muted); font-size:.9rem; font-weight:750; }
+.result-record.is-new-record { padding:.3rem .7rem; border-radius:999px; background:var(--gold-soft); color:#76550b; box-shadow:0 3px 10px rgba(113,87,22,.1); }
 .result-mastery-title { display:flex; align-items:center; justify-content:center; gap:.8rem; }
 .result-mastery-check { width:2.6rem; height:2.6rem; border:2px solid rgba(20,122,67,.2); border-radius:50%; background:#e3f2e8; font-size:1.7rem; box-shadow:0 5px 12px rgba(20,122,67,.12); }
+.result-mastery-check.is-celebrating { animation:mastery-pop 620ms cubic-bezier(.2,.85,.32,1.35) both; }
+.level-mastered-celebration { position:relative; display:inline-grid; place-items:center; }
 .level-mastered-callout { display:inline-flex; align-items:center; justify-content:center; gap:.65rem; padding:.65rem .7rem .65rem 1rem; border:1px solid #c7ddce; border-radius:999px; background:#e4f0e9; font-weight:800; }
+.level-mastered-celebration.is-celebrating .mastery-trophy { animation:mastery-pop 700ms 90ms cubic-bezier(.2,.85,.32,1.35) both; }
+.mastery-sparkles { position:absolute; width:4.6rem; height:4.6rem; right:-1rem; top:50%; pointer-events:none; transform:translateY(-50%); }
+.mastery-sparkles i { --spark-angle:calc(var(--spark-index) * 45deg); position:absolute; width:.42rem; height:.42rem; left:50%; top:50%; border-radius:50%; background:var(--gold); opacity:0; transform:translate(-50%,-50%) rotate(var(--spark-angle)) translateY(0) scale(.2); }
+.mastery-sparkles i:nth-child(even) { background:#49a06d; border-radius:1px; }
+.level-mastered-celebration.is-celebrating .mastery-sparkles i { animation:mastery-spark 700ms 150ms ease-out both; }
+.result-replay-button { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; }
+.result-replay-icon { display:inline-grid; width:1.15rem; height:1.15rem; place-items:center; }
+.result-replay-icon svg { display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .challenge-share-actions { margin-top:1rem; }
-.result-level-button { width:min(250px,100%); min-height:46px; margin-top:2px; }
+.result-level-button { margin-top:0; padding:.65rem 1rem; }
+
+@keyframes mastery-pop {
+  0% { transform:scale(.72); opacity:.35; }
+  58% { transform:scale(1.28); opacity:1; }
+  78% { transform:scale(.94); }
+  100% { transform:scale(1); opacity:1; }
+}
+
+@keyframes mastery-spark {
+  0% { opacity:0; transform:translate(-50%,-50%) rotate(var(--spark-angle)) translateY(0) scale(.2); }
+  32% { opacity:1; }
+  100% { opacity:0; transform:translate(-50%,-50%) rotate(var(--spark-angle)) translateY(-2.1rem) scale(1); }
+}
 .import-card { max-width:44rem; }
 .import-list { display:grid; gap:.6rem; margin:1.5rem 0; }
 .import-list article { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem; border:1px solid #d8d2c5; border-radius:.8rem; }
@@ -159,5 +185,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .profile-panel,.home-action-card,.progress-globe,.levels-recommended-float { transition:none !important; animation:none !important; }
+  .profile-panel,.home-action-card,.progress-globe,.levels-recommended-float,.result-mastery-check,.mastery-trophy,.mastery-sparkles i { transition:none !important; animation:none !important; }
 }
