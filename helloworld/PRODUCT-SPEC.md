@@ -132,7 +132,7 @@ region, mode or difficulty:
 3. After all regular levels are mastered, continue through regional mastery
    and then whole-world mastery.
 4. If everything is mastered, return an explicit completed-world state whose
-   primary action is **Play a surprise quiz** and whose secondary action is
+   primary action is **Surprise quiz** and whose secondary action is
    **Choose a level**.
 
 Because all content remains open, a player can ignore Continue and choose a
@@ -399,7 +399,7 @@ The completed progress globe carries a static trophy badge as an additional
 visual celebration; the heading and counts remain the accessible statement of
 the achievement.
 
-The primary action is **Play a surprise quiz**, selecting a mastered quiz that
+The primary action is **Surprise quiz**, selecting a mastered quiz that
 has not been played recently. **Choose a level** is secondary. Creating another
 profile remains available through the profile menu, and Clear progress remains
 in Settings behind confirmation.

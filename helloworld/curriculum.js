@@ -79,27 +79,22 @@
     Object.freeze({
       id: "traveller", icon: "🎒", startLevel: 1, endLevel: 4,
       title: Object.freeze({ nb: "Reisende", en: "Traveller" }),
-      description: Object.freeze({ nb: "En vennlig første reise", en: "A friendly first journey" }),
     }),
     Object.freeze({
       id: "explorer", icon: "🧭", startLevel: 5, endLevel: 14,
       title: Object.freeze({ nb: "Oppdager", en: "Explorer" }),
-      description: Object.freeze({ nb: "Oppdag mer av verden", en: "Discover more of the world" }),
     }),
     Object.freeze({
       id: "navigator", icon: "🗺️", startLevel: 15, endLevel: 33,
       title: Object.freeze({ nb: "Veiviser", en: "Navigator" }),
-      description: Object.freeze({ nb: "Større utfordringer", en: "Broader challenges" }),
     }),
     Object.freeze({
       id: "globetrotter", icon: "🌍", startLevel: 34, endLevel: 41,
       title: Object.freeze({ nb: "Verdensvandrer", en: "Globetrotter" }),
-      description: Object.freeze({ nb: "Vanskelige steder og territorier", en: "Tricky places and territories" }),
     }),
     Object.freeze({
       id: "world-master", icon: "🏆", startLevel: 42, endLevel: 53,
       title: Object.freeze({ nb: "Verdensmester", en: "World Master" }),
-      description: Object.freeze({ nb: "Lange mestringsutfordringer", en: "Long mastery challenges" }),
     }),
   ]);
 

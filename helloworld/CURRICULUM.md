@@ -207,13 +207,13 @@ The Levels screen groups the curriculum into five open journey stages. These
 stages communicate increasing challenge; they do not lock levels or represent
 a formally earned player rank.
 
-| Levels | Norwegian | English | Description |
-|---:|---|---|---|
-| 1–4 | Reisende | Traveller | A friendly first journey |
-| 5–14 | Oppdager | Explorer | Discover more of the world |
-| 15–33 | Veiviser | Navigator | Broader challenges |
-| 34–41 | Verdensvandrer | Globetrotter | Tricky places and territories |
-| 42–53 | Verdensmester | World Master | Long mastery challenges |
+| Levels | Norwegian | English |
+|---:|---|---|
+| 1–4 | Reisende | Traveller |
+| 5–14 | Oppdager | Explorer |
+| 15–33 | Veiviser | Navigator |
+| 34–41 | Verdensvandrer | Globetrotter |
+| 42–53 | Verdensmester | World Master |
 
 Quiz states:
 

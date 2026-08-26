@@ -312,9 +312,9 @@
       quizMastered: "Quiz mestret", quizNotMastered: "Ikke helt ennå", bestScore: "Beste resultat: {score}/{total}",
       nextQuiz: "Neste quiz", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
       reviewCards: "Øv med flashcards", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
-      worldMastered: "Verden mestret", surpriseQuiz: "Spill en overraskelsesquiz", chooseLevel: "Velg nivå",
+      worldMastered: "Verden mestret", surpriseQuiz: "Overraskelsesquiz", chooseLevel: "Velg nivå",
       shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre en venn",
-      nextShort: "Neste", goToRecommended: "Gå til anbefalt neste quiz",
+      goToRecommended: "Gå til anbefalt neste quiz",
       cards: "Øv med flashcards", questionsLong: "{count} spørsmål · lang utfordring",
       resumeAttempt: "Fortsett lagret forsøk", abandonAttempt: "Et langt mestringsforsøk er lagret. Starte en annen quiz og forkaste forsøket?",
       savedAttempt: "Du har et lagret forsøk på {title}.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
@@ -343,9 +343,9 @@
       quizMastered: "Quiz mastered", quizNotMastered: "Not quite yet", bestScore: "Best score: {score}/{total}",
       nextQuiz: "Next quiz", tryAgainAction: "Try again", playAgain: "Play again",
       reviewCards: "Review with flashcards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
-      worldMastered: "World mastered", surpriseQuiz: "Play a surprise quiz", chooseLevel: "Choose a level",
+      worldMastered: "World mastered", surpriseQuiz: "Surprise quiz", chooseLevel: "Choose a level",
       shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge a friend",
-      nextShort: "Next", goToRecommended: "Go to the recommended next quiz",
+      goToRecommended: "Go to the recommended next quiz",
       cards: "Practice with flashcards", questionsLong: "{count} questions · long challenge",
       resumeAttempt: "Resume saved attempt", abandonAttempt: "A long mastery attempt is saved. Start another quiz and abandon it?",
       savedAttempt: "You have a saved attempt for {title}.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
@@ -482,6 +482,7 @@
   let exploreMapUiFrame = null;
   let responsiveMapFrame = null;
   let scrollAffordanceFrame = null;
+  let recommendedNavigationFrame = null;
   let suppressExploreMapClickUntil = 0;
   const exploreMapMaxZoom = 8;
   const exploreMapZoomLevels = [1, 1.5, 2, 3, 4, 6, 8];
@@ -527,6 +528,12 @@
     return id ? curriculum.levelById.get(id) ?? null : null;
   }
   function levelTitle(level) { return level?.title?.[state.locale] ?? ""; }
+  function sectionForLevelIndex(levelIndex) {
+    const levelNumber = levelIndex + 1;
+    return curriculum.sections.find(
+      (section) => levelNumber >= section.startLevel && levelNumber <= section.endLevel,
+    ) ?? null;
+  }
   function modeLabel(modeId) {
     const mode = modesById.get(modeId);
     return mode ? t(mode.shortLabelKey) : "";
@@ -1414,6 +1421,11 @@
     const quiz = allMastered ? null : curriculum.quizById.get(next.quiz.id);
     const level = quiz ? curriculum.levels[quiz.levelIndex] : null;
     const hasPlayed = totals.playedQuizzes > 0;
+    const continueIcon = allMastered
+      ? "✦"
+      : hasPlayed && quiz
+        ? sectionForLevelIndex(quiz.levelIndex)?.icon ?? "→"
+        : "→";
     const hasUpdatedQuiz = curriculum.levels.some((candidateLevel) => candidateLevel.quizzes.some((baseQuiz) => {
       const quiz = curriculum.quizById.get(baseQuiz.id);
       const entry = profile.quizProgress?.[quiz.id];
@@ -1434,9 +1446,9 @@
         ${savedQuiz ? `<section class="saved-attempt-card"><p>${t("savedAttempt", { title: levelTitle(curriculum.levelById.get(savedQuiz.levelId)) })}</p><button class="secondary-button" data-action="resume-mastery">${t("resumeAttempt")}</button></section>` : ""}
         <section class="home-primary-actions" aria-label="${escapeHtml(t("chooseActivity"))}">
           <button class="home-action-card continue-card" data-action="${allMastered ? "surprise-quiz" : "continue-game"}">
-            <span class="home-action-icon" aria-hidden="true">${allMastered ? "✦" : "→"}</span>
+            <span class="home-action-icon" aria-hidden="true">${continueIcon}</span>
             <span><strong>${allMastered ? t("surpriseQuiz") : hasPlayed ? t("continueGame") : t("startGame")}</strong>
-            ${quiz ? `<small>${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(modeLabel(quiz.mode))}</small>` : ""}</span>
+            ${quiz && hasPlayed ? `<small>${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(modeLabel(quiz.mode))}</small>` : ""}</span>
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
@@ -1449,15 +1461,14 @@
   function levelsMarkup() {
     const profile = currentProfile();
     const next = progress.continueSelection(profile, curriculum.levels);
-    const recommendedControl = next.type === "quiz"
-      ? `<button class="quiet-button levels-recommended-button" data-action="show-recommended-next" aria-label="${escapeHtml(t("goToRecommended"))}"><span class="levels-recommended-wide">${t("recommended")}</span><span class="levels-recommended-short">${t("nextShort")}</span><span aria-hidden="true">↓</span></button>`
-      : "";
+    const recommendedLevelId = next.type === "quiz" ? next.quiz.levelId : null;
     const levelMarkup = (level, levelIndex) => {
         const value = progress.levelProgress(profile, level);
         const isMastery = level.kind.includes("mastery");
-        return `<section class="level-card ${value.mastered === 4 ? "is-mastered" : value.played ? "is-progress" : "is-unplayed"}" id="level-${escapeHtml(level.id)}">
+        const isRecommendedLevel = level.id === recommendedLevelId;
+        return `<section class="level-card ${value.mastered === 4 ? "is-mastered" : value.played ? "is-progress" : "is-unplayed"} ${isRecommendedLevel ? "is-recommended-level" : ""}" id="level-${escapeHtml(level.id)}">
           <button class="level-heading" data-action="toggle-level" data-level-id="${level.id}" aria-expanded="${state.selectedLevelId === level.id}">
-            <span class="level-number">${levelIndex + 1}</span><span><strong>${escapeHtml(levelTitle(level))}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : placeCountLabel(level.countryCodes.map((code) => countriesByCode.get(code)).filter(Boolean))}</small></span>
+            <span class="level-number">${levelIndex + 1}</span><span><strong>${escapeHtml(levelTitle(level))}${isRecommendedLevel ? `<span class="sr-only"> · ${t("recommended")}</span>` : ""}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : placeCountLabel(level.countryCodes.map((code) => countriesByCode.get(code)).filter(Boolean))}</small></span>
             <span class="level-state">${value.mastered === 4 ? `<span class="level-mastery-status" aria-label="4/4 ${t("mastered")}"><span>4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></span>` : value.played ? `${value.mastered}/4 ${t("mastered")}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span>
           </button>
           ${state.selectedLevelId === level.id ? `<div class="quiz-list"><div class="level-practice-actions"><button class="level-practice-row" data-action="level-cards" data-level-id="${level.id}"><span class="level-practice-icon" aria-hidden="true"><span></span><span></span></span><span><strong>${t("cards")}</strong></span><span aria-hidden="true">→</span></button><button class="level-practice-row level-explore-row" data-action="explore-level" data-level-id="${level.id}"><span class="level-practice-map-icon" aria-hidden="true">◎</span><span><strong>${t("exploreTheseCountries")}</strong></span><span aria-hidden="true">→</span></button></div><div class="quiz-mode-list">${level.quizzes.map((baseQuiz) => {
@@ -1466,18 +1477,21 @@
           }).join("")}</div></div>` : ""}
         </section>`;
       };
-    return `<main class="site-shell levels-shell"><header class="quiz-header app-header app-header-sticky levels-header">${brandMarkup(true, false)}<h1 class="levels-header-title">${t("levels")}</h1><div class="levels-header-actions">${recommendedControl}${homeButtonMarkup()}</div></header>
+    const recommendedNavigation = recommendedLevelId
+      ? `<button class="levels-recommended-float" data-action="show-recommended-next" aria-label="${escapeHtml(t("goToRecommended"))}" hidden><span class="recommended-next-arrow" aria-hidden="true">↓</span></button>`
+      : "";
+    return `<main class="site-shell levels-shell"><header class="quiz-header app-header app-header-sticky levels-header">${brandMarkup(true, false)}<h1 class="levels-header-title">${t("levels")}</h1><div class="levels-header-actions">${homeButtonMarkup()}</div></header>
       <div class="levels-list">${curriculum.sections.map((section) => {
         const headingId = `level-section-${section.id}`;
         return `<section class="level-section level-section-${escapeHtml(section.id)}" aria-labelledby="${headingId}">
           <header class="level-section-heading" id="${headingId}">
             <span class="level-section-icon" aria-hidden="true">${section.icon}</span>
-            <span class="level-section-copy"><strong>${escapeHtml(section.title[state.locale])}</strong><small>${escapeHtml(section.description[state.locale])}</small></span>
+            <span class="level-section-copy"><strong>${escapeHtml(section.title[state.locale])}</strong></span>
             <span class="level-section-range">${t("levelRange", { start: section.startLevel, end: section.endLevel })}</span>
           </header>
           <div class="level-section-list">${curriculum.levels.slice(section.startLevel - 1, section.endLevel).map((level, offset) => levelMarkup(level, section.startLevel - 1 + offset)).join("")}</div>
         </section>`;
-      }).join("")}</div></main>`;
+      }).join("")}</div>${recommendedNavigation}</main>`;
   }
 
   function importMarkup() {
@@ -2845,6 +2859,33 @@
     scrollAffordanceFrame = requestAnimationFrame(updateScrollAffordances);
   }
 
+  function updateRecommendedNavigation() {
+    recommendedNavigationFrame = null;
+    if (state.screen !== "levels") return;
+    const control = app.querySelector(".levels-recommended-float");
+    const target = app.querySelector(".level-card.is-recommended-level");
+    if (!control || !target) return;
+
+    const headerBottom = Math.max(
+      0,
+      app.querySelector(".levels-header")?.getBoundingClientRect().bottom ?? 0,
+    );
+    const targetBounds = target.getBoundingClientRect();
+    const isVisible = targetBounds.bottom > headerBottom && targetBounds.top < window.innerHeight;
+    control.hidden = isVisible;
+    control.style.setProperty("--levels-header-bottom", `${headerBottom}px`);
+    if (isVisible) return;
+
+    const direction = targetBounds.top >= window.innerHeight ? "down" : "up";
+    control.dataset.direction = direction;
+    control.querySelector(".recommended-next-arrow").textContent = direction === "down" ? "↓" : "↑";
+  }
+
+  function scheduleRecommendedNavigationUpdate() {
+    if (recommendedNavigationFrame !== null) return;
+    recommendedNavigationFrame = requestAnimationFrame(updateRecommendedNavigation);
+  }
+
   function render(options = {}) {
     updateDocumentMetadata();
     app.innerHTML = screenMarkup();
@@ -2856,6 +2897,7 @@
     document.body?.classList.toggle("result-page", state.screen === "result");
     document.body?.classList.toggle("explore-page", state.screen === "explore");
     scheduleScrollAffordanceUpdate();
+    scheduleRecommendedNavigationUpdate();
     scheduleResponsiveRegionMaps();
     if (state.screen === "explore" && !state.exploreRegionPickerOpen) {
       scheduleExploreMapZoomUi();
@@ -4163,11 +4205,14 @@
   window.addEventListener("pointercancel", finishExploreMapPointer);
   window.addEventListener("resize", () => {
     scheduleScrollAffordanceUpdate();
+    scheduleRecommendedNavigationUpdate();
     scheduleResponsiveRegionMaps();
     if (state.screen === "explore" && !state.exploreRegionPickerOpen) {
       scheduleExploreMapZoomUi();
     }
   });
+
+  window.addEventListener("scroll", scheduleRecommendedNavigationUpdate, { passive: true });
 
   app.addEventListener(
     "scroll",
