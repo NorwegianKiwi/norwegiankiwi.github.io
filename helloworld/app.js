@@ -3602,6 +3602,7 @@
     state.countryDetailsCode = null;
     render({
       focusCountryDetailsTriggerCode: code,
+      preserveExploreListScroll: true,
     });
   }
 
@@ -4265,7 +4266,10 @@
 
     if (action === "open-country-details") {
       state.countryDetailsCode = control.dataset.code;
-      render({ focusCountryDetails: true });
+      render({
+        focusCountryDetails: true,
+        preserveExploreListScroll: true,
+      });
       return;
     }
 
