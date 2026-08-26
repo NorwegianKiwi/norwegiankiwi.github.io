@@ -157,6 +157,15 @@ are the silhouettes whose enlarged views add a dashed internal division guide.
 Cyprus follows the UN buffer zone, while Somalia's guide follows the shared
 Natural Earth boundary with Somaliland.
 
+The island-specific compositions cover American Samoa, the Cayman Islands,
+Guernsey, New Caledonia, the Cook Islands, French Polynesia, the Northern
+Mariana Islands, the Marshall Islands, Micronesia, and Kiribati. The first four
+prioritize a recognizable compact main form and place distant islands in
+separate enlarged frames. The other six use compact extent dots and retain a
+geographic overview beside connected detail frames; the Cook Islands show
+representative northern and southern details, while the remaining five zoom
+the capital island or group.
+
 Explore reuses the same regional azimuthal equidistant maps and
 silhouettes. Active countries with Natural Earth tiny-country locator points
 use 1:10m foreground geometry on regional maps, while other foreground and all

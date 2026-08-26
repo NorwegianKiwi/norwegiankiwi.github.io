@@ -130,6 +130,18 @@ form spans multiple source objects. These rules affect only silhouettes; they
 must never be reused to filter the world or regional maps. Frames remain
 unlabelled.
 
+The editorial island rules use three related patterns. American Samoa, the
+Cayman Islands, Guernsey, and New Caledonia keep a recognizable main island or
+nearby group in the compact silhouette and relocate selected distant islands
+to directionally placed frames when enlarged. The Cook Islands, French
+Polynesia, the Northern Mariana Islands, the Marshall Islands, Micronesia, and
+Kiribati use representative extent markers in the compact silhouette. Their
+enlarged views retain a geographic overview and connect one or two source
+rectangles to readable details of a representative island or the capital
+island. The Cook Islands use Penrhyn and Rarotonga as the northern and southern
+details. Uninhabited extreme outposts omitted by these editorial selections
+remain unchanged on the world and regional maps.
+
 Expanded silhouettes mark the capitals listed in `countries.js` with small
 five-pointed stars. The generator matches the English editorial names against
 Natural Earth Populated Places and uses `capitalOverrides` for current names,
@@ -325,6 +337,12 @@ Before replacing `world-map.js`:
 - Expand ordinary, multi-capital, and inset silhouettes. Confirm that San
   Marino has a star, Monaco and Vatican City do not, and Tonga and Tuvalu place
   their stars only in the detailed inset.
+- Inspect the ten editorial island silhouettes separately. Confirm readable
+  compact main forms for American Samoa, the Cayman Islands, Guernsey, and New
+  Caledonia; eight or fewer compact extent markers for the other six; connected
+  detail frames for the Cook Islands, French Polynesia, the Northern Mariana
+  Islands, the Marshall Islands, Micronesia, and Kiribati; and no duplicated
+  capital stars.
 - Check all nine quiz-region maps, the Africa overview, and the shape inset's
   four possible corners.
 - Test the front-page map's mouse, keyboard, hover, focus, and selected region.

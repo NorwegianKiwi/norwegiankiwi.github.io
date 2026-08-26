@@ -278,7 +278,30 @@
     },
     "mh": {
       "main": [{"bounds": [164, 4, 173, 15]}],
-      "forceCompactMarkers": true
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [170.9, 6.9, 172, 7.3]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "fm": {
+      "main": [{"bounds": [137, 0, 164, 11]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [157.8, 6.5, 158.5, 7.2]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "ki": {
+      "main": [
+        {"bounds": [168, -12, 180, 6]},
+        {"bounds": [-180, -12, -150, 6]}
+      ],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [172.8, 1.1, 173.3, 1.7]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
     },
     "pw": {
       "main": [{"bounds": [134, 6.7, 135, 8.3]}],
@@ -302,6 +325,60 @@
       "expandedMainFrame": [4, 4, 38, 92],
       "insets": [
         {"selection": [{"bounds": [178.9, -8.7, 179.4, -8.3]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "as": {
+      "main": [{"bounds": [-171, -14.5, -170.5, -14.15]}],
+      "expandedMainFrame": [4, 30, 50, 48],
+      "insets": [
+        {"selection": [{"bounds": [-171.2, -11.2, -170.95, -10.9]}], "frame": [65, 5, 25, 24]},
+        {"selection": [{"bounds": [-169.8, -14.4, -169.3, -14]}], "frame": [59, 48, 37, 30]}
+      ]
+    },
+    "ky": {
+      "main": [{"bounds": [-81.5, 19.2, -81, 19.5]}],
+      "expandedMainFrame": [4, 25, 55, 50],
+      "insets": [
+        {"selection": [{"bounds": [-80.2, 19.6, -79.6, 19.9]}], "frame": [64, 25, 32, 45]}
+      ]
+    },
+    "gg": {
+      "main": [{"bounds": [-2.75, 49.35, -2.3, 49.55]}],
+      "expandedMainFrame": [4, 18, 58, 72],
+      "insets": [
+        {"selection": [{"bounds": [-2.3, 49.65, -2.1, 49.8]}], "frame": [68, 8, 28, 30]}
+      ]
+    },
+    "nc": {
+      "main": [{"bounds": [163.5, -22.8, 167.2, -19.5]}],
+      "expandedMainFrame": [4, 4, 62, 92],
+      "insets": [
+        {"selection": [{"bounds": [167.2, -22, 168.3, -20.5]}], "frame": [70, 30, 26, 40]}
+      ]
+    },
+    "ck": {
+      "main": [{"bounds": [-166, -23, -156, -8]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 34, 92],
+      "insets": [
+        {"selection": [{"bounds": [-158.1, -9.05, -157.85, -8.85]}], "frame": [44, 4, 52, 42], "connectToSource": true},
+        {"selection": [{"bounds": [-160, -21.5, -159.5, -21]}], "frame": [44, 54, 52, 42], "connectToSource": true}
+      ]
+    },
+    "pf": {
+      "main": [{"bounds": [-155, -29, -134, -7]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [-153, -18.5, -148, -15.5]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "mp": {
+      "main": [{"bounds": [144.5, 13.5, 146, 21]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [145, 14, 146, 16]}], "frame": [47, 18, 49, 64], "connectToSource": true}
       ]
     }
   },
