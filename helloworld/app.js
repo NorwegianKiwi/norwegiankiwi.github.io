@@ -2887,8 +2887,15 @@
   }
 
   function render(options = {}) {
+    const exploreListScrollTop = options.preserveExploreListScroll
+      ? app.querySelector(".explore-country-list")?.scrollTop ?? null
+      : null;
     updateDocumentMetadata();
     app.innerHTML = screenMarkup();
+    if (exploreListScrollTop !== null) {
+      const exploreList = app.querySelector(".explore-country-list");
+      if (exploreList) exploreList.scrollTop = exploreListScrollTop;
+    }
     document.body?.classList.toggle("standalone-mode", isStandalone());
     document.body?.classList.toggle(
       "challenge-page",
@@ -3163,7 +3170,17 @@
     if (nextExtent !== extent) {
       state.exploreMapExtent = nextExtent;
       resetExploreMapInteraction();
-      render({ focusCountryDetailsTriggerCode: code });
+      render({
+        focusCountryDetailsTriggerCode: code,
+        preserveExploreListScroll: !scrollCard,
+      });
+      if (scrollCard) {
+        const card = app.querySelector(
+          `.explore-country-card[data-explore-code="${code}"]`,
+        );
+        card?.scrollIntoView({ block: "nearest" });
+        scheduleScrollAffordanceUpdate();
+      }
       return;
     }
     syncExploreCountryUi();
