@@ -25,6 +25,16 @@
   color: var(--muted);
 }
 
+.quiz-level-context {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.quiz-level-context b {
+  color: var(--ink);
+}
+
 .quiet-button {
   color: var(--muted);
   font-size: 13px;

@@ -6203,6 +6203,2125 @@
       }
     },
     {
+      "id": "test-final-quiz",
+      "name": "Test · Final quiz remaining",
+      "createdAt": "2026-08-22T10:00:00.000Z",
+      "updatedAt": "2026-08-22T13:31:00.000Z",
+      "lastQuizId": "mastery-whole-world:map-country",
+      "quizProgress": {
+        "tour-hello-world:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 9,
+              "total": 9,
+              "lastPlayedAt": "2026-08-22T10:01:00.000Z"
+            }
+          }
+        },
+        "tour-hello-world:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 9,
+              "total": 9,
+              "lastPlayedAt": "2026-08-22T10:02:00.000Z"
+            }
+          }
+        },
+        "tour-hello-world:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 9,
+              "total": 9,
+              "lastPlayedAt": "2026-08-22T10:03:00.000Z"
+            }
+          }
+        },
+        "tour-hello-world:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 9,
+              "total": 9,
+              "lastPlayedAt": "2026-08-22T10:04:00.000Z"
+            }
+          }
+        },
+        "pack-nordics:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:05:00.000Z"
+            }
+          }
+        },
+        "pack-nordics:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:06:00.000Z"
+            }
+          }
+        },
+        "pack-nordics:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:07:00.000Z"
+            }
+          }
+        },
+        "pack-nordics:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:08:00.000Z"
+            }
+          }
+        },
+        "pack-western-europe:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:09:00.000Z"
+            }
+          }
+        },
+        "pack-western-europe:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:10:00.000Z"
+            }
+          }
+        },
+        "pack-western-europe:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:11:00.000Z"
+            }
+          }
+        },
+        "pack-western-europe:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:12:00.000Z"
+            }
+          }
+        },
+        "tour-world-icons:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T10:13:00.000Z"
+            }
+          }
+        },
+        "tour-world-icons:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T10:14:00.000Z"
+            }
+          }
+        },
+        "tour-world-icons:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T10:15:00.000Z"
+            }
+          }
+        },
+        "tour-world-icons:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T10:16:00.000Z"
+            }
+          }
+        },
+        "pack-baltic-neighbours:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:17:00.000Z"
+            }
+          }
+        },
+        "pack-baltic-neighbours:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:18:00.000Z"
+            }
+          }
+        },
+        "pack-baltic-neighbours:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:19:00.000Z"
+            }
+          }
+        },
+        "pack-baltic-neighbours:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:20:00.000Z"
+            }
+          }
+        },
+        "pack-iberia-alps:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:21:00.000Z"
+            }
+          }
+        },
+        "pack-iberia-alps:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:22:00.000Z"
+            }
+          }
+        },
+        "pack-iberia-alps:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:23:00.000Z"
+            }
+          }
+        },
+        "pack-iberia-alps:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:24:00.000Z"
+            }
+          }
+        },
+        "pack-central-europe:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:25:00.000Z"
+            }
+          }
+        },
+        "pack-central-europe:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:26:00.000Z"
+            }
+          }
+        },
+        "pack-central-europe:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:27:00.000Z"
+            }
+          }
+        },
+        "pack-central-europe:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:28:00.000Z"
+            }
+          }
+        },
+        "pack-balkans:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:29:00.000Z"
+            }
+          }
+        },
+        "pack-balkans:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:30:00.000Z"
+            }
+          }
+        },
+        "pack-balkans:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:31:00.000Z"
+            }
+          }
+        },
+        "pack-balkans:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:32:00.000Z"
+            }
+          }
+        },
+        "pack-eastern-europe:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:33:00.000Z"
+            }
+          }
+        },
+        "pack-eastern-europe:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:34:00.000Z"
+            }
+          }
+        },
+        "pack-eastern-europe:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:35:00.000Z"
+            }
+          }
+        },
+        "pack-eastern-europe:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:36:00.000Z"
+            }
+          }
+        },
+        "pack-european-microstates:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:37:00.000Z"
+            }
+          }
+        },
+        "pack-european-microstates:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:38:00.000Z"
+            }
+          }
+        },
+        "pack-european-microstates:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:39:00.000Z"
+            }
+          }
+        },
+        "pack-european-microstates:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:40:00.000Z"
+            }
+          }
+        },
+        "pack-north-america:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:41:00.000Z"
+            }
+          }
+        },
+        "pack-north-america:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:42:00.000Z"
+            }
+          }
+        },
+        "pack-north-america:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:43:00.000Z"
+            }
+          }
+        },
+        "pack-north-america:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:44:00.000Z"
+            }
+          }
+        },
+        "pack-central-america:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:45:00.000Z"
+            }
+          }
+        },
+        "pack-central-america:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:46:00.000Z"
+            }
+          }
+        },
+        "pack-central-america:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:47:00.000Z"
+            }
+          }
+        },
+        "pack-central-america:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:48:00.000Z"
+            }
+          }
+        },
+        "pack-northern-south-america:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:49:00.000Z"
+            }
+          }
+        },
+        "pack-northern-south-america:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:50:00.000Z"
+            }
+          }
+        },
+        "pack-northern-south-america:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:51:00.000Z"
+            }
+          }
+        },
+        "pack-northern-south-america:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:52:00.000Z"
+            }
+          }
+        },
+        "pack-southern-south-america:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:53:00.000Z"
+            }
+          }
+        },
+        "pack-southern-south-america:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:54:00.000Z"
+            }
+          }
+        },
+        "pack-southern-south-america:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:55:00.000Z"
+            }
+          }
+        },
+        "pack-southern-south-america:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T10:56:00.000Z"
+            }
+          }
+        },
+        "pack-north-africa:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:57:00.000Z"
+            }
+          }
+        },
+        "pack-north-africa:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:58:00.000Z"
+            }
+          }
+        },
+        "pack-north-africa:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T10:59:00.000Z"
+            }
+          }
+        },
+        "pack-north-africa:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T11:00:00.000Z"
+            }
+          }
+        },
+        "pack-sahel:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:01:00.000Z"
+            }
+          }
+        },
+        "pack-sahel:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:02:00.000Z"
+            }
+          }
+        },
+        "pack-sahel:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:03:00.000Z"
+            }
+          }
+        },
+        "pack-sahel:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:04:00.000Z"
+            }
+          }
+        },
+        "pack-atlantic-west-africa:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:05:00.000Z"
+            }
+          }
+        },
+        "pack-atlantic-west-africa:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:06:00.000Z"
+            }
+          }
+        },
+        "pack-atlantic-west-africa:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:07:00.000Z"
+            }
+          }
+        },
+        "pack-atlantic-west-africa:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:08:00.000Z"
+            }
+          }
+        },
+        "pack-gulf-guinea:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T11:09:00.000Z"
+            }
+          }
+        },
+        "pack-gulf-guinea:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T11:10:00.000Z"
+            }
+          }
+        },
+        "pack-gulf-guinea:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T11:11:00.000Z"
+            }
+          }
+        },
+        "pack-gulf-guinea:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T11:12:00.000Z"
+            }
+          }
+        },
+        "tour-island-world:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 11,
+              "total": 11,
+              "lastPlayedAt": "2026-08-22T11:13:00.000Z"
+            }
+          }
+        },
+        "tour-island-world:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 11,
+              "total": 11,
+              "lastPlayedAt": "2026-08-22T11:14:00.000Z"
+            }
+          }
+        },
+        "tour-island-world:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 11,
+              "total": 11,
+              "lastPlayedAt": "2026-08-22T11:15:00.000Z"
+            }
+          }
+        },
+        "tour-island-world:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 11,
+              "total": 11,
+              "lastPlayedAt": "2026-08-22T11:16:00.000Z"
+            }
+          }
+        },
+        "pack-east-asia:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:17:00.000Z"
+            }
+          }
+        },
+        "pack-east-asia:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:18:00.000Z"
+            }
+          }
+        },
+        "pack-east-asia:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:19:00.000Z"
+            }
+          }
+        },
+        "pack-east-asia:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:20:00.000Z"
+            }
+          }
+        },
+        "pack-south-asia:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T11:21:00.000Z"
+            }
+          }
+        },
+        "pack-south-asia:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T11:22:00.000Z"
+            }
+          }
+        },
+        "pack-south-asia:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T11:23:00.000Z"
+            }
+          }
+        },
+        "pack-south-asia:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T11:24:00.000Z"
+            }
+          }
+        },
+        "pack-mainland-southeast-asia:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:25:00.000Z"
+            }
+          }
+        },
+        "pack-mainland-southeast-asia:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:26:00.000Z"
+            }
+          }
+        },
+        "pack-mainland-southeast-asia:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:27:00.000Z"
+            }
+          }
+        },
+        "pack-mainland-southeast-asia:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:28:00.000Z"
+            }
+          }
+        },
+        "pack-maritime-southeast-asia:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T11:29:00.000Z"
+            }
+          }
+        },
+        "pack-maritime-southeast-asia:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T11:30:00.000Z"
+            }
+          }
+        },
+        "pack-maritime-southeast-asia:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T11:31:00.000Z"
+            }
+          }
+        },
+        "pack-maritime-southeast-asia:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T11:32:00.000Z"
+            }
+          }
+        },
+        "pack-horn-nile:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:33:00.000Z"
+            }
+          }
+        },
+        "pack-horn-nile:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:34:00.000Z"
+            }
+          }
+        },
+        "pack-horn-nile:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:35:00.000Z"
+            }
+          }
+        },
+        "pack-horn-nile:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:36:00.000Z"
+            }
+          }
+        },
+        "pack-great-lakes-congo:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:37:00.000Z"
+            }
+          }
+        },
+        "pack-great-lakes-congo:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:38:00.000Z"
+            }
+          }
+        },
+        "pack-great-lakes-congo:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:39:00.000Z"
+            }
+          }
+        },
+        "pack-great-lakes-congo:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:40:00.000Z"
+            }
+          }
+        },
+        "pack-southern-africa:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:41:00.000Z"
+            }
+          }
+        },
+        "pack-southern-africa:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:42:00.000Z"
+            }
+          }
+        },
+        "pack-southern-africa:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:43:00.000Z"
+            }
+          }
+        },
+        "pack-southern-africa:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:44:00.000Z"
+            }
+          }
+        },
+        "pack-southeast-africa-islands:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:45:00.000Z"
+            }
+          }
+        },
+        "pack-southeast-africa-islands:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:46:00.000Z"
+            }
+          }
+        },
+        "pack-southeast-africa-islands:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:47:00.000Z"
+            }
+          }
+        },
+        "pack-southeast-africa-islands:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:48:00.000Z"
+            }
+          }
+        },
+        "tour-around-equator:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T11:49:00.000Z"
+            }
+          }
+        },
+        "tour-around-equator:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T11:50:00.000Z"
+            }
+          }
+        },
+        "tour-around-equator:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T11:51:00.000Z"
+            }
+          }
+        },
+        "tour-around-equator:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T11:52:00.000Z"
+            }
+          }
+        },
+        "pack-eastern-mediterranean:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:53:00.000Z"
+            }
+          }
+        },
+        "pack-eastern-mediterranean:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:54:00.000Z"
+            }
+          }
+        },
+        "pack-eastern-mediterranean:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:55:00.000Z"
+            }
+          }
+        },
+        "pack-eastern-mediterranean:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T11:56:00.000Z"
+            }
+          }
+        },
+        "pack-arabian-gulf:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:57:00.000Z"
+            }
+          }
+        },
+        "pack-arabian-gulf:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:58:00.000Z"
+            }
+          }
+        },
+        "pack-arabian-gulf:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T11:59:00.000Z"
+            }
+          }
+        },
+        "pack-arabian-gulf:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:00:00.000Z"
+            }
+          }
+        },
+        "pack-caucasus-mesopotamia:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T12:01:00.000Z"
+            }
+          }
+        },
+        "pack-caucasus-mesopotamia:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T12:02:00.000Z"
+            }
+          }
+        },
+        "pack-caucasus-mesopotamia:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T12:03:00.000Z"
+            }
+          }
+        },
+        "pack-caucasus-mesopotamia:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T12:04:00.000Z"
+            }
+          }
+        },
+        "pack-central-asia:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T12:05:00.000Z"
+            }
+          }
+        },
+        "pack-central-asia:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T12:06:00.000Z"
+            }
+          }
+        },
+        "pack-central-asia:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T12:07:00.000Z"
+            }
+          }
+        },
+        "pack-central-asia:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 5,
+              "total": 5,
+              "lastPlayedAt": "2026-08-22T12:08:00.000Z"
+            }
+          }
+        },
+        "tour-world-favourites:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 12,
+              "total": 12,
+              "lastPlayedAt": "2026-08-22T12:09:00.000Z"
+            }
+          }
+        },
+        "tour-world-favourites:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 12,
+              "total": 12,
+              "lastPlayedAt": "2026-08-22T12:10:00.000Z"
+            }
+          }
+        },
+        "tour-world-favourites:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 12,
+              "total": 12,
+              "lastPlayedAt": "2026-08-22T12:11:00.000Z"
+            }
+          }
+        },
+        "tour-world-favourites:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 12,
+              "total": 12,
+              "lastPlayedAt": "2026-08-22T12:12:00.000Z"
+            }
+          }
+        },
+        "pack-greater-caribbean:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T12:13:00.000Z"
+            }
+          }
+        },
+        "pack-greater-caribbean:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T12:14:00.000Z"
+            }
+          }
+        },
+        "pack-greater-caribbean:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T12:15:00.000Z"
+            }
+          }
+        },
+        "pack-greater-caribbean:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 6,
+              "total": 6,
+              "lastPlayedAt": "2026-08-22T12:16:00.000Z"
+            }
+          }
+        },
+        "pack-lesser-antilles:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:17:00.000Z"
+            }
+          }
+        },
+        "pack-lesser-antilles:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:18:00.000Z"
+            }
+          }
+        },
+        "pack-lesser-antilles:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:19:00.000Z"
+            }
+          }
+        },
+        "pack-lesser-antilles:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:20:00.000Z"
+            }
+          }
+        },
+        "pack-australia-western-pacific:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:21:00.000Z"
+            }
+          }
+        },
+        "pack-australia-western-pacific:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:22:00.000Z"
+            }
+          }
+        },
+        "pack-australia-western-pacific:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:23:00.000Z"
+            }
+          }
+        },
+        "pack-australia-western-pacific:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:24:00.000Z"
+            }
+          }
+        },
+        "pack-pacific-islands:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:25:00.000Z"
+            }
+          }
+        },
+        "pack-pacific-islands:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:26:00.000Z"
+            }
+          }
+        },
+        "pack-pacific-islands:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:27:00.000Z"
+            }
+          }
+        },
+        "pack-pacific-islands:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:28:00.000Z"
+            }
+          }
+        },
+        "pack-north-atlantic-autonomies:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T12:29:00.000Z"
+            }
+          }
+        },
+        "pack-north-atlantic-autonomies:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T12:30:00.000Z"
+            }
+          }
+        },
+        "pack-north-atlantic-autonomies:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T12:31:00.000Z"
+            }
+          }
+        },
+        "pack-north-atlantic-autonomies:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T12:32:00.000Z"
+            }
+          }
+        },
+        "pack-caribbean-territories:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T12:33:00.000Z"
+            }
+          }
+        },
+        "pack-caribbean-territories:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T12:34:00.000Z"
+            }
+          }
+        },
+        "pack-caribbean-territories:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T12:35:00.000Z"
+            }
+          }
+        },
+        "pack-caribbean-territories:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 8,
+              "total": 8,
+              "lastPlayedAt": "2026-08-22T12:36:00.000Z"
+            }
+          }
+        },
+        "pack-pacific-associated-territories:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:37:00.000Z"
+            }
+          }
+        },
+        "pack-pacific-associated-territories:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:38:00.000Z"
+            }
+          }
+        },
+        "pack-pacific-associated-territories:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:39:00.000Z"
+            }
+          }
+        },
+        "pack-pacific-associated-territories:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:40:00.000Z"
+            }
+          }
+        },
+        "pack-world-special-regions:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:41:00.000Z"
+            }
+          }
+        },
+        "pack-world-special-regions:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:42:00.000Z"
+            }
+          }
+        },
+        "pack-world-special-regions:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:43:00.000Z"
+            }
+          }
+        },
+        "pack-world-special-regions:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 7,
+              "total": 7,
+              "lastPlayedAt": "2026-08-22T12:44:00.000Z"
+            }
+          }
+        },
+        "mastery-europe:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 44,
+              "total": 44,
+              "lastPlayedAt": "2026-08-22T12:45:00.000Z"
+            }
+          }
+        },
+        "mastery-europe:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 44,
+              "total": 44,
+              "lastPlayedAt": "2026-08-22T12:46:00.000Z"
+            }
+          }
+        },
+        "mastery-europe:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 44,
+              "total": 44,
+              "lastPlayedAt": "2026-08-22T12:47:00.000Z"
+            }
+          }
+        },
+        "mastery-europe:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 44,
+              "total": 44,
+              "lastPlayedAt": "2026-08-22T12:48:00.000Z"
+            }
+          }
+        },
+        "mastery-north-central-america:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T12:49:00.000Z"
+            }
+          }
+        },
+        "mastery-north-central-america:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T12:50:00.000Z"
+            }
+          }
+        },
+        "mastery-north-central-america:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T12:51:00.000Z"
+            }
+          }
+        },
+        "mastery-north-central-america:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 10,
+              "total": 10,
+              "lastPlayedAt": "2026-08-22T12:52:00.000Z"
+            }
+          }
+        },
+        "mastery-south-america:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 12,
+              "total": 12,
+              "lastPlayedAt": "2026-08-22T12:53:00.000Z"
+            }
+          }
+        },
+        "mastery-south-america:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 12,
+              "total": 12,
+              "lastPlayedAt": "2026-08-22T12:54:00.000Z"
+            }
+          }
+        },
+        "mastery-south-america:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 12,
+              "total": 12,
+              "lastPlayedAt": "2026-08-22T12:55:00.000Z"
+            }
+          }
+        },
+        "mastery-south-america:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 12,
+              "total": 12,
+              "lastPlayedAt": "2026-08-22T12:56:00.000Z"
+            }
+          }
+        },
+        "mastery-north-west-africa:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 26,
+              "total": 26,
+              "lastPlayedAt": "2026-08-22T12:57:00.000Z"
+            }
+          }
+        },
+        "mastery-north-west-africa:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 26,
+              "total": 26,
+              "lastPlayedAt": "2026-08-22T12:58:00.000Z"
+            }
+          }
+        },
+        "mastery-north-west-africa:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 26,
+              "total": 26,
+              "lastPlayedAt": "2026-08-22T12:59:00.000Z"
+            }
+          }
+        },
+        "mastery-north-west-africa:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 26,
+              "total": 26,
+              "lastPlayedAt": "2026-08-22T13:00:00.000Z"
+            }
+          }
+        },
+        "mastery-east-south-asia:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 26,
+              "total": 26,
+              "lastPlayedAt": "2026-08-22T13:01:00.000Z"
+            }
+          }
+        },
+        "mastery-east-south-asia:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 26,
+              "total": 26,
+              "lastPlayedAt": "2026-08-22T13:02:00.000Z"
+            }
+          }
+        },
+        "mastery-east-south-asia:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 26,
+              "total": 26,
+              "lastPlayedAt": "2026-08-22T13:03:00.000Z"
+            }
+          }
+        },
+        "mastery-east-south-asia:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 26,
+              "total": 26,
+              "lastPlayedAt": "2026-08-22T13:04:00.000Z"
+            }
+          }
+        },
+        "mastery-east-south-africa:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 28,
+              "total": 28,
+              "lastPlayedAt": "2026-08-22T13:05:00.000Z"
+            }
+          }
+        },
+        "mastery-east-south-africa:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 28,
+              "total": 28,
+              "lastPlayedAt": "2026-08-22T13:06:00.000Z"
+            }
+          }
+        },
+        "mastery-east-south-africa:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 28,
+              "total": 28,
+              "lastPlayedAt": "2026-08-22T13:07:00.000Z"
+            }
+          }
+        },
+        "mastery-east-south-africa:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 28,
+              "total": 28,
+              "lastPlayedAt": "2026-08-22T13:08:00.000Z"
+            }
+          }
+        },
+        "mastery-west-central-asia:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 24,
+              "total": 24,
+              "lastPlayedAt": "2026-08-22T13:09:00.000Z"
+            }
+          }
+        },
+        "mastery-west-central-asia:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 24,
+              "total": 24,
+              "lastPlayedAt": "2026-08-22T13:10:00.000Z"
+            }
+          }
+        },
+        "mastery-west-central-asia:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 24,
+              "total": 24,
+              "lastPlayedAt": "2026-08-22T13:11:00.000Z"
+            }
+          }
+        },
+        "mastery-west-central-asia:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 24,
+              "total": 24,
+              "lastPlayedAt": "2026-08-22T13:12:00.000Z"
+            }
+          }
+        },
+        "mastery-caribbean:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 13,
+              "total": 13,
+              "lastPlayedAt": "2026-08-22T13:13:00.000Z"
+            }
+          }
+        },
+        "mastery-caribbean:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 13,
+              "total": 13,
+              "lastPlayedAt": "2026-08-22T13:14:00.000Z"
+            }
+          }
+        },
+        "mastery-caribbean:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 13,
+              "total": 13,
+              "lastPlayedAt": "2026-08-22T13:15:00.000Z"
+            }
+          }
+        },
+        "mastery-caribbean:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 13,
+              "total": 13,
+              "lastPlayedAt": "2026-08-22T13:16:00.000Z"
+            }
+          }
+        },
+        "mastery-oceania:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 14,
+              "total": 14,
+              "lastPlayedAt": "2026-08-22T13:17:00.000Z"
+            }
+          }
+        },
+        "mastery-oceania:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 14,
+              "total": 14,
+              "lastPlayedAt": "2026-08-22T13:18:00.000Z"
+            }
+          }
+        },
+        "mastery-oceania:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 14,
+              "total": 14,
+              "lastPlayedAt": "2026-08-22T13:19:00.000Z"
+            }
+          }
+        },
+        "mastery-oceania:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 14,
+              "total": 14,
+              "lastPlayedAt": "2026-08-22T13:20:00.000Z"
+            }
+          }
+        },
+        "mastery-countries-world:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 197,
+              "total": 197,
+              "lastPlayedAt": "2026-08-22T13:21:00.000Z"
+            }
+          }
+        },
+        "mastery-countries-world:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 197,
+              "total": 197,
+              "lastPlayedAt": "2026-08-22T13:22:00.000Z"
+            }
+          }
+        },
+        "mastery-countries-world:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 197,
+              "total": 197,
+              "lastPlayedAt": "2026-08-22T13:23:00.000Z"
+            }
+          }
+        },
+        "mastery-countries-world:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 197,
+              "total": 197,
+              "lastPlayedAt": "2026-08-22T13:24:00.000Z"
+            }
+          }
+        },
+        "mastery-other-places-world:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 30,
+              "total": 30,
+              "lastPlayedAt": "2026-08-22T13:25:00.000Z"
+            }
+          }
+        },
+        "mastery-other-places-world:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 30,
+              "total": 30,
+              "lastPlayedAt": "2026-08-22T13:26:00.000Z"
+            }
+          }
+        },
+        "mastery-other-places-world:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 30,
+              "total": 30,
+              "lastPlayedAt": "2026-08-22T13:27:00.000Z"
+            }
+          }
+        },
+        "mastery-other-places-world:country-capital": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 30,
+              "total": 30,
+              "lastPlayedAt": "2026-08-22T13:28:00.000Z"
+            }
+          }
+        },
+        "mastery-whole-world:country-flag": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 227,
+              "total": 227,
+              "lastPlayedAt": "2026-08-22T13:29:00.000Z"
+            }
+          }
+        },
+        "mastery-whole-world:flag-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 227,
+              "total": 227,
+              "lastPlayedAt": "2026-08-22T13:30:00.000Z"
+            }
+          }
+        },
+        "mastery-whole-world:map-country": {
+          "revisions": {
+            "1": {
+              "revision": 1,
+              "bestScore": 227,
+              "total": 227,
+              "lastPlayedAt": "2026-08-22T13:31:00.000Z"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "test-all-mastered",
       "name": "Test · Everything mastered",
       "createdAt": "2026-08-22T10:00:00.000Z",

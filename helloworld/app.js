@@ -8,6 +8,9 @@
   )
     ? initialUrl.searchParams.get("lang")
     : "nb";
+  const initialPreview = new Set(["result-next-quiz", "result-next-level", "final-question", "final-result", "final-celebration"]).has(initialUrl.searchParams.get("preview"))
+    ? initialUrl.searchParams.get("preview")
+    : null;
   const data = window.GEOGRAFI_QUIZ_DATA;
   const mapData = window.GEOGRAFI_QUIZ_MAP_DATA;
   const challenge = window.GEOGRAFI_CHALLENGE;
@@ -316,7 +319,8 @@
       storageWriteFailed: "Fremgangen kunne ikke lagres på denne enheten.",
       quizMastered: "Quiz mestret", quizNotMastered: "Ikke helt ennå", scoreOutOf: "av {total}",
       scoreAnnouncement: "{score} av {total}", newRecord: "Ny rekord!", recordScore: "Rekord: {score} av {total}",
-      nextQuiz: "Neste quiz", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
+      nextQuiz: "Neste quiz", nextLevel: "Neste nivå", congratulations: "Gratulerer!", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
+      viewProgress: "Se fremgangen", worldCelebrationSummary: "Du har mestret alle {levels} nivåene og alle {quizzes} quizene.",
       reviewCards: "Øv med flashcards", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
       worldMastered: "Verden mestret", surpriseQuiz: "Overraskelsesquiz", chooseLevel: "Velg nivå",
       shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre en venn",
@@ -348,7 +352,8 @@
       storageWriteFailed: "Progress could not be saved on this device.",
       quizMastered: "Quiz mastered", quizNotMastered: "Not quite yet", scoreOutOf: "of {total}",
       scoreAnnouncement: "{score} of {total}", newRecord: "New record!", recordScore: "Record: {score} of {total}",
-      nextQuiz: "Next quiz", tryAgainAction: "Try again", playAgain: "Play again",
+      nextQuiz: "Next quiz", nextLevel: "Next level", congratulations: "Congratulations!", tryAgainAction: "Try again", playAgain: "Play again",
+      viewProgress: "View progress", worldCelebrationSummary: "You have mastered all {levels} levels and all {quizzes} quizzes.",
       reviewCards: "Review with flashcards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
       worldMastered: "World mastered", surpriseQuiz: "Surprise quiz", chooseLevel: "Choose a level",
       shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge a friend",
@@ -413,7 +418,8 @@
   let browserStorage = null;
   try { browserStorage = window.localStorage; } catch { browserStorage = null; }
   const loadedProgress = progress.loadStore(browserStorage, { defaultName: "Player 1" });
-  let progressStore = loadedProgress.store;
+  const realProgressStore = loadedProgress.store;
+  let progressStore = realProgressStore;
   let storageWarning = loadedProgress.warning;
   if (loadedProgress.needsSave) {
     const saved = progress.saveStore(browserStorage, progressStore);
@@ -452,6 +458,8 @@
     resultNewQuizMastery: false,
     resultNewLevelMastery: false,
     resultCelebrationPending: false,
+    resultPreview: null,
+    previewMode: initialPreview,
     profilePanelOpen: false,
     importProfiles: transferPreview,
     importError: transferError,
@@ -482,6 +490,8 @@
     openChallengeOpen: false,
     openChallengeValue: "",
     openChallengeError: null,
+    worldCelebrationOpen: false,
+    worldCelebrationSettled: false,
     exploreRegionPickerOpen: false,
     explorePinnedCode: null,
     explorePreviewCode: null,
@@ -492,6 +502,7 @@
   let autoAdvanceTimer = null;
   const actionFeedbackTimers = new WeakMap();
   let actionFeedbackToastTimer = null;
+  let worldCelebrationTimer = null;
   let keyboardHintsVisible = false;
   const exploreMapPointers = new Map();
   let exploreMapGesture = null;
@@ -535,6 +546,7 @@
   function currentProfile() { return progress.activeProfile(progressStore); }
   function persist(nextStore) {
     progressStore = nextStore;
+    if (state.previewMode !== null) return;
     const saved = progress.saveStore(browserStorage, progressStore);
     if (!saved.ok) storageWarning = saved.warning;
   }
@@ -1486,6 +1498,29 @@
     `;
   }
 
+  function worldCelebrationMarkup() {
+    if (!state.worldCelebrationOpen) return "";
+    const bursts = [
+      [15, 24, 0], [38, 15, 420], [66, 24, 180],
+      [84, 14, 620], [26, 56, 760], [74, 58, 980],
+    ];
+    const fireworks = bursts.map(([x, y, delay], burstIndex) => `
+      <span class="world-firework" style="--burst-x:${x}%;--burst-y:${y}%;--burst-delay:${delay}ms">
+        ${Array.from({ length: 12 }, (_, particleIndex) => `<i style="--particle-angle:${particleIndex * 30}deg;--particle-distance:-${3.6 + (particleIndex % 3) * .65}rem;--particle-color:${(particleIndex + burstIndex) % 2 ? "#e9b949" : "#58ad77"}"></i>`).join("")}
+      </span>`).join("");
+    return `
+      <div class="world-celebration-overlay ${state.worldCelebrationSettled ? "is-settled" : ""}">
+        <div class="world-fireworks" aria-hidden="true">${fireworks}</div>
+        <section class="world-celebration-dialog" role="dialog" aria-modal="true" aria-labelledby="world-celebration-title" aria-describedby="world-celebration-description" tabindex="-1">
+          <span class="world-celebration-trophy" aria-hidden="true">🏆</span>
+          <p class="kicker">${t("congratulations")}</p>
+          <h2 id="world-celebration-title">${t("worldMastered")}</h2>
+          <p id="world-celebration-description">${t("worldCelebrationSummary", { levels: curriculum.levels.length, quizzes: curriculum.levels.length * 4 })}</p>
+          <button class="primary-button world-celebration-continue" data-action="view-completed-progress">${t("viewProgress")} <span aria-hidden="true">→</span></button>
+        </section>
+      </div>`;
+  }
+
   function profilePanelMarkup() {
     if (!state.profilePanelOpen) return "";
     const active = currentProfile();
@@ -1705,6 +1740,15 @@
     const quiz = curriculumQuiz();
     const level = curriculumLevel();
     const perfect = state.score === state.questions.length;
+    const previewNextQuiz = state.resultPreview === "result-next-quiz"
+      ? curriculum.quizById.get(curriculum.levels[0].quizzes[1].id)
+      : state.resultPreview === "result-next-level"
+        ? curriculum.quizById.get(curriculum.levels[1].quizzes[0].id)
+        : null;
+    const nextQuiz = perfect
+      ? previewNextQuiz ?? (state.resultPreview === null ? progress.nextUnmastered(currentProfile(), curriculum.levels, quiz.id) : null)
+      : null;
+    const advancesToNextLevel = nextQuiz !== null && nextQuiz.levelId !== quiz.levelId;
     const best = state.resultBestScore ?? state.score;
     const isNewRecord = !perfect && state.resultPreviousBestScore !== null && state.score > state.resultPreviousBestScore;
     const recordMarkup = isNewRecord
@@ -1716,10 +1760,15 @@
     const levelMasteryMarkup = state.resultNewLevelMastery
       ? `<div class="level-mastered-celebration ${state.resultCelebrationPending ? "is-celebrating" : ""}"><p class="level-mastered-callout" aria-label="${escapeHtml(levelTitle(level))} · 4/4 ${t("mastered")}"><span>${escapeHtml(levelTitle(level))} · 4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></p><span class="mastery-sparkles" aria-hidden="true">${Array.from({ length: 8 }, (_, index) => `<i style="--spark-index:${index}"></i>`).join("")}</span></div>`
       : "";
+    const primaryAction = !perfect
+      ? { action: "retry-curriculum-quiz", className: "", label: t("tryAgainAction"), icon: "→" }
+      : nextQuiz === null
+        ? { action: "open-world-celebration", className: "is-curriculum-complete", label: t("congratulations"), icon: "✦" }
+        : { action: "next-curriculum-quiz", className: advancesToNextLevel ? "is-next-level" : "", label: advancesToNextLevel ? t("nextLevel") : t("nextQuiz"), icon: "→" };
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
-      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
-      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button result-replay-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? `${replayIcon}${t("playAgain")}` : t("nextQuiz")}</button></div><button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
-      <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}</main>`;
+      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
+      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${nextQuiz ? ` data-next-quiz-id="${escapeHtml(nextQuiz.id)}"` : ""}>${primaryAction.label} <span aria-hidden="true">${primaryAction.icon}</span></button><button class="secondary-button result-replay-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? `${replayIcon}${t("playAgain")}` : t("nextQuiz")}</button></div><button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
+      <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${worldCelebrationMarkup()}</main>`;
   }
 
   function exploreCountryStatusMarkup(countryCode) {
@@ -2863,6 +2912,7 @@
 
   function quizMarkup() {
     const question = state.questions[state.questionIndex];
+    const quiz = curriculumQuiz();
     const answered = state.answerStatus !== "unanswered";
     const progress = ((state.questionIndex + 1) / state.questions.length) * 100;
 
@@ -2905,7 +2955,7 @@
         <header class="quiz-header app-header app-header-mobile-sticky">
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
-            <span>${escapeHtml(levelTitle(curriculumLevel()))}</span>
+            <span class="quiz-level-context"><b>${t("level", { number: quiz.levelIndex + 1 })}</b><span class="quiz-level-title"> · ${escapeHtml(levelTitle(curriculumLevel()))}</span></span>
             <strong>${state.questionIndex + 1} / ${state.questions.length}</strong>
           </div>
           ${quizReturnButtonMarkup()}
@@ -3050,7 +3100,8 @@
       state.countryDetailsCode !== null ||
         state.installHelpOpen ||
         state.openChallengeOpen ||
-        state.profilePanelOpen,
+        state.profilePanelOpen ||
+        state.worldCelebrationOpen,
     );
 
     if (options.focusCorrect) app.querySelector(".is-correction")?.focus();
@@ -3072,6 +3123,7 @@
       app.querySelector('[data-action="open-challenge"]')?.focus();
     }
     if (options.focusProfilePanel) app.querySelector(".profile-panel")?.focus({ preventScroll: true });
+    if (options.focusWorldCelebration) app.querySelector(".world-celebration-continue")?.focus({ preventScroll: true });
     if (options.focusCountryDetailsTriggerCode) {
       const target = app.querySelector(
         `.explore-country-status[data-code="${options.focusCountryDetailsTriggerCode}"]`,
@@ -3253,6 +3305,32 @@
       window.clearTimeout(autoAdvanceTimer);
       autoAdvanceTimer = null;
     }
+  }
+
+  function clearWorldCelebrationTimer() {
+    if (worldCelebrationTimer === null) return;
+    window.clearTimeout(worldCelebrationTimer);
+    worldCelebrationTimer = null;
+  }
+
+  function openWorldCelebration() {
+    clearWorldCelebrationTimer();
+    state.worldCelebrationOpen = true;
+    state.worldCelebrationSettled = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    render({ focusWorldCelebration: true });
+    if (state.worldCelebrationSettled) return;
+    worldCelebrationTimer = window.setTimeout(() => {
+      worldCelebrationTimer = null;
+      state.worldCelebrationSettled = true;
+      app.querySelector(".world-celebration-overlay")?.classList.add("is-settled");
+    }, 6000);
+  }
+
+  function closeWorldCelebration() {
+    clearWorldCelebrationTimer();
+    state.worldCelebrationOpen = false;
+    state.worldCelebrationSettled = false;
+    returnToSetup({ historyMode: "replace" });
   }
 
   function setKeyboardHintsVisible(visible) {
@@ -3554,7 +3632,7 @@
     state.region = quiz.region ?? (regions.size === 1 ? [...regions][0] : "world");
     state.silhouetteExpanded = false; state.resultRecorded = false; state.resultBestScore = null;
     state.resultPreviousBestScore = null; state.resultNewQuizMastery = false; state.resultNewLevelMastery = false;
-    state.resultCelebrationPending = false;
+    state.resultCelebrationPending = false; state.resultPreview = null;
     state.screen = "quiz";
     if (savedAttempt && savedAttempt.questionIndex >= state.questions.length && !savedAttempt.correctionPending) {
       state.questionIndex = state.questions.length - 1; state.resultRecorded = false; finishCurriculumAttempt(); state.screen = "result";
@@ -3946,6 +4024,11 @@
 
   function returnToSetup({ historyMode = "push" } = {}) {
     clearAutoAdvance();
+    clearWorldCelebrationTimer();
+    if (state.previewMode !== null) {
+      progressStore = realProgressStore;
+      state.previewMode = null;
+    }
     setKeyboardHintsVisible(false);
     state.screen = "setup";
     state.questions = [];
@@ -3965,6 +4048,8 @@
     state.openChallengeOpen = false;
     state.openChallengeValue = "";
     state.openChallengeError = null;
+    state.worldCelebrationOpen = false;
+    state.worldCelebrationSettled = false;
     state.challengeActive = false;
     state.curriculumQuizId = null;
     state.activeLevelId = null;
@@ -3975,6 +4060,7 @@
     state.challengeScoreWarning = false;
     state.challengeScoreParam = null;
     state.challengeProof = null;
+    state.resultPreview = null;
     resetExploreCountryState();
     if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
     renderAtTop();
@@ -4068,13 +4154,19 @@
       return;
     }
     if (action === "next-curriculum-quiz") {
-      const quiz = progress.nextUnmastered(
-        currentProfile(),
-        curriculum.levels,
-        state.curriculumQuizId,
+      const quiz = curriculum.quizById.get(control.dataset.nextQuizId) ?? progress.nextUnmastered(
+        currentProfile(), curriculum.levels, state.curriculumQuizId,
       );
       if (quiz) startCurriculumQuiz(quiz.id, { historyMode: "replace" });
       else returnToSetup({ historyMode: "replace" });
+      return;
+    }
+    if (action === "open-world-celebration") {
+      openWorldCelebration();
+      return;
+    }
+    if (action === "view-completed-progress") {
+      closeWorldCelebration();
       return;
     }
     if (action === "view-recommended-level") {
@@ -4686,7 +4778,9 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    const activeDialog = state.openChallengeOpen
+    const activeDialog = state.worldCelebrationOpen
+      ? app.querySelector(".world-celebration-dialog")
+      : state.openChallengeOpen
       ? app.querySelector(".open-challenge-dialog")
       : state.installHelpOpen
           ? app.querySelector(".install-help-dialog")
@@ -4724,6 +4818,12 @@
     }
 
     if (event.key !== "Escape") return;
+
+    if (state.worldCelebrationOpen) {
+      event.preventDefault();
+      closeWorldCelebration();
+      return;
+    }
 
     if (state.openChallengeOpen) {
       event.preventDefault();
@@ -4845,6 +4945,63 @@
   });
 
   async function initialize() {
+    if (initialPreview === "final-question") {
+      progressStore = progress.createEmptyStore({ id: "preview-final-question", defaultName: "Preview" });
+      const finalLevel = curriculum.levels.at(-1);
+      const finalQuiz = curriculum.quizById.get(finalLevel.quizzes.at(-1).id);
+      for (const level of curriculum.levels) {
+        for (const baseQuiz of level.quizzes) {
+          const quiz = curriculum.quizById.get(baseQuiz.id);
+          if (quiz.id === finalQuiz.id) continue;
+          progressStore = progress.recordResult(progressStore, progressStore.activeProfileId, quiz, quiz.countryCodes.length);
+        }
+      }
+      const attemptSeed = "preview-final-question";
+      const recipe = curriculum.createAttempt(finalQuiz, attemptSeed);
+      const answers = recipe.slice(0, -1).map((question) => ({
+        targetCode: question.countryCode,
+        selectedCode: question.countryCode,
+        correct: true,
+      }));
+      const timestamp = new Date().toISOString();
+      progressStore = progress.saveMasteryAttempt(progressStore, progressStore.activeProfileId, {
+        quizId: finalQuiz.id,
+        revision: finalQuiz.revision,
+        attemptSeed,
+        questionIndex: answers.length,
+        score: answers.length,
+        answers,
+        correctionPending: null,
+        startedAt: timestamp,
+        updatedAt: timestamp,
+      });
+      startCurriculumQuiz(finalQuiz.id, { resume: true, historyMode: "none" });
+      return;
+    }
+    if (initialPreview) {
+      const level = initialPreview === "result-next-quiz" || initialPreview === "result-next-level"
+        ? curriculum.levels[0]
+        : curriculum.levels.at(-1);
+      const quizIndex = initialPreview === "result-next-quiz" ? 0 : 3;
+      const quiz = curriculum.quizById.get(level.quizzes[quizIndex].id);
+      state.curriculumQuizId = quiz.id;
+      state.activeLevelId = level.id;
+      state.mode = quiz.mode;
+      state.questions = quiz.countryCodes.map((code) => ({ country: countriesByCode.get(code), choices: [] }));
+      state.score = state.questions.length;
+      state.wrongAnswers = [];
+      state.resultRecorded = true;
+      state.resultBestScore = state.score;
+      state.resultPreviousBestScore = null;
+      state.resultNewQuizMastery = true;
+      state.resultNewLevelMastery = initialPreview !== "result-next-quiz";
+      state.resultCelebrationPending = false;
+      state.resultPreview = initialPreview;
+      state.screen = "result";
+      if (initialPreview === "final-celebration") openWorldCelebration();
+      else render();
+      return;
+    }
     await validateInitialChallengeScore();
     if (initialRoute && state.screen === "setup") {
       applyRoute(initialRoute, { historyMode: "replace" });

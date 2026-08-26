@@ -120,8 +120,40 @@
 .result-replay-button { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; }
 .result-replay-icon { display:inline-grid; width:1.15rem; height:1.15rem; place-items:center; }
 .result-replay-icon svg { display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.result-main-actions .primary-button.is-next-level { background:var(--green); box-shadow:0 9px 24px rgba(36,93,69,.22); }
+.result-main-actions .primary-button.is-next-level:hover { background:#174f40; }
+.result-main-actions .primary-button.is-curriculum-complete { background:var(--gold); color:var(--ink); box-shadow:0 9px 24px rgba(113,87,22,.24); }
+.result-main-actions .primary-button.is-curriculum-complete:hover { background:#dca72f; }
 .challenge-share-actions { margin-top:1rem; }
 .result-level-button { margin-top:0; padding:.65rem 1rem; }
+
+.world-celebration-overlay { position:fixed; z-index:180; inset:0; overflow:hidden; display:grid; place-items:center; padding:1.5rem; background:radial-gradient(circle at center,rgba(46,89,65,.94),rgba(12,27,20,.98)); color:#fff; }
+.world-celebration-dialog { position:relative; z-index:2; width:min(38rem,100%); display:grid; justify-items:center; padding:clamp(2rem,7vw,4rem); border:1px solid rgba(255,255,255,.2); border-radius:2rem; background:rgba(15,37,27,.74); box-shadow:0 30px 90px rgba(0,0,0,.34); backdrop-filter:blur(9px); text-align:center; }
+.world-celebration-dialog:focus { outline:none; }
+.world-celebration-trophy { display:grid; place-items:center; width:5rem; height:5rem; margin-bottom:1rem; border:2px solid rgba(233,185,73,.5); border-radius:50%; background:rgba(248,237,201,.14); font-size:2.8rem; box-shadow:0 0 32px rgba(233,185,73,.25); animation:world-trophy-arrival 850ms cubic-bezier(.2,.85,.32,1.35) both; }
+.world-celebration-dialog .kicker { margin:0 0 .7rem; color:#f8d981; }
+.world-celebration-dialog h2 { margin:0; color:#fff; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2.8rem,9vw,5.5rem); font-weight:400; letter-spacing:-.045em; line-height:.95; }
+.world-celebration-dialog p:not(.kicker) { max-width:29rem; margin:1.1rem auto 1.7rem; color:#dfece3; font-size:clamp(1rem,2.5vw,1.2rem); line-height:1.5; }
+.world-celebration-continue { background:var(--gold); color:var(--ink); box-shadow:0 9px 26px rgba(0,0,0,.25); }
+.world-celebration-continue:hover { background:#f0c75f; }
+.world-fireworks { position:absolute; inset:0; transition:opacity 800ms ease; }
+.world-celebration-overlay.is-settled .world-fireworks { opacity:.12; }
+.world-firework { position:absolute; left:var(--burst-x); top:var(--burst-y); width:.25rem; height:.25rem; }
+.world-firework i { position:absolute; left:0; top:0; width:.3rem; height:.7rem; border-radius:999px; background:var(--particle-color); opacity:0; transform-origin:50% 100%; animation:world-firework-particle 1.35s var(--burst-delay) ease-out 4 both; }
+.world-firework:nth-child(even) i { width:.42rem; height:.42rem; }
+
+@keyframes world-firework-particle {
+  0% { opacity:0; transform:rotate(var(--particle-angle)) translateY(0) scale(.2); }
+  16% { opacity:1; }
+  72% { opacity:.95; }
+  100% { opacity:0; transform:rotate(var(--particle-angle)) translateY(var(--particle-distance)) scale(.65); }
+}
+
+@keyframes world-trophy-arrival {
+  0% { opacity:0; transform:translateY(1rem) scale(.65) rotate(-8deg); }
+  65% { opacity:1; transform:translateY(0) scale(1.15) rotate(4deg); }
+  100% { opacity:1; transform:translateY(0) scale(1) rotate(0); }
+}
 
 @keyframes mastery-pop {
   0% { transform:scale(.72); opacity:.35; }
@@ -185,5 +217,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .profile-panel,.home-action-card,.progress-globe,.levels-recommended-float,.result-mastery-check,.mastery-trophy,.mastery-sparkles i { transition:none !important; animation:none !important; }
+  .profile-panel,.home-action-card,.progress-globe,.levels-recommended-float,.result-mastery-check,.mastery-trophy,.mastery-sparkles i,.world-celebration-trophy,.world-firework i { transition:none !important; animation:none !important; }
+  .world-fireworks { opacity:.12; }
 }

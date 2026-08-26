@@ -27,6 +27,7 @@ const expected = {
   "test-regular-complete": [37, 148, 148],
   "test-regional-progress": [42, 170, 171],
   "test-world-next": [46, 184, 184],
+  "test-final-quiz": [52, 211, 211],
   "test-all-mastered": [53, 212, 212],
 };
 
@@ -41,5 +42,11 @@ for (const profile of profiles) {
 
 const complete = profiles.find((profile) => profile.id === "test-all-mastered");
 assert.deepEqual(progress.continueSelection(complete, curriculum.levels), { type: "all-mastered" });
+
+const finalQuizProfile = profiles.find((profile) => profile.id === "test-final-quiz");
+assert.equal(
+  progress.continueSelection(finalQuizProfile, curriculum.levels).quiz.id,
+  curriculum.levels.at(-1).quizzes.at(-1).id,
+);
 
 console.log("Test profile backup fixture passed.");

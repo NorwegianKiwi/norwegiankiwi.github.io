@@ -301,7 +301,7 @@
     gap: 7px;
   }
 
-  .quiz-meta span {
+  .quiz-level-title {
     display: none;
   }
 
@@ -734,6 +734,21 @@
  * changing portrait phones or regular-height tablets.
  */
 @media (orientation: landscape) and (max-height: 599px) {
+  .quiz-active,
+  .flashcard-shell {
+    --short-header-height: 52px;
+    --short-bottom-space: max(6px, env(safe-area-inset-bottom));
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .quiz-active .quiz-header,
+  .flashcard-shell .quiz-header {
+    height: var(--short-header-height);
+    min-height: var(--short-header-height);
+  }
+
   .country-details-dialog {
     padding: 8px;
   }
@@ -778,7 +793,7 @@
     display: none;
   }
 
-  .quiz-active .quiz-meta span {
+  .quiz-active .quiz-level-title {
     display: none;
   }
 
@@ -1199,6 +1214,11 @@
 }
 
 @media (orientation: landscape) and (max-height: 400px) {
+  .quiz-active,
+  .flashcard-shell {
+    --short-header-height: 48px;
+  }
+
   .result-shell {
     --result-header-height: 48px;
   }

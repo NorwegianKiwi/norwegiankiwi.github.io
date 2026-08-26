@@ -49,11 +49,12 @@ browser and in the Node-based domain tests.
 ## Test profiles
 
 Import `fixtures/test-profiles-backup.json` through **Settings → Import backup
-file → Import all profiles** to add ten switchable test profiles. They cover a
+file → Import all profiles** to add eleven switchable test profiles. They cover a
 new player, played and partially mastered states, progression milestones, all
-regular levels complete, all but whole-world mastery, and all 212 quizzes
-mastered. Their IDs begin with `test-`, so importing the file again safely
-merges the same profiles instead of creating duplicates. Because imports never
+regular levels complete, all but the final quiz, and all 212 quizzes mastered.
+Use **Test · Final quiz remaining** to exercise the genuine final completion
+flow from the home screen. Their IDs begin with `test-`, so importing the file
+again safely merges the same profiles instead of creating duplicates. Because imports never
 reduce progress, delete the existing `Test · …` profiles before re-importing if
 you want to restore their original baseline after playing them.
 
@@ -62,6 +63,25 @@ Regenerate the file after changing the curriculum with:
 ```sh
 node tools/generate_test_profiles_backup.js
 ```
+
+## Result preview
+
+Result actions and the final celebration can be tested without changing saved
+profile progress:
+
+- `?preview=result-next-quiz` – show a perfect result that continues within the
+  current level
+- `?preview=result-next-level` – show a perfect result that advances to a new
+  level
+- `?preview=final-question` – open the final question with temporary in-memory
+  progress; answering it exercises the genuine completion flow without saving
+  the preview profile
+- `?preview=final-result` – show the mastered final-quiz result with the
+  **Congratulations!** action
+- `?preview=final-celebration` – open the full final celebration immediately
+
+Add `&lang=en` to any URL for English. Leaving a preview returns to the
+profile's real home screen and progress.
 
 ## Friend challenges
 

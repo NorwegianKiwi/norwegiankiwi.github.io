@@ -20,6 +20,7 @@ const scenarios = Object.freeze([
   { id: "test-regular-complete", name: "Test · All 37 regular levels", masteredLevels: 37 },
   { id: "test-regional-progress", name: "Test · 42 levels + current partial", masteredLevels: 42, masteredQuizzesInNextLevel: 2, playedQuizInNextLevel: 2 },
   { id: "test-world-next", name: "Test · 46 levels (world next)", masteredLevels: 46 },
+  { id: "test-final-quiz", name: "Test · Final quiz remaining", masteredLevels: 52, masteredQuizzesInNextLevel: 3 },
   { id: "test-all-mastered", name: "Test · Everything mastered", masteredLevels: 53 },
 ]);
 
