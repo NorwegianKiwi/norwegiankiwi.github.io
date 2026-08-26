@@ -356,12 +356,20 @@ checkbox-selection workflow while supporting both needs.
 
 - `?lang=en` continues to select English; Norwegian remains the default.
 - Explore may continue to use `region` in the query string.
+- Stable routes use `view=levels|explore|quiz|cards`, with validated stable IDs
+  and a quiz/card source where needed. Home has no `view` parameter.
+- Level expansion is encoded with `level`; quiz identity uses `id` so it cannot
+  conflict with the friend-challenge `quiz` field.
+- Screen transitions push browser history. Changes within a screen replace the
+  current entry or remain session-only. Popstate reconstructs the destination
+  from the validated route.
 - Transfer data uses the fragment so it does not conflict with query-based
   friend challenges.
 - Only the version 2 curriculum challenge query shape is accepted.
 - Internal result-preview parameters remain testing conveniences and must not
   create stored progress.
-- Ordinary curriculum navigation need not expose active progress in the URL.
+- Ordinary curriculum routes expose quiz identity and launch source, but never
+  answers, score, question position or attempt seed.
 
 ## 16. Sharing and friend challenges
 
@@ -398,9 +406,10 @@ The application should distinguish:
 
 - **Persistent state:** profiles, best results, saved mastery attempts, active
   profile and durable settings
-- **Session state:** current screen, active attempt, question index, selected
-  answer, modal state and temporary feedback
-- **URL state:** language, Explore region, challenge recipe and transfer import
+- **Session state:** active attempt, question index, selected answer, result
+  review, modal state, map interaction and temporary feedback
+- **URL state:** stable screen/content identity, launch source, language,
+  Explore region, challenge recipe and transfer import
 
 Rendering should derive visible mastery and unread states from curriculum plus
 persistent progress. UI elements must not independently mutate stored objects
@@ -416,11 +425,11 @@ uses the flag; its revealed side uses country name, capital and the existing cou
 Missed-country decks are constructed from the completed attempt's wrong-country
 codes and do not write quiz progress.
 
-Explore may also hold a session-only contextual scope with a localized title,
-country codes and a return target. Map extent is independent of this membership:
+Explore may also hold a contextual scope with a localized title, country codes
+and a return target. Level scopes are reproducible from their stable level ID;
+result-review scopes remain session-only. Map extent is independent of this membership:
 the world, Africa overview and detailed regional maps may be traversed while the
-scope list remains fixed. Contextual scopes are neither persisted nor encoded in
-the URL.
+scope list remains fixed. Contextual scopes are never persisted as saved lists.
 
 ## 18. Tests and validation
 
@@ -465,6 +474,8 @@ At minimum, add automated coverage for:
 - Curriculum challenge recipe round trip and current-revision progress recording
 - Progress sharing never contains transfer payload data
 - Existing language and challenge URL parsing
+- Stable route round trips, invalid-ID fallback and challenge/import precedence
+- Browser Back/Forward and reload behaviour for each stable screen
 - Result previews never persist progress
 - Explore remains usable if storage is unavailable
 

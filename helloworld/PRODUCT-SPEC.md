@@ -271,8 +271,9 @@ The interface uses action-oriented labels such as **Download backup file** and
 - Explore opens in the unified map-and-list workspace from the home screen.
 - Whole world is a selectable workspace with 197 countries and 30 other places,
   alphabetized within their two groups.
-- Levels and result review may open temporary, session-only country scopes;
-  these scopes do not add saved lists or URL state.
+- Levels and result review may open contextual country scopes. Level scopes use
+  the stable level ID in the URL; result-review scopes remain session-only.
+  Neither kind creates a saved list.
 - The existing regional map navigation, country selection, zoom, silhouettes,
   capital markers, notes and country list should be preserved.
 - The workspace stays within the viewport and exposes region selection, the
@@ -296,6 +297,21 @@ The interface uses action-oriented labels such as **Download backup file** and
 - No level or mastery requirement restricts Explore content.
 - Explore may later offer a contextual **Quiz me on these countries** action,
   but this is not required for the first progression release.
+
+## 12.1 Navigation and reload behaviour
+
+- Home, Levels, ordinary and level-scoped Explore, curriculum quizzes, and
+  reproducible Flashcard decks have stable query-string URLs.
+- Browser Back and Forward move between activity screens. Filters, level
+  expansion, map interaction, country selection and dialogs do not create
+  additional history steps.
+- A quiz opened from Levels returns to its containing level. A quiz opened from
+  Continue, Surprise Quiz or a friend challenge returns Home. The result screen
+  keeps the same source-aware return action.
+- Reloading a quiz or Flashcard URL restarts that activity. Existing resumable
+  mastery-attempt behaviour takes precedence when a matching saved attempt exists.
+- Result review, missed-country decks and result-scoped Explore remain temporary
+  session state and fall back to the underlying quiz after a reload.
 
 ## 13. Ethical engagement
 

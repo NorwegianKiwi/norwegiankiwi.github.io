@@ -25,7 +25,18 @@ defaults and are omitted from the URL:
 - `?region=europe` – Norwegian with Europe selected
 - `?lang=en&region=europe` – English with Europe selected
 
-The language can be changed from anywhere without resetting an active quiz,
+Stable screens are also represented in the query string, so browser Back and
+Forward work within the app and reloading returns to the same activity:
+
+- `?view=levels&level=pack-nordics` – Levels with one level expanded
+- `?view=explore&region=europe` – Explore in Europe
+- `?view=explore&level=pack-nordics` – a level-scoped Explore workspace
+- `?view=quiz&id=pack-nordics%3Acountry-flag&source=levels` – a curriculum quiz
+- `?view=cards&source=level&level=pack-nordics` – level Flashcards
+
+Reloading a quiz or Flashcard deck restarts that activity. Quiz answers, result
+reviews, card position, selected countries, map zoom and open dialogs remain
+session-only. The language can be changed from anywhere without resetting an active quiz,
 card deck, saved mastery attempt, or Explore workspace. Game progress is stored in
 versioned local profiles under the `hello-world-progress` localStorage key.
 First use creates Player 1 automatically.
@@ -90,6 +101,7 @@ node tests/challenge.test.js
 - `progress.js` – local profiles, progress derivation, persistence, transfer,
   backup and safe merging
 - `explore-state.js` – session-only Explore scope and geographic map-extent rules
+- `navigation.js` – validation and serialization of stable application routes
 - `fixtures/test-profiles-backup.json` – importable browser test profiles ranging
   from brand new to every level mastered; regenerate it with
   `node tools/generate_test_profiles_backup.js`

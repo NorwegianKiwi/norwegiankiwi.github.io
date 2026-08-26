@@ -12,11 +12,12 @@
   const mapData = window.GEOGRAFI_QUIZ_MAP_DATA;
   const challenge = window.GEOGRAFI_CHALLENGE;
   const exploreState = window.GEOGRAFI_EXPLORE_STATE;
+  const navigation = window.GEOGRAFI_NAVIGATION;
   const curriculum = window.GEOGRAFI_CURRICULUM;
   const progress = window.GEOGRAFI_PROGRESS;
   const app = document.getElementById("app");
 
-  if (!data || !mapData || !challenge || !exploreState || !curriculum || !progress || !app) {
+  if (!data || !mapData || !challenge || !exploreState || !navigation || !curriculum || !progress || !app) {
     throw new Error(
       initialLocale === "en"
         ? "Hello World! could not load the country data."
@@ -396,6 +397,12 @@
   );
 
   const initialChallenge = challenge.readUrl(initialUrl, curriculum.quizById);
+  const navigationContext = {
+    quizById: curriculum.quizById,
+    levelById: curriculum.levelById,
+    regionIds: new Set(regionOptions.map((region) => region.id)),
+  };
+  const initialRoute = navigation.readUrl(initialUrl, navigationContext);
 
   let browserStorage = null;
   try { browserStorage = window.localStorage; } catch { browserStorage = null; }
@@ -441,6 +448,7 @@
     importError: transferError,
     selectedLevelId: null,
     flashcardReturn: "home",
+    quizReturn: "home",
     challengeTargetScore: null,
     challengeScoreVerified: false,
     challengeScoreWarning: initialChallenge?.valid === true,
@@ -737,6 +745,16 @@
     `;
   }
 
+  function quizReturnButtonMarkup() {
+    if (state.quizReturn !== "levels") return homeButtonMarkup();
+    return `
+      <button class="quiet-button home-button" data-action="back-from-quiz">
+        <span aria-hidden="true">←</span>
+        ${t("backToLevels")}
+      </button>
+    `;
+  }
+
   function actionFeedbackMarkup() {
     return `
       <span class="action-feedback-icon" aria-hidden="true"></span>
@@ -744,24 +762,96 @@
     `;
   }
 
-  function syncUrlState() {
-    const url = new URL(window.location.href);
-    url.search = "";
-    if (state.locale === "en") url.searchParams.set("lang", "en");
-    if (state.region !== "world" && !state.challengeActive) url.searchParams.set("region", state.region);
+  const historySessionId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+
+  function currentRoute() {
+    if (state.screen === "levels") {
+      return { screen: "levels", levelId: state.selectedLevelId };
+    }
+    if (state.screen === "explore") {
+      if (state.exploreReturn?.screen === "result") return quizRoute();
+      return {
+        screen: "explore",
+        levelId: state.exploreScope?.levelId ?? null,
+        region: state.region,
+      };
+    }
+    if (state.screen === "flashcards") {
+      if (state.flashcardReturn === "result") return quizRoute();
+      if (state.flashcardReturn === "level") {
+        return { screen: "flashcards", source: "level", levelId: state.activeLevelId };
+      }
+      if (state.flashcardReturn === "explore") {
+        return {
+          screen: "flashcards",
+          source: "explore",
+          levelId: state.exploreScope?.levelId ?? null,
+          region: state.region,
+        };
+      }
+    }
+    if (state.screen === "quiz" || state.screen === "result") return quizRoute();
+    return { screen: "setup" };
+  }
+
+  function quizRoute() {
+    return state.curriculumQuizId
+      ? {
+          screen: "quiz",
+          quizId: state.curriculumQuizId,
+          source: state.quizReturn === "levels" ? "levels" : "home",
+        }
+      : { screen: "setup" };
+  }
+
+  function routeEquals(left, right) {
+    return JSON.stringify(left) === JSON.stringify(right);
+  }
+
+  function syncUrlState({ push = false, route = currentRoute() } = {}) {
+    let url;
     if (state.challengeActive && state.curriculumQuizId) {
+      url = new URL(window.location.href);
+      url.search = "";
+      url.hash = "";
+      if (state.locale === "en") url.searchParams.set("lang", "en");
       const quiz = curriculumQuiz();
       url.searchParams.set("cv", "2");
       url.searchParams.set("quiz", state.curriculumQuizId);
       url.searchParams.set("rev", String(quiz?.revision ?? 1));
       if (state.challengeScoreParam !== null) url.searchParams.set("score", state.challengeScoreParam); else url.searchParams.delete("score");
       if (state.challengeProof !== null) url.searchParams.set("proof", state.challengeProof); else url.searchParams.delete("proof");
+    } else {
+      url = navigation.createUrl(window.location.href, route, state.locale);
     }
+
+    const previousState = window.history.state;
+    const historyState = {
+      helloWorldNavigation: true,
+      sessionId: historySessionId,
+      route,
+      screen: state.screen,
+      returnRoute: push
+        ? previousState?.route ?? navigation.readUrl(window.location.href, navigationContext)
+        : previousState?.returnRoute ?? null,
+    };
     try {
-      window.history.replaceState(null, "", url.href);
+      window.history[push ? "pushState" : "replaceState"](historyState, "", url.href);
     } catch (error) {
-      console.warn("Could not update the language and region URL.", error);
+      console.warn("Could not update the navigation URL.", error);
     }
+  }
+
+  function returnToRoute(route) {
+    const currentHistoryState = window.history.state;
+    if (
+      currentHistoryState?.sessionId === historySessionId &&
+      routeEquals(currentHistoryState.returnRoute, route)
+    ) {
+      window.history.back();
+      return;
+    }
+    applyRoute(route, { historyMode: "replace" });
   }
 
   function updateDocumentMetadata() {
@@ -1588,7 +1678,7 @@
     const perfect = state.score === state.questions.length;
     const record = progress.currentRecord(currentProfile(), quiz);
     const best = record?.bestScore ?? state.score;
-    return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup()}</header>
+    return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score"><strong>${state.score}/${state.questions.length}</strong><span>${t("bestScore", { score: best, total: state.questions.length })}</span></div>${state.resultNewLevelMastery ? `<p class="level-mastered-callout" aria-label="${escapeHtml(levelTitle(level))} · 4/4 ${t("mastered")}"><span>${escapeHtml(levelTitle(level))} · 4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></p>` : ""}${challengeComparisonMarkup()}</div>
       <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button" data-action="${perfect ? "next-curriculum-quiz" : "retry-curriculum-quiz"}">${perfect ? t("nextQuiz") : t("tryAgainAction")} <span aria-hidden="true">→</span></button><button class="secondary-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? t("playAgain") : t("nextQuiz")}</button></div><button class="secondary-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
       <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}</main>`;
@@ -2773,7 +2863,7 @@
             <span>${escapeHtml(levelTitle(curriculumLevel()))}</span>
             <strong>${state.questionIndex + 1} / ${state.questions.length}</strong>
           </div>
-          ${homeButtonMarkup()}
+          ${quizReturnButtonMarkup()}
         </header>
 
         <div
@@ -3017,7 +3107,10 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function showRecommendedLevels(fallbackLevelId = state.activeLevelId) {
+  function showRecommendedLevels(
+    fallbackLevelId = state.activeLevelId,
+    { historyMode = "push" } = {},
+  ) {
     const next = progress.continueSelection(
       currentProfile(),
       curriculum.levels,
@@ -3026,6 +3119,7 @@
     const levelId = quiz?.levelId ?? fallbackLevelId ?? null;
     state.selectedLevelId = levelId;
     state.screen = "levels";
+    if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
     if (!levelId) {
       renderAtTop();
       return;
@@ -3033,6 +3127,79 @@
     render({
       focusLevelTarget: quiz ? { quizId: quiz.id } : { levelId },
     });
+  }
+
+  function showLevelsRoute(levelId, { historyMode = "none" } = {}) {
+    state.selectedLevelId = levelId ?? null;
+    state.screen = "levels";
+    state.exploreScope = null;
+    state.exploreReturn = null;
+    if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
+    renderAtTop();
+  }
+
+  function applyRoute(route, { historyMode = "none" } = {}) {
+    if (!route || route.screen === "setup") {
+      returnToSetup({ historyMode });
+      return;
+    }
+    if (route.screen === "levels") {
+      showLevelsRoute(route.levelId, { historyMode });
+      return;
+    }
+    if (route.screen === "explore") {
+      state.region = route.region;
+      if (route.levelId) {
+        const level = curriculum.levelById.get(route.levelId);
+        state.activeLevelId = level.id;
+        showContextualExplore(
+          contextualExploreScope(level.title, level.countryCodes, level.id),
+          { screen: "levels", levelId: level.id },
+          null,
+          { historyMode },
+        );
+      } else {
+        showExplore({ historyMode });
+      }
+      return;
+    }
+    if (route.screen === "quiz") {
+      state.challengeActive = false;
+      const saved = currentProfile().savedMasteryAttempt;
+      const quiz = curriculum.quizById.get(route.quizId);
+      startCurriculumQuiz(route.quizId, {
+        resume: saved?.quizId === route.quizId && saved.revision === quiz.revision,
+        source: route.source,
+        historyMode,
+      });
+      return;
+    }
+    if (route.screen === "flashcards" && route.source === "level") {
+      const level = curriculum.levelById.get(route.levelId);
+      state.activeLevelId = level.id;
+      startFlashcards(
+        level.countryCodes.map((code) => countriesByCode.get(code)),
+        "level",
+        { historyMode },
+      );
+      return;
+    }
+    if (route.screen === "flashcards" && route.source === "explore") {
+      state.region = route.region;
+      if (route.levelId) {
+        const level = curriculum.levelById.get(route.levelId);
+        state.activeLevelId = level.id;
+        showContextualExplore(
+          contextualExploreScope(level.title, level.countryCodes, level.id),
+          { screen: "levels", levelId: level.id },
+          null,
+          { historyMode: "none" },
+        );
+      } else {
+        showExplore({ historyMode: "none" });
+      }
+      startFlashcards(shuffle(countriesInExploreMapScope()), "explore", { historyMode });
+    }
   }
 
   function clearAutoAdvance() {
@@ -3249,6 +3416,7 @@
     if (state.questionIndex === state.questions.length - 1) {
       finishCurriculumAttempt();
       state.screen = "result";
+      syncUrlState();
     } else {
       state.questionIndex += 1;
       state.selectedCode = null;
@@ -3295,9 +3463,19 @@
     state.resultRecorded = true;
   }
 
-  function startCurriculumQuiz(quizId, { resume = false, challengeRound = false } = {}) {
+  function startCurriculumQuiz(
+    quizId,
+    { resume = false, challengeRound = false, source = null, historyMode = "push" } = {},
+  ) {
     const quiz = curriculum.quizById.get(quizId);
     if (!quiz) return;
+    const quizSource = source ?? (
+      state.screen === "levels"
+        ? "levels"
+        : state.screen === "quiz" || state.screen === "result"
+          ? state.quizReturn
+          : "home"
+    );
     const saved = currentProfile().savedMasteryAttempt;
     if (!resume && saved && !window.confirm(t("abandonAttempt"))) return;
     if (!resume && saved) persist(progress.abandonMasteryAttempt(progressStore, progressStore.activeProfileId));
@@ -3305,6 +3483,7 @@
     const level = curriculum.levelById.get(quiz.levelId);
     const savedAttempt = resume && saved?.quizId === quizId && saved.revision === quiz.revision ? saved : null;
     state.curriculumQuizId = quiz.id; state.activeLevelId = level.id; state.mode = quiz.mode;
+    state.quizReturn = quizSource === "levels" ? "levels" : "home";
     state.challengeActive = challengeRound || state.challengeActive;
     state.attemptSeed = savedAttempt?.attemptSeed ?? freshAttemptSeed();
     const recipe = curriculum.createAttempt(quiz, state.attemptSeed);
@@ -3327,10 +3506,11 @@
     if (savedAttempt && savedAttempt.questionIndex >= state.questions.length && !savedAttempt.correctionPending) {
       state.questionIndex = state.questions.length - 1; state.resultRecorded = false; finishCurriculumAttempt(); state.screen = "result";
     }
+    if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
     renderAtTop({ focusCorrect: state.answerStatus === "correction" });
   }
 
-  function showExplore() {
+  function showExplore({ historyMode = "push" } = {}) {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
     state.screen = "explore";
@@ -3345,13 +3525,15 @@
     state.exploreMapExtent = state.region;
     state.exploreRegionPickerOpen = false;
     resetExploreCountryState();
+    if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
     renderAtTop();
   }
 
-  function contextualExploreScope(title, countryCodes) {
+  function contextualExploreScope(title, countryCodes, levelId = null) {
     return {
       kind: "contextual",
       title,
+      levelId,
       countryCodes: exploreState.uniqueCodes(countryCodes).filter((code) =>
         countriesByCode.has(code),
       ),
@@ -3362,7 +3544,12 @@
     return { nb: messages.nb[key], en: messages.en[key] };
   }
 
-  function showContextualExplore(scope, returnTarget, pinnedCode = null) {
+  function showContextualExplore(
+    scope,
+    returnTarget,
+    pinnedCode = null,
+    { historyMode = "push" } = {},
+  ) {
     if (!scope.countryCodes.length) return;
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
@@ -3378,6 +3565,7 @@
       ? pinnedCode
       : null;
     state.exploreRegionPickerOpen = false;
+    if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
     renderAtTop(
       state.explorePinnedCode
         ? { focusCountryDetailsTriggerCode: state.explorePinnedCode }
@@ -3398,20 +3586,15 @@
 
   function returnFromExplore() {
     const returnTarget = state.exploreReturn;
-    state.exploreScope = null;
-    state.exploreReturn = null;
-    state.countryDetailsCode = null;
-    state.silhouetteExpanded = false;
     if (returnTarget?.screen === "result") {
-      state.screen = "result";
-      render({ focusReviewCode: returnTarget.reviewCode });
+      returnToRoute(quizRoute());
       return;
     }
     if (returnTarget?.screen === "levels") {
-      showRecommendedLevels(returnTarget.levelId);
+      returnToRoute({ screen: "levels", levelId: returnTarget.levelId });
       return;
     }
-    returnToSetup();
+    returnToRoute({ screen: "setup" });
   }
 
   function closeCountryDetails() {
@@ -3651,8 +3834,7 @@
     state.importProfiles = null;
     state.importError = false;
     clearTransferFragment();
-    state.screen = "setup";
-    renderAtTop();
+    returnToSetup({ historyMode: "replace" });
   }
 
   function importSingleProfile(imported) {
@@ -3675,6 +3857,7 @@
   function startFlashcards(
     flashcards,
     returnTarget,
+    { historyMode = "push" } = {},
   ) {
     state.flashcards = flashcards;
     state.flashcardIndex = 0;
@@ -3682,6 +3865,7 @@
     state.flashcardReturn = returnTarget;
     state.countryDetailsCode = null;
     state.screen = "flashcards";
+    if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
     renderAtTop({ focusFlashcard: true });
   }
 
@@ -3706,7 +3890,7 @@
     }
   }
 
-  function returnToSetup() {
+  function returnToSetup({ historyMode = "push" } = {}) {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
     state.screen = "setup";
@@ -3738,7 +3922,7 @@
     state.challengeScoreParam = null;
     state.challengeProof = null;
     resetExploreCountryState();
-    syncUrlState();
+    if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
     renderAtTop();
   }
 
@@ -3809,7 +3993,7 @@
       return;
     }
     if (action === "show-recommended-next") {
-      showRecommendedLevels();
+      showRecommendedLevels(undefined, { historyMode: "replace" });
       return;
     }
     if (action === "toggle-level") {
@@ -3817,6 +4001,7 @@
         state.selectedLevelId === control.dataset.levelId
           ? null
           : control.dataset.levelId;
+      syncUrlState();
       render();
       return;
     }
@@ -3825,7 +4010,7 @@
       return;
     }
     if (action === "retry-curriculum-quiz") {
-      startCurriculumQuiz(state.curriculumQuizId);
+      startCurriculumQuiz(state.curriculumQuizId, { historyMode: "replace" });
       return;
     }
     if (action === "next-curriculum-quiz") {
@@ -3834,8 +4019,8 @@
         curriculum.levels,
         state.curriculumQuizId,
       );
-      if (quiz) startCurriculumQuiz(quiz.id);
-      else returnToSetup();
+      if (quiz) startCurriculumQuiz(quiz.id, { historyMode: "replace" });
+      else returnToSetup({ historyMode: "replace" });
       return;
     }
     if (action === "view-recommended-level") {
@@ -3870,20 +4055,22 @@
       const level = curriculum.levelById.get(control.dataset.levelId);
       if (!level) return;
       showContextualExplore(
-        contextualExploreScope(level.title, level.countryCodes),
+        contextualExploreScope(level.title, level.countryCodes, level.id),
         { screen: "levels", levelId: level.id },
       );
       return;
     }
     if (action === "back-from-cards") {
       if (state.flashcardReturn === "explore") {
-        state.screen = "explore";
-        render({ focusExploreFlashcards: true });
+        returnToRoute({
+          screen: "explore",
+          levelId: state.exploreScope?.levelId ?? null,
+          region: state.region,
+        });
       } else if (state.flashcardReturn === "result") {
-        state.screen = "result";
-        render({ focusResultFlashcards: true });
+        returnToRoute(quizRoute());
       } else {
-        showRecommendedLevels(state.activeLevelId);
+        returnToRoute({ screen: "levels", levelId: state.activeLevelId });
       }
       return;
     }
@@ -3918,7 +4105,13 @@
     }
     if (action === "import-one") { const imported = state.importProfiles?.[Number(control.dataset.importIndex)]; if (imported) importSingleProfile(imported); return; }
     if (action === "import-all") { importAllProfiles(); return; }
-    if (action === "cancel-import") { state.importProfiles = null; state.importError = false; clearTransferFragment(); state.screen = "setup"; renderAtTop(); return; }
+    if (action === "cancel-import") {
+      state.importProfiles = null;
+      state.importError = false;
+      clearTransferFragment();
+      returnToSetup({ historyMode: "replace" });
+      return;
+    }
 
     if (action === "install-app") {
       void requestInstall();
@@ -3991,9 +4184,11 @@
     if (action === "explore-map-region") {
       if (!updateRegion(control.dataset.value)) return;
       state.exploreScope = null;
+      state.exploreReturn = null;
       state.exploreMapExtent = state.region;
       resetExploreCountryState();
       state.exploreRegionPickerOpen = false;
+      syncUrlState();
       render({ focusExploreHeading: true });
       return;
     }
@@ -4087,7 +4282,12 @@
     }
 
     if (action === "setup") {
-      returnToSetup();
+      returnToRoute({ screen: "setup" });
+      return;
+    }
+
+    if (action === "back-from-quiz") {
+      returnToRoute({ screen: "levels", levelId: state.activeLevelId });
     }
   });
 
@@ -4548,9 +4748,52 @@
     if (state.screen === "setup") render();
   });
 
+  window.addEventListener("popstate", (event) => {
+    const route = navigation.readUrl(window.location.href, navigationContext);
+    if (!route) {
+      window.location.reload();
+      return;
+    }
+
+    const historyState = event.state;
+    if (
+      historyState?.sessionId === historySessionId &&
+      route.screen === "quiz" &&
+      route.quizId === state.curriculumQuizId
+    ) {
+      if (historyState.screen === "result" && state.resultRecorded) {
+        state.screen = "result";
+        renderAtTop();
+        return;
+      }
+      if (
+        historyState.screen === "explore" &&
+        state.exploreReturn?.screen === "result"
+      ) {
+        state.screen = "explore";
+        renderAtTop();
+        return;
+      }
+      if (
+        historyState.screen === "flashcards" &&
+        state.flashcardReturn === "result"
+      ) {
+        state.screen = "flashcards";
+        renderAtTop({ focusFlashcard: true });
+        return;
+      }
+    }
+
+    applyRoute(route, { historyMode: "none" });
+  });
+
   async function initialize() {
     await validateInitialChallengeScore();
-    if (state.screen !== "challenge-error") syncUrlState();
+    if (initialRoute && state.screen === "setup") {
+      applyRoute(initialRoute, { historyMode: "replace" });
+      return;
+    }
+    if (state.screen !== "challenge-error" && state.screen !== "import") syncUrlState();
     render();
   }
 
