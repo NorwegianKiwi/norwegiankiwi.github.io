@@ -153,6 +153,12 @@
     if (!record) return "unplayed";
     return record.total === quiz.countryCodes.length && record.bestScore === record.total ? "mastered" : "played";
   }
+  function matchingSavedAttempt(profile, quiz) {
+    const attempt = profile?.savedMasteryAttempt;
+    return attempt && quiz && attempt.quizId === quiz.id && attempt.revision === quiz.revision
+      ? attempt
+      : null;
+  }
   function levelProgress(profile, level) {
     const states = level.quizzes.map((quiz) => quizState(profile, { ...quiz, countryCodes: level.countryCodes }));
     return { mastered: states.filter((state) => state === "mastered").length, played: states.filter((state) => state !== "unplayed").length, total: 4 };
@@ -343,6 +349,7 @@
   return Object.freeze({
     STORAGE_KEY, SCHEMA_VERSION, TRANSFER_VERSION, createProfile, createEmptyStore,
     validateRoot, loadStore, saveStore, activeProfile, currentRecord, quizState,
+    matchingSavedAttempt,
     levelProgress, summary, continueSelection, nextUnmastered, surpriseQuiz,
     recordResult, addProfile, switchProfile, renameProfile, clearProgress,
     deleteProfile, saveMasteryAttempt, abandonMasteryAttempt, transferableProfile,

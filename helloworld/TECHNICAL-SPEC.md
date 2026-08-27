@@ -262,7 +262,8 @@ Rules:
 - Resuming never permits changing a previous answer.
 - Language changes do not invalidate an attempt because stored identities are
   language-independent.
-- Starting another scored quiz while an attempt exists requires explicit
+- Starting the same current quiz ID and revision resumes the saved attempt
+  directly. Starting a different scored quiz requires an accessible in-app
   confirmation; confirmation deletes the saved attempt.
 - Completing the attempt records its best result and removes the saved attempt.
 - Saved attempts are local operational state and are excluded from profile

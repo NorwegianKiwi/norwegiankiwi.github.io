@@ -42,6 +42,27 @@ const attempt = {
 };
 store = progress.saveMasteryAttempt(store, originalId, attempt);
 assert.deepEqual(progress.activeProfile(store).savedMasteryAttempt.answers, attempt.answers);
+assert.equal(
+  progress.matchingSavedAttempt(progress.activeProfile(store), {
+    id: attempt.quizId,
+    revision: attempt.revision,
+  })?.attemptSeed,
+  attempt.attemptSeed,
+);
+assert.equal(
+  progress.matchingSavedAttempt(progress.activeProfile(store), {
+    id: attempt.quizId,
+    revision: attempt.revision + 1,
+  }),
+  null,
+);
+assert.equal(
+  progress.matchingSavedAttempt(progress.activeProfile(store), {
+    id: "mastery-europe:flag-country",
+    revision: attempt.revision,
+  }),
+  null,
+);
 store = progress.abandonMasteryAttempt(store, originalId);
 assert.equal(progress.activeProfile(store).savedMasteryAttempt, null);
 

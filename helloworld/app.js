@@ -306,8 +306,7 @@
       mastered: "mestret", unplayed: "Ikke spilt", recommended: "Anbefalt neste",
       profileMenu: "Profil og innstillinger", addProfile: "Legg til profil", renameProfile: "Gi profilen nytt navn",
       switchProfile: "Bytt profil", clearProgress: "Nullstill fremgang", deleteProfile: "Slett profil",
-      clearConfirm: "Nullstille all spillfremgang for denne profilen?", deleteConfirm: "Slette denne profilen?",
-      newProfileName: "Navn på ny profil", renamePrompt: "Nytt profilnavn", settings: "Innstillinger",
+      newProfileName: "Navn på ny profil", settings: "Innstillinger",
       transferProfile: "Overfør denne profilen", copyTransferLink: "Kopier overføringslenke",
       transferCopied: "Overføringslenken er kopiert.", transferFailed: "Kunne ikke kopiere lenken.",
       backupDevice: "Sikkerhetskopier denne enheten", downloadBackup: "Last ned sikkerhetskopi",
@@ -326,7 +325,18 @@
       shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre en venn",
       goToRecommended: "Gå til anbefalt neste quiz",
       cards: "Øv med flashcards", questionsLong: "{count} spørsmål · lang utfordring",
-      resumeAttempt: "Fortsett lagret forsøk", abandonAttempt: "Et langt mestringsforsøk er lagret. Starte en annen quiz og forkaste forsøket?",
+      resumeAttempt: "Fortsett lagret forsøk", quizInProgress: "Quiz pågår", continueMode: "Fortsett {mode}",
+      answeredProgress: "{answered} / {total} besvart", keepSavedAttempt: "Behold lagret forsøk",
+      abandonAttemptTitle: "Starte en annen quiz?",
+      abandonAttemptDescription: "Du har besvart {answered} av {total} spørsmål i {savedTitle} · {savedMode}. Hvis du starter {nextTitle} · {nextMode}, slettes dette forsøket.",
+      abandonAndStart: "Forkast forsøket og start quizen",
+      addProfileTitle: "Legg til profil", addProfileDescription: "Fremgangen til den nye profilen lagres separat på denne enheten.",
+      addProfileAction: "Opprett profil", renameProfileTitle: "Gi profilen nytt navn",
+      renameProfileDescription: "Skriv inn et nytt navn for {name}.", renameProfileAction: "Lagre navn",
+      clearProgressTitle: "Nullstille fremgangen?", clearProgressDescription: "Alle quizresultater og eventuelle lagrede forsøk for {name} slettes. Profilen beholdes.",
+      clearProgressAction: "Nullstill fremgang", deleteProfileTitle: "Slette profilen?",
+      deleteProfileDescription: "Profilen {name} og all fremgangen dens slettes fra denne enheten. Dette kan ikke angres.",
+      deleteProfileAction: "Slett profil",
       savedAttempt: "Du har et lagret forsøk på {title}.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
       challengeQuizTitle: "Quizutfordring", scoreToBeat: "Resultat å slå", approximateTime: "Omtrent {minutes} min",
       shareUnavailable: "Kunne ikke dele eller kopiere akkurat nå.", profilePrivacy: "Fremgangen lagres bare på denne enheten.",
@@ -339,8 +349,7 @@
       mastered: "mastered", unplayed: "Unplayed", recommended: "Recommended next",
       profileMenu: "Profile and settings", addProfile: "Add profile", renameProfile: "Rename profile",
       switchProfile: "Switch profile", clearProgress: "Clear progress", deleteProfile: "Delete profile",
-      clearConfirm: "Clear all game progress for this profile?", deleteConfirm: "Delete this profile?",
-      newProfileName: "New profile name", renamePrompt: "New profile name", settings: "Settings",
+      newProfileName: "New profile name", settings: "Settings",
       transferProfile: "Transfer this profile", copyTransferLink: "Copy transfer link",
       transferCopied: "Transfer link copied.", transferFailed: "Could not copy the link.",
       backupDevice: "Back up this device", downloadBackup: "Download backup file",
@@ -359,7 +368,18 @@
       shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge a friend",
       goToRecommended: "Go to the recommended next quiz",
       cards: "Practice with flashcards", questionsLong: "{count} questions · long challenge",
-      resumeAttempt: "Resume saved attempt", abandonAttempt: "A long mastery attempt is saved. Start another quiz and abandon it?",
+      resumeAttempt: "Resume saved attempt", quizInProgress: "Quiz in progress", continueMode: "Continue {mode}",
+      answeredProgress: "{answered} / {total} answered", keepSavedAttempt: "Keep saved attempt",
+      abandonAttemptTitle: "Start a different quiz?",
+      abandonAttemptDescription: "You have answered {answered} of {total} questions in {savedTitle} · {savedMode}. Starting {nextTitle} · {nextMode} will delete that attempt.",
+      abandonAndStart: "Abandon attempt and start quiz",
+      addProfileTitle: "Add profile", addProfileDescription: "The new profile’s progress will be stored separately on this device.",
+      addProfileAction: "Create profile", renameProfileTitle: "Rename profile",
+      renameProfileDescription: "Enter a new name for {name}.", renameProfileAction: "Save name",
+      clearProgressTitle: "Clear progress?", clearProgressDescription: "All quiz results and any saved attempt for {name} will be deleted. The profile will remain.",
+      clearProgressAction: "Clear progress", deleteProfileTitle: "Delete profile?",
+      deleteProfileDescription: "The profile {name} and all of its progress will be deleted from this device. This cannot be undone.",
+      deleteProfileAction: "Delete profile",
       savedAttempt: "You have a saved attempt for {title}.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
       challengeQuizTitle: "Quiz challenge", scoreToBeat: "Score to beat", approximateTime: "About {minutes} min",
       shareUnavailable: "Could not share or copy right now.", profilePrivacy: "Progress is stored only on this device.",
@@ -461,6 +481,7 @@
     resultPreview: null,
     previewMode: initialPreview,
     profilePanelOpen: false,
+    actionDialog: null,
     importProfiles: transferPreview,
     importError: transferError,
     selectedLevelId: null,
@@ -1498,6 +1519,81 @@
     `;
   }
 
+  function actionDialogDetails() {
+    const dialog = state.actionDialog;
+    if (!dialog) return null;
+    const profile = progressStore.profiles[dialog.profileId] ?? currentProfile();
+    if (dialog.kind === "abandon-attempt") {
+      const saved = profile.savedMasteryAttempt;
+      const savedQuiz = saved ? curriculum.quizById.get(saved.quizId) : null;
+      const nextQuiz = curriculum.quizById.get(dialog.quizId);
+      if (!saved || !savedQuiz || !nextQuiz) return null;
+      return {
+        title: t("abandonAttemptTitle"),
+        description: t("abandonAttemptDescription", {
+          answered: saved.questionIndex,
+          total: savedQuiz.countryCodes.length,
+          savedTitle: levelTitle(curriculum.levelById.get(savedQuiz.levelId)),
+          savedMode: modeLabel(savedQuiz.mode),
+          nextTitle: levelTitle(curriculum.levelById.get(nextQuiz.levelId)),
+          nextMode: modeLabel(nextQuiz.mode),
+        }),
+        confirmLabel: t("abandonAndStart"),
+        cancelLabel: t("keepSavedAttempt"),
+        danger: true,
+      };
+    }
+    if (dialog.kind === "add-profile") {
+      return {
+        title: t("addProfileTitle"), description: t("addProfileDescription"),
+        confirmLabel: t("addProfileAction"), cancelLabel: t("cancel"),
+        inputLabel: t("newProfileName"), inputValue: "",
+      };
+    }
+    if (dialog.kind === "rename-profile") {
+      return {
+        title: t("renameProfileTitle"),
+        description: t("renameProfileDescription", { name: profile.name }),
+        confirmLabel: t("renameProfileAction"), cancelLabel: t("cancel"),
+        inputLabel: t("newProfileName"), inputValue: profile.name,
+      };
+    }
+    if (dialog.kind === "clear-profile") {
+      return {
+        title: t("clearProgressTitle"),
+        description: t("clearProgressDescription", { name: profile.name }),
+        confirmLabel: t("clearProgressAction"), cancelLabel: t("cancel"), danger: true,
+      };
+    }
+    if (dialog.kind === "delete-profile") {
+      return {
+        title: t("deleteProfileTitle"),
+        description: t("deleteProfileDescription", { name: profile.name }),
+        confirmLabel: t("deleteProfileAction"), cancelLabel: t("cancel"), danger: true,
+      };
+    }
+    return null;
+  }
+
+  function actionDialogMarkup() {
+    const details = actionDialogDetails();
+    if (!details) return "";
+    return `
+      <div class="action-dialog-overlay" data-action="close-action-dialog">
+        <section class="action-dialog" role="dialog" aria-modal="true" aria-labelledby="action-dialog-title" aria-describedby="action-dialog-description" tabindex="-1">
+          <form data-action-dialog-form>
+            <h2 id="action-dialog-title">${escapeHtml(details.title)}</h2>
+            <p id="action-dialog-description">${escapeHtml(details.description)}</p>
+            ${details.inputLabel ? `<label for="action-dialog-input">${escapeHtml(details.inputLabel)}</label><input id="action-dialog-input" name="profile-name" type="text" maxlength="40" value="${escapeHtml(details.inputValue)}" autocomplete="off" />` : ""}
+            <div class="action-dialog-actions">
+              <button class="secondary-button" type="button" data-action="close-action-dialog" data-dialog-cancel-focus>${escapeHtml(details.cancelLabel)}</button>
+              <button class="${details.danger ? "danger-confirm-button" : "primary-button"}" type="submit">${escapeHtml(details.confirmLabel)}</button>
+            </div>
+          </form>
+        </section>
+      </div>`;
+  }
+
   function worldCelebrationMarkup() {
     if (!state.worldCelebrationOpen) return "";
     const bursts = [
@@ -1616,18 +1712,28 @@
     const profile = currentProfile();
     const next = progress.continueSelection(profile, curriculum.levels);
     const recommendedLevelId = next.type === "quiz" ? next.quiz.levelId : null;
+    const savedQuizCandidate = profile.savedMasteryAttempt
+      ? curriculum.quizById.get(profile.savedMasteryAttempt.quizId)
+      : null;
+    const savedAttempt = progress.matchingSavedAttempt(profile, savedQuizCandidate);
+    const savedQuiz = savedAttempt ? savedQuizCandidate : null;
     const levelMarkup = (level, levelIndex) => {
         const value = progress.levelProgress(profile, level);
         const isMastery = level.kind.includes("mastery");
         const isRecommendedLevel = level.id === recommendedLevelId;
-        return `<section class="level-card ${value.mastered === 4 ? "is-mastered" : value.played ? "is-progress" : "is-unplayed"} ${isRecommendedLevel ? "is-recommended-level" : ""}" id="level-${escapeHtml(level.id)}">
+        const hasSavedAttempt = savedQuiz?.levelId === level.id;
+        const levelProgressStatus = value.mastered === 4
+          ? `<span class="level-mastery-status" aria-label="4/4 ${t("mastered")}"><span>4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></span>`
+          : value.played ? `${value.mastered}/4 ${t("mastered")}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`;
+        return `<section class="level-card ${value.mastered === 4 ? "is-mastered" : value.played ? "is-progress" : "is-unplayed"} ${isRecommendedLevel ? "is-recommended-level" : ""} ${hasSavedAttempt ? "has-saved-attempt" : ""}" id="level-${escapeHtml(level.id)}">
           <button class="level-heading" data-action="toggle-level" data-level-id="${level.id}" aria-expanded="${state.selectedLevelId === level.id}">
             <span class="level-number">${levelIndex + 1}</span><span><strong>${escapeHtml(levelTitle(level))}${isRecommendedLevel ? `<span class="sr-only"> · ${t("recommended")}</span>` : ""}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : placeCountLabel(level.countryCodes.map((code) => countriesByCode.get(code)).filter(Boolean))}</small></span>
-            <span class="level-state">${value.mastered === 4 ? `<span class="level-mastery-status" aria-label="4/4 ${t("mastered")}"><span>4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></span>` : value.played ? `${value.mastered}/4 ${t("mastered")}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span>
+            <span class="level-state">${hasSavedAttempt ? `<span class="level-attempt-status"><strong>${t("quizInProgress")}</strong><small>${t("answeredProgress", { answered: savedAttempt.questionIndex, total: level.countryCodes.length })}</small></span>` : ""}<span class="level-progress-status">${levelProgressStatus}</span></span>
           </button>
           ${state.selectedLevelId === level.id ? `<div class="quiz-list"><div class="level-practice-actions"><button class="level-practice-row" data-action="level-cards" data-level-id="${level.id}"><span class="level-practice-icon" aria-hidden="true"><span></span><span></span></span><span><strong>${t("cards")}</strong></span><span aria-hidden="true">→</span></button><button class="level-practice-row level-explore-row" data-action="explore-level" data-level-id="${level.id}"><span class="level-practice-map-icon" aria-hidden="true">◎</span><span><strong>${t("exploreTheseCountries")}</strong></span><span aria-hidden="true">→</span></button></div><div class="quiz-mode-list">${level.quizzes.map((baseQuiz) => {
-            const quiz = curriculum.quizById.get(baseQuiz.id); const record = progress.currentRecord(profile, quiz); const status = progress.quizState(profile, quiz); const recommended = next.type === "quiz" && next.quiz.id === quiz.id;
-            return `<button class="quiz-row ${recommended ? "is-recommended" : ""}" data-action="start-curriculum-quiz" data-quiz-id="${quiz.id}"><span>${escapeHtml(modeLabel(quiz.mode))}${recommended ? `<small>${t("recommended")}</small>` : ""}</span><span>${status === "mastered" ? `<span class="quiz-mastery-status" aria-label="${record.bestScore}/${record.total} · ${t("quizMastered")}"><span>${record.bestScore}/${record.total}</span><span class="mastery-check" aria-hidden="true">✓</span></span>` : status === "played" ? `${record.bestScore}/${record.total}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`}</span></button>`;
+            const quiz = curriculum.quizById.get(baseQuiz.id); const record = progress.currentRecord(profile, quiz); const status = progress.quizState(profile, quiz); const recommended = next.type === "quiz" && next.quiz.id === quiz.id; const quizAttempt = progress.matchingSavedAttempt(profile, quiz);
+            const recordStatus = status === "mastered" ? `<span class="quiz-mastery-status" aria-label="${record.bestScore}/${record.total} · ${t("quizMastered")}"><span>${record.bestScore}/${record.total}</span><span class="mastery-check" aria-hidden="true">✓</span></span>` : status === "played" ? `${record.bestScore}/${record.total}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`;
+            return `<button class="quiz-row ${recommended ? "is-recommended" : ""} ${quizAttempt ? "has-saved-attempt" : ""}" data-action="start-curriculum-quiz" data-quiz-id="${quiz.id}"><span><strong>${escapeHtml(quizAttempt ? t("continueMode", { mode: modeLabel(quiz.mode) }) : modeLabel(quiz.mode))}</strong>${quizAttempt ? `<small>${t("quizInProgress")}</small>` : recommended ? `<small>${t("recommended")}</small>` : ""}</span><span>${quizAttempt ? `<span class="quiz-attempt-status"><strong>${t("answeredProgress", { answered: quizAttempt.questionIndex, total: quiz.countryCodes.length })}</strong>${status !== "unplayed" ? `<small>${recordStatus}</small>` : ""}</span>` : recordStatus}</span></button>`;
           }).join("")}</div></div>` : ""}
         </section>`;
       };
@@ -3076,7 +3182,15 @@
       ? app.querySelector(".explore-country-list")?.scrollTop ?? null
       : null;
     updateDocumentMetadata();
-    app.innerHTML = screenMarkup();
+    app.innerHTML = `${screenMarkup()}${actionDialogMarkup()}`;
+    if (state.actionDialog) {
+      [...app.children].forEach((child) => {
+        if (!child.classList.contains("action-dialog-overlay")) {
+          child.setAttribute("inert", "");
+          child.setAttribute("aria-hidden", "true");
+        }
+      });
+    }
     if (state.screen === "result") state.resultCelebrationPending = false;
     if (exploreListScrollTop !== null) {
       const exploreList = app.querySelector(".explore-country-list");
@@ -3101,6 +3215,7 @@
         state.installHelpOpen ||
         state.openChallengeOpen ||
         state.profilePanelOpen ||
+        state.actionDialog !== null ||
         state.worldCelebrationOpen,
     );
 
@@ -3123,6 +3238,21 @@
       app.querySelector('[data-action="open-challenge"]')?.focus();
     }
     if (options.focusProfilePanel) app.querySelector(".profile-panel")?.focus({ preventScroll: true });
+    if (options.focusActionDialog) {
+      const input = app.querySelector("#action-dialog-input");
+      if (input) {
+        input.focus({ preventScroll: true });
+        if (state.actionDialog?.kind === "rename-profile") input.select();
+      } else {
+        app.querySelector("[data-dialog-cancel-focus]")?.focus({ preventScroll: true });
+      }
+    }
+    if (options.focusActionDialogReturn) {
+      const descriptor = options.focusActionDialogReturn;
+      [...app.querySelectorAll("[data-action]")].find((control) =>
+        Object.entries(descriptor).every(([key, value]) => control.dataset[key] === value),
+      )?.focus({ preventScroll: true });
+    }
     if (options.focusWorldCelebration) app.querySelector(".world-celebration-continue")?.focus({ preventScroll: true });
     if (options.focusCountryDetailsTriggerCode) {
       const target = app.querySelector(
@@ -3594,7 +3724,13 @@
 
   function startCurriculumQuiz(
     quizId,
-    { resume = false, challengeRound = false, source = null, historyMode = "push" } = {},
+    {
+      resume = false,
+      challengeRound = false,
+      source = null,
+      historyMode = "push",
+      savedAttemptHandled = false,
+    } = {},
   ) {
     const quiz = curriculum.quizById.get(quizId);
     if (!quiz) return;
@@ -3606,11 +3742,18 @@
           : "home"
     );
     const saved = currentProfile().savedMasteryAttempt;
-    if (!resume && saved && !window.confirm(t("abandonAttempt"))) return;
-    if (!resume && saved) persist(progress.abandonMasteryAttempt(progressStore, progressStore.activeProfileId));
+    const matchingAttempt = progress.matchingSavedAttempt(currentProfile(), quiz);
+    const shouldResume = Boolean(matchingAttempt && (resume || !challengeRound));
+    if (!shouldResume && saved && !savedAttemptHandled) {
+      openActionDialog("abandon-attempt", {
+        quizId,
+        startOptions: { challengeRound, source, historyMode },
+      });
+      return;
+    }
     clearAutoAdvance(); setKeyboardHintsVisible(false);
     const level = curriculum.levelById.get(quiz.levelId);
-    const savedAttempt = resume && saved?.quizId === quizId && saved.revision === quiz.revision ? saved : null;
+    const savedAttempt = shouldResume ? matchingAttempt : null;
     state.curriculumQuizId = quiz.id; state.activeLevelId = level.id; state.mode = quiz.mode;
     state.quizReturn = quizSource === "levels" ? "levels" : "home";
     state.challengeActive = challengeRound || state.challengeActive;
@@ -3757,6 +3900,70 @@
     state.openChallengeValue = "";
     state.openChallengeError = null;
     render({ focusOpenChallengeButton: true });
+  }
+
+  function focusedActionDescriptor() {
+    const control = document.activeElement?.closest?.("[data-action]");
+    if (!control || !app.contains(control)) return null;
+    return Object.fromEntries(
+      Object.entries(control.dataset).filter(([key]) =>
+        ["action", "quizId", "nextQuizId", "profileId", "levelId"].includes(key),
+      ),
+    );
+  }
+
+  function openActionDialog(kind, payload = {}) {
+    state.actionDialog = {
+      kind,
+      profileId: progressStore.activeProfileId,
+      returnFocus: focusedActionDescriptor(),
+      ...payload,
+    };
+    render({ focusActionDialog: true });
+  }
+
+  function closeActionDialog() {
+    if (!state.actionDialog) return;
+    const returnFocus = state.actionDialog.returnFocus;
+    state.actionDialog = null;
+    render({ focusActionDialogReturn: returnFocus });
+  }
+
+  function confirmActionDialog(form) {
+    const dialog = state.actionDialog;
+    if (!dialog) return;
+    state.actionDialog = null;
+    if (dialog.kind === "abandon-attempt") {
+      persist(progress.abandonMasteryAttempt(progressStore, dialog.profileId));
+      startCurriculumQuiz(dialog.quizId, { ...dialog.startOptions, savedAttemptHandled: true });
+      return;
+    }
+    if (dialog.kind === "add-profile") {
+      persist(progress.addProfile(progressStore, form.elements.namedItem("profile-name")?.value ?? ""));
+      state.profilePanelOpen = false;
+      renderAtTop();
+      return;
+    }
+    if (dialog.kind === "rename-profile") {
+      persist(progress.renameProfile(
+        progressStore,
+        dialog.profileId,
+        form.elements.namedItem("profile-name")?.value ?? "",
+      ));
+      render({ focusProfilePanel: true });
+      return;
+    }
+    if (dialog.kind === "clear-profile") {
+      persist(progress.clearProgress(progressStore, dialog.profileId));
+      state.profilePanelOpen = false;
+      renderAtTop();
+      return;
+    }
+    if (dialog.kind === "delete-profile") {
+      persist(progress.deleteProfile(progressStore, dialog.profileId));
+      state.profilePanelOpen = false;
+      renderAtTop();
+    }
   }
 
   function normalizedAppPath(url) {
@@ -4048,6 +4255,8 @@
     state.openChallengeOpen = false;
     state.openChallengeValue = "";
     state.openChallengeError = null;
+    state.profilePanelOpen = false;
+    state.actionDialog = null;
     state.worldCelebrationOpen = false;
     state.worldCelebrationSettled = false;
     state.challengeActive = false;
@@ -4111,6 +4320,12 @@
     }
 
     const action = control.dataset.action;
+
+    if (action === "close-action-dialog") {
+      if (control.classList.contains("action-dialog-overlay") && event.target !== control) return;
+      closeActionDialog();
+      return;
+    }
 
     if (action === "continue-game") {
       const next = progress.continueSelection(
@@ -4228,10 +4443,10 @@
     if (action === "close-profile-panel") { if (event.target === control) { state.profilePanelOpen = false; render(); } return; }
     if (action === "close-profile-panel-button") { state.profilePanelOpen = false; render(); return; }
     if (action === "switch-profile") { persist(progress.switchProfile(progressStore, control.dataset.profileId)); state.profilePanelOpen = false; renderAtTop(); return; }
-    if (action === "add-profile") { const name = window.prompt(t("newProfileName")); if (name !== null) { persist(progress.addProfile(progressStore, name)); state.profilePanelOpen = false; renderAtTop(); } return; }
-    if (action === "rename-profile") { const name = window.prompt(t("renamePrompt"), currentProfile().name); if (name !== null) { persist(progress.renameProfile(progressStore, progressStore.activeProfileId, name)); render({ focusProfilePanel: true }); } return; }
-    if (action === "clear-profile") { if (window.confirm(t("clearConfirm"))) { persist(progress.clearProgress(progressStore, progressStore.activeProfileId)); state.profilePanelOpen = false; renderAtTop(); } return; }
-    if (action === "delete-profile") { if (window.confirm(t("deleteConfirm"))) { persist(progress.deleteProfile(progressStore, progressStore.activeProfileId)); state.profilePanelOpen = false; renderAtTop(); } return; }
+    if (action === "add-profile") { openActionDialog("add-profile"); return; }
+    if (action === "rename-profile") { openActionDialog("rename-profile"); return; }
+    if (action === "clear-profile") { openActionDialog("clear-profile"); return; }
+    if (action === "delete-profile") { openActionDialog("delete-profile"); return; }
     if (action === "copy-transfer") { void copyTransferLink(control); return; }
     if (action === "download-backup") { downloadBackup(); return; }
     if (action === "share-progress") { void copyProgressShare(control); return; }
@@ -4441,6 +4656,12 @@
   });
 
   app.addEventListener("submit", (event) => {
+    const actionDialogForm = event.target.closest("[data-action-dialog-form]");
+    if (actionDialogForm && app.contains(actionDialogForm)) {
+      event.preventDefault();
+      confirmActionDialog(actionDialogForm);
+      return;
+    }
     const form = event.target.closest("[data-open-challenge-form]");
     if (!form || !app.contains(form)) return;
     event.preventDefault();
@@ -4458,6 +4679,11 @@
   });
 
   app.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && event.target.matches?.("#action-dialog-input")) {
+      event.preventDefault();
+      event.target.form?.requestSubmit();
+      return;
+    }
     const fileButton = event.target.closest?.(".file-button");
     if (!fileButton || (event.key !== "Enter" && event.key !== " ")) return;
     event.preventDefault();
@@ -4778,7 +5004,9 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    const activeDialog = state.worldCelebrationOpen
+    const activeDialog = state.actionDialog
+      ? app.querySelector(".action-dialog")
+      : state.worldCelebrationOpen
       ? app.querySelector(".world-celebration-dialog")
       : state.openChallengeOpen
       ? app.querySelector(".open-challenge-dialog")
@@ -4818,6 +5046,12 @@
     }
 
     if (event.key !== "Escape") return;
+
+    if (state.actionDialog) {
+      event.preventDefault();
+      closeActionDialog();
+      return;
+    }
 
     if (state.worldCelebrationOpen) {
       event.preventDefault();

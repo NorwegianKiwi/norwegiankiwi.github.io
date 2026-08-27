@@ -168,6 +168,10 @@ The interface must not use lives or prevent further play because of mistakes.
 Regional and world mastery attempts are resumable. They remain one attempt:
 previous answers cannot be changed, and resuming does not reset mistakes.
 Ordinary short quizzes restart when abandoned.
+On the Levels screen, the matching level and quiz visibly show the saved
+question position. Selecting that same quiz resumes it directly. Selecting a
+different scored quiz opens an in-app confirmation before the saved attempt is
+abandoned.
 
 ## 8. Mastery and scores
 
@@ -346,8 +350,9 @@ The player competes against their own previous results and the curriculum.
   tablets.
 - Regional and world mastery attempts are saved after every answer and can
   resume after navigation, reload or browser closure.
-- Starting another scored quiz while a mastery attempt is saved requires clear
-  confirmation that the saved attempt will be abandoned.
+- Reopening the matching mastery quiz resumes it directly from its saved
+  position. Starting a different scored quiz requires clear in-app confirmation
+  that the saved attempt will be abandoned.
 - Motion must respect reduced-motion preferences.
 - Norwegian and English must expose the same interface capabilities and
   translation keys.
