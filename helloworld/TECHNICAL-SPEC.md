@@ -417,11 +417,11 @@ persistent progress. UI elements must not independently mutate stored objects
 without going through validated progress functions.
 
 The home progress globe and its numeric label both derive from mastered levels
-out of 53. Current-level progress derives from mastered quizzes out of four.
+out of 52. Current-level progress derives from mastered quizzes out of four.
 They must not use different hidden denominators.
 
 Explore Flashcards are read-only learning state. Their deck is derived from the
-current visible Explore scope, including the all-Africa overview. A card front
+current visible Explore scope. A card front
 uses the flag; its revealed side uses country name, capital and the existing country silhouette.
 Missed-country decks are constructed from the completed attempt's wrong-country
 codes and do not write quiz progress.
@@ -429,7 +429,7 @@ codes and do not write quiz progress.
 Explore may also hold a contextual scope with a localized title, country codes
 and a return target. Level scopes are reproducible from their stable level ID;
 result-review scopes remain session-only. Map extent is independent of this membership:
-the world, Africa overview and detailed regional maps may be traversed while the
+the world and detailed regional maps may be traversed while the
 scope list remains fixed. Contextual scopes are never persisted as saved lists.
 
 ## 18. Tests and validation
@@ -438,9 +438,9 @@ At minimum, add automated coverage for:
 
 ### Curriculum
 
-- 53 unique ordered level IDs
+- 52 unique ordered level IDs
 - Exactly four unique canonical modes per level
-- 212 unique quiz IDs
+- 208 unique quiz IDs
 - Valid positive revisions and fixed seeds
 - All referenced country codes exist
 - Exactly 227 unique systematic-pack assignments
@@ -510,7 +510,7 @@ The first progression release is complete when:
 - A new player can start Level 1 from the first viewport with one primary click;
   Player 1 is created automatically.
 - A returning player can continue the correct quiz from the home screen.
-- All 212 quizzes can be selected directly and record independent best scores.
+- All 208 quizzes can be selected directly and record independent best scores.
 - Quiz and level mastery are accurately derived and displayed.
 - Multiple local profiles remain separated.
 - Clear progress works for one profile without affecting others.

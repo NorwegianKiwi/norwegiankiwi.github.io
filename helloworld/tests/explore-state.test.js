@@ -9,11 +9,10 @@ require("../world-map.js");
 const regions = {
   no: "europe",
   se: "europe",
-  dz: "north-west-africa",
-  ke: "east-south-africa",
+  dz: "africa",
+  ke: "africa",
   jp: "east-south-asia",
 };
-const africa = new Set(["north-west-africa", "east-south-africa"]);
 const regionForCode = (code) => regions[code] ?? null;
 
 assert.deepEqual(exploreState.uniqueCodes(["no", "se", "no", null]), ["no", "se"]);
@@ -21,36 +20,27 @@ assert.deepEqual(
   exploreState.sortCodes(["z", "a", "b", "a"], (code) => ({ a: "Alfa", b: "Bravo", z: "Zulu" })[code], "en"),
   ["a", "b", "z"],
 );
-assert.equal(exploreState.initialExtent(["no", "se"], regionForCode, africa), "europe");
-assert.equal(exploreState.initialExtent(["dz", "ke"], regionForCode, africa), "africa");
-assert.equal(exploreState.initialExtent(["no", "jp"], regionForCode, africa), "world");
-assert.equal(exploreState.initialExtent([], regionForCode, africa), "world");
+assert.equal(exploreState.initialExtent(["no", "se"], regionForCode), "europe");
+assert.equal(exploreState.initialExtent(["dz", "ke"], regionForCode), "africa");
+assert.equal(exploreState.initialExtent(["no", "jp"], regionForCode), "world");
+assert.equal(exploreState.initialExtent([], regionForCode), "world");
 
-assert.equal(exploreState.zoomInExtent("world", "europe", africa), "europe");
-assert.equal(exploreState.zoomInExtent("world", "east-south-africa", africa), "africa");
-assert.equal(exploreState.zoomInExtent("africa", "east-south-africa", africa), "east-south-africa");
-assert.equal(exploreState.zoomInExtent("world", null, africa), "world");
-assert.equal(exploreState.zoomOutExtent("east-south-africa", africa), "africa");
-assert.equal(exploreState.zoomOutExtent("africa", africa), "world");
-assert.equal(exploreState.zoomOutExtent("europe", africa), "world");
-assert.equal(exploreState.zoomOutExtent("world", africa), "world");
+assert.equal(exploreState.zoomInExtent("world", "europe"), "europe");
+assert.equal(exploreState.zoomInExtent("world", "africa"), "africa");
+assert.equal(exploreState.zoomInExtent("africa", "africa"), "africa");
+assert.equal(exploreState.zoomInExtent("world", null), "world");
+assert.equal(exploreState.zoomOutExtent("africa"), "world");
+assert.equal(exploreState.zoomOutExtent("europe"), "world");
+assert.equal(exploreState.zoomOutExtent("world"), "world");
 
-assert.equal(exploreState.extentForSelection("world", "europe", africa), "world");
-assert.equal(exploreState.extentForSelection("europe", "europe", africa), "europe");
+assert.equal(exploreState.extentForSelection("world", "europe"), "world");
+assert.equal(exploreState.extentForSelection("europe", "europe"), "europe");
 assert.equal(
-  exploreState.extentForSelection("europe", "east-south-asia", africa),
+  exploreState.extentForSelection("europe", "east-south-asia"),
   "east-south-asia",
 );
-assert.equal(
-  exploreState.extentForSelection("north-west-africa", "east-south-africa", africa),
-  "east-south-africa",
-);
-assert.equal(
-  exploreState.extentForSelection("africa", "east-south-africa", africa),
-  "africa",
-);
-assert.equal(exploreState.extentForSelection("africa", "europe", africa), "europe");
-assert.equal(exploreState.extentForSelection("europe", null, africa), "europe");
+assert.equal(exploreState.extentForSelection("africa", "europe"), "europe");
+assert.equal(exploreState.extentForSelection("europe", null), "europe");
 
 const countryCodes = new Set(
   global.GEOGRAFI_QUIZ_DATA.places.map((country) => country.code),

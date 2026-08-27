@@ -141,7 +141,7 @@ only from the tour's country set.
 | 41 | `pack-world-special-regions` | Special regions around the world | French Guiana (`gf`), Falkland Islands (`fk`), Western Sahara (`eh`), Réunion (`re`), Mayotte (`yt`), Hong Kong (`hk`), Macau (`mo`) | 7 | 6 |
 
 The opening World Tour is based on familiarity rather than strict
-representation of the app's nine organisational regions. It spans every
+representation of the app's eight organisational regions. It spans every
 inhabited continent. The second tour soon adds Jamaica for the Caribbean and
 Türkiye for West and Central Asia.
 
@@ -166,15 +166,14 @@ quizzes. Perfect scores are intentionally required for mastery.
 | 42 | `mastery-europe` | Europe mastery | 44 | 176 |
 | 43 | `mastery-north-central-america` | North and Central America mastery | 10 | 40 |
 | 44 | `mastery-south-america` | South America mastery | 12 | 48 |
-| 45 | `mastery-north-west-africa` | North and West Africa mastery | 26 | 104 |
+| 45 | `mastery-africa` | Africa mastery | 54 | 216 |
 | 46 | `mastery-east-south-asia` | East and South Asia mastery | 26 | 104 |
-| 47 | `mastery-east-south-africa` | East and South Africa mastery | 28 | 112 |
-| 48 | `mastery-west-central-asia` | West and Central Asia mastery | 24 | 96 |
-| 49 | `mastery-caribbean` | Caribbean mastery | 13 | 52 |
-| 50 | `mastery-oceania` | Oceania mastery | 14 | 56 |
-| 51 | `mastery-countries-world` | Countries of the world | 197 | 788 |
-| 52 | `mastery-other-places-world` | Other places of the world | 30 | 120 |
-| 53 | `mastery-whole-world` | The whole world | 227 | 908 |
+| 47 | `mastery-west-central-asia` | West and Central Asia mastery | 24 | 96 |
+| 48 | `mastery-caribbean` | Caribbean mastery | 13 | 52 |
+| 49 | `mastery-oceania` | Oceania mastery | 14 | 56 |
+| 50 | `mastery-countries-world` | Countries of the world | 197 | 788 |
+| 51 | `mastery-other-places-world` | Other places of the world | 30 | 120 |
+| 52 | `mastery-whole-world` | The whole world | 227 | 908 |
 
 The combined whole-world level contains the four ultimate challenges:
 
@@ -192,12 +191,12 @@ challenge has not been mastered.
 - 36 systematic learning levels
 - 5 World Tour interludes
 - 12 mastery levels
-- 53 levels in total
+- 52 levels in total
 - 144 short learning quizzes
 - 20 World Tour quizzes
 - 36 regional mastery quizzes
 - 12 world-mastery quizzes
-- 212 quizzes in total
+- 208 quizzes in total
 - 227 places, each assigned to exactly one systematic pack
 - Every place practised in all four quiz modes before the mastery section
 
@@ -213,7 +212,7 @@ a formally earned player rank.
 | 5–14 | Oppdager | Explorer |
 | 15–33 | Veiviser | Navigator |
 | 34–41 | Verdensvandrer | Globetrotter |
-| 42–53 | Verdensmester | World Master |
+| 42–52 | Verdensmester | World Master |
 
 Quiz states:
 
@@ -249,7 +248,7 @@ Progress is stored against `quiz-id@revision`.
 
 ## Playtesting and tuning boundaries
 
-The 53-level order, place assignments, four single-mode quizzes per level and
+The 52-level order, place assignments, four single-mode quizzes per level and
 mastery structure are the approved initial curriculum. Playtesting may tune
 presentation details such as answer-feedback timing, card layout and responsive
 density without changing quiz identity.
@@ -258,4 +257,4 @@ Changing a country set, choice count, fixed alternatives or other material
 difficulty requires deliberate curriculum review and the revision handling
 described above. Missed countries are reviewed through the optional Explore
 Cards flow defined in `PRODUCT-SPEC.md`; additional review levels are not part
-of the initial 53-level curriculum.
+of the initial 52-level curriculum.

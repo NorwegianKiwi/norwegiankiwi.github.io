@@ -166,7 +166,7 @@ for (const level of curriculum.levels) {
     completedStore = progress.recordResult(completedStore, "complete-profile", quiz, quiz.countryCodes.length);
   }
 }
-assert.equal(progress.summary(progress.activeProfile(completedStore), curriculum.levels).masteredQuizzes, 212);
+assert.equal(progress.summary(progress.activeProfile(completedStore), curriculum.levels).masteredQuizzes, 208);
 assert.deepEqual(progress.continueSelection(progress.activeProfile(completedStore), curriculum.levels), { type: "all-mastered" });
 assert.ok(progress.surpriseQuiz(progress.activeProfile(completedStore), curriculum.levels));
 assert.ok(progress.encodeTransfer(progress.activeProfile(completedStore)).length < 25_000);

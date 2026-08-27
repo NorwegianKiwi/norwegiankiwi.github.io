@@ -6120,42 +6120,42 @@
             }
           }
         },
-        "mastery-north-west-africa:country-flag": {
+        "mastery-africa:country-flag": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:57:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:flag-country": {
+        "mastery-africa:flag-country": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:58:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:map-country": {
+        "mastery-africa:map-country": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:59:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:country-capital": {
+        "mastery-africa:country-capital": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T13:00:00.000Z"
             }
           }
@@ -6206,7 +6206,7 @@
       "id": "test-final-quiz",
       "name": "Test · Final quiz remaining",
       "createdAt": "2026-08-22T10:00:00.000Z",
-      "updatedAt": "2026-08-22T13:31:00.000Z",
+      "updatedAt": "2026-08-22T13:27:00.000Z",
       "lastQuizId": "mastery-whole-world:map-country",
       "quizProgress": {
         "tour-hello-world:country-flag": {
@@ -7969,42 +7969,42 @@
             }
           }
         },
-        "mastery-north-west-africa:country-flag": {
+        "mastery-africa:country-flag": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:57:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:flag-country": {
+        "mastery-africa:flag-country": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:58:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:map-country": {
+        "mastery-africa:map-country": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:59:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:country-capital": {
+        "mastery-africa:country-capital": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T13:00:00.000Z"
             }
           }
@@ -8049,53 +8049,13 @@
             }
           }
         },
-        "mastery-east-south-africa:country-flag": {
-          "revisions": {
-            "1": {
-              "revision": 1,
-              "bestScore": 28,
-              "total": 28,
-              "lastPlayedAt": "2026-08-22T13:05:00.000Z"
-            }
-          }
-        },
-        "mastery-east-south-africa:flag-country": {
-          "revisions": {
-            "1": {
-              "revision": 1,
-              "bestScore": 28,
-              "total": 28,
-              "lastPlayedAt": "2026-08-22T13:06:00.000Z"
-            }
-          }
-        },
-        "mastery-east-south-africa:map-country": {
-          "revisions": {
-            "1": {
-              "revision": 1,
-              "bestScore": 28,
-              "total": 28,
-              "lastPlayedAt": "2026-08-22T13:07:00.000Z"
-            }
-          }
-        },
-        "mastery-east-south-africa:country-capital": {
-          "revisions": {
-            "1": {
-              "revision": 1,
-              "bestScore": 28,
-              "total": 28,
-              "lastPlayedAt": "2026-08-22T13:08:00.000Z"
-            }
-          }
-        },
         "mastery-west-central-asia:country-flag": {
           "revisions": {
             "1": {
               "revision": 1,
               "bestScore": 24,
               "total": 24,
-              "lastPlayedAt": "2026-08-22T13:09:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:05:00.000Z"
             }
           }
         },
@@ -8105,7 +8065,7 @@
               "revision": 1,
               "bestScore": 24,
               "total": 24,
-              "lastPlayedAt": "2026-08-22T13:10:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:06:00.000Z"
             }
           }
         },
@@ -8115,7 +8075,7 @@
               "revision": 1,
               "bestScore": 24,
               "total": 24,
-              "lastPlayedAt": "2026-08-22T13:11:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:07:00.000Z"
             }
           }
         },
@@ -8125,7 +8085,7 @@
               "revision": 1,
               "bestScore": 24,
               "total": 24,
-              "lastPlayedAt": "2026-08-22T13:12:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:08:00.000Z"
             }
           }
         },
@@ -8135,7 +8095,7 @@
               "revision": 1,
               "bestScore": 13,
               "total": 13,
-              "lastPlayedAt": "2026-08-22T13:13:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:09:00.000Z"
             }
           }
         },
@@ -8145,7 +8105,7 @@
               "revision": 1,
               "bestScore": 13,
               "total": 13,
-              "lastPlayedAt": "2026-08-22T13:14:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:10:00.000Z"
             }
           }
         },
@@ -8155,7 +8115,7 @@
               "revision": 1,
               "bestScore": 13,
               "total": 13,
-              "lastPlayedAt": "2026-08-22T13:15:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:11:00.000Z"
             }
           }
         },
@@ -8165,7 +8125,7 @@
               "revision": 1,
               "bestScore": 13,
               "total": 13,
-              "lastPlayedAt": "2026-08-22T13:16:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:12:00.000Z"
             }
           }
         },
@@ -8175,7 +8135,7 @@
               "revision": 1,
               "bestScore": 14,
               "total": 14,
-              "lastPlayedAt": "2026-08-22T13:17:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:13:00.000Z"
             }
           }
         },
@@ -8185,7 +8145,7 @@
               "revision": 1,
               "bestScore": 14,
               "total": 14,
-              "lastPlayedAt": "2026-08-22T13:18:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:14:00.000Z"
             }
           }
         },
@@ -8195,7 +8155,7 @@
               "revision": 1,
               "bestScore": 14,
               "total": 14,
-              "lastPlayedAt": "2026-08-22T13:19:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:15:00.000Z"
             }
           }
         },
@@ -8205,7 +8165,7 @@
               "revision": 1,
               "bestScore": 14,
               "total": 14,
-              "lastPlayedAt": "2026-08-22T13:20:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:16:00.000Z"
             }
           }
         },
@@ -8215,7 +8175,7 @@
               "revision": 1,
               "bestScore": 197,
               "total": 197,
-              "lastPlayedAt": "2026-08-22T13:21:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:17:00.000Z"
             }
           }
         },
@@ -8225,7 +8185,7 @@
               "revision": 1,
               "bestScore": 197,
               "total": 197,
-              "lastPlayedAt": "2026-08-22T13:22:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:18:00.000Z"
             }
           }
         },
@@ -8235,7 +8195,7 @@
               "revision": 1,
               "bestScore": 197,
               "total": 197,
-              "lastPlayedAt": "2026-08-22T13:23:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:19:00.000Z"
             }
           }
         },
@@ -8245,7 +8205,7 @@
               "revision": 1,
               "bestScore": 197,
               "total": 197,
-              "lastPlayedAt": "2026-08-22T13:24:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:20:00.000Z"
             }
           }
         },
@@ -8255,7 +8215,7 @@
               "revision": 1,
               "bestScore": 30,
               "total": 30,
-              "lastPlayedAt": "2026-08-22T13:25:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:21:00.000Z"
             }
           }
         },
@@ -8265,7 +8225,7 @@
               "revision": 1,
               "bestScore": 30,
               "total": 30,
-              "lastPlayedAt": "2026-08-22T13:26:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:22:00.000Z"
             }
           }
         },
@@ -8275,7 +8235,7 @@
               "revision": 1,
               "bestScore": 30,
               "total": 30,
-              "lastPlayedAt": "2026-08-22T13:27:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:23:00.000Z"
             }
           }
         },
@@ -8285,7 +8245,7 @@
               "revision": 1,
               "bestScore": 30,
               "total": 30,
-              "lastPlayedAt": "2026-08-22T13:28:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:24:00.000Z"
             }
           }
         },
@@ -8295,7 +8255,7 @@
               "revision": 1,
               "bestScore": 227,
               "total": 227,
-              "lastPlayedAt": "2026-08-22T13:29:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:25:00.000Z"
             }
           }
         },
@@ -8305,7 +8265,7 @@
               "revision": 1,
               "bestScore": 227,
               "total": 227,
-              "lastPlayedAt": "2026-08-22T13:30:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:26:00.000Z"
             }
           }
         },
@@ -8315,7 +8275,7 @@
               "revision": 1,
               "bestScore": 227,
               "total": 227,
-              "lastPlayedAt": "2026-08-22T13:31:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:27:00.000Z"
             }
           }
         }
@@ -8325,7 +8285,7 @@
       "id": "test-all-mastered",
       "name": "Test · Everything mastered",
       "createdAt": "2026-08-22T10:00:00.000Z",
-      "updatedAt": "2026-08-22T13:32:00.000Z",
+      "updatedAt": "2026-08-22T13:28:00.000Z",
       "lastQuizId": "mastery-whole-world:country-capital",
       "quizProgress": {
         "tour-hello-world:country-flag": {
@@ -10088,42 +10048,42 @@
             }
           }
         },
-        "mastery-north-west-africa:country-flag": {
+        "mastery-africa:country-flag": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:57:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:flag-country": {
+        "mastery-africa:flag-country": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:58:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:map-country": {
+        "mastery-africa:map-country": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T12:59:00.000Z"
             }
           }
         },
-        "mastery-north-west-africa:country-capital": {
+        "mastery-africa:country-capital": {
           "revisions": {
             "1": {
               "revision": 1,
-              "bestScore": 26,
-              "total": 26,
+              "bestScore": 54,
+              "total": 54,
               "lastPlayedAt": "2026-08-22T13:00:00.000Z"
             }
           }
@@ -10168,53 +10128,13 @@
             }
           }
         },
-        "mastery-east-south-africa:country-flag": {
-          "revisions": {
-            "1": {
-              "revision": 1,
-              "bestScore": 28,
-              "total": 28,
-              "lastPlayedAt": "2026-08-22T13:05:00.000Z"
-            }
-          }
-        },
-        "mastery-east-south-africa:flag-country": {
-          "revisions": {
-            "1": {
-              "revision": 1,
-              "bestScore": 28,
-              "total": 28,
-              "lastPlayedAt": "2026-08-22T13:06:00.000Z"
-            }
-          }
-        },
-        "mastery-east-south-africa:map-country": {
-          "revisions": {
-            "1": {
-              "revision": 1,
-              "bestScore": 28,
-              "total": 28,
-              "lastPlayedAt": "2026-08-22T13:07:00.000Z"
-            }
-          }
-        },
-        "mastery-east-south-africa:country-capital": {
-          "revisions": {
-            "1": {
-              "revision": 1,
-              "bestScore": 28,
-              "total": 28,
-              "lastPlayedAt": "2026-08-22T13:08:00.000Z"
-            }
-          }
-        },
         "mastery-west-central-asia:country-flag": {
           "revisions": {
             "1": {
               "revision": 1,
               "bestScore": 24,
               "total": 24,
-              "lastPlayedAt": "2026-08-22T13:09:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:05:00.000Z"
             }
           }
         },
@@ -10224,7 +10144,7 @@
               "revision": 1,
               "bestScore": 24,
               "total": 24,
-              "lastPlayedAt": "2026-08-22T13:10:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:06:00.000Z"
             }
           }
         },
@@ -10234,7 +10154,7 @@
               "revision": 1,
               "bestScore": 24,
               "total": 24,
-              "lastPlayedAt": "2026-08-22T13:11:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:07:00.000Z"
             }
           }
         },
@@ -10244,7 +10164,7 @@
               "revision": 1,
               "bestScore": 24,
               "total": 24,
-              "lastPlayedAt": "2026-08-22T13:12:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:08:00.000Z"
             }
           }
         },
@@ -10254,7 +10174,7 @@
               "revision": 1,
               "bestScore": 13,
               "total": 13,
-              "lastPlayedAt": "2026-08-22T13:13:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:09:00.000Z"
             }
           }
         },
@@ -10264,7 +10184,7 @@
               "revision": 1,
               "bestScore": 13,
               "total": 13,
-              "lastPlayedAt": "2026-08-22T13:14:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:10:00.000Z"
             }
           }
         },
@@ -10274,7 +10194,7 @@
               "revision": 1,
               "bestScore": 13,
               "total": 13,
-              "lastPlayedAt": "2026-08-22T13:15:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:11:00.000Z"
             }
           }
         },
@@ -10284,7 +10204,7 @@
               "revision": 1,
               "bestScore": 13,
               "total": 13,
-              "lastPlayedAt": "2026-08-22T13:16:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:12:00.000Z"
             }
           }
         },
@@ -10294,7 +10214,7 @@
               "revision": 1,
               "bestScore": 14,
               "total": 14,
-              "lastPlayedAt": "2026-08-22T13:17:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:13:00.000Z"
             }
           }
         },
@@ -10304,7 +10224,7 @@
               "revision": 1,
               "bestScore": 14,
               "total": 14,
-              "lastPlayedAt": "2026-08-22T13:18:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:14:00.000Z"
             }
           }
         },
@@ -10314,7 +10234,7 @@
               "revision": 1,
               "bestScore": 14,
               "total": 14,
-              "lastPlayedAt": "2026-08-22T13:19:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:15:00.000Z"
             }
           }
         },
@@ -10324,7 +10244,7 @@
               "revision": 1,
               "bestScore": 14,
               "total": 14,
-              "lastPlayedAt": "2026-08-22T13:20:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:16:00.000Z"
             }
           }
         },
@@ -10334,7 +10254,7 @@
               "revision": 1,
               "bestScore": 197,
               "total": 197,
-              "lastPlayedAt": "2026-08-22T13:21:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:17:00.000Z"
             }
           }
         },
@@ -10344,7 +10264,7 @@
               "revision": 1,
               "bestScore": 197,
               "total": 197,
-              "lastPlayedAt": "2026-08-22T13:22:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:18:00.000Z"
             }
           }
         },
@@ -10354,7 +10274,7 @@
               "revision": 1,
               "bestScore": 197,
               "total": 197,
-              "lastPlayedAt": "2026-08-22T13:23:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:19:00.000Z"
             }
           }
         },
@@ -10364,7 +10284,7 @@
               "revision": 1,
               "bestScore": 197,
               "total": 197,
-              "lastPlayedAt": "2026-08-22T13:24:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:20:00.000Z"
             }
           }
         },
@@ -10374,7 +10294,7 @@
               "revision": 1,
               "bestScore": 30,
               "total": 30,
-              "lastPlayedAt": "2026-08-22T13:25:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:21:00.000Z"
             }
           }
         },
@@ -10384,7 +10304,7 @@
               "revision": 1,
               "bestScore": 30,
               "total": 30,
-              "lastPlayedAt": "2026-08-22T13:26:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:22:00.000Z"
             }
           }
         },
@@ -10394,7 +10314,7 @@
               "revision": 1,
               "bestScore": 30,
               "total": 30,
-              "lastPlayedAt": "2026-08-22T13:27:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:23:00.000Z"
             }
           }
         },
@@ -10404,7 +10324,7 @@
               "revision": 1,
               "bestScore": 30,
               "total": 30,
-              "lastPlayedAt": "2026-08-22T13:28:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:24:00.000Z"
             }
           }
         },
@@ -10414,7 +10334,7 @@
               "revision": 1,
               "bestScore": 227,
               "total": 227,
-              "lastPlayedAt": "2026-08-22T13:29:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:25:00.000Z"
             }
           }
         },
@@ -10424,7 +10344,7 @@
               "revision": 1,
               "bestScore": 227,
               "total": 227,
-              "lastPlayedAt": "2026-08-22T13:30:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:26:00.000Z"
             }
           }
         },
@@ -10434,7 +10354,7 @@
               "revision": 1,
               "bestScore": 227,
               "total": 227,
-              "lastPlayedAt": "2026-08-22T13:31:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:27:00.000Z"
             }
           }
         },
@@ -10444,7 +10364,7 @@
               "revision": 1,
               "bestScore": 227,
               "total": 227,
-              "lastPlayedAt": "2026-08-22T13:32:00.000Z"
+              "lastPlayedAt": "2026-08-22T13:28:00.000Z"
             }
           }
         }

@@ -1,7 +1,7 @@
 # Hello World!
 
 A static, bilingual geography progression game covering 197 countries and 30
-other places in 53 levels and 212 fixed single-mode quizzes. It includes multiple local profiles,
+other places in 52 levels and 208 fixed single-mode quizzes. It includes multiple local profiles,
 best scores, resumable mastery challenges, progress transfer and backup, plus
 an independent, viewport-fitted Explore workspace with world, regional, and
 contextual country maps plus a country list and Flashcards action.
@@ -51,7 +51,7 @@ browser and in the Node-based domain tests.
 Import `fixtures/test-profiles-backup.json` through **Settings → Import backup
 file → Import all profiles** to add eleven switchable test profiles. They cover a
 new player, played and partially mastered states, progression milestones, all
-regular levels complete, all but the final quiz, and all 212 quizzes mastered.
+regular levels complete, all but the final quiz, and all 208 quizzes mastered.
 Use **Test · Final quiz remaining** to exercise the genuine final completion
 flow from the home screen. Their IDs begin with `test-`, so importing the file
 again safely merges the same profiles instead of creating duplicates. Because imports never
@@ -116,7 +116,7 @@ node tests/challenge.test.js
 - `styles/` – presentation split into base, quiz, Explore, flashcard, and
   responsive stylesheets
 - `countries.js` – bilingual place, relationship, civic-centre, and region data
-- `curriculum.js` – the 53 ordered levels, 212 quizzes, stable identities and
+- `curriculum.js` – the 52 ordered levels, 208 quizzes, stable identities and
   deterministic curriculum attempt construction
 - `progress.js` – local profiles, progress derivation, persistence, transfer,
   backup and safe merging
@@ -144,7 +144,7 @@ data is public domain; its source and terms are documented in
 `licenses/natural-earth-public-domain.txt`.
 
 `world-map.js` also contains pregenerated region-centred azimuthal equidistant
-geometry with automatically fitted cameras for the nine individual regions
+geometry with automatically fitted cameras for the eight individual regions
 used by the map quiz, plus an Explore-only overview of all 54 African
 countries.
 Oceania is Pacific-centred so that island states on both sides of the date
@@ -201,13 +201,10 @@ the capital island or group.
 Explore reuses the same regional azimuthal equidistant maps and
 silhouettes. Active countries with Natural Earth tiny-country locator points
 use 1:10m foreground geometry on regional maps, while other foreground and all
-background geography use 1:50m. A map is available for each of the nine
-individual regions;
-Whole world instead presents a region choice. From either African region,
-Explore can temporarily show a full-Africa overview without changing the
-selected quiz region. East and South Asia always shows its complete regional
-view, including all of Russia. The Africa control is Explore-only and does not
-change the selected region or URL. Regional maps use
+background geography use 1:50m. A map is available for each of the eight
+individual regions; Whole world instead presents a region choice. Africa is
+one ordinary region throughout Explore, flashcards, and quizzes. East and South
+Asia always shows its complete regional view, including all of Russia. Regional maps use
 an independent background layer generated with the same transform as its
 active countries. Every non-active country polygon intersecting the responsive
 frame is retained, without a relevance or proximity filter. The camera expands

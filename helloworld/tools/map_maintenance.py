@@ -23,8 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = Path(__file__).with_name("map-sources.json")
 VALID_REGIONS = {
     "europe",
-    "north-west-africa",
-    "east-south-africa",
+    "africa",
     "west-central-asia",
     "east-south-asia",
     "oceania",
@@ -34,8 +33,7 @@ VALID_REGIONS = {
 }
 EXPECTED_REGION_COUNTS = {
     "europe": 50,
-    "north-west-africa": 27,
-    "east-south-africa": 30,
+    "africa": 57,
     "west-central-asia": 24,
     "east-south-asia": 28,
     "oceania": 21,
@@ -269,9 +267,6 @@ def load_generated_map(path=None):
     data = decode_assignment(text, "const data = ")
     data["quizProjection"] = decode_assignment(text, "data.quizProjection = ")
     data["quizRegions"] = decode_assignment(text, "data.quizRegions = ")
-    data["overviewRegions"] = decode_assignment(
-        text, "data.overviewRegions = "
-    ) if "data.overviewRegions = " in text else {}
     data["silhouetteViewBox"] = decode_assignment(
         text, "data.silhouetteViewBox = "
     )
@@ -800,145 +795,6 @@ def validate_local_data(map_path=None):
                     + ", ".join(sorted(outside_camera))
                 )
 
-    expected_overviews = set(manifest.get("overviewRegions", {}))
-    overview_regions = map_data.get("overviewRegions", {})
-    actual_overviews = set(overview_regions)
-    if actual_overviews != expected_overviews:
-        errors.append(
-            "Oversiktskart avviker fra manifestet: "
-            f"forventet {sorted(expected_overviews)}, "
-            f"fant {sorted(actual_overviews)}"
-        )
-
-    for overview, settings in manifest.get("overviewRegions", {}).items():
-        view = overview_regions.get(overview)
-        if not view:
-            continue
-        if not isinstance(view.get("backgroundFeatures"), list):
-            errors.append(f"{overview} mangler backgroundFeatures")
-        if not parse_view_box(view.get("bleedViewBox")):
-            errors.append(f"{overview} mangler gyldig bleedViewBox")
-        active_overview_background = sorted(
-            {
-                feature["code"]
-                for feature in view.get("backgroundFeatures", [])
-                if region_for_code.get(feature.get("code"))
-                in set(settings["memberRegions"])
-            }
-        )
-        if active_overview_background:
-            errors.append(
-                f"{overview} har aktive land i bakgrunnslaget: "
-                + ", ".join(active_overview_background)
-            )
-        geometry_codes = {
-            feature["code"]
-            for feature in view["features"]
-            if feature.get("code")
-        }
-        geometry_codes.update(
-            marker["code"] for marker in view["markers"] if marker.get("code")
-        )
-        member_regions = set(settings["memberRegions"])
-        expected_codes = {
-            country["code"]
-            for country in countries
-            if country["region"] in member_regions
-        }
-        missing = sorted(expected_codes - geometry_codes)
-        if missing:
-            errors.append(
-                f"{overview} mangler oversiktsgeometri for: {', '.join(missing)}"
-            )
-        unexpected = sorted(
-            {
-                item.get("code")
-                for item in view["features"] + view["markers"]
-                if item.get("code") not in expected_codes
-            },
-            key=lambda value: value or "",
-        )
-        if unexpected:
-            errors.append(
-                f"{overview} har ikke-aktive objekter i forgrunnslaget: "
-                + ", ".join(str(code) for code in unexpected)
-            )
-        invalid_marker_sizes = sorted(
-            {
-                marker.get("code")
-                for marker in view["markers"]
-                if not isinstance(marker.get("readableSize"), (int, float))
-                or marker["readableSize"] < 0
-            },
-            key=lambda value: value or "",
-        )
-        if invalid_marker_sizes:
-            errors.append(
-                f"{overview} har markører uten gyldig readableSize: "
-                + ", ".join(str(code) for code in invalid_marker_sizes)
-            )
-        cropped = sorted(
-            feature["code"]
-            for feature in view["features"]
-            if feature.get("cropPath")
-        )
-        if cropped:
-            errors.append(
-                f"{overview} beskjærer aktive land: " + ", ".join(cropped)
-            )
-        camera = parse_view_box(view.get("viewBox"))
-        bleed = parse_view_box(view.get("bleedViewBox"))
-        if camera and bleed:
-            camera_x, camera_y, camera_width, camera_height = camera
-            bleed_x, bleed_y, bleed_width, bleed_height = bleed
-            tolerance = 0.2
-            if not (
-                bleed_x <= camera_x + tolerance
-                and bleed_y <= camera_y + tolerance
-                and bleed_x + bleed_width
-                >= camera_x + camera_width - tolerance
-                and bleed_y + bleed_height
-                >= camera_y + camera_height - tolerance
-                and bleed_width >= camera_height * 2.4 - tolerance
-                and bleed_height >= camera_width / 0.75 - tolerance
-            ):
-                errors.append(
-                    f"{overview} har for lite automatisk bleed-område"
-                )
-            camera_right = camera_x + camera_width
-            camera_bottom = camera_y + camera_height
-            outside_camera = set()
-            for feature in view["features"]:
-                coordinates = [
-                    float(value)
-                    for value in re.findall(
-                        r"-?\d+(?:\.\d+)?", feature["path"]
-                    )
-                ]
-                if any(
-                    x < camera_x - tolerance
-                    or x > camera_right + tolerance
-                    or y < camera_y - tolerance
-                    or y > camera_bottom + tolerance
-                    for x, y in zip(coordinates[::2], coordinates[1::2])
-                ):
-                    outside_camera.add(feature.get("code"))
-            for marker in view["markers"]:
-                if not (
-                    camera_x - tolerance
-                    <= marker["x"]
-                    <= camera_right + tolerance
-                    and camera_y - tolerance
-                    <= marker["y"]
-                    <= camera_bottom + tolerance
-                ):
-                    outside_camera.add(marker.get("code"))
-            if outside_camera:
-                errors.append(
-                    f"{overview} har aktive land utenfor kameraet: "
-                    + ", ".join(sorted(outside_camera))
-                )
-
     source = map_data.get("source", "")
     version = manifest["naturalEarthVersion"]
     if version not in source:
@@ -984,7 +840,6 @@ def validate_local_data(map_path=None):
         f"Hovedstadsmarkører: {total_capital_markers} "
         f"i {len(actual_capital_codes)} silhuetter"
     )
-    print(f"Oversiktskart: {len(actual_overviews)}")
     print(
         "Regioner: "
         + ", ".join(

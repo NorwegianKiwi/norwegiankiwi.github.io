@@ -124,8 +124,6 @@
       zoomOutMap: "Zoom ut på kartet",
       zoomInMap: "Zoom inn på kartet",
       resetMapZoom: "Tilbakestill kartzoom, {percent} prosent",
-      africaOverview: "Afrika",
-      viewAllAfrica: "Vis hele Afrika",
       showRegion: "Vis region",
       viewWorld: "Vis verden",
       mapAreaControls: "Bytt kartutsnitt",
@@ -251,8 +249,6 @@
       zoomOutMap: "Zoom out of the map",
       zoomInMap: "Zoom into the map",
       resetMapZoom: "Reset map zoom, {percent} per cent",
-      africaOverview: "Africa",
-      viewAllAfrica: "View all Africa",
       showRegion: "Show region",
       viewWorld: "View world",
       mapAreaControls: "Change map area",
@@ -387,8 +383,7 @@
   });
   const mapSelectableRegions = [
     "europe",
-    "north-west-africa",
-    "east-south-africa",
+    "africa",
     "west-central-asia",
     "east-south-asia",
     "oceania",
@@ -396,10 +391,6 @@
     "south-america",
     "caribbean",
   ];
-  const africaRegionIds = new Set([
-    "north-west-africa",
-    "east-south-africa",
-  ]);
   const countriesByCode = new Map(
     countries.map((country) => [country.code, country]),
   );
@@ -702,7 +693,6 @@
     return exploreState.initialExtent(
       countryCodes,
       mapRegionForCode,
-      africaRegionIds,
     );
   }
 
@@ -2551,14 +2541,11 @@
         markers: mapData.markers,
       };
     }
-    return extent === "africa"
-      ? mapData.overviewRegions.africa
-      : mapData.quizRegions[extent];
+    return mapData.quizRegions[extent];
   }
 
   function exploreMapExtentLabel(extent) {
     if (extent === "world") return t("wholeWorld");
-    if (extent === "africa") return t("africaOverview");
     return regionLabel(regionsById.get(extent));
   }
 
@@ -2568,12 +2555,11 @@
     const zoomInExtent = exploreState.zoomInExtent(
       extent,
       selectedRegion,
-      africaRegionIds,
     );
-    const zoomOutExtent = exploreState.zoomOutExtent(extent, africaRegionIds);
+    const zoomOutExtent = exploreState.zoomOutExtent(extent);
     const controls = [];
     if (zoomOutExtent !== extent) {
-      controls.push(`<button type="button" class="secondary-button explore-map-scope-button" data-action="explore-map-area" data-value="${zoomOutExtent}"><span aria-hidden="true">−</span> ${escapeHtml(zoomOutExtent === "world" ? t("viewWorld") : t("viewAllAfrica"))}</button>`);
+      controls.push(`<button type="button" class="secondary-button explore-map-scope-button" data-action="explore-map-area" data-value="${zoomOutExtent}"><span aria-hidden="true">−</span> ${escapeHtml(t("viewWorld"))}</button>`);
     }
     if (zoomInExtent !== extent) {
       controls.push(`<button type="button" class="secondary-button explore-map-scope-button" data-action="explore-map-area" data-value="${zoomInExtent}">${escapeHtml(t("showRegion"))} <span aria-hidden="true">+</span></button>`);
@@ -3586,7 +3572,6 @@
     const nextExtent = exploreState.extentForSelection(
       extent,
       regionId,
-      africaRegionIds,
     );
     if (nextExtent !== extent) {
       state.exploreMapExtent = nextExtent;
@@ -4558,7 +4543,6 @@
       const extent = control.dataset.value;
       if (
         extent !== "world" &&
-        extent !== "africa" &&
         !mapSelectableRegions.includes(extent)
       ) return;
       state.exploreMapExtent = extent;

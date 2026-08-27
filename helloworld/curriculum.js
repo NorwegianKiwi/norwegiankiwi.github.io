@@ -64,9 +64,8 @@
     ["mastery-europe", "Europa-mestring", "Europe mastery", "region", "europe"],
     ["mastery-north-central-america", "Nord- og Mellom-Amerika-mestring", "North and Central America mastery", "region", "north-central-america"],
     ["mastery-south-america", "Sør-Amerika-mestring", "South America mastery", "region", "south-america"],
-    ["mastery-north-west-africa", "Nord- og Vest-Afrika-mestring", "North and West Africa mastery", "region", "north-west-africa"],
+    ["mastery-africa", "Afrika-mestring", "Africa mastery", "region", "africa"],
     ["mastery-east-south-asia", "Øst- og Sør-Asia-mestring", "East and South Asia mastery", "region", "east-south-asia"],
-    ["mastery-east-south-africa", "Øst- og Sør-Afrika-mestring", "East and South Africa mastery", "region", "east-south-africa"],
     ["mastery-west-central-asia", "Vest- og Sentral-Asia-mestring", "West and Central Asia mastery", "region", "west-central-asia"],
     ["mastery-caribbean", "Karibia-mestring", "Caribbean mastery", "region", "caribbean"],
     ["mastery-oceania", "Oseania-mestring", "Oceania mastery", "region", "oceania"],
@@ -93,7 +92,7 @@
       title: Object.freeze({ nb: "Verdensvandrer", en: "Globetrotter" }),
     }),
     Object.freeze({
-      id: "world-master", icon: "🏆", startLevel: 42, endLevel: 53,
+      id: "world-master", icon: "🏆", startLevel: 42, endLevel: 52,
       title: Object.freeze({ nb: "Verdensmester", en: "World Master" }),
     }),
   ]);

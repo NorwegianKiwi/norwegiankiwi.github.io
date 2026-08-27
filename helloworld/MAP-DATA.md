@@ -50,8 +50,7 @@ other things:
 - map geometry or a marker for every learnable place
 - one silhouette per place
 - the expected 234 civic-centre markers across 225 silhouettes
-- complete coverage in each of the nine quiz-region maps and the Africa
-  overview map
+- complete coverage in each of the eight quiz-region maps
 - the expected Natural Earth version and projections
 
 The validation does not determine whether political borders or the country
@@ -167,9 +166,6 @@ readable. Country membership in region maps must always be looked up in
 `countries.js`; the `CONTINENT`, `REGION_UN`, and `SUBREGION` fields in Natural
 Earth serve only as a basis for comparison.
 
-The Africa overview is a separate map extent under `overviewRegions` and
-combines the two African quiz regions. It is not an overlapping quiz region.
-
 The dependency-free reference generator creates a separate candidate:
 
 ```sh
@@ -181,7 +177,7 @@ python3 tools/map_maintenance.py validate \
 ```
 
 When region maps change, preserve the existing Natural Earth world map and shape
-insets with `--base-map`. All region maps and the Africa overview are always
+insets with `--base-map`. All region maps are always
 regenerated through the same azimuthal-equidistant pipeline:
 
 ```sh
@@ -299,7 +295,6 @@ window.GEOGRAFI_QUIZ_MAP_DATA = {
   markers,
   quizProjection,
   quizRegions: { [id]: { viewBox, bleedViewBox, backgroundFeatures, features, markers } },
-  overviewRegions: { [id]: { viewBox, bleedViewBox, backgroundFeatures, features, markers } },
   silhouetteViewBox,
   silhouettes,
   silhouetteCapitals: { [countryCode]: { main, insets } }
@@ -343,7 +338,7 @@ Before replacing `world-map.js`:
   detail frames for the Cook Islands, French Polynesia, the Northern Mariana
   Islands, the Marshall Islands, Micronesia, and Kiribati; and no duplicated
   capital stars.
-- Check all nine quiz-region maps, the Africa overview, and the shape inset's
+- Check all eight quiz-region maps and the shape inset's
   four possible corners.
 - Test the front-page map's mouse, keyboard, hover, focus, and selected region.
 - Test the map quiz with correct answers, incorrect answers, and corrections in

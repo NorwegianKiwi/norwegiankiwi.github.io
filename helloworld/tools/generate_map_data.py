@@ -1532,7 +1532,6 @@ def write_candidate(path, data):
   const data = {compact_json(data["base"])};
   data.quizProjection = {compact_json(data["quizProjection"])};
   data.quizRegions = {compact_json(data["quizRegions"])};
-  data.overviewRegions = {compact_json(data["overviewRegions"])};
   data.silhouetteViewBox = {compact_json(data["silhouetteViewBox"])};
   data.silhouettes = {compact_json(data["silhouettes"])};
   data.silhouetteCapitals = {compact_json(data["silhouetteCapitals"])};
@@ -1543,13 +1542,6 @@ def write_candidate(path, data):
     Object.freeze(view);
   }});
   Object.freeze(data.quizRegions);
-  Object.values(data.overviewRegions).forEach((view) => {{
-    Object.freeze(view.features);
-    Object.freeze(view.markers);
-    Object.freeze(view.backgroundFeatures);
-    Object.freeze(view);
-  }});
-  Object.freeze(data.overviewRegions);
   Object.values(data.silhouettes).forEach((silhouette) => {{
     Object.freeze(silhouette.markers);
     if (silhouette.expanded) {{
@@ -1758,21 +1750,12 @@ def main():
             }
             for region in manifest["quizRegions"]
         }
-        overview_active_codes = {
-            overview: {
-                code
-                for code, country_region in region_for_code.items()
-                if country_region in set(settings["memberRegions"])
-            }
-            for overview, settings in manifest.get("overviewRegions", {}).items()
-        }
         if (
             args.refresh_silhouette_overrides
             or args.refresh_world_overrides
             or args.refresh_world
         ):
             quiz_regions = existing["quizRegions"]
-            overview_regions = existing["overviewRegions"]
         else:
             quiz_regions = build_region_views(
                 regional_active_features,
@@ -1781,16 +1764,6 @@ def main():
                 local_names,
                 manifest["quizRegions"],
                 quiz_active_codes,
-                marker_overrides,
-                manifest.get("regionalGeometryOverrides", {}),
-            )
-            overview_regions = build_region_views(
-                regional_active_features,
-                countries50,
-                tiny50,
-                local_names,
-                manifest.get("overviewRegions", {}),
-                overview_active_codes,
                 marker_overrides,
                 manifest.get("regionalGeometryOverrides", {}),
             )
@@ -1848,7 +1821,6 @@ def main():
             },
             "quizProjection": manifest["generatedOutput"]["quizProjection"],
             "quizRegions": quiz_regions,
-            "overviewRegions": overview_regions,
             "silhouetteViewBox": (
                 existing["silhouetteViewBox"]
                 if args.base_map

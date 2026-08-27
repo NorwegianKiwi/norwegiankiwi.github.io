@@ -33,13 +33,9 @@
       "centerLongitude": 15,
       "bounds": [-25, 34, 45, 72]
     },
-    "north-west-africa": {
-      "centerLongitude": 10,
-      "bounds": [-26, 0, 39, 38]
-    },
-    "east-south-africa": {
-      "centerLongitude": 30,
-      "bounds": [7, -36, 60, 24]
+    "africa": {
+      "centerLongitude": 17,
+      "bounds": [-25, -38, 58, 40]
     },
     "west-central-asia": {
       "centerLongitude": 52,
@@ -64,13 +60,6 @@
     "caribbean": {
       "centerLongitude": -74,
       "bounds": [-90, 5, -58, 30]
-    }
-  },
-  "overviewRegions": {
-    "africa": {
-      "centerLongitude": 17,
-      "bounds": [-25, -38, 58, 40],
-      "memberRegions": ["north-west-africa", "east-south-africa"]
     }
   },
   "generatedOutput": {

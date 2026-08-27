@@ -5,7 +5,7 @@ global.window = global;
 require("../countries.js");
 const curriculum = require("../curriculum.js");
 
-const { countries, otherPlaces, places } = global.GEOGRAFI_QUIZ_DATA;
+const { countries, otherPlaces, places, regionOptions } = global.GEOGRAFI_QUIZ_DATA;
 const countryCodes = new Set(countries.map((country) => country.code));
 const placeCodes = new Set(places.map((place) => place.code));
 const placesByCode = new Map(places.map((place) => [place.code, place]));
@@ -15,10 +15,15 @@ const quizzes = levels.flatMap((level) => level.quizzes.map((quiz) => ({ ...quiz
 assert.equal(countries.length, 197);
 assert.equal(otherPlaces.length, 30);
 assert.equal(places.length, 227);
-assert.equal(levels.length, 53);
-assert.equal(new Set(levels.map((level) => level.id)).size, 53);
-assert.equal(quizzes.length, 212);
-assert.equal(new Set(quizzes.map((quiz) => quiz.id)).size, 212);
+assert.equal(countries.filter((country) => country.region === "africa").length, 54);
+assert.equal(otherPlaces.filter((place) => place.region === "africa").length, 3);
+assert.equal(places.filter((place) => place.region === "africa").length, 57);
+assert.ok(regionOptions.some((region) => region.id === "africa"));
+assert.ok(!regionOptions.some((region) => ["north-west-africa", "east-south-africa"].includes(region.id)));
+assert.equal(levels.length, 52);
+assert.equal(new Set(levels.map((level) => level.id)).size, 52);
+assert.equal(quizzes.length, 208);
+assert.equal(new Set(quizzes.map((quiz) => quiz.id)).size, 208);
 
 assert.deepEqual(
   curriculum.sections.map(({ id, icon, startLevel, endLevel }) => [id, icon, startLevel, endLevel]),
@@ -27,7 +32,7 @@ assert.deepEqual(
     ["explorer", "🧭", 5, 14],
     ["navigator", "🗺️", 15, 33],
     ["globetrotter", "🌍", 34, 41],
-    ["world-master", "🏆", 42, 53],
+    ["world-master", "🏆", 42, 52],
   ],
 );
 const sectionLevelNumbers = curriculum.sections.flatMap((section) =>
@@ -69,6 +74,7 @@ assert.deepEqual(
   otherPlaces.map((place) => place.code).sort(),
 );
 assert.equal(curriculum.levelById.get("mastery-whole-world").countryCodes.length, 227);
+assert.equal(curriculum.levelById.get("mastery-africa").countryCodes.length, 54);
 
 const relationshipLabel = (place, locale) =>
   place.relatedCountryCode

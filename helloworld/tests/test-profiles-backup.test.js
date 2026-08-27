@@ -27,8 +27,8 @@ const expected = {
   "test-regular-complete": [37, 148, 148],
   "test-regional-progress": [42, 170, 171],
   "test-world-next": [46, 184, 184],
-  "test-final-quiz": [52, 211, 211],
-  "test-all-mastered": [53, 212, 212],
+  "test-final-quiz": [51, 207, 207],
+  "test-all-mastered": [52, 208, 208],
 };
 
 for (const profile of profiles) {
