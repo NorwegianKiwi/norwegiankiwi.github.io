@@ -52,6 +52,10 @@ shape:
   titleKey: "levelNordics",
   kind: "pack", // "pack", "tour", "regional-mastery", "world-mastery"
   countryCodes: ["no", "se", "dk", "fi", "is"],
+  region: null,             // one primary region for a regional challenge
+  regions: null,            // primary-region union for a composite challenge
+  sourcePackIds: null,      // systematic-pack union for a review challenge
+  category: null,           // category selector for a world challenge
   quizzes: [
     {
       id: "pack-nordics:country-flag",
@@ -417,7 +421,7 @@ persistent progress. UI elements must not independently mutate stored objects
 without going through validated progress functions.
 
 The home progress globe and its numeric label both derive from mastered levels
-out of 52. Current-level progress derives from mastered quizzes out of four.
+out of 58. Current-level progress derives from mastered quizzes out of four.
 They must not use different hidden denominators.
 
 Explore Flashcards are read-only learning state. Their deck is derived from the
@@ -438,13 +442,13 @@ At minimum, add automated coverage for:
 
 ### Curriculum
 
-- 52 unique ordered level IDs
+- 58 unique ordered level IDs
 - Exactly four unique canonical modes per level
-- 208 unique quiz IDs
+- 232 unique quiz IDs
 - Valid positive revisions and fixed seeds
 - All referenced country codes exist
 - Exactly 227 unique systematic-pack assignments
-- Exact regional mastery membership
+- Exact pack-union and composite-region mastery membership
 - Exact 197-country, 30-other-place, and 227-place world mastery memberships
 - Choice counts do not exceed valid candidate pools
 
@@ -510,7 +514,7 @@ The first progression release is complete when:
 - A new player can start Level 1 from the first viewport with one primary click;
   Player 1 is created automatically.
 - A returning player can continue the correct quiz from the home screen.
-- All 208 quizzes can be selected directly and record independent best scores.
+- All 232 quizzes can be selected directly and record independent best scores.
 - Quiz and level mastery are accurately derived and displayed.
 - Multiple local profiles remain separated.
 - Clear progress works for one profile without affecting others.

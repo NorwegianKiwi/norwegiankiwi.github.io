@@ -1,7 +1,7 @@
 # Hello World!
 
 A static, bilingual geography progression game covering 197 countries and 30
-other places in 52 levels and 208 fixed single-mode quizzes. It includes multiple local profiles,
+other places in 58 levels and 232 fixed single-mode quizzes. It includes multiple local profiles,
 best scores, resumable mastery challenges, progress transfer and backup, plus
 an independent, viewport-fitted Explore workspace with world, regional, and
 contextual country maps plus a country list and Flashcards action.
@@ -51,7 +51,7 @@ browser and in the Node-based domain tests.
 Import `fixtures/test-profiles-backup.json` through **Settings → Import backup
 file → Import all profiles** to add eleven switchable test profiles. They cover a
 new player, played and partially mastered states, progression milestones, all
-regular levels complete, all but the final quiz, and all 208 quizzes mastered.
+regular levels complete, all but the final quiz, and all 232 quizzes mastered.
 Use **Test · Final quiz remaining** to exercise the genuine final completion
 flow from the home screen. Their IDs begin with `test-`, so importing the file
 again safely merges the same profiles instead of creating duplicates. Because imports never
@@ -116,7 +116,7 @@ node tests/challenge.test.js
 - `styles/` – presentation split into base, quiz, Explore, flashcard, and
   responsive stylesheets
 - `countries.js` – bilingual place, relationship, civic-centre, and region data
-- `curriculum.js` – the 52 ordered levels, 208 quizzes, stable identities and
+- `curriculum.js` – the 58 ordered levels, 232 quizzes, stable identities and
   deterministic curriculum attempt construction
 - `progress.js` – local profiles, progress derivation, persistence, transfer,
   backup and safe merging

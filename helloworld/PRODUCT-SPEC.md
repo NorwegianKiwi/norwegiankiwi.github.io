@@ -46,7 +46,7 @@ The game contains:
 - **Progress:** a best score and mastery state for every quiz.
 - **Explore:** the existing interactive maps and country list.
 
-The exact 52-level, 208-quiz journey is defined in `CURRICULUM.md`, which is the
+The exact 58-level, 232-quiz journey is defined in `CURRICULUM.md`, which is the
 content source of truth.
 
 ## 4. Home screen and information hierarchy
@@ -68,10 +68,10 @@ required choice screen.
 The Continue card also shows overall and current-level progress:
 
 - A globe that fills with colour in proportion to mastered levels
-- An explicit accessible count such as **12 of 52 levels mastered**
+- An explicit accessible count such as **12 of 58 levels mastered**
 - Current-level progress such as **2 of 4 quizzes mastered**
 
-The globe and overall number must represent the same measurement. At 52/52 the
+The globe and overall number must represent the same measurement. At 58/58 the
 globe becomes fully coloured and may receive a subtle gold completion treatment.
 The number remains the authoritative accessible representation; the globe is
 never the only progress signal.
@@ -376,8 +376,8 @@ profile later.
 
 The profile or completed-world surface can share a concise achievement such as:
 
-- **I have mastered 18 of 52 levels in Hello World!**
-- **I have mastered all 208 geography quizzes.**
+- **I have mastered 18 of 58 levels in Hello World!**
+- **I have mastered all 232 geography quizzes.**
 
 This shares an invitation to the game, not the transferable profile payload.
 Profile transfer remains a separate private action.
@@ -410,11 +410,11 @@ These may be reconsidered after observing actual use.
 
 ## 18. Completed-world state
 
-After all 208 quizzes are mastered, the home screen celebrates the retained
+After all 232 quizzes are mastered, the home screen celebrates the retained
 achievement rather than suggesting that progress be erased:
 
 > **World mastered**
-> 52 of 52 levels · 208 of 208 quizzes
+> 58 of 58 levels · 232 of 232 quizzes
 
 The completed progress globe carries a static trophy badge as an additional
 visual celebration; the heading and counts remain the accessible statement of

@@ -61,13 +61,15 @@
 .levels-header-title { margin:0; font-size:1.1rem; }
 .levels-header-actions { display:flex; align-items:center; justify-content:flex-end; gap:.5rem; }
 .levels-list { display:grid; gap:2.25rem; margin-top:2rem; }
-.level-section { --section-accent:#963f5d; --section-soft:#f3dce4; display:grid; gap:.7rem; }
-.level-section-explorer { --section-accent:#98551f; --section-soft:#f4e0cf; }
-.level-section-navigator { --section-accent:#35658d; --section-soft:#d9e8f3; }
-.level-section-globetrotter { --section-accent:#6f4f7d; --section-soft:#eadfed; }
-.level-section-world-master { --section-accent:#8b6a16; --section-soft:#f8edc9; }
-.level-section-heading { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.85rem; padding:0 .2rem .75rem; border-bottom:2px solid color-mix(in srgb, var(--section-accent) 36%, transparent); color:var(--section-accent); }
-.level-section-icon { display:grid; place-items:center; width:2.6rem; height:2.6rem; border-radius:50%; background:var(--section-soft); font-size:1.3rem; box-shadow:0 4px 10px rgba(28,43,44,.06); }
+.level-section { --section-on-badge:#18231d; display:grid; gap:.7rem; }
+.level-section-traveller { --section-accent:#a52855; --section-badge:#e36a91; }
+.level-section-explorer { --section-accent:#a84b08; --section-badge:#e9943a; }
+.level-section-navigator { --section-accent:#235fa4; --section-badge:#5b91d1; }
+.level-section-globetrotter { --section-accent:#6b3fa0; --section-badge:#a47ed2; }
+.level-section-regional-expert { --section-accent:#00776c; --section-badge:#36a99c; }
+.level-section-world-master { --section-accent:#946600; --section-badge:#e1ad2b; }
+.level-section-heading { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.85rem; padding:0 .2rem .75rem; border-bottom:2px solid color-mix(in srgb, var(--section-accent) 58%, transparent); color:var(--section-accent); }
+.level-section-icon { display:grid; place-items:center; width:2.6rem; height:2.6rem; border-radius:50%; background:var(--section-badge, var(--section-accent)); font-size:1.3rem; box-shadow:0 5px 14px color-mix(in srgb, var(--section-badge, var(--section-accent)) 30%, transparent); }
 .level-section-copy { display:grid; }
 .level-section-copy strong { font-size:1.15rem; }
 .level-section-range { color:var(--muted); font-size:.78rem; font-weight:700; }
@@ -78,7 +80,7 @@
 .level-card.is-recommended-level { border:3px solid var(--green); box-shadow:0 7px 18px rgba(36,93,69,.1); }
 .level-card.has-saved-attempt { border:3px solid #287762; background:#edf6f2; box-shadow:0 9px 24px rgba(36,93,69,.14); }
 .level-heading { width:100%; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:1rem; padding:1rem 1.1rem; border:0; background:transparent; color:inherit; text-align:left; font:inherit; }
-.level-number { display:grid; place-items:center; width:2.3rem; height:2.3rem; border-radius:50%; background:var(--section-soft, #eee9df); color:var(--section-accent, inherit); font-weight:800; }
+.level-number { display:grid; place-items:center; width:2.3rem; height:2.3rem; border-radius:50%; background:var(--section-badge, var(--section-accent, #4f5d56)); color:var(--section-on-badge, #fff); font-weight:800; box-shadow:0 3px 9px color-mix(in srgb, var(--section-badge, var(--section-accent, #4f5d56)) 22%, transparent); }
 .level-heading strong,.level-heading small { display:block; }
 .level-heading small { margin-top:.2rem; color:#687272; }
 .level-state { display:grid; justify-items:end; gap:.3rem; white-space:nowrap; font-weight:750; }

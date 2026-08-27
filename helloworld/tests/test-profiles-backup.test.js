@@ -24,11 +24,11 @@ const expected = {
   "test-level-1": [1, 4, 4],
   "test-level-5": [5, 20, 20],
   "test-level-20": [20, 82, 83],
-  "test-regular-complete": [37, 148, 148],
-  "test-regional-progress": [42, 170, 171],
-  "test-world-next": [46, 184, 184],
-  "test-final-quiz": [51, 207, 207],
-  "test-all-mastered": [52, 208, 208],
+  "test-regular-complete": [41, 164, 164],
+  "test-regional-progress": [46, 186, 187],
+  "test-world-next": [52, 208, 208],
+  "test-final-quiz": [57, 231, 231],
+  "test-all-mastered": [58, 232, 232],
 };
 
 for (const profile of profiles) {

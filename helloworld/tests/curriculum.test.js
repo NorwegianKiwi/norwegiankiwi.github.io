@@ -33,19 +33,31 @@ for (const [code, region] of Object.entries({
 })) {
   assert.equal(placesByCode.get(code).region, region, code);
 }
-assert.equal(levels.length, 52);
-assert.equal(new Set(levels.map((level) => level.id)).size, 52);
-assert.equal(quizzes.length, 208);
-assert.equal(new Set(quizzes.map((quiz) => quiz.id)).size, 208);
+assert.equal(levels.length, 58);
+assert.equal(new Set(levels.map((level) => level.id)).size, 58);
+assert.equal(quizzes.length, 232);
+assert.equal(new Set(quizzes.map((quiz) => quiz.id)).size, 232);
 
 assert.deepEqual(
   curriculum.sections.map(({ id, icon, startLevel, endLevel }) => [id, icon, startLevel, endLevel]),
   [
-    ["traveller", "🎒", 1, 4],
-    ["explorer", "🧭", 5, 14],
-    ["navigator", "🗺️", 15, 33],
-    ["globetrotter", "🌍", 34, 41],
-    ["world-master", "🏆", 42, 52],
+    ["traveller", "🚶", 1, 4],
+    ["explorer", "🥾", 5, 14],
+    ["navigator", "🧭", 15, 27],
+    ["globetrotter", "✈️", 28, 41],
+    ["regional-expert", "🗺️", 42, 52],
+    ["world-master", "🌍", 53, 58],
+  ],
+);
+assert.deepEqual(
+  curriculum.sections.map(({ title }) => title),
+  [
+    { nb: "Reisende", en: "Traveller" },
+    { nb: "Oppdager", en: "Explorer" },
+    { nb: "Navigatør", en: "Navigator" },
+    { nb: "Globetrotter", en: "Globetrotter" },
+    { nb: "Kartograf", en: "Cartographer" },
+    { nb: "Verdensmester", en: "World Master" },
   ],
 );
 const sectionLevelNumbers = curriculum.sections.flatMap((section) =>
@@ -73,9 +85,36 @@ const systematic = levels.filter((level) => level.kind === "pack").flatMap((leve
 assert.equal(systematic.length, 227);
 assert.equal(new Set(systematic).size, 227);
 
-for (const level of levels.filter((level) => level.kind === "regional-mastery")) {
+for (const level of levels.filter((level) => level.kind === "regional-mastery" && level.region)) {
   const expected = countries.filter((country) => country.region === level.region).map((country) => country.code).sort();
   assert.deepEqual([...level.countryCodes].sort(), expected, level.id);
+}
+
+const expectedPackMasteries = {
+  "mastery-europe-north-west": ["pack-nordics", "pack-western-europe", "pack-baltic-neighbours"],
+  "mastery-africa-north-west": ["pack-north-africa", "pack-sahel", "pack-atlantic-west-africa", "pack-gulf-guinea"],
+  "mastery-europe-central-south-east": ["pack-iberia-alps", "pack-central-europe", "pack-balkans", "pack-eastern-europe", "pack-european-microstates"],
+  "mastery-africa-central-east-south": ["pack-horn-nile", "pack-great-lakes-congo", "pack-southern-africa", "pack-southeast-africa-islands"],
+};
+for (const [levelId, packIds] of Object.entries(expectedPackMasteries)) {
+  const level = curriculum.levelById.get(levelId);
+  const expected = packIds.flatMap((packId) => curriculum.levelById.get(packId).countryCodes);
+  assert.deepEqual(level.sourcePackIds, packIds, levelId);
+  assert.deepEqual(level.countryCodes, expected, levelId);
+}
+
+assert.deepEqual(
+  levels.slice(41, 52).map((level) => level.countryCodes.length),
+  [10, 12, 13, 14, 16, 24, 26, 26, 28, 28, 30],
+);
+assert.deepEqual(
+  levels.slice(52).map((level) => level.countryCodes.length),
+  [35, 44, 54, 64, 197, 227],
+);
+assert.deepEqual(curriculum.levelById.get("mastery-americas").regions, ["north-central-america", "south-america", "caribbean"]);
+assert.deepEqual(curriculum.levelById.get("mastery-asia-oceania").regions, ["asia-west", "asia-east", "oceania"]);
+for (const levelId of ["mastery-americas", "mastery-europe", "mastery-africa", "mastery-asia-oceania", "mastery-countries-world"]) {
+  assert.ok(curriculum.levelById.get(levelId).countryCodes.every((code) => countryCodes.has(code)), levelId);
 }
 assert.deepEqual([...levels.at(-1).countryCodes].sort(), [...placeCodes].sort());
 assert.deepEqual(
@@ -88,6 +127,8 @@ assert.deepEqual(
 );
 assert.equal(curriculum.levelById.get("mastery-whole-world").countryCodes.length, 227);
 assert.equal(curriculum.levelById.get("mastery-africa").countryCodes.length, 54);
+assert.equal(curriculum.levelById.get("mastery-americas").countryCodes.length, 35);
+assert.equal(curriculum.levelById.get("mastery-asia-oceania").countryCodes.length, 64);
 assert.equal(curriculum.levelById.get("mastery-asia-east").title.en, "Asia (East) mastery");
 assert.equal(curriculum.levelById.get("mastery-asia-east").title.nb, "Asia (øst)-mestring");
 assert.equal(curriculum.levelById.get("mastery-asia-west").title.en, "Asia (West) mastery");
@@ -130,5 +171,24 @@ for (const question of firstAttempt) {
   assert.ok(question.choiceCodes.includes(question.countryCode));
   assert.deepEqual(new Set(question.choiceCodes), new Set(curriculum.fixedAlternativeCodes(quiz)[question.countryCode]));
 }
+
+for (const level of levels.slice(41)) {
+  assert.deepEqual(level.quizzes.map((candidate) => candidate.choiceCount), [9, 6, 6, 6], level.id);
+  for (const baseQuiz of level.quizzes) {
+    const masteryQuiz = curriculum.quizById.get(baseQuiz.id);
+    assert.equal(curriculum.createAttempt(masteryQuiz, "full-length").length, level.countryCodes.length, masteryQuiz.id);
+  }
+}
+
+const regionalQuiz = curriculum.quizById.get("mastery-europe-north-west:flag-country");
+const regionalCodes = new Set(regionalQuiz.countryCodes);
+for (const choices of Object.values(curriculum.fixedAlternativeCodes(regionalQuiz))) {
+  assert.ok(choices.every((code) => regionalCodes.has(code)));
+}
+const worldQuiz = curriculum.quizById.get("mastery-countries-world:flag-country");
+assert.ok(
+  Object.values(curriculum.fixedAlternativeCodes(worldQuiz)).flat().some((code) => !countryCodes.has(code)),
+  "world mastery distractors should use the complete place pool",
+);
 
 console.log("Curriculum tests passed.");

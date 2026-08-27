@@ -22,9 +22,9 @@ the 227-place dataset: 197 countries and 30 other places.
 - A quiz is mastered by answering every question correctly in one attempt.
 - A level is mastered when all four quizzes in it are mastered.
 - Progress records the best score for each quiz revision.
-- The final challenges are intentionally difficult. Regional challenges use
-  every country in the region; the three world masteries use 197 countries,
-  30 other places, and all 227 places respectively.
+- The final challenges are intentionally difficult. Regional reviews bridge
+  the short learning packs and continent-scale mastery before the 197-country
+  and 227-place finales.
 
 ## The four quiz modes
 
@@ -59,7 +59,7 @@ seed used to select its answer alternatives.
 - Answer positions are shuffled for every attempt.
 - Regular-level alternatives come from the current country pack, so an
   introductory quiz does not require knowledge of countries not yet introduced.
-- Regional mastery alternatives come from the relevant region.
+- Regional mastery alternatives come from the relevant challenge set.
 - World mastery alternatives come from the complete 227-place dataset.
 
 This keeps attempts equivalent without teaching the player that "Sweden is
@@ -77,8 +77,9 @@ Difficulty increases slowly through the recommended journey:
 | Caribbean and Oceania | Advanced | 6 | 5–7 |
 | World Tours 1–2 | Easy mixed review | 3 | 9–10 |
 | World Tours 3–5 | Mixed review | 4 | 10–12 |
-| Regional mastery | Mastery | 9 for Find the flag; 6 for other modes | Entire region |
-| World mastery | Ultimate | 9 for Find the flag; 6 for other modes | 30–227 |
+| Cartographer reviews | Mastery | 9 for Find the flag; 6 for other modes | 10–30 |
+| Continental mastery | Mastery | 9 for Find the flag; 6 for other modes | 35–64 |
+| World mastery | Ultimate | 9 for Find the flag; 6 for other modes | 197–227 |
 
 If a pack contains fewer countries than the configured alternative count, the
 alternative count is capped at the pack size. Difficulty can later be tuned per
@@ -154,26 +155,48 @@ Mixed-region map quizzes select the relevant regional map separately for each
 question. The question type remains purely map-to-country; only the displayed
 region changes between questions.
 
-## Mastery levels
+## Regional review and mastery levels
 
-Mastery levels are displayed in a final **Mastery challenges** section. They
-are open from the beginning, but Continue reaches them only after the regular
-learning levels. Every mastery level contains four separate, single-mode
-quizzes. Perfect scores are intentionally required for mastery.
+The **Cartographer** section bridges the short learning packs and the final
+**World Master** section. All challenges are open from the beginning, but
+Continue reaches them only after the regular learning levels. Every challenge
+contains four separate, full-length single-mode quizzes. Perfect scores are
+intentionally required for mastery.
 
 | No. | Stable level ID | Challenge | Countries per quiz | Total questions across four quizzes |
 |---:|---|---|---:|---:|
-| 42 | `mastery-europe` | Europe mastery | 44 | 176 |
-| 43 | `mastery-north-central-america` | North and Central America mastery | 10 | 40 |
-| 44 | `mastery-south-america` | South America mastery | 12 | 48 |
-| 45 | `mastery-africa` | Africa mastery | 54 | 216 |
-| 46 | `mastery-asia-east` | Asia (East) mastery | 26 | 104 |
+| 42 | `mastery-north-central-america` | North and Central America mastery | 10 | 40 |
+| 43 | `mastery-south-america` | South America mastery | 12 | 48 |
+| 44 | `mastery-caribbean` | Caribbean mastery | 13 | 52 |
+| 45 | `mastery-oceania` | Oceania mastery | 14 | 56 |
+| 46 | `mastery-europe-north-west` | Northern and Western Europe mastery | 16 | 64 |
 | 47 | `mastery-asia-west` | Asia (West) mastery | 24 | 96 |
-| 48 | `mastery-caribbean` | Caribbean mastery | 13 | 52 |
-| 49 | `mastery-oceania` | Oceania mastery | 14 | 56 |
-| 50 | `mastery-countries-world` | Countries of the world | 197 | 788 |
-| 51 | `mastery-other-places-world` | Other places of the world | 30 | 120 |
-| 52 | `mastery-whole-world` | The whole world | 227 | 908 |
+| 48 | `mastery-africa-north-west` | Northern and Western Africa mastery | 26 | 104 |
+| 49 | `mastery-asia-east` | Asia (East) mastery | 26 | 104 |
+| 50 | `mastery-europe-central-south-east` | Central, Southern and Eastern Europe mastery | 28 | 112 |
+| 51 | `mastery-africa-central-east-south` | Central, Eastern and Southern Africa mastery | 28 | 112 |
+| 52 | `mastery-other-places-world` | Other places of the world | 30 | 120 |
+| 53 | `mastery-americas` | Americas mastery | 35 | 140 |
+| 54 | `mastery-europe` | Europe mastery | 44 | 176 |
+| 55 | `mastery-africa` | Africa mastery | 54 | 216 |
+| 56 | `mastery-asia-oceania` | Asia and Oceania mastery | 64 | 256 |
+| 57 | `mastery-countries-world` | Countries of the world | 197 | 788 |
+| 58 | `mastery-whole-world` | The whole world | 227 | 908 |
+
+The split reviews reuse these exact systematic packs rather than adding a new
+region taxonomy:
+
+- Northern and Western Europe: Nordic countries, Western Europe, and Baltic neighbours.
+- Central, Southern and Eastern Europe: Iberia and the Alps, Central Europe,
+  the Balkans, Eastern and southeastern Europe, and European microstates and Malta.
+- Northern and Western Africa: North Africa, the Sahel, Atlantic West Africa,
+  and Gulf of Guinea and Central Africa.
+- Central, Eastern and Southern Africa: Horn and Upper Nile, Great Lakes and
+  Congo basin, Southern Africa, and Southeast Africa and the Indian Ocean.
+
+Americas combines North and Central America, South America, and the Caribbean.
+Asia and Oceania combines both Asian regions with Oceania. All continent-scale
+challenges contain countries only.
 
 The combined whole-world level contains the four ultimate challenges:
 
@@ -190,19 +213,19 @@ challenge has not been mastered.
 
 - 36 systematic learning levels
 - 5 World Tour interludes
-- 12 mastery levels
-- 52 levels in total
+- 17 mastery levels
+- 58 levels in total
 - 144 short learning quizzes
 - 20 World Tour quizzes
-- 36 regional mastery quizzes
-- 12 world-mastery quizzes
-- 208 quizzes in total
+- 44 Cartographer quizzes
+- 24 World Master quizzes
+- 232 quizzes in total
 - 227 places, each assigned to exactly one systematic pack
 - Every place practised in all four quiz modes before the mastery section
 
 ## Progress display and next action
 
-The Levels screen groups the curriculum into five open journey stages. These
+The Levels screen groups the curriculum into six open journey stages. These
 stages communicate increasing challenge; they do not lock levels or represent
 a formally earned player rank.
 
@@ -210,9 +233,10 @@ a formally earned player rank.
 |---:|---|---|
 | 1–4 | Reisende | Traveller |
 | 5–14 | Oppdager | Explorer |
-| 15–33 | Veiviser | Navigator |
-| 34–41 | Verdensvandrer | Globetrotter |
-| 42–52 | Verdensmester | World Master |
+| 15–27 | Navigatør | Navigator |
+| 28–41 | Globetrotter | Globetrotter |
+| 42–52 | Kartograf | Cartographer |
+| 53–58 | Verdensmester | World Master |
 
 Quiz states:
 
@@ -248,7 +272,7 @@ Progress is stored against `quiz-id@revision`.
 
 ## Playtesting and tuning boundaries
 
-The 52-level order, place assignments, four single-mode quizzes per level and
+The 58-level order, place assignments, four single-mode quizzes per level and
 mastery structure are the approved initial curriculum. Playtesting may tune
 presentation details such as answer-feedback timing, card layout and responsive
 density without changing quiz identity.
@@ -257,4 +281,4 @@ Changing a country set, choice count, fixed alternatives or other material
 difficulty requires deliberate curriculum review and the revision handling
 described above. Missed countries are reviewed through the optional Explore
 Cards flow defined in `PRODUCT-SPEC.md`; additional review levels are not part
-of the initial 52-level curriculum.
+of the initial 58-level curriculum.

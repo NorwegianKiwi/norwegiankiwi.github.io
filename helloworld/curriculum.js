@@ -61,38 +61,48 @@
   ];
 
   const mastery = [
-    ["mastery-europe", "Europa-mestring", "Europe mastery", "region", "europe"],
     ["mastery-north-central-america", "Nord- og Mellom-Amerika-mestring", "North and Central America mastery", "region", "north-central-america"],
     ["mastery-south-america", "Sør-Amerika-mestring", "South America mastery", "region", "south-america"],
-    ["mastery-africa", "Afrika-mestring", "Africa mastery", "region", "africa"],
-    ["mastery-asia-east", "Asia (øst)-mestring", "Asia (East) mastery", "region", "asia-east"],
-    ["mastery-asia-west", "Asia (vest)-mestring", "Asia (West) mastery", "region", "asia-west"],
     ["mastery-caribbean", "Karibia-mestring", "Caribbean mastery", "region", "caribbean"],
     ["mastery-oceania", "Oseania-mestring", "Oceania mastery", "region", "oceania"],
-    ["mastery-countries-world", "Verdens land", "Countries of the world", "category", "country"],
+    ["mastery-europe-north-west", "Nord- og Vest-Europa-mestring", "Northern and Western Europe mastery", "packs", "pack-nordics pack-western-europe pack-baltic-neighbours"],
+    ["mastery-asia-west", "Asia (vest)-mestring", "Asia (West) mastery", "region", "asia-west"],
+    ["mastery-africa-north-west", "Nord- og Vest-Afrika-mestring", "Northern and Western Africa mastery", "packs", "pack-north-africa pack-sahel pack-atlantic-west-africa pack-gulf-guinea"],
+    ["mastery-asia-east", "Asia (øst)-mestring", "Asia (East) mastery", "region", "asia-east"],
+    ["mastery-europe-central-south-east", "Sentral-, Sør- og Øst-Europa-mestring", "Central, Southern and Eastern Europe mastery", "packs", "pack-iberia-alps pack-central-europe pack-balkans pack-eastern-europe pack-european-microstates"],
+    ["mastery-africa-central-east-south", "Sentral-, Øst- og Sør-Afrika-mestring", "Central, Eastern and Southern Africa mastery", "packs", "pack-horn-nile pack-great-lakes-congo pack-southern-africa pack-southeast-africa-islands"],
     ["mastery-other-places-world", "Andre steder i verden", "Other places of the world", "category", "other-place"],
+    ["mastery-americas", "Amerika-mestring", "Americas mastery", "regions", "north-central-america south-america caribbean"],
+    ["mastery-europe", "Europa-mestring", "Europe mastery", "region", "europe"],
+    ["mastery-africa", "Afrika-mestring", "Africa mastery", "region", "africa"],
+    ["mastery-asia-oceania", "Asia og Oseania-mestring", "Asia and Oceania mastery", "regions", "asia-west asia-east oceania"],
+    ["mastery-countries-world", "Verdens land", "Countries of the world", "category", "country"],
     ["mastery-whole-world", "Hele verden", "The whole world", "all", "world"],
   ];
 
   const sections = Object.freeze([
     Object.freeze({
-      id: "traveller", icon: "🎒", startLevel: 1, endLevel: 4,
+      id: "traveller", icon: "🚶", startLevel: 1, endLevel: 4,
       title: Object.freeze({ nb: "Reisende", en: "Traveller" }),
     }),
     Object.freeze({
-      id: "explorer", icon: "🧭", startLevel: 5, endLevel: 14,
+      id: "explorer", icon: "🥾", startLevel: 5, endLevel: 14,
       title: Object.freeze({ nb: "Oppdager", en: "Explorer" }),
     }),
     Object.freeze({
-      id: "navigator", icon: "🗺️", startLevel: 15, endLevel: 33,
-      title: Object.freeze({ nb: "Veiviser", en: "Navigator" }),
+      id: "navigator", icon: "🧭", startLevel: 15, endLevel: 27,
+      title: Object.freeze({ nb: "Navigatør", en: "Navigator" }),
     }),
     Object.freeze({
-      id: "globetrotter", icon: "🌍", startLevel: 34, endLevel: 41,
-      title: Object.freeze({ nb: "Verdensvandrer", en: "Globetrotter" }),
+      id: "globetrotter", icon: "✈️", startLevel: 28, endLevel: 41,
+      title: Object.freeze({ nb: "Globetrotter", en: "Globetrotter" }),
     }),
     Object.freeze({
-      id: "world-master", icon: "🏆", startLevel: 42, endLevel: 52,
+      id: "regional-expert", icon: "🗺️", startLevel: 42, endLevel: 52,
+      title: Object.freeze({ nb: "Kartograf", en: "Cartographer" }),
+    }),
+    Object.freeze({
+      id: "world-master", icon: "🌍", startLevel: 53, endLevel: 58,
       title: Object.freeze({ nb: "Verdensmester", en: "World Master" }),
     }),
   ]);
@@ -118,15 +128,22 @@
     });
   });
 
+  const learningLevelById = new Map(levels.map((level) => [level.id, level]));
   for (const [id, nb, en, selector, value] of mastery) {
     const countryCodes = selector === "all"
       ? places.map((place) => place.code)
       : selector === "category"
         ? places.filter((place) => place.category === value).map((place) => place.code)
-        : places.filter((place) => place.category === "country" && place.region === value).map((place) => place.code);
-    const kind = selector === "region" ? "regional-mastery" : "world-mastery";
+        : selector === "packs"
+          ? value.split(" ").flatMap((packId) => learningLevelById.get(packId)?.countryCodes ?? [])
+          : selector === "regions"
+            ? places.filter((place) => place.category === "country" && value.split(" ").includes(place.region)).map((place) => place.code)
+            : places.filter((place) => place.category === "country" && place.region === value).map((place) => place.code);
+    const kind = ["region", "regions", "packs"].includes(selector) ? "regional-mastery" : "world-mastery";
     levels.push(Object.freeze({
       id, kind, region: selector === "region" ? value : null,
+      regions: selector === "regions" ? Object.freeze(value.split(" ")) : null,
+      sourcePackIds: selector === "packs" ? Object.freeze(value.split(" ")) : null,
       category: selector === "category" ? value : null,
       title: Object.freeze({ nb, en }),
       countryCodes: Object.freeze(countryCodes),
