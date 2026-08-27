@@ -11,7 +11,7 @@ const regions = {
   se: "europe",
   dz: "africa",
   ke: "africa",
-  jp: "east-south-asia",
+  jp: "asia-east",
 };
 const regionForCode = (code) => regions[code] ?? null;
 
@@ -36,8 +36,8 @@ assert.equal(exploreState.zoomOutExtent("world"), "world");
 assert.equal(exploreState.extentForSelection("world", "europe"), "world");
 assert.equal(exploreState.extentForSelection("europe", "europe"), "europe");
 assert.equal(
-  exploreState.extentForSelection("europe", "east-south-asia"),
-  "east-south-asia",
+  exploreState.extentForSelection("europe", "asia-east"),
+  "asia-east",
 );
 assert.equal(exploreState.extentForSelection("africa", "europe"), "europe");
 assert.equal(exploreState.extentForSelection("europe", null), "europe");

@@ -247,11 +247,11 @@ produce a clear loading error.
 Each country has one `region`. The project uses the UN
 [M49 classification](https://unstats.un.org/unsd/methodology/m49/overview/)
 as a starting point, with balanced educational macro-regions for Africa and
-Asia: North and West Africa (26), East and South Africa (28), West and Central
-Asia (24), and East and South Asia (25). Russia is a deliberate exception: it
-belongs to East and South Asia, and both the regional map and silhouette show
-the complete country. Cyprus and Türkiye belong
-to West and Central Asia. Countries in the Americas store the most specific
+Asia: North and West Africa (26), East and South Africa (28), Asia (West) with
+24 countries, and Asia (East) with 26 countries. Russia is a deliberate
+exception: it belongs to Asia (East), and both the regional map and silhouette
+show the complete country. Cyprus and Türkiye belong to Asia (West). Countries
+in the Americas store the most specific
 region (`north-central-america`, `south-america`, or `caribbean`).
 
 The initial country notes explain Russia and Türkiye's continental placement

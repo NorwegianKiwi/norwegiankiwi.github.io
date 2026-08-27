@@ -318,8 +318,8 @@ Before replacing `world-map.js`:
 - Confirm 234 civic-centre markers across 225 silhouettes, with none for Monaco or
   Vatican City.
 - Confirm that unavailable territories are map context and cannot be selected.
-- Check that Russia appears only in East and South Asia, and Cyprus and Türkiye
-  in West and Central Asia. Both the region map and the shape inset must show
+- Check that Russia appears only in Asia (East), and Cyprus and Türkiye in Asia
+  (West). Both the region map and the shape inset must show
   all of Russia, including Kaliningrad and the geometry at the date line.
 - Inspect Kosovo, Palestine, and all new code overrides separately.
 - Confirm that Somalia includes Somaliland in its active regional geometry and

@@ -37,11 +37,11 @@
       "centerLongitude": 17,
       "bounds": [-25, -38, 58, 40]
     },
-    "west-central-asia": {
+    "asia-west": {
       "centerLongitude": 52,
       "bounds": [20, 8, 89, 58]
     },
-    "east-south-asia": {
+    "asia-east": {
       "centerLongitude": 115,
       "bounds": [18, -12, 192, 83]
     },
@@ -374,7 +374,7 @@
   "policy": {
     "quizCountryList": "countries.js is authoritative; Natural Earth does not decide which entities are quiz countries",
     "quizRegionMembership": "countries.js is the only source of region membership",
-    "russia": "Pedagogical exception: Russia belongs to East and South Asia; both its regional map and silhouette show the complete country",
+    "russia": "Pedagogical exception: Russia belongs to Asia (East); both its regional map and silhouette show the complete country",
     "somalia": "Pedagogical exception: Somaliland is included in Somalia on regional maps and silhouettes; the enlarged silhouette marks their shared de facto boundary",
     "transcontinentalCountries": "Each quiz country has exactly one canonical region",
     "territories": "Natural Earth features not present in countries.js are non-selectable context",

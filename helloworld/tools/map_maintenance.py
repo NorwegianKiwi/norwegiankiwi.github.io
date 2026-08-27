@@ -24,8 +24,8 @@ MANIFEST_PATH = Path(__file__).with_name("map-sources.json")
 VALID_REGIONS = {
     "europe",
     "africa",
-    "west-central-asia",
-    "east-south-asia",
+    "asia-west",
+    "asia-east",
     "oceania",
     "north-central-america",
     "south-america",
@@ -34,8 +34,8 @@ VALID_REGIONS = {
 EXPECTED_REGION_COUNTS = {
     "europe": 50,
     "africa": 57,
-    "west-central-asia": 24,
-    "east-south-asia": 28,
+    "asia-west": 24,
+    "asia-east": 28,
     "oceania": 21,
     "north-central-america": 12,
     "south-america": 14,

@@ -9,6 +9,7 @@ const { countries, otherPlaces, places, regionOptions } = global.GEOGRAFI_QUIZ_D
 const countryCodes = new Set(countries.map((country) => country.code));
 const placeCodes = new Set(places.map((place) => place.code));
 const placesByCode = new Map(places.map((place) => [place.code, place]));
+const regionsById = new Map(regionOptions.map((region) => [region.id, region]));
 const levels = curriculum.levels;
 const quizzes = levels.flatMap((level) => level.quizzes.map((quiz) => ({ ...quiz, level })));
 
@@ -20,6 +21,18 @@ assert.equal(otherPlaces.filter((place) => place.region === "africa").length, 3)
 assert.equal(places.filter((place) => place.region === "africa").length, 57);
 assert.ok(regionOptions.some((region) => region.id === "africa"));
 assert.ok(!regionOptions.some((region) => ["north-west-africa", "east-south-africa"].includes(region.id)));
+assert.deepEqual(regionsById.get("asia-west").label, { nb: "Asia (vest)", en: "Asia (West)" });
+assert.deepEqual(regionsById.get("asia-east").label, { nb: "Asia (øst)", en: "Asia (East)" });
+for (const [code, region] of Object.entries({
+  jp: "asia-east",
+  in: "asia-east",
+  ru: "asia-east",
+  cy: "asia-west",
+  kz: "asia-west",
+  tr: "asia-west",
+})) {
+  assert.equal(placesByCode.get(code).region, region, code);
+}
 assert.equal(levels.length, 52);
 assert.equal(new Set(levels.map((level) => level.id)).size, 52);
 assert.equal(quizzes.length, 208);
@@ -75,6 +88,10 @@ assert.deepEqual(
 );
 assert.equal(curriculum.levelById.get("mastery-whole-world").countryCodes.length, 227);
 assert.equal(curriculum.levelById.get("mastery-africa").countryCodes.length, 54);
+assert.equal(curriculum.levelById.get("mastery-asia-east").title.en, "Asia (East) mastery");
+assert.equal(curriculum.levelById.get("mastery-asia-east").title.nb, "Asia (øst)-mestring");
+assert.equal(curriculum.levelById.get("mastery-asia-west").title.en, "Asia (West) mastery");
+assert.equal(curriculum.levelById.get("mastery-asia-west").title.nb, "Asia (vest)-mestring");
 
 const relationshipLabel = (place, locale) =>
   place.relatedCountryCode

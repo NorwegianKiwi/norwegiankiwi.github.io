@@ -384,8 +384,8 @@
   const mapSelectableRegions = [
     "europe",
     "africa",
-    "west-central-asia",
-    "east-south-asia",
+    "asia-west",
+    "asia-east",
     "oceania",
     "north-central-america",
     "south-america",

@@ -9,7 +9,7 @@ const quizById = new Map([
 const levelById = new Map([
   ["level-one", { id: "level-one" }],
 ]);
-const regionIds = new Set(["world", "europe", "africa"]);
+const regionIds = new Set(["world", "europe", "africa", "asia-west", "asia-east"]);
 const context = { quizById, levelById, regionIds };
 
 function read(path) {
@@ -36,6 +36,16 @@ assert.deepEqual(read("?view=explore&region=africa"), {
   screen: "explore",
   levelId: null,
   region: "africa",
+});
+assert.deepEqual(read("?view=explore&region=asia-west"), {
+  screen: "explore",
+  levelId: null,
+  region: "asia-west",
+});
+assert.deepEqual(read("?view=explore&region=asia-east"), {
+  screen: "explore",
+  levelId: null,
+  region: "asia-east",
 });
 assert.deepEqual(read("?view=explore&region=north-west-africa"), {
   screen: "explore",
@@ -84,6 +94,8 @@ const routes = [
   { screen: "setup" },
   { screen: "levels", levelId: "level-one" },
   { screen: "explore", levelId: null, region: "europe" },
+  { screen: "explore", levelId: null, region: "asia-west" },
+  { screen: "explore", levelId: null, region: "asia-east" },
   { screen: "explore", levelId: "level-one", region: "world" },
   { screen: "quiz", quizId: "level-one:country-flag", source: "levels" },
   { screen: "flashcards", source: "level", levelId: "level-one" },

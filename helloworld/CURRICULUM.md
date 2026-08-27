@@ -143,7 +143,7 @@ only from the tour's country set.
 The opening World Tour is based on familiarity rather than strict
 representation of the app's eight organisational regions. It spans every
 inhabited continent. The second tour soon adds Jamaica for the Caribbean and
-Türkiye for West and Central Asia.
+Türkiye for Asia (West).
 
 The systematic Caribbean and Oceania packs come late because small island
 states are often less familiar, have less familiar capitals, and can be harder
@@ -167,8 +167,8 @@ quizzes. Perfect scores are intentionally required for mastery.
 | 43 | `mastery-north-central-america` | North and Central America mastery | 10 | 40 |
 | 44 | `mastery-south-america` | South America mastery | 12 | 48 |
 | 45 | `mastery-africa` | Africa mastery | 54 | 216 |
-| 46 | `mastery-east-south-asia` | East and South Asia mastery | 26 | 104 |
-| 47 | `mastery-west-central-asia` | West and Central Asia mastery | 24 | 96 |
+| 46 | `mastery-asia-east` | Asia (East) mastery | 26 | 104 |
+| 47 | `mastery-asia-west` | Asia (West) mastery | 24 | 96 |
 | 48 | `mastery-caribbean` | Caribbean mastery | 13 | 52 |
 | 49 | `mastery-oceania` | Oceania mastery | 14 | 56 |
 | 50 | `mastery-countries-world` | Countries of the world | 197 | 788 |
