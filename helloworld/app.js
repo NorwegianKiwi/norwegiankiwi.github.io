@@ -317,6 +317,7 @@
       nextQuiz: "Neste quiz", congratulations: "Gratulerer!", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
       milestones: "Milepæler", milestoneReached: "Milepæl nådd", milestoneSummary: "Du har mestret nivå {start}–{end}.",
       celebrateMilestone: "Feir milepælen", replayMilestone: "Spill feiringen for {stage} igjen",
+      replayWorldCelebration: "Spill Verden mestret-feiringen igjen",
       milestoneLocked: "{stage} er ikke oppnådd ennå", nextStage: "Neste etappe: {stage}", continueWithStage: "Fortsett med: {stage}",
       finalCelebration: "Finalefeiring", stageMastered: "Mestret",
       viewProgress: "Til forsiden", worldCelebrationSummary: "Du har mestret alle {levels} nivåene og alle {quizzes} quizene.",
@@ -364,6 +365,7 @@
       nextQuiz: "Next quiz", congratulations: "Congratulations!", tryAgainAction: "Try again", playAgain: "Play again",
       milestones: "Milestones", milestoneReached: "Milestone reached", milestoneSummary: "You mastered levels {start}–{end}.",
       celebrateMilestone: "Celebrate milestone", replayMilestone: "Replay the {stage} celebration",
+      replayWorldCelebration: "Replay the World mastered celebration",
       milestoneLocked: "{stage} has not been earned yet", nextStage: "Next stage: {stage}", continueWithStage: "Continue with: {stage}",
       finalCelebration: "Final celebration", stageMastered: "Mastered",
       viewProgress: "Back home", worldCelebrationSummary: "You have mastered all {levels} levels and all {quizzes} quizzes.",
@@ -512,9 +514,11 @@
     openChallengeValue: "",
     openChallengeError: null,
     worldCelebrationOpen: false,
+    worldCelebrationOrigin: null,
     worldCelebrationSettled: false,
     milestoneCelebrationStageId: null,
     milestoneCelebrationOrigin: null,
+    milestoneCelebrationReturnScrollY: null,
     milestoneCelebrationSettled: false,
     exploreRegionPickerOpen: false,
     explorePinnedCode: null,
@@ -1623,16 +1627,16 @@
   function milestoneCelebrationMarkup() {
     const stage = curriculum.stages.find((candidate) => candidate.id === state.milestoneCelebrationStageId);
     if (!stage) return "";
-    const replay = state.milestoneCelebrationOrigin === "home-replay";
+    const replay = state.milestoneCelebrationOrigin?.endsWith("-replay");
     const selection = progress.continueSelection(currentProfile(), curriculum.levels);
     const nextQuiz = selection.type === "quiz" ? curriculum.quizById.get(selection.quiz.id) : null;
     const nextStage = nextQuiz ? stageForLevelIndex(nextQuiz.levelIndex) : null;
     const nextStageLabel = nextStage
       ? t(nextStage.startLevel > stage.endLevel ? "nextStage" : "continueWithStage", { stage: stageTitle(nextStage) })
       : "";
-    const isFinalMilestone = stage.id === curriculum.stages.at(-1).id && selection.type === "all-mastered";
+    const isFinalMilestone = selection.type === "all-mastered";
     const primaryAction = replay
-      ? `<button class="primary-button milestone-celebration-continue" data-action="close-milestone-celebration">${t("viewProgress")} <span aria-hidden="true">→</span></button>`
+      ? `<button class="primary-button milestone-celebration-continue" data-action="close-milestone-celebration">${t(state.milestoneCelebrationOrigin === "levels-replay" ? "backToLevels" : "viewProgress")} <span aria-hidden="true">→</span></button>`
       : isFinalMilestone
         ? `<button class="primary-button milestone-celebration-continue" data-action="open-world-celebration">${t("finalCelebration")} <span aria-hidden="true">✦</span></button>`
         : nextQuiz
@@ -1656,14 +1660,18 @@
   function worldCelebrationMarkup() {
     if (!state.worldCelebrationOpen) return "";
     return `
-      <div class="world-celebration-overlay ${state.worldCelebrationSettled ? "is-settled" : ""}">
-        <div class="world-fireworks" aria-hidden="true">${celebrationFireworksMarkup()}</div>
-        <section class="world-celebration-dialog" role="dialog" aria-modal="true" aria-labelledby="world-celebration-title" aria-describedby="world-celebration-description" tabindex="-1">
-          <span class="world-celebration-trophy" aria-hidden="true">🏆</span>
+      <div class="world-celebration-overlay world-master-celebration-overlay ${state.worldCelebrationSettled ? "is-settled" : ""}">
+        <div class="world-master-stars" aria-hidden="true">${Array.from({ length: 18 }, (_, index) => `<i style="--star-x:${(index * 37 + 11) % 100}%;--star-y:${(index * 61 + 7) % 100}%;--star-delay:${(index % 6) * .4}s;--star-size:${.2 + (index % 3) * .1}rem"></i>`).join("")}</div>
+        <section class="world-celebration-dialog world-master-celebration-dialog" role="dialog" aria-modal="true" aria-labelledby="world-celebration-title" aria-describedby="world-celebration-description" tabindex="-1">
+          <div class="world-master-visual" aria-hidden="true">
+            <span class="world-master-orbit world-master-orbit-one"></span>
+            <span class="world-master-orbit world-master-orbit-two"></span>
+            <div class="progress-globe world-master-globe" style="--progress:100%"><img class="progress-globe-base" src="./favicon.svg" alt="" /><img class="progress-globe-fill" src="./favicon.svg" alt="" /></div>
+            <span class="world-master-celebration-trophy">🏆</span>
+          </div>
           <p class="kicker">${t("congratulations")}</p>
           <h2 id="world-celebration-title">${t("worldMastered")}</h2>
           <p id="world-celebration-description">${t("worldCelebrationSummary", { levels: curriculum.levels.length, quizzes: curriculum.levels.length * 4 })}</p>
-          <div class="world-milestone-collection">${milestoneStickersMarkup(currentProfile())}</div>
           <button class="primary-button world-celebration-continue" data-action="view-completed-progress">${t("viewProgress")} <span aria-hidden="true">→</span></button>
         </section>
       </div>`;
@@ -1712,7 +1720,7 @@
   function homeProgressMarkup(summaryValue) {
     const percentage = (summaryValue.masteredLevels / summaryValue.totalLevels) * 100;
     const allMastered = summaryValue.masteredLevels === summaryValue.totalLevels;
-    return `<div class="progress-globe-wrap"><div class="progress-globe-achievement"><div class="progress-globe" style="--progress:${percentage}%" aria-hidden="true"><img class="progress-globe-base" src="./favicon.svg" alt="" /><img class="progress-globe-fill" src="./favicon.svg" alt="" /></div>${allMastered ? `<span class="mastery-trophy world-mastery-trophy" aria-hidden="true">🏆</span>` : ""}</div><strong>${t("levelsMastered", { count: summaryValue.masteredLevels, total: summaryValue.totalLevels })}</strong></div>`;
+    return `<div class="progress-globe-wrap"><div class="progress-globe-achievement"><div class="progress-globe" style="--progress:${percentage}%" aria-hidden="true"><img class="progress-globe-base" src="./favicon.svg" alt="" /><img class="progress-globe-fill" src="./favicon.svg" alt="" /></div>${allMastered ? `<button class="world-mastery-button" data-action="replay-world-celebration" aria-label="${escapeHtml(t("replayWorldCelebration"))}"><span aria-hidden="true">🏆</span></button>` : ""}</div><strong>${t("levelsMastered", { count: summaryValue.masteredLevels, total: summaryValue.totalLevels })}</strong></div>`;
   }
 
   function setupMarkup() {
@@ -1741,7 +1749,7 @@
         <header class="brand-bar app-header app-header-sticky">${brandMarkup(false, false)}<div class="setup-header-actions">${profileControlMarkup()}${siteHomeLinkMarkup()}</div></header>
         ${storageWarning ? `<p class="storage-warning" role="status">${t(storageWarning)}</p>` : ""}
         ${hasUpdatedQuiz ? `<p class="storage-warning" role="status">${t("updatedQuizzes")}</p>` : ""}
-        <section class="home-hero" id="top">
+        <div class="home-dashboard"><section class="home-hero" id="top">
           <div><p class="kicker">${t("heroKicker")}</p><h1>${allMastered ? t("worldMastered") : `${t("heroTitleBefore")} <em>${t("heroTitleEmphasis")}</em>`}</h1></div>
           ${homeProgressMarkup(totals)}
         </section>
@@ -1755,9 +1763,9 @@
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
-        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button action-feedback-button" data-action="share-progress">${t("shareProgress")}${actionFeedbackMarkup()}</button><button class="quiet-button" data-action="open-challenge">${t("openChallenge")}</button></nav>
+        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button action-feedback-button" data-action="share-progress">${t("shareProgress")}${actionFeedbackMarkup()}</button><button class="quiet-button" data-action="open-challenge">${t("openChallenge")}</button></nav></div>
         <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a><a href="./licenses/local-flags.txt">${t("localFlagsLicence")}</a><a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a><a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a></span></footer>
-        ${profilePanelMarkup()}${installHelpMarkup()}${openChallengeMarkup()}${milestoneCelebrationMarkup()}
+        ${profilePanelMarkup()}${installHelpMarkup()}${openChallengeMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}
       </main>${installAction}</div>`;
   }
 
@@ -1797,15 +1805,18 @@
       <div class="levels-list">${curriculum.stages.map((stage) => {
         const headingId = `level-stage-${stage.id}`;
         const stageValue = progress.stageProgress(profile, stage, curriculum.levels);
+        const stageIcon = `${stage.icon}${stageValue.isMastered ? `<span class="level-stage-check">✓</span>` : ""}`;
         return `<section class="level-stage level-stage-${escapeHtml(stage.id)} ${stageValue.isMastered ? "is-mastered" : ""}" aria-labelledby="${headingId}">
           <header class="level-stage-heading" id="${headingId}">
-            <span class="level-stage-icon" aria-hidden="true">${stage.icon}${stageValue.isMastered ? `<span class="level-stage-check">✓</span>` : ""}</span>
+            ${stageValue.isMastered
+              ? `<button class="level-stage-icon level-stage-replay" data-action="replay-milestone" data-stage-id="${escapeHtml(stage.id)}" aria-label="${escapeHtml(t("replayMilestone", { stage: stageTitle(stage) }))}">${stageIcon}</button>`
+              : `<span class="level-stage-icon" aria-hidden="true">${stageIcon}</span>`}
             <span class="level-stage-copy"><strong>${escapeHtml(stage.title[state.locale])}</strong></span>
             <span class="level-stage-status"><span class="level-stage-range">${t("levelRange", { start: stage.startLevel, end: stage.endLevel })}</span>${stageValue.isMastered ? `<span class="level-stage-mastered">${t("stageMastered")}</span>` : ""}</span>
           </header>
           <div class="level-stage-list">${curriculum.levels.slice(stage.startLevel - 1, stage.endLevel).map((level, offset) => levelMarkup(level, stage.startLevel - 1 + offset)).join("")}</div>
         </section>`;
-      }).join("")}</div>${recommendedNavigation}</main>`;
+      }).join("")}</div>${recommendedNavigation}${milestoneCelebrationMarkup()}</main>`;
   }
 
   function importMarkup() {
@@ -3382,6 +3393,9 @@
         )
         ?.focus({ preventScroll: true });
     }
+    if (Number.isFinite(options.restoreWindowScrollY)) {
+      window.scrollTo({ top: options.restoreWindowScrollY, behavior: "auto" });
+    }
   }
 
   function renderAtTop(options = {}) {
@@ -3509,6 +3523,7 @@
     clearMilestoneCelebrationTimer();
     state.milestoneCelebrationStageId = stage.id;
     state.milestoneCelebrationOrigin = origin;
+    state.milestoneCelebrationReturnScrollY = origin === "levels-replay" ? window.scrollY : null;
     state.milestoneCelebrationSettled = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     render({ focusMilestoneCelebration: true });
     if (state.milestoneCelebrationSettled) return;
@@ -3523,24 +3538,29 @@
     clearMilestoneCelebrationTimer();
     const stageId = state.milestoneCelebrationStageId;
     const origin = state.milestoneCelebrationOrigin;
+    const returnScrollY = state.milestoneCelebrationReturnScrollY;
     state.milestoneCelebrationStageId = null;
     state.milestoneCelebrationOrigin = null;
+    state.milestoneCelebrationReturnScrollY = null;
     state.milestoneCelebrationSettled = false;
     if (returnHome) returnToSetup({ historyMode: "replace" });
     else render({
-      focusActionDialogReturn: origin === "home-replay"
+      focusActionDialogReturn: origin?.endsWith("-replay")
         ? { action: "replay-milestone", stageId }
         : { action: "open-milestone-celebration" },
+      restoreWindowScrollY: returnScrollY,
     });
   }
 
-  function openWorldCelebration() {
+  function openWorldCelebration(origin = state.screen === "setup" ? "home-replay" : "newly-earned") {
     clearMilestoneCelebrationTimer();
     state.milestoneCelebrationStageId = null;
     state.milestoneCelebrationOrigin = null;
+    state.milestoneCelebrationReturnScrollY = null;
     state.milestoneCelebrationSettled = false;
     clearWorldCelebrationTimer();
     state.worldCelebrationOpen = true;
+    state.worldCelebrationOrigin = origin;
     state.worldCelebrationSettled = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     render({ focusWorldCelebration: true });
     if (state.worldCelebrationSettled) return;
@@ -3553,9 +3573,15 @@
 
   function closeWorldCelebration() {
     clearWorldCelebrationTimer();
+    const origin = state.worldCelebrationOrigin;
     state.worldCelebrationOpen = false;
+    state.worldCelebrationOrigin = null;
     state.worldCelebrationSettled = false;
-    returnToSetup({ historyMode: "replace" });
+    if (origin === "home-replay") {
+      render({ focusActionDialogReturn: { action: "replay-world-celebration" } });
+    } else {
+      returnToSetup({ historyMode: "replace" });
+    }
   }
 
   function setKeyboardHintsVisible(visible) {
@@ -4356,9 +4382,11 @@
     state.profilePanelOpen = false;
     state.actionDialog = null;
     state.worldCelebrationOpen = false;
+    state.worldCelebrationOrigin = null;
     state.worldCelebrationSettled = false;
     state.milestoneCelebrationStageId = null;
     state.milestoneCelebrationOrigin = null;
+    state.milestoneCelebrationReturnScrollY = null;
     state.milestoneCelebrationSettled = false;
     state.challengeActive = false;
     state.curriculumQuizId = null;
@@ -4478,7 +4506,7 @@
     if (action === "replay-milestone") {
       const stage = curriculum.stages.find((candidate) => candidate.id === control.dataset.stageId);
       if (stage && progress.stageProgress(currentProfile(), stage, curriculum.levels).isMastered) {
-        openMilestoneCelebration(stage.id, "home-replay");
+        openMilestoneCelebration(stage.id, state.screen === "levels" ? "levels-replay" : "home-replay");
       }
       return;
     }
@@ -4487,13 +4515,14 @@
       return;
     }
     if (action === "close-milestone-celebration") {
-      dismissMilestoneCelebration({ returnHome: true });
+      dismissMilestoneCelebration({ returnHome: state.milestoneCelebrationOrigin === "newly-earned" });
       return;
     }
     if (action === "next-curriculum-quiz") {
       clearMilestoneCelebrationTimer();
       state.milestoneCelebrationStageId = null;
       state.milestoneCelebrationOrigin = null;
+      state.milestoneCelebrationReturnScrollY = null;
       state.milestoneCelebrationSettled = false;
       const quiz = curriculum.quizById.get(control.dataset.nextQuizId) ?? progress.nextUnmastered(
         currentProfile(), curriculum.levels, state.curriculumQuizId,
@@ -4503,7 +4532,13 @@
       return;
     }
     if (action === "open-world-celebration") {
-      openWorldCelebration();
+      openWorldCelebration("newly-earned");
+      return;
+    }
+    if (action === "replay-world-celebration") {
+      if (progress.continueSelection(currentProfile(), curriculum.levels).type === "all-mastered") {
+        openWorldCelebration("home-replay");
+      }
       return;
     }
     if (action === "view-completed-progress") {
