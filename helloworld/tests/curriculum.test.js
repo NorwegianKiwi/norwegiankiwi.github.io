@@ -41,7 +41,7 @@ assert.equal(new Set(quizzes.map((quiz) => quiz.id)).size, 232);
 assert.deepEqual(
   curriculum.stages.map(({ id, icon, startLevel, endLevel }) => [id, icon, startLevel, endLevel]),
   [
-    ["traveller", "🚶", 1, 4],
+    ["tourist", "🚶", 1, 4],
     ["explorer", "🥾", 5, 14],
     ["navigator", "🧭", 15, 27],
     ["globetrotter", "✈️", 28, 41],
@@ -52,7 +52,7 @@ assert.deepEqual(
 assert.deepEqual(
   curriculum.stages.map(({ title }) => title),
   [
-    { nb: "Reisende", en: "Traveller" },
+    { nb: "Turist", en: "Tourist" },
     { nb: "Oppdager", en: "Explorer" },
     { nb: "Navigatør", en: "Navigator" },
     { nb: "Globetrotter", en: "Globetrotter" },

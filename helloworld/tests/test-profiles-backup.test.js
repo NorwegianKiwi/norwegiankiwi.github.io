@@ -28,6 +28,8 @@ const expected = {
   "test-regional-progress": [46, 186, 187],
   "test-world-next": [52, 208, 208],
   "test-final-quiz": [57, 231, 231],
+  "test-navigator-tourist-gap": [16, 67, 67],
+  "test-tourist-world-gap": [57, 231, 231],
   "test-all-mastered": [58, 232, 232],
 };
 
@@ -47,6 +49,41 @@ const finalQuizProfile = profiles.find((profile) => profile.id === "test-final-q
 assert.equal(
   progress.continueSelection(finalQuizProfile, curriculum.levels).quiz.id,
   curriculum.levels.at(-1).quizzes.at(-1).id,
+);
+
+const tourist = curriculum.stages.find((stage) => stage.id === "tourist");
+const navigator = curriculum.stages.find((stage) => stage.id === "navigator");
+const touristFinalLevel = curriculum.levels[tourist.endLevel - 1];
+const touristNameQuiz = curriculum.quizById.get(
+  touristFinalLevel.quizzes.find((quiz) => quiz.mode === "flag-country").id,
+);
+const touristFlagQuiz = curriculum.quizById.get(
+  touristFinalLevel.quizzes.find((quiz) => quiz.mode === "country-flag").id,
+);
+
+const navigatorGapProfile = profiles.find((profile) => profile.id === "test-navigator-tourist-gap");
+assert.equal(progress.stageProgress(navigatorGapProfile, navigator, curriculum.levels).isMastered, true);
+assert.equal(progress.stageProgress(navigatorGapProfile, tourist, curriculum.levels).isMastered, false);
+assert.equal(progress.quizState(navigatorGapProfile, touristNameQuiz), "unplayed");
+assert.deepEqual(
+  progress.continueSelection(navigatorGapProfile, curriculum.levels).quiz.id,
+  touristNameQuiz.id,
+);
+assert.deepEqual(
+  curriculum.stages.filter((stage) => progress.stageProgress(navigatorGapProfile, stage, curriculum.levels).isMastered).map((stage) => stage.id),
+  ["navigator"],
+);
+
+const touristWorldGapProfile = profiles.find((profile) => profile.id === "test-tourist-world-gap");
+assert.equal(progress.stageProgress(touristWorldGapProfile, tourist, curriculum.levels).isMastered, false);
+assert.equal(progress.quizState(touristWorldGapProfile, touristFlagQuiz), "unplayed");
+assert.deepEqual(
+  progress.continueSelection(touristWorldGapProfile, curriculum.levels).quiz.id,
+  touristFlagQuiz.id,
+);
+assert.deepEqual(
+  curriculum.stages.filter((stage) => progress.stageProgress(touristWorldGapProfile, stage, curriculum.levels).isMastered).map((stage) => stage.id),
+  ["explorer", "navigator", "globetrotter", "regional-expert", "world-master"],
 );
 
 console.log("Test profile backup fixture passed.");

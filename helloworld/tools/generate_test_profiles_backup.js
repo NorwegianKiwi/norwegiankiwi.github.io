@@ -21,6 +21,17 @@ const scenarios = Object.freeze([
   { id: "test-regional-progress", name: "Test · 46 levels + current partial", masteredLevels: 46, masteredQuizzesInNextLevel: 2, playedQuizInNextLevel: 2 },
   { id: "test-world-next", name: "Test · 52 levels (world next)", masteredLevels: 52 },
   { id: "test-final-quiz", name: "Test · Final quiz remaining", masteredLevels: 57, masteredQuizzesInNextLevel: 3 },
+  {
+    id: "test-navigator-tourist-gap",
+    name: "Test · Navigator earned; Tourist name left",
+    masteredStageIds: ["navigator"],
+    almostMasteredStage: { stageId: "tourist", missingMode: "flag-country" },
+  },
+  {
+    id: "test-tourist-world-gap",
+    name: "Test · All stages except Tourist flag",
+    allExcept: { stageId: "tourist", missingMode: "country-flag" },
+  },
   { id: "test-all-mastered", name: "Test · Everything mastered", masteredLevels: 58 },
 ]);
 
@@ -30,6 +41,22 @@ function timestamp(index) {
 
 function quizAt(levelIndex, quizIndex) {
   return curriculum.quizById.get(curriculum.levels[levelIndex].quizzes[quizIndex].id);
+}
+
+function stageById(stageId) {
+  return curriculum.stages.find((stage) => stage.id === stageId);
+}
+
+function stageQuizIds(stageId) {
+  const stage = stageById(stageId);
+  return curriculum.levels
+    .slice(stage.startLevel - 1, stage.endLevel)
+    .flatMap((level) => level.quizzes.map((quiz) => quiz.id));
+}
+
+function finalStageQuizId({ stageId, missingMode }) {
+  const stage = stageById(stageId);
+  return curriculum.levels[stage.endLevel - 1].quizzes.find((quiz) => quiz.mode === missingMode).id;
 }
 
 function buildProfile(scenario) {
@@ -52,6 +79,28 @@ function buildProfile(scenario) {
     for (let quizIndex = 0; quizIndex < scenario.masteredQuizzes; quizIndex += 1) {
       const quiz = quizAt(0, quizIndex);
       record(quiz, quiz.countryCodes.length);
+    }
+  }
+
+  if (scenario.masteredStageIds) {
+    const ids = new Set(scenario.masteredStageIds.flatMap(stageQuizIds));
+    for (const quiz of curriculum.quizById.values()) {
+      if (ids.has(quiz.id)) record(quiz, quiz.countryCodes.length);
+    }
+  }
+
+  if (scenario.almostMasteredStage) {
+    const missingQuizId = finalStageQuizId(scenario.almostMasteredStage);
+    const ids = new Set(stageQuizIds(scenario.almostMasteredStage.stageId));
+    for (const quiz of curriculum.quizById.values()) {
+      if (ids.has(quiz.id) && quiz.id !== missingQuizId) record(quiz, quiz.countryCodes.length);
+    }
+  }
+
+  if (scenario.allExcept) {
+    const missingQuizId = finalStageQuizId(scenario.allExcept);
+    for (const quiz of curriculum.quizById.values()) {
+      if (quiz.id !== missingQuizId) record(quiz, quiz.countryCodes.length);
     }
   }
 

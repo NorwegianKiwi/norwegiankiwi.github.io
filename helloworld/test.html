@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="nb">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Manual test menu · Hello World!</title>
+    <link rel="stylesheet" href="./styles/test-menu.css?v=20260829-preview1" />
+    <script src="./curriculum.js?v=20260829-tourist1" defer></script>
+    <script src="./test-menu.js?v=20260829-preview1" defer></script>
+  </head>
+  <body>
+    <header class="test-header">
+      <div>
+        <p class="test-kicker">Hello World!</p>
+        <h1 data-test-title>Manuell testmeny</h1>
+        <p data-test-intro>Velg en tilstand. Bruk Tilbake i nettleseren for å komme tilbake hit.</p>
+      </div>
+      <div class="test-language" role="group" aria-label="Preview language">
+        <button type="button" data-test-language="nb" aria-pressed="true">Norsk</button>
+        <button type="button" data-test-language="en" aria-pressed="false">English</button>
+      </div>
+    </header>
+    <main data-test-menu></main>
+    <noscript>Denne testsiden krever JavaScript. / This test page requires JavaScript.</noscript>
+  </body>
+</html>

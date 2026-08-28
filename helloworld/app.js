@@ -8,7 +8,11 @@
   )
     ? initialUrl.searchParams.get("lang")
     : "nb";
-  const initialPreview = new Set(["result-next-quiz", "result-next-level", "milestone-celebration", "milestone-replay", "final-question", "final-result", "final-celebration"]).has(initialUrl.searchParams.get("preview"))
+  const initialPreview = new Set([
+    "result-next-quiz", "result-next-level", "milestone-result", "milestone-celebration",
+    "milestone-question", "milestone-replay", "navigator-tourist-gap-question",
+    "tourist-world-final-question", "final-question", "final-result", "final-celebration",
+  ]).has(initialUrl.searchParams.get("preview"))
     ? initialUrl.searchParams.get("preview")
     : null;
   const data = window.GEOGRAFI_QUIZ_DATA;
@@ -5346,47 +5350,132 @@
     applyRoute(route, { historyMode: "none" });
   });
 
-  async function initialize() {
-    if (initialPreview === "final-question") {
-      progressStore = progress.createEmptyStore({ id: "preview-final-question", defaultName: "Preview" });
-      const finalLevel = curriculum.levels.at(-1);
-      const finalQuiz = curriculum.quizById.get(finalLevel.quizzes.at(-1).id);
-      for (const level of curriculum.levels) {
-        for (const baseQuiz of level.quizzes) {
-          const quiz = curriculum.quizById.get(baseQuiz.id);
-          if (quiz.id === finalQuiz.id) continue;
-          progressStore = progress.recordResult(progressStore, progressStore.activeProfileId, quiz, quiz.countryCodes.length);
+  function previewStage() {
+    return curriculum.stages.find((stage) => stage.id === initialUrl.searchParams.get("stage"))
+      ?? curriculum.stages[0];
+  }
+
+  function previewStageQuizzes(stage) {
+    return curriculum.levels
+      .slice(stage.startLevel - 1, stage.endLevel)
+      .flatMap((level) => level.quizzes.map((baseQuiz) => curriculum.quizById.get(baseQuiz.id)));
+  }
+
+  function previewStageFinalQuiz(stage, mode = "country-capital") {
+    const level = curriculum.levels[stage.endLevel - 1];
+    const baseQuiz = level.quizzes.find((quiz) => quiz.mode === mode) ?? level.quizzes.at(-1);
+    return curriculum.quizById.get(baseQuiz.id);
+  }
+
+  function resetPreviewProgress(id) {
+    progressStore = progress.createEmptyStore({ id: `preview-${id}`, defaultName: "Preview" });
+  }
+
+  function masterPreviewQuizzes(predicate) {
+    for (const level of curriculum.levels) {
+      for (const baseQuiz of level.quizzes) {
+        const quiz = curriculum.quizById.get(baseQuiz.id);
+        if (predicate(quiz)) {
+          progressStore = progress.recordResult(
+            progressStore,
+            progressStore.activeProfileId,
+            quiz,
+            quiz.countryCodes.length,
+          );
         }
       }
-      const attemptSeed = "preview-final-question";
-      const recipe = curriculum.createAttempt(finalQuiz, attemptSeed);
-      const answers = recipe.slice(0, -1).map((question) => ({
-        targetCode: question.countryCode,
-        selectedCode: question.countryCode,
-        correct: true,
-      }));
-      const timestamp = new Date().toISOString();
-      progressStore = progress.saveMasteryAttempt(progressStore, progressStore.activeProfileId, {
-        quizId: finalQuiz.id,
-        revision: finalQuiz.revision,
-        attemptSeed,
-        questionIndex: answers.length,
-        score: answers.length,
-        answers,
-        correctionPending: null,
-        startedAt: timestamp,
-        updatedAt: timestamp,
-      });
-      startCurriculumQuiz(finalQuiz.id, { resume: true, historyMode: "none" });
+    }
+  }
+
+  function preparePreviewResult(stage, previewName) {
+    resetPreviewProgress(previewName);
+    const stageQuizIds = new Set(previewStageQuizzes(stage).map((quiz) => quiz.id));
+    masterPreviewQuizzes((quiz) => stageQuizIds.has(quiz.id));
+    const quiz = previewStageFinalQuiz(stage);
+    const level = curriculum.levelById.get(quiz.levelId);
+    state.curriculumQuizId = quiz.id;
+    state.activeLevelId = level.id;
+    state.mode = quiz.mode;
+    state.questions = quiz.countryCodes.map((code) => ({ country: countriesByCode.get(code), choices: [] }));
+    state.score = state.questions.length;
+    state.wrongAnswers = [];
+    state.resultRecorded = true;
+    state.resultBestScore = state.score;
+    state.resultPreviousBestScore = null;
+    state.resultNewQuizMastery = true;
+    state.resultNewLevelMastery = true;
+    state.resultNewStageMastery = true;
+    state.resultCelebrationPending = false;
+    state.resultPreview = previewName;
+    state.screen = "result";
+  }
+
+  function startLastQuestionPreview(quiz, previewName) {
+    const attemptSeed = `preview-${previewName}`;
+    const recipe = curriculum.createAttempt(quiz, attemptSeed);
+    const answers = recipe.slice(0, -1).map((question) => ({
+      targetCode: question.countryCode,
+      selectedCode: question.countryCode,
+      correct: true,
+    }));
+    const timestamp = new Date().toISOString();
+    progressStore = progress.saveMasteryAttempt(progressStore, progressStore.activeProfileId, {
+      quizId: quiz.id,
+      revision: quiz.revision,
+      attemptSeed,
+      questionIndex: answers.length,
+      score: answers.length,
+      answers,
+      correctionPending: null,
+      startedAt: timestamp,
+      updatedAt: timestamp,
+    });
+    startCurriculumQuiz(quiz.id, { resume: true, historyMode: "none" });
+  }
+
+  async function initialize() {
+    if (initialPreview === "tourist-world-final-question") {
+      const tourist = curriculum.stages.find((stage) => stage.id === "tourist");
+      const targetQuiz = previewStageFinalQuiz(tourist, "country-flag");
+      resetPreviewProgress(initialPreview);
+      masterPreviewQuizzes((quiz) => quiz.id !== targetQuiz.id);
+      startLastQuestionPreview(targetQuiz, initialPreview);
+      return;
+    }
+    if (initialPreview === "navigator-tourist-gap-question") {
+      const tourist = curriculum.stages.find((stage) => stage.id === "tourist");
+      const navigator = curriculum.stages.find((stage) => stage.id === "navigator");
+      const touristGap = previewStageFinalQuiz(tourist, "flag-country");
+      const navigatorTarget = previewStageFinalQuiz(navigator);
+      const selectedQuizIds = new Set([
+        ...previewStageQuizzes(tourist),
+        ...previewStageQuizzes(navigator),
+      ].map((quiz) => quiz.id));
+      resetPreviewProgress(initialPreview);
+      masterPreviewQuizzes((quiz) => selectedQuizIds.has(quiz.id) && ![touristGap.id, navigatorTarget.id].includes(quiz.id));
+      startLastQuestionPreview(navigatorTarget, initialPreview);
+      return;
+    }
+    if (initialPreview === "milestone-question") {
+      const stage = previewStage();
+      const targetQuiz = previewStageFinalQuiz(stage);
+      const stageQuizIds = new Set(previewStageQuizzes(stage).map((quiz) => quiz.id));
+      resetPreviewProgress(`${initialPreview}-${stage.id}`);
+      masterPreviewQuizzes((quiz) => stageQuizIds.has(quiz.id) && quiz.id !== targetQuiz.id);
+      startLastQuestionPreview(targetQuiz, `${initialPreview}-${stage.id}`);
+      return;
+    }
+    if (initialPreview === "final-question") {
+      const finalLevel = curriculum.levels.at(-1);
+      const finalQuiz = curriculum.quizById.get(finalLevel.quizzes.at(-1).id);
+      resetPreviewProgress(initialPreview);
+      masterPreviewQuizzes((quiz) => quiz.id !== finalQuiz.id);
+      startLastQuestionPreview(finalQuiz, initialPreview);
       return;
     }
     if (initialPreview === "final-result" || initialPreview === "final-celebration") {
-      for (const level of curriculum.levels) {
-        for (const baseQuiz of level.quizzes) {
-          const candidate = curriculum.quizById.get(baseQuiz.id);
-          progressStore = progress.recordResult(progressStore, progressStore.activeProfileId, candidate, candidate.countryCodes.length);
-        }
-      }
+      resetPreviewProgress(initialPreview);
+      masterPreviewQuizzes(() => true);
       const level = curriculum.levels.at(-1);
       const quiz = curriculum.quizById.get(level.quizzes.at(-1).id);
       state.curriculumQuizId = quiz.id;
@@ -5408,37 +5497,18 @@
       else render();
       return;
     }
-    if (initialPreview === "milestone-celebration" || initialPreview === "milestone-replay") {
-      const stage = curriculum.stages[0];
-      for (const level of curriculum.levels.slice(stage.startLevel - 1, stage.endLevel)) {
-        for (const baseQuiz of level.quizzes) {
-          const candidate = curriculum.quizById.get(baseQuiz.id);
-          progressStore = progress.recordResult(progressStore, progressStore.activeProfileId, candidate, candidate.countryCodes.length);
-        }
-      }
+    if (["milestone-result", "milestone-celebration", "milestone-replay"].includes(initialPreview)) {
+      const stage = previewStage();
+      preparePreviewResult(stage, `${initialPreview}-${stage.id}`);
       if (initialPreview === "milestone-replay") {
-        state.screen = "setup";
-        openMilestoneCelebration(stage.id, "home-replay");
+        const source = initialUrl.searchParams.get("source") === "levels" ? "levels" : "home";
+        state.screen = source === "levels" ? "levels" : "setup";
+        state.selectedLevelId = source === "levels" ? curriculum.levels[stage.endLevel - 1].id : null;
+        openMilestoneCelebration(stage.id, `${source}-replay`);
         return;
       }
-      const level = curriculum.levels[stage.endLevel - 1];
-      const quiz = curriculum.quizById.get(level.quizzes.at(-1).id);
-      state.curriculumQuizId = quiz.id;
-      state.activeLevelId = level.id;
-      state.mode = quiz.mode;
-      state.questions = quiz.countryCodes.map((code) => ({ country: countriesByCode.get(code), choices: [] }));
-      state.score = state.questions.length;
-      state.wrongAnswers = [];
-      state.resultRecorded = true;
-      state.resultBestScore = state.score;
-      state.resultPreviousBestScore = null;
-      state.resultNewQuizMastery = true;
-      state.resultNewLevelMastery = true;
-      state.resultNewStageMastery = true;
-      state.resultCelebrationPending = false;
-      state.resultPreview = initialPreview;
-      state.screen = "result";
-      openMilestoneCelebration(stage.id, "newly-earned");
+      if (initialPreview === "milestone-celebration") openMilestoneCelebration(stage.id, "newly-earned");
+      else render();
       return;
     }
     if (initialPreview) {

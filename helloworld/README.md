@@ -49,11 +49,12 @@ browser and in the Node-based domain tests.
 ## Test profiles
 
 Import `fixtures/test-profiles-backup.json` through **Settings → Import backup
-file → Import all profiles** to add eleven switchable test profiles. They cover a
+file → Import all profiles** to add thirteen switchable test profiles. They cover a
 new player, played and partially mastered states, progression milestones, all
 regular levels complete, all but the final quiz, and all 232 quizzes mastered.
 Use **Test · Final quiz remaining** to exercise the genuine final completion
-flow from the home screen. Their IDs begin with `test-`, so importing the file
+flow from the home screen. The two out-of-order profiles leave one Tourist quiz
+open while Navigator or every other stage is already mastered. Their IDs begin with `test-`, so importing the file
 again safely merges the same profiles instead of creating duplicates. Because imports never
 reduce progress, delete the existing `Test · …` profiles before re-importing if
 you want to restore their original baseline after playing them.
@@ -64,19 +65,33 @@ Regenerate the file after changing the curriculum with:
 node tools/generate_test_profiles_backup.js
 ```
 
-## Result preview
+## Manual preview menu
 
-Result actions and the final celebration can be tested without changing saved
-profile progress:
+Open `test.html` directly for a hidden, standalone catalog of result,
+celebration, replay, one-question, out-of-order, and World Mastered previews.
+It is not linked from the game. Every scenario has a copyable URL and the page
+can switch all links between Norwegian and English. Browser Back returns to the
+catalog.
+
+Preview progress is temporary and never changes saved profiles. The underlying
+parameterized URLs include:
 
 - `?preview=result-next-quiz` – show a perfect result that continues within the
   current level
 - `?preview=result-next-level` – show a perfect result that advances to a new
   level
-- `?preview=milestone-celebration` – show the newly earned Traveller milestone
-  celebration and sticker placement
-- `?preview=milestone-replay` – replay the completed Traveller milestone from
-  the home-page context
+- `?preview=milestone-result&stage=navigator` – show a perfect result that earns
+  the selected stage
+- `?preview=milestone-celebration&stage=navigator` – open the selected stage
+  celebration directly
+- `?preview=milestone-question&stage=navigator` – start with one question left
+  before the selected stage is earned
+- `?preview=milestone-replay&stage=navigator` – replay from Home; add
+  `&source=levels` to replay from Levels
+- `?preview=navigator-tourist-gap-question` – earn Navigator while Tourist still
+  has its final Match the name quiz open
+- `?preview=tourist-world-final-question` – finish Tourist's final Find the flag
+  quiz after every other quiz is mastered, then continue into World Mastered
 - `?preview=final-question` – open the final question with temporary in-memory
   progress; answering it exercises the genuine completion flow without saving
   the preview profile
@@ -84,8 +99,10 @@ profile progress:
   two-step World Master milestone and final celebration flow
 - `?preview=final-celebration` – open the full final celebration immediately
 
-Add `&lang=en` to any URL for English. Leaving a preview returns to the
-profile's real home screen and progress.
+Valid stage values are `tourist`, `explorer`, `navigator`, `globetrotter`,
+`regional-expert`, and `world-master`; invalid values default to Tourist. Add
+`&lang=en` to any URL for English. Leaving a preview returns to the profile's
+real home screen and progress.
 
 ## Friend challenges
 
@@ -116,6 +133,7 @@ node tests/challenge.test.js
 ## Files
 
 - `index.html` – document shell and default metadata
+- `test.html` – unlinked standalone catalog for manual preview testing
 - `manifest.webmanifest` and `icons/` – installable web-app metadata and icons
 - `styles/` – presentation split into base, quiz, Explore, flashcard, and
   responsive stylesheets

@@ -82,8 +82,8 @@
 
   const stages = Object.freeze([
     Object.freeze({
-      id: "traveller", icon: "🚶", startLevel: 1, endLevel: 4,
-      title: Object.freeze({ nb: "Reisende", en: "Traveller" }),
+      id: "tourist", icon: "🚶", startLevel: 1, endLevel: 4,
+      title: Object.freeze({ nb: "Turist", en: "Tourist" }),
     }),
     Object.freeze({
       id: "explorer", icon: "🥾", startLevel: 5, endLevel: 14,

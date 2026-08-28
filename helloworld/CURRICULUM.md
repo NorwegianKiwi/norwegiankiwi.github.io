@@ -231,7 +231,7 @@ a formally earned player rank.
 
 | Levels | Norwegian | English |
 |---:|---|---|
-| 1–4 | Reisende | Traveller |
+| 1–4 | Turist | Tourist |
 | 5–14 | Oppdager | Explorer |
 | 15–27 | Navigatør | Navigator |
 | 28–41 | Globetrotter | Globetrotter |
