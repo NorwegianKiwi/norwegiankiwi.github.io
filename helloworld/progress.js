@@ -163,6 +163,11 @@
     const states = level.quizzes.map((quiz) => quizState(profile, { ...quiz, countryCodes: level.countryCodes }));
     return { mastered: states.filter((state) => state === "mastered").length, played: states.filter((state) => state !== "unplayed").length, total: 4 };
   }
+  function stageProgress(profile, stage, levels) {
+    const stageLevels = levels.slice(stage.startLevel - 1, stage.endLevel);
+    const mastered = stageLevels.filter((level) => levelProgress(profile, level).mastered === 4).length;
+    return { mastered, total: stageLevels.length, isMastered: mastered === stageLevels.length };
+  }
   function summary(profile, levels) {
     let masteredLevels = 0;
     let masteredQuizzes = 0;
@@ -350,7 +355,7 @@
     STORAGE_KEY, SCHEMA_VERSION, TRANSFER_VERSION, createProfile, createEmptyStore,
     validateRoot, loadStore, saveStore, activeProfile, currentRecord, quizState,
     matchingSavedAttempt,
-    levelProgress, summary, continueSelection, nextUnmastered, surpriseQuiz,
+    levelProgress, stageProgress, summary, continueSelection, nextUnmastered, surpriseQuiz,
     recordResult, addProfile, switchProfile, renameProfile, clearProgress,
     deleteProfile, saveMasteryAttempt, abandonMasteryAttempt, transferableProfile,
     encodeTransfer, decodeTransfer, mergeProfiles, importAsNew, mergeInto,

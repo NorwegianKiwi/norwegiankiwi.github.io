@@ -159,6 +159,32 @@ const profiles = progress.parseBackup(backup);
 assert.equal(profiles.length, 2);
 assert.ok(profiles.every((profile) => profile.savedMasteryAttempt === null));
 
+const travellerStage = curriculum.stages[0];
+let stageStore = progress.createEmptyStore({ id: "stage-profile", now: clock.now });
+assert.deepEqual(
+  progress.stageProgress(progress.activeProfile(stageStore), travellerStage, curriculum.levels),
+  { mastered: 0, total: 4, isMastered: false },
+);
+for (const level of curriculum.levels.slice(1, travellerStage.endLevel)) {
+  for (const baseQuiz of level.quizzes) {
+    const quiz = curriculum.quizById.get(baseQuiz.id);
+    stageStore = progress.recordResult(stageStore, "stage-profile", quiz, quiz.countryCodes.length);
+  }
+}
+assert.deepEqual(
+  progress.stageProgress(progress.activeProfile(stageStore), travellerStage, curriculum.levels),
+  { mastered: 3, total: 4, isMastered: false },
+  "a stage remains incomplete when its first level is completed out of order",
+);
+for (const baseQuiz of curriculum.levels[0].quizzes) {
+  const quiz = curriculum.quizById.get(baseQuiz.id);
+  stageStore = progress.recordResult(stageStore, "stage-profile", quiz, quiz.countryCodes.length);
+}
+assert.deepEqual(
+  progress.stageProgress(progress.activeProfile(stageStore), travellerStage, curriculum.levels),
+  { mastered: 4, total: 4, isMastered: true },
+);
+
 let completedStore = progress.createEmptyStore({ id: "complete-profile", now: clock.now });
 for (const level of curriculum.levels) {
   for (const baseQuiz of level.quizzes) {
@@ -167,6 +193,7 @@ for (const level of curriculum.levels) {
   }
 }
 assert.equal(progress.summary(progress.activeProfile(completedStore), curriculum.levels).masteredQuizzes, 232);
+assert.ok(curriculum.stages.every((stage) => progress.stageProgress(progress.activeProfile(completedStore), stage, curriculum.levels).isMastered));
 assert.deepEqual(progress.continueSelection(progress.activeProfile(completedStore), curriculum.levels), { type: "all-mastered" });
 assert.ok(progress.surpriseQuiz(progress.activeProfile(completedStore), curriculum.levels));
 assert.ok(progress.encodeTransfer(progress.activeProfile(completedStore)).length < 25_000);

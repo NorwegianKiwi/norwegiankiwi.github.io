@@ -80,7 +80,7 @@
     ["mastery-whole-world", "Hele verden", "The whole world", "all", "world"],
   ];
 
-  const sections = Object.freeze([
+  const stages = Object.freeze([
     Object.freeze({
       id: "traveller", icon: "🚶", startLevel: 1, endLevel: 4,
       title: Object.freeze({ nb: "Reisende", en: "Traveller" }),
@@ -217,7 +217,7 @@
 
   return Object.freeze({
     MODES,
-    sections,
+    stages,
     levels: Object.freeze(levels),
     quizById,
     levelById,

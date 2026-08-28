@@ -39,7 +39,7 @@ assert.equal(quizzes.length, 232);
 assert.equal(new Set(quizzes.map((quiz) => quiz.id)).size, 232);
 
 assert.deepEqual(
-  curriculum.sections.map(({ id, icon, startLevel, endLevel }) => [id, icon, startLevel, endLevel]),
+  curriculum.stages.map(({ id, icon, startLevel, endLevel }) => [id, icon, startLevel, endLevel]),
   [
     ["traveller", "🚶", 1, 4],
     ["explorer", "🥾", 5, 14],
@@ -50,7 +50,7 @@ assert.deepEqual(
   ],
 );
 assert.deepEqual(
-  curriculum.sections.map(({ title }) => title),
+  curriculum.stages.map(({ title }) => title),
   [
     { nb: "Reisende", en: "Traveller" },
     { nb: "Oppdager", en: "Explorer" },
@@ -60,13 +60,13 @@ assert.deepEqual(
     { nb: "Verdensmester", en: "World Master" },
   ],
 );
-const sectionLevelNumbers = curriculum.sections.flatMap((section) =>
-  Array.from({ length: section.endLevel - section.startLevel + 1 }, (_, index) => section.startLevel + index),
+const stageLevelNumbers = curriculum.stages.flatMap((stage) =>
+  Array.from({ length: stage.endLevel - stage.startLevel + 1 }, (_, index) => stage.startLevel + index),
 );
-assert.deepEqual(sectionLevelNumbers, Array.from({ length: levels.length }, (_, index) => index + 1));
-for (const section of curriculum.sections) {
-  assert.ok(section.title.nb && section.title.en, section.id);
-  assert.equal("description" in section, false, section.id);
+assert.deepEqual(stageLevelNumbers, Array.from({ length: levels.length }, (_, index) => index + 1));
+for (const stage of curriculum.stages) {
+  assert.ok(stage.title.nb && stage.title.en, stage.id);
+  assert.equal("description" in stage, false, stage.id);
 }
 
 for (const level of levels) {

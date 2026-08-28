@@ -73,11 +73,15 @@ profile progress:
   current level
 - `?preview=result-next-level` – show a perfect result that advances to a new
   level
+- `?preview=milestone-celebration` – show the newly earned Traveller milestone
+  celebration and sticker placement
+- `?preview=milestone-replay` – replay the completed Traveller milestone from
+  the home-page context
 - `?preview=final-question` – open the final question with temporary in-memory
   progress; answering it exercises the genuine completion flow without saving
   the preview profile
-- `?preview=final-result` – show the mastered final-quiz result with the
-  **Congratulations!** action
+- `?preview=final-result` – show the mastered final-quiz result and exercise the
+  two-step World Master milestone and final celebration flow
 - `?preview=final-celebration` – open the full final celebration immediately
 
 Add `&lang=en` to any URL for English. Leaving a preview returns to the

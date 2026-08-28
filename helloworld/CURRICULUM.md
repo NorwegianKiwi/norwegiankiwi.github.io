@@ -157,8 +157,8 @@ region changes between questions.
 
 ## Regional review and mastery levels
 
-The **Cartographer** section bridges the short learning packs and the final
-**World Master** section. All challenges are open from the beginning, but
+The **Cartographer** stage bridges the short learning packs and the final
+**World Master** stage. All challenges are open from the beginning, but
 Continue reaches them only after the regular learning levels. Every challenge
 contains four separate, full-length single-mode quizzes. Perfect scores are
 intentionally required for mastery.
@@ -221,7 +221,7 @@ challenge has not been mastered.
 - 24 World Master quizzes
 - 232 quizzes in total
 - 227 places, each assigned to exactly one systematic pack
-- Every place practised in all four quiz modes before the mastery section
+- Every place practised in all four quiz modes before the mastery stages
 
 ## Progress display and next action
 
