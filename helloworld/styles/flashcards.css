@@ -6,6 +6,16 @@
   overflow: hidden;
 }
 
+.flashcard-scope {
+  min-width: 0;
+}
+
+.flashcard-scope .level-reference-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .flashcard-stage {
   width: min(1000px, 100%);
   height: calc(100dvh - 91px);

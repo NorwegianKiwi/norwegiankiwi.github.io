@@ -464,6 +464,16 @@ body.explore-page {
   line-height: 1.05;
 }
 
+.explore-region-control .level-reference {
+  width: 100%;
+}
+
+.explore-region-control .level-reference-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .explore-region-control small {
   color: var(--muted);
   font-size: 12px;

@@ -318,7 +318,7 @@
       storageWriteFailed: "Fremgangen kunne ikke lagres på denne enheten.",
       quizMastered: "Quiz mestret", quizNotMastered: "Ikke helt ennå", scoreOutOf: "av {total}",
       scoreAnnouncement: "{score} av {total}", newRecord: "Ny rekord!", recordScore: "Rekord: {score} av {total}",
-      nextQuiz: "Neste quiz", nextLevelAction: "Neste: Nivå {number}", congratulations: "Gratulerer!", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
+      nextQuiz: "Neste quiz", nextLevelAction: "Neste", congratulations: "Gratulerer!", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
       milestones: "Milepæler", milestoneReached: "Milepæl nådd", milestoneSummary: "Du har mestret nivå {start}–{end}.",
       milestoneAction: "Milepæl nådd", replayMilestone: "Spill feiringen for {stage} igjen",
       replayWorldCelebration: "Spill «Verden mestret»-feiringen igjen",
@@ -333,7 +333,9 @@
       resumeAttempt: "Fortsett quizen", quizInProgress: "Quiz pågår", continueMode: "Fortsett: {mode}",
       answeredProgress: "{answered} / {total} besvart", keepSavedAttempt: "Behold lagret forsøk",
       abandonAttemptTitle: "Vil du starte en annen quiz?",
-      abandonAttemptDescription: "Du har besvart {answered} av {total} spørsmål i {savedTitle} · {savedMode}. Hvis du starter {nextTitle} · {nextMode}, slettes dette forsøket.",
+      abandonAttemptProgress: "Du har besvart {answered} av {total} spørsmål i",
+      abandonAttemptStarting: "Hvis du starter",
+      abandonAttemptEnding: "slettes dette forsøket.",
       abandonAndStart: "Forkast forsøket og start quizen",
       addProfileTitle: "Legg til profil", addProfileDescription: "Fremgangen til den nye profilen lagres separat på denne enheten.",
       addProfileAction: "Opprett profil", renameProfileTitle: "Gi profilen nytt navn",
@@ -342,7 +344,7 @@
       clearProgressAction: "Nullstill fremgang", deleteProfileTitle: "Vil du slette profilen?",
       deleteProfileDescription: "Profilen {name} og all fremgangen dens slettes fra denne enheten. Dette kan ikke angres.",
       deleteProfileAction: "Slett profil",
-      savedAttempt: "En quiz på {title} er påbegynt.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
+      savedAttempt: "Påbegynt quiz:", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
       challengeQuizTitle: "Quizutfordring", scoreToBeat: "Resultat å slå", approximateTime: "Omtrent {minutes} min",
       shareUnavailable: "Kunne ikke dele eller kopiere akkurat nå.", profilePrivacy: "Fremgangen lagres bare på denne enheten.",
     }),
@@ -366,7 +368,7 @@
       storageWriteFailed: "Progress could not be saved on this device.",
       quizMastered: "Quiz mastered", quizNotMastered: "Not quite yet", scoreOutOf: "of {total}",
       scoreAnnouncement: "{score} of {total}", newRecord: "New record!", recordScore: "Record: {score} of {total}",
-      nextQuiz: "Next quiz", nextLevelAction: "Next: Level {number}", congratulations: "Congratulations!", tryAgainAction: "Try again", playAgain: "Play again",
+      nextQuiz: "Next quiz", nextLevelAction: "Next", congratulations: "Congratulations!", tryAgainAction: "Try again", playAgain: "Play again",
       milestones: "Milestones", milestoneReached: "Milestone reached", milestoneSummary: "You mastered levels {start}–{end}.",
       milestoneAction: "Milestone reached", replayMilestone: "Replay the {stage} celebration",
       replayWorldCelebration: "Replay the world mastery celebration",
@@ -381,7 +383,9 @@
       resumeAttempt: "Resume quiz", quizInProgress: "Quiz in progress", continueMode: "Continue: {mode}",
       answeredProgress: "{answered} / {total} answered", keepSavedAttempt: "Keep saved attempt",
       abandonAttemptTitle: "Start a different quiz?",
-      abandonAttemptDescription: "You have answered {answered} of {total} questions in {savedTitle} · {savedMode}. Starting {nextTitle} · {nextMode} will delete that attempt.",
+      abandonAttemptProgress: "You have answered {answered} of {total} questions in",
+      abandonAttemptStarting: "Starting",
+      abandonAttemptEnding: "will delete that attempt.",
       abandonAndStart: "Abandon attempt and start quiz",
       addProfileTitle: "Add profile", addProfileDescription: "The new profile’s progress will be stored separately on this device.",
       addProfileAction: "Create profile", renameProfileTitle: "Rename profile",
@@ -390,7 +394,7 @@
       clearProgressAction: "Clear progress", deleteProfileTitle: "Delete profile?",
       deleteProfileDescription: "The profile {name} and all of its progress will be deleted from this device. This cannot be undone.",
       deleteProfileAction: "Delete profile",
-      savedAttempt: "A quiz in {title} is in progress.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
+      savedAttempt: "Quiz in progress:", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
       challengeQuizTitle: "Quiz challenge", scoreToBeat: "Score to beat", approximateTime: "About {minutes} min",
       shareUnavailable: "Could not share or copy right now.", profilePrivacy: "Progress is stored only on this device.",
     }),
@@ -590,11 +594,24 @@
     return id ? curriculum.levelById.get(id) ?? null : null;
   }
   function levelTitle(level) { return level?.title?.[state.locale] ?? ""; }
+  function levelIndexForLevel(level) {
+    return level ? curriculum.levels.findIndex((candidate) => candidate.id === level.id) : -1;
+  }
   function stageForLevelIndex(levelIndex) {
     const levelNumber = levelIndex + 1;
     return curriculum.stages.find(
       (stage) => levelNumber >= stage.startLevel && levelNumber <= stage.endLevel,
     ) ?? null;
+  }
+  function levelBadgeMarkup(levelIndex, size = "regular") {
+    if (!Number.isInteger(levelIndex) || levelIndex < 0) return "";
+    const stage = stageForLevelIndex(levelIndex);
+    return `<span class="level-badge level-badge-${escapeHtml(size)} level-stage-${escapeHtml(stage?.id ?? "")}" aria-label="${escapeHtml(t("level", { number: levelIndex + 1 }))}"><span aria-hidden="true">${levelIndex + 1}</span></span>`;
+  }
+  function levelReferenceMarkup(level, { size = "compact", showTitle = true, className = "" } = {}) {
+    const levelIndex = levelIndexForLevel(level);
+    if (levelIndex < 0) return "";
+    return `<span class="level-reference${className ? ` ${escapeHtml(className)}` : ""}">${levelBadgeMarkup(levelIndex, size)}${showTitle ? `<span class="level-reference-title">${escapeHtml(levelTitle(level))}</span>` : ""}</span>`;
   }
   function stageTitle(stage) { return stage?.title?.[state.locale] ?? ""; }
   function modeLabel(modeId) {
@@ -709,6 +726,15 @@
     return state.region === "world"
       ? t("wholeWorld")
       : regionLabel(selectedRegion());
+  }
+
+  function exploreScopeMarkup(size = "compact") {
+    const level = state.exploreScope?.levelId
+      ? curriculum.levelById.get(state.exploreScope.levelId)
+      : null;
+    return level
+      ? levelReferenceMarkup(level, { size })
+      : escapeHtml(exploreScopeLabel());
   }
 
   function initialExploreMapExtent(countryCodes) {
@@ -1540,16 +1566,14 @@
       const savedQuiz = saved ? curriculum.quizById.get(saved.quizId) : null;
       const nextQuiz = curriculum.quizById.get(dialog.quizId);
       if (!saved || !savedQuiz || !nextQuiz) return null;
+      const savedLevel = curriculum.levelById.get(savedQuiz.levelId);
+      const nextLevel = curriculum.levelById.get(nextQuiz.levelId);
       return {
         title: t("abandonAttemptTitle"),
-        description: t("abandonAttemptDescription", {
+        descriptionMarkup: `${escapeHtml(t("abandonAttemptProgress", {
           answered: saved.questionIndex,
           total: savedQuiz.countryCodes.length,
-          savedTitle: levelTitle(curriculum.levelById.get(savedQuiz.levelId)),
-          savedMode: modeLabel(savedQuiz.mode),
-          nextTitle: levelTitle(curriculum.levelById.get(nextQuiz.levelId)),
-          nextMode: modeLabel(nextQuiz.mode),
-        }),
+        }))} ${levelReferenceMarkup(savedLevel, { size: "compact" })} · ${escapeHtml(modeLabel(savedQuiz.mode))}. ${escapeHtml(t("abandonAttemptStarting"))} ${levelReferenceMarkup(nextLevel, { size: "compact" })} · ${escapeHtml(modeLabel(nextQuiz.mode))}, ${escapeHtml(t("abandonAttemptEnding"))}`,
         confirmLabel: t("abandonAndStart"),
         cancelLabel: t("keepSavedAttempt"),
         danger: true,
@@ -1595,7 +1619,7 @@
         <section class="action-dialog" role="dialog" aria-modal="true" aria-labelledby="action-dialog-title" aria-describedby="action-dialog-description" tabindex="-1">
           <form data-action-dialog-form>
             <h2 id="action-dialog-title">${escapeHtml(details.title)}</h2>
-            <p id="action-dialog-description">${escapeHtml(details.description)}</p>
+            <p id="action-dialog-description">${details.descriptionMarkup ?? escapeHtml(details.description)}</p>
             ${details.inputLabel ? `<label for="action-dialog-input">${escapeHtml(details.inputLabel)}</label><input id="action-dialog-input" name="profile-name" type="text" maxlength="40" value="${escapeHtml(details.inputValue)}" autocomplete="off" />` : ""}
             <div class="action-dialog-actions">
               <button class="secondary-button" type="button" data-action="close-action-dialog" data-dialog-cancel-focus>${escapeHtml(details.cancelLabel)}</button>
@@ -1644,7 +1668,7 @@
       : isFinalMilestone
         ? `<button class="primary-button milestone-celebration-continue" data-action="open-world-celebration">${t("worldMasteredAction")} <span aria-hidden="true">✦</span></button>`
         : nextQuiz
-          ? `<div class="milestone-next"><p>${escapeHtml(nextStageLabel)}</p><button class="primary-button milestone-celebration-continue" data-action="next-curriculum-quiz" data-next-quiz-id="${escapeHtml(nextQuiz.id)}">${t("nextLevelAction", { number: nextQuiz.levelIndex + 1 })} <span aria-hidden="true">→</span></button></div>`
+          ? `<div class="milestone-next"><p>${escapeHtml(nextStageLabel)}</p><button class="primary-button milestone-celebration-continue level-action" data-action="next-curriculum-quiz" data-next-quiz-id="${escapeHtml(nextQuiz.id)}"><span>${t("nextLevelAction")}</span>${levelBadgeMarkup(nextQuiz.levelIndex, "compact")}<span aria-hidden="true">→</span></button></div>`
           : `<button class="primary-button milestone-celebration-continue" data-action="close-milestone-celebration"><span aria-hidden="true">←</span> ${t("home")}</button>`;
     return `
       <div class="world-celebration-overlay milestone-celebration-overlay level-stage-${escapeHtml(stage.id)} ${state.milestoneCelebrationSettled ? "is-settled" : ""}">
@@ -1758,12 +1782,12 @@
           ${homeProgressMarkup(totals)}
         </section>
         <section class="home-milestones" aria-labelledby="home-milestones-title"><strong id="home-milestones-title">${t("milestones")}</strong>${milestoneStickersMarkup(profile, { interactive: true })}</section>
-        ${savedQuiz ? `<section class="saved-attempt-card"><p>${t("savedAttempt", { title: levelTitle(curriculum.levelById.get(savedQuiz.levelId)) })}</p><button class="secondary-button" data-action="resume-mastery">${t("resumeAttempt")}</button></section>` : ""}
+        ${savedQuiz ? `<section class="saved-attempt-card"><p>${t("savedAttempt")} ${levelReferenceMarkup(curriculum.levelById.get(savedQuiz.levelId), { size: "compact" })}</p><button class="secondary-button" data-action="resume-mastery">${t("resumeAttempt")}</button></section>` : ""}
         <section class="home-primary-actions" aria-label="${escapeHtml(t("chooseActivity"))}">
           <button class="home-action-card continue-card" data-action="${allMastered ? "surprise-quiz" : "continue-game"}">
             <span class="home-action-icon" aria-hidden="true">${continueIcon}</span>
             <span><strong>${allMastered ? t("surpriseQuiz") : hasPlayed ? t("continueGame") : t("startGame")}</strong>
-            ${quiz && hasPlayed ? `<small>${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(modeLabel(quiz.mode))}</small>` : ""}</span>
+            ${quiz && hasPlayed ? `<small class="home-level-context">${levelBadgeMarkup(quiz.levelIndex, "small")}<span>${escapeHtml(modeLabel(quiz.mode))}</span></small>` : ""}</span>
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
@@ -1788,11 +1812,11 @@
         const isRecommendedLevel = level.id === recommendedLevelId;
         const hasSavedAttempt = savedQuiz?.levelId === level.id;
         const levelProgressStatus = value.mastered === 4
-          ? `<span class="level-mastery-status" aria-label="4/4 ${t("mastered")}"><span>4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></span>`
+          ? `<span class="level-mastery-status" aria-label="${escapeHtml(t("mastered"))}"><span class="mastery-trophy" aria-hidden="true">🏆</span></span>`
           : value.played ? `${value.mastered}/4 ${t("mastered")}` : `<span class="unread-dot" aria-label="${t("unplayed")}"></span>`;
         return `<section class="level-card ${value.mastered === 4 ? "is-mastered" : value.played ? "is-progress" : "is-unplayed"} ${isRecommendedLevel ? "is-recommended-level" : ""} ${hasSavedAttempt ? "has-saved-attempt" : ""}" id="level-${escapeHtml(level.id)}">
           <button class="level-heading" data-action="toggle-level" data-level-id="${level.id}" aria-expanded="${state.selectedLevelId === level.id}">
-            <span class="level-number">${levelIndex + 1}</span><span><strong>${escapeHtml(levelTitle(level))}${isRecommendedLevel ? `<span class="sr-only"> · ${t("recommended")}</span>` : ""}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : placeCountLabel(level.countryCodes.map((code) => countriesByCode.get(code)).filter(Boolean))}</small></span>
+            ${levelBadgeMarkup(levelIndex, "regular")}<span><strong>${escapeHtml(levelTitle(level))}${isRecommendedLevel ? `<span class="sr-only"> · ${t("recommended")}</span>` : ""}</strong><small>${isMastery ? t("questionsLong", { count: level.countryCodes.length }) : placeCountLabel(level.countryCodes.map((code) => countriesByCode.get(code)).filter(Boolean))}</small></span>
             <span class="level-state">${hasSavedAttempt ? `<span class="level-attempt-status"><strong>${t("quizInProgress")}</strong><small>${t("answeredProgress", { answered: savedAttempt.questionIndex, total: level.countryCodes.length })}</small></span>` : ""}<span class="level-progress-status">${levelProgressStatus}</span></span>
           </button>
           ${state.selectedLevelId === level.id ? `<div class="quiz-list"><div class="level-practice-actions"><button class="level-practice-row" data-action="level-cards" data-level-id="${level.id}"><span class="level-practice-icon" aria-hidden="true"><span></span><span></span></span><span><strong>${t("cards")}</strong></span><span aria-hidden="true">→</span></button><button class="level-practice-row level-explore-row" data-action="explore-level" data-level-id="${level.id}"><span class="level-practice-map-icon" aria-hidden="true">◎</span><span><strong>${t("exploreTheseCountries")}</strong></span><span aria-hidden="true">→</span></button></div><div class="quiz-mode-list">${level.quizzes.map((baseQuiz) => {
@@ -1871,7 +1895,7 @@
     const level = quiz ? curriculum.levelById.get(quiz.levelId) : null;
     if (!quiz || !level) return invalidChallengeMarkup();
     return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup()}</header>
-      <section class="challenge-card challenge-intro-card"><p class="kicker">${t("challengeQuizTitle")}</p><h1>${escapeHtml(levelTitle(level))}</h1>
+      <section class="challenge-card challenge-intro-card"><p class="kicker">${t("challengeQuizTitle")}</p><h1>${levelReferenceMarkup(level, { size: "large", className: "challenge-level-reference" })}</h1>
       <div class="challenge-details"><div><span>${t("testYourself")}</span><strong>${escapeHtml(modeLabel(quiz.mode))}</strong></div><div><span>${t("questionsLabel")}</span><strong>${quiz.countryCodes.length}</strong></div><div><span>${t("approximateTime", { minutes: Math.max(2, Math.ceil(quiz.countryCodes.length / 4)) })}</span><strong>${state.challengeScoreVerified ? `${t("scoreToBeat")}: ${state.challengeTargetScore}/${quiz.countryCodes.length}` : ""}</strong></div></div>
       ${state.challengeScoreWarning ? `<p class="challenge-warning" role="status">${t("unverifiedScore")}</p>` : ""}
       <button class="primary-button" data-action="start-challenge">${t("startChallenge")} <span aria-hidden="true">→</span></button></section></main>`;
@@ -1933,7 +1957,7 @@
         : "";
     const replayIcon = `<span class="result-replay-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M20 11a8 8 0 1 0-2.35 5.65M20 4v7h-7" /></svg></span>`;
     const levelMasteryMarkup = state.resultNewLevelMastery
-      ? `<div class="level-mastered-celebration ${state.resultCelebrationPending ? "is-celebrating" : ""}"><p class="level-mastered-callout" aria-label="${escapeHtml(levelTitle(level))} · 4/4 ${t("mastered")}"><span>${escapeHtml(levelTitle(level))} · 4/4</span><span class="mastery-trophy" aria-hidden="true">🏆</span></p><span class="mastery-sparkles" aria-hidden="true">${Array.from({ length: 8 }, (_, index) => `<i style="--spark-index:${index}"></i>`).join("")}</span></div>`
+      ? `<div class="level-mastered-celebration ${state.resultCelebrationPending ? "is-celebrating" : ""}"><p class="level-mastered-callout">${levelReferenceMarkup(level, { size: "compact" })}<span class="mastery-trophy" aria-label="${escapeHtml(t("mastered"))}">🏆</span></p><span class="mastery-sparkles" aria-hidden="true">${Array.from({ length: 8 }, (_, index) => `<i style="--spark-index:${index}"></i>`).join("")}</span></div>`
       : "";
     const primaryAction = !perfect
       ? { action: "retry-curriculum-quiz", className: "", label: t("tryAgainAction"), icon: "→" }
@@ -1941,9 +1965,9 @@
         ? { action: "open-milestone-celebration", className: "is-curriculum-complete", label: t("milestoneAction"), icon: "✦" }
       : nextQuiz === null
         ? { action: "open-world-celebration", className: "is-curriculum-complete", label: t("congratulations"), icon: "✦" }
-        : { action: "next-curriculum-quiz", className: advancesToNextLevel ? "is-next-level" : "", label: advancesToNextLevel ? t("nextLevelAction", { number: nextQuiz.levelIndex + 1 }) : t("nextQuiz"), icon: "→" };
+        : { action: "next-curriculum-quiz", className: advancesToNextLevel ? "is-next-level level-action" : "", label: advancesToNextLevel ? `${t("nextLevelAction")} ${levelBadgeMarkup(nextQuiz.levelIndex, "compact")}` : t("nextQuiz"), icon: "→" };
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
-      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
+      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
       <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${nextQuiz ? ` data-next-quiz-id="${escapeHtml(nextQuiz.id)}"` : ""}>${primaryAction.label} <span aria-hidden="true">${primaryAction.icon}</span></button><button class="secondary-button result-replay-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? `${replayIcon}${t("playAgain")}` : t("nextQuiz")}</button></div><button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
       <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
   }
@@ -2788,7 +2812,7 @@
               aria-label="${escapeHtml(t("changeRegion"))}: ${escapeHtml(scopeLabel)}"
             >
               <span>
-                <strong>${escapeHtml(scopeLabel)}</strong>
+                <strong>${exploreScopeMarkup("small")}</strong>
               </span>
               <span class="explore-region-control-arrow" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false"><path d="M7 7h11m0 0-3-3m3 3-3 3M17 17H6m0 0 3 3m-3-3 3-3" /></svg>
@@ -2900,6 +2924,10 @@
       : state.flashcardReturn === "result"
         ? t("backToResults")
         : t("backToLevels");
+    const levelScopeMarkup = state.flashcardReturn === "level" && level
+      ? levelReferenceMarkup(level, { size: "small" })
+      : null;
+    const scopeMarkup = levelScopeMarkup ?? escapeHtml(scopeLabel);
     const complete = state.flashcardIndex >= state.flashcards.length;
 
     if (complete) {
@@ -2914,7 +2942,7 @@
             <p>
               ${t("flashcardsSummaryBefore")} ${state.flashcards.length}
               ${t("flashcardsSummaryAfter")}
-              ${escapeHtml(scopeLabel)}${/[.!?]$/.test(scopeLabel) ? "" : "."}
+              ${scopeMarkup}${/[.!?]$/.test(scopeLabel) ? "" : "."}
             </p>
             <div class="flashcard-actions">
               <button class="primary-button" data-action="back-from-cards">${escapeHtml(returnLabel)}</button>
@@ -2934,7 +2962,7 @@
         <header class="quiz-header app-header">
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
-            <span>${escapeHtml(scopeLabel)}</span>
+            <span class="flashcard-scope">${scopeMarkup}</span>
             <strong>${state.flashcardIndex + 1} / ${state.flashcards.length}</strong>
           </div>
           <button class="quiet-button home-button" data-action="back-from-cards"><span aria-hidden="true">←</span>${escapeHtml(returnLabel)}</button>
@@ -3131,7 +3159,7 @@
         <header class="quiz-header app-header app-header-mobile-sticky">
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
-            <span class="quiz-level-context"><b>${t("level", { number: quiz.levelIndex + 1 })}</b><span class="quiz-level-title"> · ${escapeHtml(levelTitle(curriculumLevel()))}</span></span>
+            ${levelReferenceMarkup(curriculumLevel(), { size: "small", className: "quiz-level-context" })}
             <strong>${state.questionIndex + 1} / ${state.questions.length}</strong>
           </div>
           ${quizReturnButtonMarkup()}
@@ -4278,7 +4306,7 @@
       const proof = await challenge.createScoreProof(recipe);
       const url = challenge.createUrl(window.location.href, { ...recipe, proof }, state.locale);
       const level = curriculumLevel();
-      const message = `${levelTitle(level)} · ${modeLabel(quiz.mode)}\n${state.score}/${quiz.countryCodes.length} · ${t("approximateTime", { minutes: Math.max(2, Math.ceil(quiz.countryCodes.length / 4)) })}\n${url.href}`;
+      const message = `${t("level", { number: quiz.levelIndex + 1 })} · ${levelTitle(level)} · ${modeLabel(quiz.mode)}\n${state.score}/${quiz.countryCodes.length} · ${t("approximateTime", { minutes: Math.max(2, Math.ceil(quiz.countryCodes.length / 4)) })}\n${url.href}`;
       await shareWithClipboardFallback(
         control,
         { title: t("challengeQuizTitle"), text: message },

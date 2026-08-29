@@ -34,13 +34,14 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
 .home-action-card { min-height:clamp(7rem,18dvh,9rem); display:flex; align-items:center; gap:1.2rem; text-align:left; border:0; border-radius:1.5rem; padding:clamp(1.1rem,3vw,1.75rem); color:#fff; box-shadow:0 14px 35px rgba(28,43,44,.12); }
 .home-action-card strong { display:block; font-size:clamp(1.35rem,3vw,2rem); line-height:1.05; }
 .home-action-card small { display:block; margin-top:.65rem; line-height:1.5; opacity:.88; font-size:.92rem; }
+.home-level-context { display:flex !important; align-items:center; gap:.5rem; min-width:0; }
 .continue-card { background:#173f48; }
 .explore-home-card { background:#a34d67; }
 .home-action-icon { display:grid; place-items:center; width:3.25rem; height:3.25rem; border-radius:50%; background:rgba(255,255,255,.16); font-size:1.6rem; flex:none; }
 .home-secondary-actions { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:.7rem; max-width:72rem; margin:0 auto; }
 .storage-warning,.saved-attempt-card { max-width:72rem; margin:0 auto 1rem; border-radius:1rem; padding:1rem 1.2rem; background:#fff4c7; }
 .saved-attempt-card { display:flex; align-items:center; justify-content:space-between; gap:1rem; background:#e5f1ec; }
-.saved-attempt-card p { margin:0; }
+.saved-attempt-card p { min-width:0; margin:0; }
 
 .profile-overlay { position:fixed; inset:0; z-index:100; display:flex; justify-content:flex-end; background:rgba(18,31,34,.46); }
 .profile-panel { width:min(30rem, 100%); height:100%; overflow:auto; background:#f8f5ee; padding:clamp(1.25rem,4vw,2rem); box-shadow:-20px 0 50px rgba(0,0,0,.16); }
@@ -101,7 +102,6 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
 .level-card.is-recommended-level { border:3px solid var(--green); box-shadow:0 7px 18px rgba(36,93,69,.1); }
 .level-card.has-saved-attempt { border:3px solid #287762; background:#edf6f2; box-shadow:0 9px 24px rgba(36,93,69,.14); }
 .level-heading { width:100%; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:1rem; padding:1rem 1.1rem; border:0; background:transparent; color:inherit; text-align:left; font:inherit; }
-.level-number { display:grid; place-items:center; width:2.3rem; height:2.3rem; border-radius:50%; background:var(--stage-badge,var(--stage-accent,#4f5d56)); color:var(--stage-on-badge,#fff); font-weight:800; box-shadow:0 3px 9px color-mix(in srgb,var(--stage-badge,var(--stage-accent,#4f5d56)) 22%,transparent); }
 .level-heading strong,.level-heading small { display:block; }
 .level-heading small { margin-top:.2rem; color:#687272; }
 .level-state { display:grid; justify-items:end; gap:.3rem; white-space:nowrap; font-weight:750; }
@@ -156,7 +156,9 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
 .result-mastery-check { width:2.6rem; height:2.6rem; border:2px solid rgba(20,122,67,.2); border-radius:50%; background:#e3f2e8; font-size:1.7rem; box-shadow:0 5px 12px rgba(20,122,67,.12); }
 .result-mastery-check.is-celebrating { animation:mastery-pop 620ms cubic-bezier(.2,.85,.32,1.35) both; }
 .level-mastered-celebration { position:relative; display:inline-grid; place-items:center; }
-.level-mastered-callout { display:inline-flex; align-items:center; justify-content:center; gap:.65rem; padding:.65rem .7rem .65rem 1rem; border:1px solid #c7ddce; border-radius:999px; background:#e4f0e9; font-weight:800; }
+.level-mastered-callout { max-width:100%; display:inline-flex; align-items:center; justify-content:center; gap:.65rem; padding:.65rem .7rem .65rem 1rem; border:1px solid #c7ddce; border-radius:999px; background:#e4f0e9; font-weight:800; }
+.level-action { gap:.65rem; }
+.primary-button .level-badge,.primary-button .level-badge > span { font-size:.78rem; }
 .level-mastered-celebration.is-celebrating .mastery-trophy { animation:mastery-pop 700ms 90ms cubic-bezier(.2,.85,.32,1.35) both; }
 .mastery-sparkles { position:absolute; width:4.6rem; height:4.6rem; right:-1rem; top:50%; pointer-events:none; transform:translateY(-50%); }
 .mastery-sparkles i { --spark-angle:calc(var(--spark-index) * 45deg); position:absolute; width:.42rem; height:.42rem; left:50%; top:50%; border-radius:50%; background:var(--gold); opacity:0; transform:translate(-50%,-50%) rotate(var(--spark-angle)) translateY(0) scale(.2); }
@@ -292,7 +294,7 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
   .level-stage-icon { width:2.85rem; height:2.85rem; font-size:1.6rem; }
   .level-stage-copy strong { font-size:1.05rem; }
   .level-stage-status { font-size:.72rem; }
-  .level-number { width:2rem; height:2rem; }
+  .level-badge-regular { --level-badge-size:2rem; font-size:.8rem; }
   .level-state { font-size:.82rem; }
   .mastery-trophy { width:1.65rem; height:1.65rem; font-size:.9rem; }
   .result-mastery-title { gap:.55rem; }

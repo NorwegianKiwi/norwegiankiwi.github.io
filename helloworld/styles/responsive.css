@@ -301,7 +301,7 @@
     gap: 7px;
   }
 
-  .quiz-level-title {
+  .quiz-level-context .level-reference-title {
     display: none;
   }
 
@@ -793,7 +793,7 @@
     display: none;
   }
 
-  .quiz-active .quiz-level-title {
+  .quiz-active .quiz-level-context .level-reference-title {
     display: none;
   }
 
@@ -1028,6 +1028,40 @@
 
 /* Result summaries occupy the first viewport; review rows remain below it. */
 @media (max-width: 600px) {
+  .challenge-card {
+    padding: 18px 0 max(18px, env(safe-area-inset-bottom));
+  }
+
+  .challenge-card .kicker {
+    margin-bottom: 10px;
+  }
+
+  .challenge-card h1 {
+    font-size: clamp(30px, 9vw, 42px);
+    line-height: 1;
+  }
+
+  .challenge-level-reference {
+    gap: 0.6rem;
+  }
+
+  .challenge-level-reference .level-badge-large {
+    --level-badge-size: 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .challenge-details {
+    margin-bottom: 16px;
+  }
+
+  .challenge-details div {
+    padding: 11px 6px;
+  }
+
+  .challenge-details strong {
+    font-size: 16px;
+  }
+
   .result-shell {
     --result-header-height: 58px;
   }

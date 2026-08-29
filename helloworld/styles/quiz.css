@@ -27,11 +27,11 @@
 
 .quiz-level-context {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   white-space: nowrap;
 }
 
-.quiz-level-context b {
+.quiz-level-context .level-reference-title {
   color: var(--ink);
 }
 
@@ -825,6 +825,11 @@ body.challenge-page {
   font-size: clamp(42px, 6vw, 68px);
 }
 
+.challenge-level-reference {
+  justify-content: center;
+  gap: 0.8rem;
+}
+
 .challenge-card > p:not(.kicker):not(.challenge-warning) {
   max-width: 590px;
   margin: 20px auto 0;
@@ -921,6 +926,14 @@ body.result-page {
   display: grid;
   justify-items: center;
   gap: 12px;
+}
+
+.result-level-context {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
 }
 
 .result-main-actions {
