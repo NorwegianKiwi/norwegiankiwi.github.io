@@ -71,8 +71,6 @@
       installSafariText:
         "Åpne denne siden i Safari for å legge den til på Hjem-skjermen. Trykk deretter på Del, velg «Legg til på Hjem-skjermen», slå på «Åpne som webapp», og trykk «Legg til».",
       closeInstallHelp: "Lukk",
-      upgradeNotice: "En ny versjon med nivåer og lagret fremgang er tilgjengelig.",
-      openUpgrade: "Åpne den nye versjonen",
       review: "Gjennomgang",
       reviewHeading: "Dette kan du øve mer på",
       reviewCount: "{count} land å se nærmere på.",
@@ -244,8 +242,6 @@
       installSafariText:
         "Open this page in Safari to add it to your Home Screen. Then tap Share, choose “Add to Home Screen”, turn on “Open as Web App”, and tap “Add”.",
       closeInstallHelp: "Close",
-      upgradeNotice: "A new version with levels and saved progress is available.",
-      openUpgrade: "Open the new version",
       review: "Review",
       reviewHeading: "Here is what you can practise",
       reviewCount:
@@ -1403,11 +1399,6 @@
           </div>
           <img class="hero-globe" src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
         </section>
-
-        <aside class="upgrade-notice" aria-label="${escapeHtml(t("upgradeNotice"))}">
-          <span>${t("upgradeNotice")}</span>
-          <a href="../helloworld/">${t("openUpgrade")}</a>
-        </aside>
 
         <section class="region-panel" aria-labelledby="region-heading">
           <h2 id="region-heading">${t("chooseArea")}</h2>
