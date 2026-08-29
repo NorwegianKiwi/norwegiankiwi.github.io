@@ -770,6 +770,9 @@
     className,
     screenRadius,
   ) {
+    const readableSizeAttribute = Number.isFinite(marker.readableSize)
+      ? `data-map-marker-readable-size="${marker.readableSize}"`
+      : "";
     return `
       <circle
         class="${className}"
@@ -778,7 +781,7 @@
         r="${screenRadius}"
         data-map-marker-screen-radius="${screenRadius}"
         data-map-marker-code="${escapeHtml(marker.code)}"
-        data-map-marker-readable-size="${marker.readableSize}"
+        ${readableSizeAttribute}
         vector-effect="non-scaling-stroke"
       />
     `;
@@ -1032,7 +1035,11 @@
     const targetMarkers = view.markers.filter(
       (marker) => marker.code === targetCode,
     );
-    const locatorCodes = new Set(view.markers.map((marker) => marker.code));
+    const locatorCodes = new Set(
+      view.markers
+        .filter((marker) => Number.isFinite(marker.readableSize))
+        .map((marker) => marker.code),
+    );
 
     const pathMarkup = (features, className) =>
       features
