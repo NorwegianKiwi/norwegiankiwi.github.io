@@ -28,7 +28,15 @@ First use creates Player 1 automatically.
 
 The hosted site can be installed as an online-only web app. Use **Add to Home
 Screen** or **Install app** in the browser. The installed application still
-requires a network connection to the hosted site.
+requires a network connection to the hosted site. The compact in-page install
+action is limited to eligible phones and tablets; desktop browsers keep their
+own installation controls.
+
+Challenge links, profile-transfer links, and ordinary invitations can be
+pasted into **Open shared link** on Home. This is the reliable way to use a
+transfer link in an installed app when tapping it opens a browser instead. A
+transfer previews one profile before anything is written. **Import backup
+file** previews a saved file containing every profile from another device.
 
 ## Development and verification
 
@@ -68,7 +76,8 @@ in [AGENTS.md](AGENTS.md).
 - `countries.js` — localized place, relationship, civic-centre, and region data
 - `curriculum.js` — ordered levels, stable quizzes, and deterministic attempts
 - `progress.js` — profiles, persistence, transfer, backup, and progress rules
-- `navigation.js` and `challenge.js` — stable routes and friend challenges
+- `navigation.js`, `challenge.js`, `shared-link.js`, and `sharing.js` — stable
+  routes, friend challenges, pasted-link classification, and email drafts
 - `explore-state.js` and `map-view.js` — pure Explore scope and map viewport
   calculations
 - `world-map.js` — generated Natural Earth map and silhouette data
@@ -96,6 +105,11 @@ recipe contains the stable quiz ID and revision, score to beat, and a
 casual-tamper proof. Valid current-revision challenges record normal progress;
 they never contain transferable profile data. The proof is not authentication,
 because all code and inputs are public in this static application.
+
+Milestone and World Master celebrations provide **Share my progress**. Browsers
+with a native Share menu use it; other browsers open a prepared message in the
+default email application. Challenge sharing follows the same rule. Only
+**Copy transfer link** writes a private progress payload to the clipboard.
 
 ## Data and licences
 

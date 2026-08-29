@@ -23,6 +23,10 @@ The progression implementation should preserve this deployment model unless a
 separate decision explicitly changes it. Local progress and transfer must not
 require a server, database or account.
 
+The product has not yet been published. The current schemas and URL recipes are
+versioned for validation, but no obsolete pre-release shape requires migration
+or compatibility handling.
+
 ## 2. Sources of truth
 
 The implementation should maintain clear boundaries:
@@ -34,6 +38,8 @@ The implementation should maintain clear boundaries:
 - `progress.js`: profiles, persistence, validation, import/export, merging and
   Continue selection
 - `challenge.js`: the explicitly versioned curriculum challenge recipe
+- `shared-link.js`: extraction and classification of pasted app links/messages
+- `sharing.js`: dependency-free construction of encoded email draft URLs
 - `localization.js`: complete bilingual interface catalogs and interpolation
 - `map-view.js`: pure map viewport, zoom, pan and coordinate calculations
 - `app.js`: application state, rendering and interaction orchestration
@@ -308,6 +314,12 @@ advanced file backup but should not be exposed as the primary UX terminology.
 Nothing is written until the player chooses **Create profile** or **Merge** in
 the import preview.
 
+A single-profile preview has no redundant row-level Import action. If the
+stable ID already exists, the primary action clearly updates that profile; if
+it is new, the primary action creates it. Explicit merge targets exclude the
+matching-ID profile. Multi-profile imports retain Import all and per-profile
+Import actions.
+
 ### Create profile
 
 - Preserve the imported profile ID unless it collides with an unrelated local
@@ -375,6 +387,10 @@ checkbox-selection workflow while supporting both needs.
   create stored progress.
 - Ordinary curriculum routes expose quiz identity and launch source, but never
   answers, score, question position or attempt seed.
+- **Open shared link** accepts a bare URL or text containing exactly one URL,
+  requires the current origin and normalised app path, and classifies a current
+  challenge, `#progress` transfer or ordinary Home invitation. Challenge query
+  fields retain precedence if a link also contains a transfer fragment.
 
 ## 16. Sharing and friend challenges
 
@@ -398,12 +414,21 @@ result records normal curriculum progress for the active profile. Since a
 default Player 1 is created automatically, first-time challenge visitors can
 play and save without an onboarding form.
 
-The shared message includes quiz title, mode, score, approximate time and a
-direct link. It must not contain profile-transfer data.
+The shared challenge includes quiz title, mode, score, approximate time and a
+direct link. It must not contain profile-transfer data. Milestone celebration
+sharing names the earned stage and level range; World Master sharing states the
+58-level and 232-quiz completion. Both use the ordinary game URL and do not
+encode or grant access to saved progress.
 
-Progress sharing is separate: generate a concise text achievement such as
-levels/quizzes mastered plus the ordinary game URL. It does not encode or grant
-access to saved progress.
+Native `navigator.share` is used when available. Otherwise a user-initiated
+`mailto:` URL opens a prepared subject and body. Native cancellation is not an
+error. A missing or blocked email handler cannot be detected, and progress or
+challenge sharing has no clipboard fallback.
+
+Custom install UI is shown only on eligible mobile/tablet HTTP(S) visits and is
+hidden in standalone mode. iOS receives manual Safari guidance; Chromium mobile
+requires an actionable `beforeinstallprompt`. Desktop install events are not
+cancelled so browser-owned installation UI remains available.
 
 ## 17. Rendering and state separation
 

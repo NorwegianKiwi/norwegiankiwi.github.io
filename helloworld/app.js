@@ -37,13 +37,15 @@
   const data = window.GEOGRAFI_QUIZ_DATA;
   const mapData = window.GEOGRAFI_QUIZ_MAP_DATA;
   const challenge = window.GEOGRAFI_CHALLENGE;
+  const sharedLink = window.GEOGRAFI_SHARED_LINK;
+  const sharing = window.GEOGRAFI_SHARING;
   const exploreState = window.GEOGRAFI_EXPLORE_STATE;
   const navigation = window.GEOGRAFI_NAVIGATION;
   const curriculum = window.GEOGRAFI_CURRICULUM;
   const progress = window.GEOGRAFI_PROGRESS;
   const app = document.getElementById("app");
 
-  if (!data || !mapData || !challenge || !exploreState || !navigation || !curriculum || !progress || !app) {
+  if (!data || !mapData || !challenge || !sharedLink || !sharing || !exploreState || !navigation || !curriculum || !progress || !app) {
     throw new Error(
       initialLocale === "en"
         ? "Hello World! could not load the country data."
@@ -148,6 +150,7 @@
     actionDialog: null,
     importProfiles: transferPreview,
     importError: transferError,
+    importSource: transferPreview || transferError ? "transfer" : null,
     selectedLevelId: null,
     flashcardReturn: "home",
     quizReturn: "home",
@@ -1091,6 +1094,21 @@
     );
   }
 
+  function isMobileDevice() {
+    return (
+      isIosDevice() ||
+      window.navigator.userAgentData?.mobile === true ||
+      /Android|Mobile/i.test(window.navigator.userAgent)
+    );
+  }
+
+  function isInstallContext() {
+    return (
+      window.location.protocol === "https:" ||
+      (window.location.protocol === "http:" && /^(?:localhost|127(?:\.\d+){3}|\[::1\])$/.test(window.location.hostname))
+    );
+  }
+
   function isIosSafari() {
     if (!isIosDevice()) return false;
 
@@ -1106,6 +1124,8 @@
 
   function installActionMarkup() {
     if (
+      !isInstallContext() ||
+      !isMobileDevice() ||
       isStandalone() ||
       (!isIosDevice() && deferredInstallPrompt === null)
     ) {
@@ -1113,16 +1133,10 @@
     }
 
     return `
-      <aside class="install-app-banner">
-        <button
-          class="install-app-button"
-          type="button"
-          data-action="install-app"
-        >
-          <img src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
-          <span>${t("installApp")}</span>
-        </button>
-      </aside>
+      <button class="quiet-button install-app-button" type="button" data-action="install-app">
+        <img src="./favicon.svg" alt="" aria-hidden="true" draggable="false" />
+        <span>${t("installApp")}</span>
+      </button>
     `;
   }
 
@@ -1176,18 +1190,18 @@
           aria-describedby="open-challenge-description"
           tabindex="-1"
         >
-          <h2 id="open-challenge-title">${t("openChallengePrompt")}</h2>
-          <p id="open-challenge-description">${t("openChallengeDescription")}</p>
+          <h2 id="open-challenge-title">${t("openSharedLinkPrompt")}</h2>
+          <p id="open-challenge-description">${t("openSharedLinkDescription")}</p>
           <form data-open-challenge-form novalidate>
-            <label for="challenge-input">${t("challengeInputLabel")}</label>
+            <label for="challenge-input">${t("sharedLinkInputLabel")}</label>
             <input
               id="challenge-input"
               name="challenge-input"
               type="text"
               autocomplete="off"
-              autocapitalize="characters"
+              autocapitalize="none"
               spellcheck="false"
-              placeholder="${escapeHtml(t("challengeInputPlaceholder"))}"
+              placeholder="${escapeHtml(t("sharedLinkInputPlaceholder"))}"
               value="${escapeHtml(state.openChallengeValue)}"
               aria-describedby="open-challenge-error"
               ${state.openChallengeError ? 'aria-invalid="true"' : ""}
@@ -1196,7 +1210,7 @@
               ${state.openChallengeError ? t(state.openChallengeError) : ""}
             </p>
             <div class="open-challenge-actions">
-              <button class="primary-button" type="submit">${t("openChallenge")}</button>
+              <button class="primary-button" type="submit">${t("openSharedLink")}</button>
               <button class="secondary-button" type="button" data-action="cancel-open-challenge">${t("cancel")}</button>
             </div>
           </form>
@@ -1328,7 +1342,10 @@
           <h2 id="milestone-celebration-title">${escapeHtml(stageTitle(stage))}</h2>
           <p id="milestone-celebration-description">${t("milestoneSummary", { start: stage.startLevel, end: stage.endLevel })}</p>
           <div class="milestone-celebration-collection"><strong>${t("milestones")}</strong>${milestoneStickersMarkup(currentProfile(), { activeStageId: stage.id })}</div>
-          ${primaryAction}
+          <div class="celebration-actions">
+            ${primaryAction}
+            <button class="quiet-button action-feedback-button" data-action="share-progress" data-stage-id="${escapeHtml(stage.id)}">${t("shareProgress")}${actionFeedbackMarkup()}</button>
+          </div>
         </section>
       </div>`;
   }
@@ -1348,7 +1365,10 @@
           <p class="kicker">${t("congratulations")}</p>
           <h2 id="world-celebration-title">${t("worldMastered")}</h2>
           <p id="world-celebration-description">${t("worldCelebrationSummary", { levels: curriculum.levels.length, quizzes: curriculum.levels.length * 4 })}</p>
-          <button class="primary-button world-celebration-continue" data-action="view-completed-progress"><span aria-hidden="true">←</span> ${t("home")}</button>
+          <div class="celebration-actions">
+            <button class="primary-button world-celebration-continue" data-action="view-completed-progress"><span aria-hidden="true">←</span> ${t("home")}</button>
+            <button class="quiet-button action-feedback-button" data-action="share-progress" data-share-kind="world">${t("shareProgress")}${actionFeedbackMarkup()}</button>
+          </div>
         </section>
       </div>`;
   }
@@ -1419,7 +1439,6 @@
     }));
     const savedAttempt = profile.savedMasteryAttempt;
     const savedQuiz = savedAttempt ? curriculum.quizById.get(savedAttempt.quizId) : null;
-    const installAction = installActionMarkup();
     return `
       <div class="setup-page progression-home"><main class="site-shell setup-shell">
         <header class="brand-bar app-header app-header-sticky">${brandMarkup(false, false)}<div class="setup-header-actions">${profileControlMarkup()}${siteHomeLinkMarkup()}</div></header>
@@ -1439,10 +1458,10 @@
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
-        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button action-feedback-button" data-action="share-progress">${t("shareProgress")}${actionFeedbackMarkup()}</button><button class="quiet-button" data-action="open-challenge">${t("openChallenge")}</button></nav></div>
+        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button" data-action="open-challenge">${t("openSharedLink")}</button>${installActionMarkup()}</nav></div>
         <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a><a href="./licenses/local-flags.txt">${t("localFlagsLicence")}</a><a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a><a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a></span></footer>
         ${profilePanelMarkup()}${installHelpMarkup()}${openChallengeMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}
-      </main>${installAction}</div>`;
+      </main></div>`;
   }
 
   function levelsMarkup() {
@@ -1497,9 +1516,17 @@
 
   function importMarkup() {
     if (state.importError || !state.importProfiles?.length) return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup("cancel-import")}</header><section class="challenge-card"><h1>${t("invalidImport")}</h1><button class="primary-button" data-action="cancel-import">${t("home")}</button></section></main>`;
-    return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup("cancel-import")}</header><section class="challenge-card import-card"><p class="kicker">${t("importProgress")}</p><h1>${state.importProfiles.length === 1 ? escapeHtml(state.importProfiles[0].name) : t("backupHeading")}</h1>
-      <div class="import-list">${state.importProfiles.map((profile, index) => { const totals = progress.summary(profile, curriculum.levels); return `<article><div><strong>${escapeHtml(profile.name)}</strong><span>${t("playedAndMastered", { played: totals.playedQuizzes, mastered: totals.masteredQuizzes })}</span></div><button class="secondary-button" data-action="import-one" data-import-index="${index}">${t("importOne")}</button></article>`; }).join("")}</div>
-      <div class="import-actions">${state.importProfiles.length > 1 ? `<button class="primary-button" data-action="import-all">${t("importAll")}</button>` : `<button class="primary-button" data-action="create-imported-profile">${t("createProfile")}</button>${Object.values(progressStore.profiles).map((profile) => `<button class="secondary-button" data-action="merge-import" data-profile-id="${escapeHtml(profile.id)}">${t("mergeInto", { name: profile.name })}</button>`).join("")}`}<button class="quiet-button" data-action="cancel-import">${t("importCancel")}</button></div>
+    const singleProfile = state.importProfiles.length === 1 ? state.importProfiles[0] : null;
+    const matchingProfile = singleProfile ? progressStore.profiles[singleProfile.id] ?? null : null;
+    const heading = state.importSource === "backup" ? t("backupHeading") : escapeHtml(singleProfile?.name ?? t("backupHeading"));
+    const singleActions = singleProfile
+      ? `${matchingProfile
+          ? `<button class="primary-button" data-action="update-imported-profile">${t("updateProfile", { name: matchingProfile.name })}</button>`
+          : `<button class="primary-button" data-action="create-imported-profile">${t("createProfile")}</button>`}${Object.values(progressStore.profiles).filter((profile) => profile.id !== matchingProfile?.id).map((profile) => `<button class="secondary-button" data-action="merge-import" data-profile-id="${escapeHtml(profile.id)}">${t("mergeInto", { name: profile.name })}</button>`).join("")}`
+      : "";
+    return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup("cancel-import")}</header><section class="challenge-card import-card"><p class="kicker">${t(state.importSource === "backup" ? "importBackup" : "importProgress")}</p><h1>${heading}</h1>
+      <div class="import-list">${state.importProfiles.map((profile, index) => { const totals = progress.summary(profile, curriculum.levels); return `<article><div><strong>${escapeHtml(profile.name)}</strong><span>${t("playedAndMastered", { played: totals.playedQuizzes, mastered: totals.masteredQuizzes })}</span></div>${state.importProfiles.length > 1 ? `<button class="secondary-button" data-action="import-one" data-import-index="${index}">${t("importOne")}</button>` : ""}</article>`; }).join("")}</div>
+      <div class="import-actions">${state.importProfiles.length > 1 ? `<button class="primary-button" data-action="import-all">${t("importAll")}</button>` : singleActions}<button class="quiet-button" data-action="cancel-import">${t("importCancel")}</button></div>
     </section></main>`;
   }
 
@@ -1617,7 +1644,7 @@
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
       <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${nextQuiz ? ` data-next-quiz-id="${escapeHtml(nextQuiz.id)}"` : ""}>${primaryAction.label} <span aria-hidden="true">${primaryAction.icon}</span></button><button class="secondary-button result-replay-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? `${replayIcon}${t("playAgain")}` : t("nextQuiz")}</button></div><button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
-      <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="copy-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
+      <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="share-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
   }
 
   function exploreCountryStatusMarkup(countryCode) {
@@ -3714,62 +3741,49 @@
     }
   }
 
-  function normalizedAppPath(url) {
-    const withoutIndex = url.pathname.replace(/\/index\.html$/, "/");
-    return withoutIndex.endsWith("/") ? withoutIndex : `${withoutIndex}/`;
-  }
-
-  function openChallengeInput(value) {
+  function openSharedLinkInput(value) {
     const trimmedValue = value.trim();
     state.openChallengeValue = trimmedValue;
-    if (!trimmedValue) {
-      state.openChallengeError = "challengeInputRequired";
-      render({ focusOpenChallengeInput: true });
-      return;
-    }
-
-    let sourceUrl;
-    try {
-      sourceUrl = new URL(trimmedValue);
-    } catch {
-      state.openChallengeError = "challengeUrlMalformed";
+    const parsed = sharedLink.classify(trimmedValue, window.location.href, {
+      quizById: curriculum.quizById,
+      readChallenge: challenge.readUrl,
+      decodeTransfer: progress.decodeTransfer,
+    });
+    if (parsed.error) {
+      state.openChallengeError = parsed.error;
       render({
         focusOpenChallengeInput: true,
-        selectOpenChallengeInput: true,
+        selectOpenChallengeInput: parsed.error !== "sharedLinkRequired",
       });
       return;
     }
 
-    const currentUrl = new URL(window.location.href);
-    if (
-      sourceUrl.origin !== currentUrl.origin ||
-      normalizedAppPath(sourceUrl) !== normalizedAppPath(currentUrl)
-    ) {
-      state.openChallengeError = "challengeUrlWrongApp";
-      render({
-        focusOpenChallengeInput: true,
-        selectOpenChallengeInput: true,
-      });
+    if (parsed.kind === "challenge") {
+      window.location.assign(challenge.createUrl(window.location.href, {
+        quizId: parsed.recipe.quizId,
+        revision: parsed.recipe.revision,
+        score: parsed.recipe.scoreParam,
+        proof: parsed.recipe.proof,
+      }, parsed.locale));
       return;
     }
 
-    const recipe = challenge.readUrl(sourceUrl, curriculum.quizById);
-    if (!recipe?.valid) {
-      state.openChallengeError = "challengeUrlInvalid";
-      render({
-        focusOpenChallengeInput: true,
-        selectOpenChallengeInput: true,
-      });
+    if (parsed.kind === "transfer") {
+      const url = navigation.createUrl(
+        window.location.href,
+        { screen: "setup" },
+        parsed.locale,
+      );
+      url.hash = `progress=${parsed.payload}`;
+      window.location.assign(url);
       return;
     }
 
-    const locale = sourceUrl.searchParams.get("lang") === "en" ? "en" : "nb";
-    window.location.assign(challenge.createUrl(window.location.href, {
-      quizId: recipe.quizId,
-      revision: recipe.revision,
-      score: recipe.scoreParam,
-      proof: recipe.proof,
-    }, locale));
+    window.location.assign(navigation.createUrl(
+      window.location.href,
+      { screen: "setup" },
+      parsed.locale,
+    ));
   }
 
   async function copyText(value) {
@@ -3844,7 +3858,16 @@
     }
   }
 
-  async function shareWithClipboardFallback(control, shareData, copyValue, copiedKey, failedKey) {
+  function openEmail(subject, body) {
+    const anchor = document.createElement("a");
+    anchor.href = sharing.createEmailUrl(subject, body);
+    anchor.hidden = true;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+  }
+
+  async function shareWithEmailFallback(control, shareData, emailBody, failedKey) {
     beginActionFeedback(control);
     if (navigator.share) {
       try {
@@ -3856,14 +3879,12 @@
           clearActionFeedback(control);
           return;
         }
+        showActionFeedbackError(control, failedKey);
+        return;
       }
     }
-    try {
-      await copyText(copyValue);
-      showCopiedFeedback(control, copiedKey);
-    } catch {
-      showActionFeedbackError(control, failedKey);
-    }
+    openEmail(shareData.title, emailBody);
+    clearActionFeedback(control);
   }
 
   async function copyTransferLink(control) {
@@ -3873,22 +3894,30 @@
     await copyWithFeedback(control, url.href, "transferCopied", "transferFailed");
   }
 
-  async function copyProgressShare(control) {
-    const totals = progress.summary(currentProfile(), curriculum.levels);
-    const url = new URL(window.location.href); url.search = state.locale === "en" ? "?lang=en" : ""; url.hash = "";
-    const text = totals.masteredQuizzes === totals.totalQuizzes
-      ? `${state.locale === "en" ? `I have mastered all ${totals.totalQuizzes} geography quizzes in Hello World!` : `Jeg har mestret alle ${totals.totalQuizzes} geografiquizene i Hei verden!`}\n${url.href}`
-      : `${state.locale === "en" ? `I have mastered ${totals.masteredLevels} of ${totals.totalLevels} levels in Hello World!` : `Jeg har mestret ${totals.masteredLevels} av ${totals.totalLevels} nivåer i Hei verden!`}\n${url.href}`;
-    await shareWithClipboardFallback(
+  async function shareProgress(control) {
+    const url = navigation.createUrl(window.location.href, { screen: "setup" }, state.locale);
+    const stage = curriculum.stages.find((candidate) => candidate.id === control.dataset.stageId);
+    const isWorldMaster = control.dataset.shareKind === "world";
+    if (!stage && !isWorldMaster) return;
+    const subject = isWorldMaster
+      ? t("worldShareSubject")
+      : t("milestoneShareSubject", { stage: stageTitle(stage) });
+    const text = isWorldMaster
+      ? t("worldShareText", { levels: curriculum.levels.length, quizzes: curriculum.levels.length * 4 })
+      : t("milestoneShareText", {
+          stage: stageTitle(stage),
+          start: stage.startLevel,
+          end: stage.endLevel,
+        });
+    await shareWithEmailFallback(
       control,
-      { title: t("brandName"), text },
-      text,
-      "progressCopied",
+      { title: subject, text, url: url.href },
+      `${text}\n\n${url.href}`,
       "shareUnavailable",
     );
   }
 
-  async function copyCurriculumChallenge(control) {
+  async function shareCurriculumChallenge(control) {
     const quiz = curriculumQuiz(); if (!quiz) return;
     beginActionFeedback(control);
     try {
@@ -3896,12 +3925,11 @@
       const proof = await challenge.createScoreProof(recipe);
       const url = challenge.createUrl(window.location.href, { ...recipe, proof }, state.locale);
       const level = curriculumLevel();
-      const message = `${t("level", { number: quiz.levelIndex + 1 })} · ${levelTitle(level)} · ${modeLabel(quiz.mode)}\n${state.score}/${quiz.countryCodes.length} · ${t("approximateTime", { minutes: Math.max(2, Math.ceil(quiz.countryCodes.length / 4)) })}\n${url.href}`;
-      await shareWithClipboardFallback(
+      const message = `${t("level", { number: quiz.levelIndex + 1 })} · ${levelTitle(level)} · ${modeLabel(quiz.mode)}\n${state.score}/${quiz.countryCodes.length} · ${t("approximateTime", { minutes: Math.max(2, Math.ceil(quiz.countryCodes.length / 4)) })}`;
+      await shareWithEmailFallback(
         control,
-        { title: t("challengeQuizTitle"), text: message },
-        message,
-        "challengeLinkCopied",
+        { title: t("challengeQuizTitle"), text: message, url: url.href },
+        `${message}\n\n${url.href}`,
         "challengeShareFailed",
       );
     } catch {
@@ -3920,6 +3948,7 @@
     persist(nextStore);
     state.importProfiles = null;
     state.importError = false;
+    state.importSource = null;
     clearTransferFragment();
     returnToSetup({ historyMode: "replace" });
   }
@@ -3929,6 +3958,10 @@
       ? progress.mergeInto(progressStore, imported.id, imported)
       : progress.importAsNew(progressStore, imported);
     finishImport(nextStore);
+  }
+
+  function createImportedProfile(imported) {
+    finishImport(progress.importAsNew(progressStore, imported));
   }
 
   function importAllProfiles() {
@@ -4235,9 +4268,16 @@
     if (action === "delete-profile") { openActionDialog("delete-profile"); return; }
     if (action === "copy-transfer") { void copyTransferLink(control); return; }
     if (action === "download-backup") { downloadBackup(); return; }
-    if (action === "share-progress") { void copyProgressShare(control); return; }
-    if (action === "copy-curriculum-challenge") { void copyCurriculumChallenge(control); return; }
-    if (action === "create-imported-profile") { if (state.importProfiles?.[0]) importSingleProfile(state.importProfiles[0]); return; }
+    if (action === "share-progress") { void shareProgress(control); return; }
+    if (action === "share-curriculum-challenge") { void shareCurriculumChallenge(control); return; }
+    if (action === "create-imported-profile") { if (state.importProfiles?.[0]) createImportedProfile(state.importProfiles[0]); return; }
+    if (action === "update-imported-profile") {
+      const imported = state.importProfiles?.[0];
+      if (imported && progressStore.profiles[imported.id]) {
+        finishImport(progress.mergeInto(progressStore, imported.id, imported));
+      }
+      return;
+    }
     if (action === "merge-import") {
       if (state.importProfiles?.[0]) {
         finishImport(
@@ -4255,6 +4295,7 @@
     if (action === "cancel-import") {
       state.importProfiles = null;
       state.importError = false;
+      state.importSource = null;
       clearTransferFragment();
       returnToSetup({ historyMode: "replace" });
       return;
@@ -4450,7 +4491,7 @@
     const form = event.target.closest("[data-open-challenge-form]");
     if (!form || !app.contains(form)) return;
     event.preventDefault();
-    openChallengeInput(
+    openSharedLinkInput(
       form.elements.namedItem("challenge-input")?.value ?? "",
     );
   });
@@ -4459,8 +4500,8 @@
     if (!event.target.matches?.("[data-backup-input]") || !event.target.files?.[0]) return;
     try {
       state.importProfiles = progress.parseBackup(await event.target.files[0].text());
-      state.importError = false; state.profilePanelOpen = false; state.screen = "import"; renderAtTop();
-    } catch { state.importProfiles = null; state.importError = true; state.profilePanelOpen = false; state.screen = "import"; renderAtTop(); }
+      state.importError = false; state.importSource = "backup"; state.profilePanelOpen = false; state.screen = "import"; renderAtTop();
+    } catch { state.importProfiles = null; state.importError = true; state.importSource = "backup"; state.profilePanelOpen = false; state.screen = "import"; renderAtTop(); }
   });
 
   app.addEventListener("keydown", (event) => {
@@ -4921,6 +4962,7 @@
   }
 
   window.addEventListener("beforeinstallprompt", (event) => {
+    if (!isInstallContext() || !isMobileDevice()) return;
     event.preventDefault();
     deferredInstallPrompt = event;
     if (state.screen === "setup" && !isStandalone()) render();

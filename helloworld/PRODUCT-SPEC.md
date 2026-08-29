@@ -88,7 +88,8 @@ The home screen may expose quieter actions for:
 - Viewing all levels
 - Switching profiles
 - Opening settings
-- Opening an existing friend challenge
+- Opening a shared challenge, profile transfer or invitation
+- Installing the web app on an eligible phone or tablet
 
 These must not compete visually with Continue game and Explore the world.
 
@@ -256,6 +257,11 @@ The recipient can:
 - Merge it with an existing profile
 - Cancel
 
+When an installed app does not receive a tapped web link, the player can copy
+the complete link or shared message and paste it into **Open shared link** on
+Home. The same entry point recognises friend challenges, profile transfers and
+ordinary game invitations while rejecting links for another app or host.
+
 Import must never silently replace or reduce existing progress. Merge keeps the
 best current-revision score for each quiz and therefore preserves mastery.
 
@@ -373,13 +379,20 @@ profile later.
 
 ### Share my progress
 
-The profile or completed-world surface can share a concise achievement such as:
-
-- **I have mastered 18 of 58 levels in Hello World!**
-- **I have mastered all 232 geography quizzes.**
+Every earned milestone celebration, including a replay, offers **Share my
+progress**. A stage share names the milestone and completed level range. The
+World Master celebration shares completion of all 58 levels and 232 quizzes.
+Home itself does not show a progress-sharing action.
 
 This shares an invitation to the game, not the transferable profile payload.
 Profile transfer remains a separate private action.
+
+Where the Web Share API is available, progress and challenges open the system
+share menu. Otherwise they open a localised `mailto:` draft in the default
+email application. The application cannot detect whether an email handler is
+configured or whether the draft is sent, and it does not silently copy these
+messages. Clipboard actions are explicitly labelled, such as **Copy transfer
+link**.
 
 Sharing is secondary and must not displace Continue, Try Again or Next Quiz.
 

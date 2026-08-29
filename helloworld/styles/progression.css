@@ -183,6 +183,9 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
 .world-celebration-dialog p:not(.kicker) { max-width:29rem; margin:clamp(.65rem,2vmin,1.1rem) auto clamp(.85rem,2.5vmin,1.7rem); color:#dfece3; font-size:clamp(.9rem,2.2vmin,1.2rem); line-height:1.45; }
 .world-celebration-continue { background:var(--gold); color:var(--ink); box-shadow:0 9px 26px rgba(0,0,0,.25); }
 .world-celebration-continue:hover { background:#f0c75f; }
+.celebration-actions { display:grid; justify-items:center; gap:.65rem; width:100%; }
+.celebration-actions > .quiet-button { color:#fff; text-decoration-color:rgba(255,255,255,.55); }
+.celebration-actions > .quiet-button:hover { color:#fff; text-decoration-color:#fff; }
 .milestone-celebration-overlay { background:radial-gradient(circle at center,color-mix(in srgb,var(--stage-accent) 76%,#183225),rgba(12,27,20,.98)); }
 .milestone-celebration-dialog { width:min(42rem,100%); padding:clamp(1.6rem,5vw,3rem); }
 .milestone-celebration-close { position:absolute; right:.8rem; top:.65rem; color:#fff; opacity:.72; }
@@ -349,12 +352,14 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
   .milestone-celebration-collection { gap:.35rem; margin-bottom:.65rem; }
   .milestone-celebration-collection .milestone-sticker { width:clamp(2.35rem,10dvh,3rem); font-size:clamp(1.18rem,5.4dvh,1.55rem); }
   .world-master-visual { width:clamp(7.25rem,31dvh,10rem); margin-bottom:.25rem; }
+  .celebration-actions { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:center; gap:.45rem 1rem; }
+  .celebration-actions > .quiet-button { min-height:2.5rem; margin-bottom:.2rem; padding:.45rem .75rem; }
 }
 
 @media (orientation: landscape) and (max-height: 599px) {
   .world-master-celebration-dialog { width:min(46rem,100%); grid-template-columns:auto minmax(0,1fr); column-gap:clamp(1rem,4vw,2.5rem); align-items:center; }
   .world-master-visual { grid-column:1; grid-row:1 / 5; width:clamp(8rem,47dvh,12rem); margin:0; }
-  .world-master-celebration-dialog .kicker,.world-master-celebration-dialog h2,.world-master-celebration-dialog p,.world-master-celebration-dialog .world-celebration-continue { grid-column:2; }
+  .world-master-celebration-dialog .kicker,.world-master-celebration-dialog h2,.world-master-celebration-dialog p,.world-master-celebration-dialog .celebration-actions { grid-column:2; }
   .world-master-celebration-dialog h2 { font-size:clamp(2.2rem,12dvh,4rem); }
 }
 

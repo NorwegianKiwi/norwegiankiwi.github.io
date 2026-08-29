@@ -112,6 +112,27 @@ test("profile progress, persistence, transfer, and recovery", () => {
   assert.equal(progress.currentRecord(merged, firstQuiz).bestScore, 9);
   assert.deepEqual(progress.mergeProfiles(merged, decoded).quizProgress, merged.quizProgress);
 
+  const importedAsNew = progress.importAsNew(
+    store,
+    decoded,
+    { cryptoObject: { randomUUID: () => "imported-copy" } },
+  );
+  assert.equal(importedAsNew.activeProfileId, "imported-copy");
+  assert.equal(importedAsNew.profiles["imported-copy"].name, "Lance");
+  assert.equal(
+    progress.currentRecord(importedAsNew.profiles["imported-copy"], firstQuiz).bestScore,
+    9,
+    "explicit creation keeps imported results even when the stable ID collides",
+  );
+
+  const updatedExisting = progress.mergeInto(store, originalId, decoded);
+  const repeatedlyUpdated = progress.mergeInto(updatedExisting, originalId, decoded);
+  assert.deepEqual(
+    repeatedlyUpdated.profiles[originalId].quizProgress,
+    updatedExisting.profiles[originalId].quizProgress,
+    "updating a matching imported profile is idempotent",
+  );
+
   let equalScoreStore = progress.createEmptyStore({ id: originalId, now: clock.now });
   equalScoreStore = progress.recordResult(
     equalScoreStore,
