@@ -1,12 +1,11 @@
 # Hello World! progression game — technical specification
 
-**Status:** Draft for owner approval  
-**Companion specifications:** `PRODUCT-SPEC.md`, `CURRICULUM.md`  
+**Status:** Current implementation contract
+**Companion specifications:** `PRODUCT-SPEC.md`, `CURRICULUM.md`
 **Purpose:** Define storage, identity, compatibility, data ownership and
-implementation boundaries for the progression redesign.
+implementation boundaries for the progression system.
 
-This specification describes target behaviour. It does not require all code to
-remain in the current files or prescribe incidental CSS structure.
+This specification describes the current behavior and compatibility contract. It does not require code to remain in particular files or prescribe incidental CSS structure.
 
 ## 1. Existing constraints to preserve
 
@@ -29,17 +28,18 @@ require a server, database or account.
 The implementation should maintain clear boundaries:
 
 - `countries.js`: country names, capitals, notes and primary regions
-- `distractors.js`: curated flag relationships and visual conflicts
 - `world-map.js`: regional maps and country silhouettes
-- A new curriculum data module: ordered levels, stable IDs, revisions, country
-  sets, modes, seeds and alternative counts
-- A new progress module: profiles, persistence, validation, import/export,
-  merging and Continue selection
+- `curriculum.js`: ordered levels, stable IDs, revisions, country sets, modes,
+  seeds, alternative counts, and fixed visual-conflict rules
+- `progress.js`: profiles, persistence, validation, import/export, merging and
+  Continue selection
 - `challenge.js`: the explicitly versioned curriculum challenge recipe
+- `localization.js`: complete bilingual interface catalogs and interpolation
+- `map-view.js`: pure map viewport, zoom, pan and coordinate calculations
 - `app.js`: application state, rendering and interaction orchestration
 
-The exact filenames for new modules may change, but curriculum and progress
-logic should not be buried as unrelated constants throughout `app.js`.
+Curriculum and progress logic must remain outside the browser orchestration in
+`app.js`.
 
 ## 3. Curriculum data model
 
@@ -112,7 +112,7 @@ may remain stored but is not treated as current mastery.
 
 ## 5. Persistent storage
 
-Progress is stored in `localStorage`. Use one namespaced root key, provisionally:
+Progress is stored in `localStorage`. The namespaced root key is:
 
 ```text
 hello-world-progress
@@ -488,28 +488,9 @@ Visual and interaction testing must cover phone, tablet and desktop layouts,
 keyboard operation, reduced motion, Norwegian and English, and both empty and
 heavily completed profiles.
 
-## 19. Suggested implementation sequence
+## 19. Acceptance criteria
 
-1. Add machine-readable curriculum definitions and validation tests.
-2. Add pure progress/profile functions and tests.
-3. Add localStorage loading, validation and failure recovery.
-4. Adapt quiz construction to fixed curriculum sets.
-5. Build the simplified home screen and level overview.
-6. Connect result recording, mastery displays and Continue behaviour.
-7. Add profile management.
-8. Add resumable regional and world mastery attempts.
-9. Add transfer-link import preview and merge.
-10. Add all-profile backup-file import/export.
-11. Add curriculum quiz challenges and progress sharing.
-12. Perform responsive, accessibility, bilingual and routing regression
-    testing.
-
-Implementation should remain incremental and keep the existing Explore surface
-working throughout.
-
-## 20. Completion criteria for the progression release
-
-The first progression release is complete when:
+The progression system must continue to satisfy these criteria:
 
 - A new player can start Level 1 from the first viewport with one primary click;
   Player 1 is created automatically.
@@ -529,12 +510,3 @@ The first progression release is complete when:
 - Curriculum quiz challenges open directly and record valid current progress.
 - Progress achievements can be shared without exposing transferable progress.
 - The application remains static, bilingual and dependency-free at runtime.
-
-## 21. Remaining implementation choices
-
-The following should be decided before their implementation step:
-
-1. The exact compact transfer encoding and checksum.
-2. The exact version 2 challenge parameter names and score-proof message.
-3. Whether the current single `app.js` is split further during the redesign or
-   only the new curriculum/progress domains are extracted.

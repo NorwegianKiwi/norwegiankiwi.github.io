@@ -1,14 +1,14 @@
 # Geography game curriculum
 
-This document defines the proposed progression game built on top of the
-the 227-place dataset: 197 countries and 30 other places.
+This document defines the current progression game built on the 227-place
+dataset: 197 countries and 30 other places.
 
 ## Design principles
 
 - The home screen offers **Continue game** and **Explore the world** as its two
   primary actions.
-- Explore opens in the map view. The existing country list remains available
-  as a secondary view.
+- Explore opens as a viewport-fitted workspace containing the map and country
+  list.
 - Every quiz contains exactly one question type. Question types are never mixed
   within a scored quiz.
 - All levels and quizzes are always available. The order below is recommended,

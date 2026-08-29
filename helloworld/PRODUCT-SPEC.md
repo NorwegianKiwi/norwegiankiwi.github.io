@@ -1,7 +1,7 @@
 # Hello World! progression game — product specification
 
-**Status:** Draft for owner approval  
-**Companion specifications:** `CURRICULUM.md`, `TECHNICAL-SPEC.md`  
+**Status:** Current product contract
+**Companion specifications:** `CURRICULUM.md`, `TECHNICAL-SPEC.md`
 **Purpose:** Preserve the agreed product decisions and constrain future design
 and implementation work.
 
@@ -51,15 +51,14 @@ content source of truth.
 
 ## 4. Home screen and information hierarchy
 
-The current configuration-heavy setup screen must be replaced by a simpler
-home screen whose two primary actions are:
+The home screen presents two primary actions:
 
 ### Continue game
 
 For a new profile, the label is **Start game**. For an existing profile it is
 **Continue game** and includes concise context, for example:
 
-> Level 6 · Iberia and the Alps  
+> Level 6 · Iberia and the Alps
 > Find the flag · 0/6
 
 Activating it starts the correct quiz immediately; it must not open another
@@ -248,7 +247,7 @@ databases. Transfer links contain only the active profile.
 
 Opening a transfer link must show an import preview, for example:
 
-> Import Lance's progress?  
+> Import Lance's progress?
 > 28 quizzes played · 17 mastered
 
 The recipient can:
@@ -393,7 +392,7 @@ Sharing is secondary and must not displace Continue, Try Again or Next Quiz.
 - Unsupported challenge versions fail clearly and are never reinterpreted as
   curriculum quizzes.
 
-## 17. Explicitly out of scope for the first release
+## 17. Current non-goals
 
 - Cloud storage or cross-device automatic synchronisation
 - User accounts, passwords, email or social login
@@ -425,7 +424,7 @@ has not been played recently. **Choose a level** is secondary. Creating another
 profile remains available through the profile menu, and Clear progress remains
 in Settings behind confirmation.
 
-The first release does not count repeated masteries and does not unlock a timed
+The current release does not count repeated masteries and does not unlock a timed
 mode. Those ideas may be reconsidered after observing real use.
 
 ## 19. Quiz revisions in the interface
