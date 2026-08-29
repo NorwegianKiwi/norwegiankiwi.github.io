@@ -242,6 +242,28 @@
   box-shadow: 0 12px 30px rgba(41, 54, 45, 0.08);
 }
 
+.question-map-area-controls {
+  position: absolute;
+  z-index: 4;
+  top: 8px;
+  right: 8px;
+  max-width: calc(100% - 24px);
+}
+
+.question-map-area-button {
+  min-height: 44px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.94);
+  box-shadow: 0 3px 12px rgba(24, 35, 29, 0.14);
+  font-size: 12px;
+}
+
+.map-quiz-visual.has-expanded-silhouette .question-map-area-controls {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .question-map {
   width: 100%;
   height: 100%;
@@ -258,12 +280,6 @@
   stroke-width: 1;
   fill-rule: evenodd;
   paint-order: stroke fill;
-}
-
-.question-map-country.is-context {
-  fill: #ccd4ce;
-  stroke: rgba(255, 253, 247, 0.7);
-  opacity: 0.28;
 }
 
 .question-map-country.is-crop-edge {
@@ -1213,8 +1229,7 @@
     }
 
   .map-quiz-visual {
-      height: min(58vw, 250px);
-      height: clamp(180px, min(58vw, 28dvh), 250px);
+      height: clamp(190px, min(68vw, 32dvh), 290px);
       min-height: 0;
       border-radius: 12px;
     }

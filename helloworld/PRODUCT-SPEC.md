@@ -157,6 +157,9 @@ different level at any time.
 - Difficulty and alternative counts follow `CURRICULUM.md`.
 - Mixed-region map quizzes select the appropriate regional map for each
   question without changing question type.
+- Map questions open in a regional view with surrounding geography at normal
+  prominence. A learner may temporarily switch to a highlighted world view for
+  orientation; each new question returns to the regional view.
 
 The existing corrective learning interaction should remain: after an incorrect
 answer, the correct option is clearly identified and the player confirms it

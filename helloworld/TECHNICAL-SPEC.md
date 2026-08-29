@@ -478,6 +478,11 @@ result-review scopes remain session-only. Map extent is independent of this memb
 the world and detailed regional maps may be traversed while the
 scope list remains fixed. Contextual scopes are never persisted as saved lists.
 
+Map-quiz area selection is likewise session-only, but intentionally resets to
+the target country's regional extent for every new question. Switching to the
+world extent changes only the rendered map geometry and must not alter attempt,
+answer, persistence or URL state.
+
 ## 18. Tests and validation
 
 At minimum, add automated coverage for:

@@ -165,6 +165,7 @@
     questionIndex: 0,
     selectedCode: null,
     answerStatus: "unanswered",
+    quizMapArea: "region",
     silhouetteExpanded: false,
     score: 0,
     wrongAnswers: [],
@@ -1003,25 +1004,28 @@
     `;
   }
 
-  function regionalQuestionMapMarkup(regionId, targetCode) {
-    const view = mapData.quizRegions[regionId];
+  function questionMapMarkup(regionId, targetCode) {
+    const isWorld = state.quizMapArea === "world";
+    const view = isWorld
+      ? {
+          viewBox: mapData.viewBox,
+          bleedViewBox: mapData.viewBox,
+          features: mapData.features,
+          markers: mapData.markers,
+          backgroundFeatures: [],
+        }
+      : mapData.quizRegions[regionId];
     const region = regionsById.get(regionId);
     const markerRadius = 3;
-    const contextFeatures = view.backgroundFeatures ?? view.features.filter(
-      (feature) => mapRegionForCode(feature.code) !== regionId,
-    );
-    const regionFeatures = view.features.filter(
-      (feature) =>
-        mapRegionForCode(feature.code) === regionId &&
-        feature.code !== targetCode,
+    const contextFeatures = view.backgroundFeatures ?? [];
+    const otherFeatures = view.features.filter(
+      (feature) => feature.code !== targetCode,
     );
     const targetFeatures = view.features.filter(
       (feature) => feature.code === targetCode,
     );
-    const regionMarkers = view.markers.filter(
-      (marker) =>
-        mapRegionForCode(marker.code) === regionId &&
-        marker.code !== targetCode,
+    const otherMarkers = view.markers.filter(
+      (marker) => marker.code !== targetCode,
     );
     const targetMarkers = view.markers.filter(
       (marker) => marker.code === targetCode,
@@ -1046,7 +1050,15 @@
         )
         .join("");
     return `
-      <div class="map-quiz-visual">
+      <div class="map-quiz-visual${isWorld ? " is-world-area" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
+        <div class="question-map-area-controls" role="group" aria-label="${escapeHtml(t("mapAreaControls"))}">
+          <button
+            type="button"
+            class="secondary-button question-map-area-button"
+            data-action="quiz-map-area"
+            data-value="${isWorld ? "region" : "world"}"
+          >${escapeHtml(t(isWorld ? "showRegion" : "viewWorld"))}</button>
+        </div>
         <svg
           class="question-map"
           data-responsive-region-map
@@ -1054,14 +1066,16 @@
           data-bleed-view-box="${view.bleedViewBox ?? view.viewBox}"
           viewBox="${view.viewBox}"
           role="img"
-          aria-label="${escapeHtml(t("highlightedMap", { region: regionLabel(region) }))}"
+          aria-label="${escapeHtml(isWorld
+            ? t("highlightedWorldMap")
+            : t("highlightedMap", { region: regionLabel(region) }))}"
           preserveAspectRatio="xMidYMid meet"
         >
           <rect class="question-map-ocean" x="-10000" y="-10000" width="20000" height="20000" />
           <g aria-hidden="true">
-            ${pathMarkup(contextFeatures, "question-map-country is-context")}
-            ${pathMarkup(regionFeatures, "question-map-country")}
-            ${markerMarkup(regionMarkers, "question-map-marker", markerRadius)}
+            ${pathMarkup(contextFeatures, "question-map-country")}
+            ${pathMarkup(otherFeatures, "question-map-country")}
+            ${markerMarkup(otherMarkers, "question-map-marker", markerRadius)}
             ${pathMarkup(targetFeatures, "question-map-target-halo")}
             ${pathMarkup(targetFeatures, "question-map-country is-target")}
             ${markerMarkup(
@@ -2758,7 +2772,7 @@
       state.mode === "map-country"
         ? `
           <div class="map-quiz-layout">
-            ${regionalQuestionMapMarkup(state.curriculumQuizId ? question.country.region : state.region, question.country.code)}
+            ${questionMapMarkup(state.curriculumQuizId ? question.country.region : state.region, question.country.code)}
             <div class="answer-grid ${gridClass}" data-choice-count="${choiceCount}">
               ${question.choices
                 .map((choice, index) =>
@@ -3035,6 +3049,13 @@
       app
         .querySelector(
           `[data-action="explore-map-area"][data-value="${options.focusExploreMapArea}"]`,
+        )
+        ?.focus({ preventScroll: true });
+    }
+    if (options.focusQuizMapArea) {
+      app
+        .querySelector(
+          `[data-action="quiz-map-area"][data-value="${options.focusQuizMapArea}"]`,
         )
         ?.focus({ preventScroll: true });
     }
@@ -3424,6 +3445,9 @@
     app
       .querySelector(".explore-region-map")
       ?.classList.toggle("has-expanded-silhouette", expanded);
+    app
+      .querySelector(".map-quiz-visual")
+      ?.classList.toggle("has-expanded-silhouette", expanded);
     control.classList.toggle("is-expanded", expanded);
     control.setAttribute("aria-expanded", String(expanded));
     control.setAttribute(
@@ -3448,6 +3472,7 @@
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
     app.querySelector(".answer-card:focus")?.blur();
+    state.quizMapArea = "region";
     state.silhouetteExpanded = false;
     if (state.questionIndex === state.questions.length - 1) {
       finishCurriculumAttempt();
@@ -3540,6 +3565,7 @@
     const level = curriculum.levelById.get(quiz.levelId);
     const savedAttempt = shouldResume ? matchingAttempt : null;
     state.curriculumQuizId = quiz.id; state.activeLevelId = level.id; state.mode = quiz.mode;
+    state.quizMapArea = "region";
     state.quizReturn = quizSource === "levels" ? "levels" : "home";
     state.challengeActive = challengeRound || state.challengeActive;
     state.attemptSeed = savedAttempt?.attemptSeed ?? freshAttemptSeed();
@@ -4287,6 +4313,18 @@
     }
     if (action === "retry-curriculum-quiz") {
       startCurriculumQuiz(state.curriculumQuizId, { historyMode: "replace" });
+      return;
+    }
+    if (action === "quiz-map-area") {
+      if (
+        state.screen !== "quiz" ||
+        state.mode !== "map-country" ||
+        !["region", "world"].includes(control.dataset.value)
+      ) return;
+      state.quizMapArea = control.dataset.value;
+      render({
+        focusQuizMapArea: state.quizMapArea === "world" ? "region" : "world",
+      });
       return;
     }
     if (action === "open-milestone-celebration") {
