@@ -388,11 +388,21 @@ This shares an invitation to the game, not the transferable profile payload.
 Profile transfer remains a separate private action.
 
 Where the Web Share API is available, progress and challenges open the system
-share menu. Otherwise they open a localised `mailto:` draft in the default
-email application. The application cannot detect whether an email handler is
-configured or whether the draft is sent, and it does not silently copy these
-messages. Clipboard actions are explicitly labelled, such as **Copy transfer
-link**.
+share menu. Otherwise an accessible in-game dialog offers **Open email draft**
+and **Copy message**. The application cannot detect whether an email handler is
+configured or whether the draft is sent. Nothing is copied or opened until the
+player chooses the corresponding explicit action. The dialog title matches the
+sharing action and it closes through the standard top-corner close control.
+
+Native shares and email drafts use the same recognisable title, explanatory
+text and ordinary game or challenge URL. Email uses that title as its subject
+and adds only a short localised call to action before the URL. A customised
+profile name appears in the title and explanation; the untouched **Player 1**
+placeholder is omitted and the copy uses first person instead.
+
+Generated invitation, challenge, and transfer links always target the canonical
+public game URL, `https://lanceolav.com/helloworld/`, even when the current copy
+is opened from a local file or development server.
 
 Sharing is secondary and must not displace Continue, Try Again or Next Quiz.
 

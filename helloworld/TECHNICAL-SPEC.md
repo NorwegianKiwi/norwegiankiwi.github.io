@@ -420,10 +420,27 @@ sharing names the earned stage and level range; World Master sharing states the
 58-level and 232-quiz completion. Both use the ordinary game URL and do not
 encode or grant access to saved progress.
 
-Native `navigator.share` is used when available. Otherwise a user-initiated
-`mailto:` URL opens a prepared subject and body. Native cancellation is not an
-error. A missing or blocked email handler cannot be detected, and progress or
-challenge sharing has no clipboard fallback.
+Native `navigator.share` is used when available. Otherwise an accessible modal
+offers explicit controls to open the prepared `mailto:` subject/body or copy the
+complete title, explanation, call to action and URL. Native cancellation is not
+an error. A missing or blocked email handler cannot be detected; the copy action
+provides a handler-independent alternative without silently changing behaviour.
+The fallback dialog uses the initiating action label as its accessible title,
+has no capability-explanation copy, and closes with a top-corner close button.
+
+Both channels derive from one share payload containing `title`, explanatory
+`text` and `url`. The email subject equals the native title; its body contains
+the same text, a localised call to action and the same URL. A profile name is
+included only when its normalised value is not the default `Player 1` placeholder.
+Challenge result screens prepare the signed URL and share payload before enabling
+the share control, so native sharing and fallback-dialog opening begin inside the
+player's click rather than after an asynchronous proof calculation.
+
+`sharing.PUBLIC_APP_URL` is the single canonical base for generated invitation,
+challenge, and transfer links: `https://lanceolav.com/helloworld/`. The shared-link
+classifier accepts that origin and normalised path. Local `file://` and localhost
+copies may additionally recognize their own path for development, while an HTTP(S)
+copy on another origin does not become an accepted production link source.
 
 Custom install UI is shown only on eligible mobile/tablet HTTP(S) visits and is
 hidden in standalone mode. iOS receives manual Safari guidance; Chromium mobile

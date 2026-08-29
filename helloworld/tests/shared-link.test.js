@@ -112,3 +112,37 @@ test("rejects ambiguous, foreign, corrupt, and unsupported shared links", () => 
     "challenge parameters keep precedence over a transfer fragment",
   );
 });
+
+test("accepts canonical public links in local development without weakening production checks", () => {
+  const assert = require("node:assert/strict");
+  global.window = global;
+  require("../countries.js");
+  const curriculum = require("../curriculum.js");
+  const challenge = require("../challenge.js");
+  const progress = require("../progress.js");
+  const sharedLink = require("../shared-link.js");
+  const canonicalUrl = "https://lanceolav.com/helloworld/";
+  const dependencies = {
+    canonicalUrl,
+    quizById: curriculum.quizById,
+    readChallenge: challenge.readUrl,
+    decodeTransfer: progress.decodeTransfer,
+  };
+
+  assert.equal(
+    sharedLink.classify(canonicalUrl, "file:///tmp/helloworld/index.html", dependencies).kind,
+    "invitation",
+  );
+  assert.equal(
+    sharedLink.classify(canonicalUrl, "http://localhost:8765/", dependencies).kind,
+    "invitation",
+  );
+  assert.equal(
+    sharedLink.classify(
+      "https://copy.example/helloworld/",
+      "https://copy.example/helloworld/",
+      dependencies,
+    ).error,
+    "sharedLinkWrongApp",
+  );
+});

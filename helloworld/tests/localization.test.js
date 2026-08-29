@@ -19,6 +19,42 @@ test("interpolates placeholders and simple plurals", () => {
   assert.equal(localization.translate("nb", "levelRange", { start: 3, end: 7 }), "Nivå 3–7");
 });
 
+test("builds personalized and anonymous share copy in both locales", () => {
+  assert.equal(
+    localization.translate("en", "challengeShareSubjectNamed", { name: "Sølvi" }),
+    "Hello World! challenge from Sølvi",
+  );
+  assert.equal(
+    localization.translate("nb", "challengeShareTextNamed", {
+      name: "Sølvi", score: 5, total: 5, level: 2,
+      levelTitle: "Nordiske land", mode: "Finn flagget", minutes: 2,
+    }),
+    "Sølvi fikk 5 av 5 i nivå 2: Nordiske land · Finn flagget. Klarer du å slå resultatet? Quizen tar omtrent 2 min.",
+  );
+  assert.equal(
+    localization.translate("en", "milestoneShareText", {
+      stage: "Explorer", start: 5, end: 14,
+    }),
+    "I reached Explorer and mastered levels 5–14 in Hello World!",
+  );
+  assert.equal(
+    localization.translate("nb", "milestoneShareSubjectNamed", {
+      name: "Sølvi", stage: "Utforsker",
+    }),
+    "Sølvi nådde Utforsker i Hei verden!",
+  );
+  assert.equal(
+    localization.translate("en", "worldShareTextNamed", {
+      name: "Sølvi", levels: 58, quizzes: 232,
+    }),
+    "Sølvi mastered all 58 levels and all 232 geography quizzes in Hello World!",
+  );
+  assert.equal(
+    localization.translate("nb", "worldShareSubject"),
+    "Jeg har mestret verden i Hei verden!",
+  );
+});
+
 test("rejects unknown locales and keys", () => {
   assert.throws(() => localization.translate("fr", "brandName"), /Unsupported locale/);
   assert.throws(() => localization.translate("en", "missingKey"), /Missing en translation/);

@@ -28,7 +28,7 @@
     ? initialUrl.searchParams.get("lang")
     : "nb";
   const initialPreview = new Set([
-    "result-next-quiz", "result-next-level", "milestone-result", "milestone-celebration",
+    "result-next-quiz", "result-next-level", "share-fallback", "milestone-result", "milestone-celebration",
     "milestone-question", "milestone-replay", "navigator-tourist-gap-question",
     "tourist-world-final-question", "final-question", "final-result", "final-celebration",
   ]).has(initialUrl.searchParams.get("preview"))
@@ -197,6 +197,8 @@
   let actionFeedbackToastTimer = null;
   let worldCelebrationTimer = null;
   let milestoneCelebrationTimer = null;
+  let preparedChallengeShare = null;
+  let preparingChallengeShare = null;
   let keyboardHintsVisible = false;
   const exploreMapPointers = new Map();
   let exploreMapGesture = null;
@@ -1270,6 +1272,15 @@
         confirmLabel: t("deleteProfileAction"), cancelLabel: t("cancel"), danger: true,
       };
     }
+    if (dialog.kind === "share-fallback") {
+      return {
+        title: dialog.title,
+        closeButton: true,
+        actionsMarkup: `
+          <button class="secondary-button action-feedback-button" type="button" data-action="copy-share-message">${escapeHtml(t("copyMessage"))}${actionFeedbackMarkup()}</button>
+          <button class="primary-button" type="button" data-action="open-share-email">${escapeHtml(t("openEmailDraft"))}</button>`,
+      };
+    }
     return null;
   }
 
@@ -1278,14 +1289,15 @@
     if (!details) return "";
     return `
       <div class="action-dialog-overlay" data-action="close-action-dialog">
-        <section class="action-dialog" role="dialog" aria-modal="true" aria-labelledby="action-dialog-title" aria-describedby="action-dialog-description" tabindex="-1">
+        <section class="action-dialog${details.closeButton ? " has-close-button" : ""}" role="dialog" aria-modal="true" aria-labelledby="action-dialog-title"${details.description || details.descriptionMarkup ? ' aria-describedby="action-dialog-description"' : ""} tabindex="-1">
+          ${details.closeButton ? `<button class="icon-close action-dialog-close" type="button" data-action="close-action-dialog" data-dialog-cancel-focus aria-label="${escapeHtml(t("close"))}">×</button>` : ""}
           <form data-action-dialog-form>
             <h2 id="action-dialog-title">${escapeHtml(details.title)}</h2>
-            <p id="action-dialog-description">${details.descriptionMarkup ?? escapeHtml(details.description)}</p>
+            ${details.description || details.descriptionMarkup ? `<p id="action-dialog-description">${details.descriptionMarkup ?? escapeHtml(details.description)}</p>` : ""}
             ${details.inputLabel ? `<label for="action-dialog-input">${escapeHtml(details.inputLabel)}</label><input id="action-dialog-input" name="profile-name" type="text" maxlength="40" value="${escapeHtml(details.inputValue)}" autocomplete="off" />` : ""}
             <div class="action-dialog-actions">
-              <button class="secondary-button" type="button" data-action="close-action-dialog" data-dialog-cancel-focus>${escapeHtml(details.cancelLabel)}</button>
-              <button class="${details.danger ? "danger-confirm-button" : "primary-button"}" type="submit">${escapeHtml(details.confirmLabel)}</button>
+              ${details.actionsMarkup ?? `<button class="secondary-button" type="button" data-action="close-action-dialog" data-dialog-cancel-focus>${escapeHtml(details.cancelLabel)}</button>
+              <button class="${details.danger ? "danger-confirm-button" : "primary-button"}" type="submit">${escapeHtml(details.confirmLabel)}</button>`}
             </div>
           </form>
         </section>
@@ -1644,7 +1656,7 @@
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
       <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${nextQuiz ? ` data-next-quiz-id="${escapeHtml(nextQuiz.id)}"` : ""}>${primaryAction.label} <span aria-hidden="true">${primaryAction.icon}</span></button><button class="secondary-button result-replay-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? `${replayIcon}${t("playAgain")}` : t("nextQuiz")}</button></div><button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
-      <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="share-curriculum-challenge">${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
+      <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="share-curriculum-challenge"${isCurriculumChallengeShareReady() ? "" : " disabled aria-busy=\"true\""}>${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
   }
 
   function exploreCountryStatusMarkup(countryCode) {
@@ -2895,6 +2907,7 @@
       : null;
     updateDocumentMetadata();
     app.innerHTML = `${screenMarkup()}${actionDialogMarkup()}`;
+    if (state.screen === "result") void prepareCurriculumChallengeShare();
     if (state.actionDialog) {
       [...app.children].forEach((child) => {
         if (!child.classList.contains("action-dialog-overlay")) {
@@ -3745,6 +3758,7 @@
     const trimmedValue = value.trim();
     state.openChallengeValue = trimmedValue;
     const parsed = sharedLink.classify(trimmedValue, window.location.href, {
+      canonicalUrl: sharing.PUBLIC_APP_URL,
       quizById: curriculum.quizById,
       readChallenge: challenge.readUrl,
       decodeTransfer: progress.decodeTransfer,
@@ -3867,74 +3881,172 @@
     anchor.remove();
   }
 
-  async function shareWithEmailFallback(control, shareData, emailBody, failedKey) {
+  async function shareWithEmailFallback(control, payload, failedKey, dialogTitle) {
+    if (!navigator.share || state.previewMode === "share-fallback") {
+      openActionDialog("share-fallback", {
+        sharePayload: payload,
+        failedKey,
+        title: dialogTitle,
+      });
+      return;
+    }
     beginActionFeedback(control);
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
+    try {
+      await navigator.share(payload.native);
+      clearActionFeedback(control);
+    } catch (error) {
+      if (error?.name === "AbortError") {
         clearActionFeedback(control);
         return;
-      } catch (error) {
-        if (error?.name === "AbortError") {
-          clearActionFeedback(control);
-          return;
-        }
-        showActionFeedbackError(control, failedKey);
-        return;
       }
+      showActionFeedbackError(control, failedKey);
     }
-    openEmail(shareData.title, emailBody);
-    clearActionFeedback(control);
   }
 
   async function copyTransferLink(control) {
-    const url = new URL(window.location.href);
+    const url = new URL(sharing.PUBLIC_APP_URL);
     url.search = state.locale === "en" ? "?lang=en" : "";
     url.hash = `progress=${progress.encodeTransfer(currentProfile())}`;
     await copyWithFeedback(control, url.href, "transferCopied", "transferFailed");
   }
 
   async function shareProgress(control) {
-    const url = navigation.createUrl(window.location.href, { screen: "setup" }, state.locale);
+    const url = navigation.createUrl(sharing.PUBLIC_APP_URL, { screen: "setup" }, state.locale);
     const stage = curriculum.stages.find((candidate) => candidate.id === control.dataset.stageId);
     const isWorldMaster = control.dataset.shareKind === "world";
     if (!stage && !isWorldMaster) return;
-    const subject = isWorldMaster
-      ? t("worldShareSubject")
-      : t("milestoneShareSubject", { stage: stageTitle(stage) });
-    const text = isWorldMaster
-      ? t("worldShareText", { levels: curriculum.levels.length, quizzes: curriculum.levels.length * 4 })
-      : t("milestoneShareText", {
-          stage: stageTitle(stage),
-          start: stage.startLevel,
-          end: stage.endLevel,
-        });
+    const name = sharing.personalizedName(currentProfile().name);
+    const values = isWorldMaster
+      ? { name, levels: curriculum.levels.length, quizzes: curriculum.levels.length * 4 }
+      : { name, stage: stageTitle(stage), start: stage.startLevel, end: stage.endLevel };
+    const subject = t(
+      isWorldMaster
+        ? name ? "worldShareSubjectNamed" : "worldShareSubject"
+        : name ? "milestoneShareSubjectNamed" : "milestoneShareSubject",
+      values,
+    );
+    const text = t(
+      isWorldMaster
+        ? name ? "worldShareTextNamed" : "worldShareText"
+        : name ? "milestoneShareTextNamed" : "milestoneShareText",
+      values,
+    );
     await shareWithEmailFallback(
       control,
-      { title: subject, text, url: url.href },
-      `${text}\n\n${url.href}`,
+      sharing.createSharePayload({
+        title: subject,
+        text,
+        url: url.href,
+        emailCallToAction: t("progressEmailCallToAction"),
+      }),
       "shareUnavailable",
+      t("shareProgress"),
     );
   }
 
-  async function shareCurriculumChallenge(control) {
-    const quiz = curriculumQuiz(); if (!quiz) return;
-    beginActionFeedback(control);
-    try {
-      const recipe = { quizId: quiz.id, revision: quiz.revision, score: state.score };
-      const proof = await challenge.createScoreProof(recipe);
-      const url = challenge.createUrl(window.location.href, { ...recipe, proof }, state.locale);
-      const level = curriculumLevel();
-      const message = `${t("level", { number: quiz.levelIndex + 1 })} · ${levelTitle(level)} · ${modeLabel(quiz.mode)}\n${state.score}/${quiz.countryCodes.length} · ${t("approximateTime", { minutes: Math.max(2, Math.ceil(quiz.countryCodes.length / 4)) })}`;
-      await shareWithEmailFallback(
-        control,
-        { title: t("challengeQuizTitle"), text: message, url: url.href },
-        `${message}\n\n${url.href}`,
-        "challengeShareFailed",
-      );
-    } catch {
-      showActionFeedbackError(control, "challengeShareFailed");
+  function curriculumChallengeShareContext() {
+    if (state.screen !== "result") return null;
+    const quiz = curriculumQuiz();
+    const level = curriculumLevel();
+    if (!quiz || !level) return null;
+    const name = sharing.personalizedName(currentProfile().name);
+    return {
+      key: JSON.stringify([
+        window.location.origin,
+        window.location.pathname,
+        state.locale,
+        currentProfile().id,
+        currentProfile().name,
+        quiz.id,
+        quiz.revision,
+        state.score,
+      ]),
+      quiz,
+      level,
+      name,
+      score: state.score,
+    };
+  }
+
+  function isCurriculumChallengeShareReady() {
+    const context = curriculumChallengeShareContext();
+    return Boolean(context && preparedChallengeShare?.key === context.key);
+  }
+
+  async function createCurriculumChallengeShare(context) {
+    const recipe = {
+      quizId: context.quiz.id,
+      revision: context.quiz.revision,
+      score: context.score,
+    };
+    const proof = await challenge.createScoreProof(recipe);
+    const url = challenge.createUrl(
+      sharing.PUBLIC_APP_URL,
+      { ...recipe, proof },
+      state.locale,
+    );
+    const values = {
+      name: context.name,
+      score: context.score,
+      total: context.quiz.countryCodes.length,
+      level: context.quiz.levelIndex + 1,
+      levelTitle: levelTitle(context.level),
+      mode: modeLabel(context.quiz.mode),
+      minutes: Math.max(2, Math.ceil(context.quiz.countryCodes.length / 4)),
+    };
+    return sharing.createSharePayload({
+      title: t(context.name ? "challengeShareSubjectNamed" : "challengeShareSubject", values),
+      text: t(context.name ? "challengeShareTextNamed" : "challengeShareText", values),
+      url: url.href,
+      emailCallToAction: t("challengeEmailCallToAction"),
+    });
+  }
+
+  function updateCurriculumChallengeShareControl() {
+    const control = app.querySelector('[data-action="share-curriculum-challenge"]');
+    if (!control) return;
+    const pending = preparingChallengeShare?.key === curriculumChallengeShareContext()?.key;
+    control.disabled = pending;
+    if (pending) control.setAttribute("aria-busy", "true");
+    else control.removeAttribute("aria-busy");
+  }
+
+  async function prepareCurriculumChallengeShare() {
+    const context = curriculumChallengeShareContext();
+    if (!context || preparedChallengeShare?.key === context.key) {
+      updateCurriculumChallengeShareControl();
+      return;
     }
+    if (preparingChallengeShare?.key === context.key) return;
+    const pending = createCurriculumChallengeShare(context);
+    preparingChallengeShare = { key: context.key, pending };
+    updateCurriculumChallengeShareControl();
+    try {
+      const payload = await pending;
+      if (curriculumChallengeShareContext()?.key === context.key) {
+        preparedChallengeShare = { key: context.key, payload };
+      }
+    } catch {
+      if (preparedChallengeShare?.key === context.key) preparedChallengeShare = null;
+    } finally {
+      if (preparingChallengeShare?.key === context.key) preparingChallengeShare = null;
+      updateCurriculumChallengeShareControl();
+    }
+  }
+
+  function shareCurriculumChallenge(control) {
+    const context = curriculumChallengeShareContext();
+    if (!context || preparedChallengeShare?.key !== context.key) {
+      showActionFeedbackError(control, "challengeShareFailed");
+      void prepareCurriculumChallengeShare();
+      return;
+    }
+    void shareWithEmailFallback(
+      control,
+      preparedChallengeShare.payload,
+      "challengeShareFailed",
+      t("challengeThisQuiz"),
+    );
   }
 
   function downloadBackup() {
@@ -4111,6 +4223,28 @@
     if (action === "close-action-dialog") {
       if (control.classList.contains("action-dialog-overlay") && event.target !== control) return;
       closeActionDialog();
+      return;
+    }
+    if (action === "open-share-email") {
+      const payload = state.actionDialog?.kind === "share-fallback"
+        ? state.actionDialog.sharePayload
+        : null;
+      if (!payload) return;
+      openEmail(payload.email.subject, payload.email.body);
+      closeActionDialog();
+      return;
+    }
+    if (action === "copy-share-message") {
+      const payload = state.actionDialog?.kind === "share-fallback"
+        ? state.actionDialog.sharePayload
+        : null;
+      if (!payload) return;
+      void copyWithFeedback(
+        control,
+        sharing.createFallbackMessage(payload),
+        "shareMessageCopied",
+        state.actionDialog.failedKey,
+      );
       return;
     }
 
@@ -5175,10 +5309,10 @@
       return;
     }
     if (initialPreview) {
-      const level = initialPreview === "result-next-quiz" || initialPreview === "result-next-level"
+      const level = ["result-next-quiz", "result-next-level", "share-fallback"].includes(initialPreview)
         ? curriculum.levels[0]
         : curriculum.levels.at(-1);
-      const quizIndex = initialPreview === "result-next-quiz" ? 0 : 3;
+      const quizIndex = initialPreview === "result-next-quiz" || initialPreview === "share-fallback" ? 0 : 3;
       const quiz = curriculum.quizById.get(level.quizzes[quizIndex].id);
       state.curriculumQuizId = quiz.id;
       state.activeLevelId = level.id;
@@ -5193,7 +5327,7 @@
       state.resultNewLevelMastery = initialPreview !== "result-next-quiz";
       state.resultNewStageMastery = false;
       state.resultCelebrationPending = false;
-      state.resultPreview = initialPreview;
+      state.resultPreview = initialPreview === "share-fallback" ? "result-next-quiz" : initialPreview;
       state.screen = "result";
       render();
       return;

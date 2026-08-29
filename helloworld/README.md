@@ -107,9 +107,15 @@ they never contain transferable profile data. The proof is not authentication,
 because all code and inputs are public in this static application.
 
 Milestone and World Master celebrations provide **Share my progress**. Browsers
-with a native Share menu use it; other browsers open a prepared message in the
-default email application. Challenge sharing follows the same rule. Only
-**Copy transfer link** writes a private progress payload to the clipboard.
+with a native Share menu use it; other browsers open an in-game choice to launch
+a prepared email draft or explicitly copy the complete message. Challenge
+sharing follows the same rule. **Copy transfer link** remains the explicit way
+to copy a private progress payload.
+Native sharing and email use the same explanatory copy; a customised profile
+name identifies the sender, while the default **Player 1** name is omitted.
+All invitation, challenge, and transfer links use the canonical deployment at
+`https://lanceolav.com/helloworld/`, including when testing from `file://` or
+localhost.
 
 ## Data and licences
 

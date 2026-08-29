@@ -69,6 +69,7 @@
         items: [
           { title: { nb: "Neste quiz", en: "Next quiz" }, description: { nb: "Perfekt resultat som fortsetter i samme nivå.", en: "Perfect result continuing within the same level." }, params: { preview: "result-next-quiz" } },
           { title: { nb: "Neste nivå", en: "Next level" }, description: { nb: "Perfekt resultat som går videre til neste nivå.", en: "Perfect result advancing to the next level." }, params: { preview: "result-next-level" } },
+          { title: { nb: "Deling uten delingsmeny", en: "Sharing without Share menu" }, description: { nb: "Resultat med e-post- og kopieringsdialogen som brukes i Firefox.", en: "Result with the email-and-copy dialog used in Firefox." }, params: { preview: "share-fallback" } },
         ],
       },
       { id: "results", items: stageItems("milestone-result") },

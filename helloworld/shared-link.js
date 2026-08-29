@@ -45,10 +45,18 @@
     const currentUrl = currentValue instanceof URL
       ? currentValue
       : new URL(currentValue);
-    if (
-      sourceUrl.origin !== currentUrl.origin ||
-      normalizedAppPath(sourceUrl) !== normalizedAppPath(currentUrl)
-    ) {
+    const canonicalUrl = dependencies.canonicalUrl
+      ? new URL(dependencies.canonicalUrl)
+      : null;
+    const matches = (candidate) => Boolean(
+      candidate &&
+      sourceUrl.origin === candidate.origin &&
+      normalizedAppPath(sourceUrl) === normalizedAppPath(candidate)
+    );
+    const localDevelopment = currentUrl.protocol === "file:" ||
+      ["localhost", "127.0.0.1", "[::1]"].includes(currentUrl.hostname);
+    const matchesCurrentDevelopmentCopy = (localDevelopment || !canonicalUrl) && matches(currentUrl);
+    if (!matches(canonicalUrl) && !matchesCurrentDevelopmentCopy) {
       return { error: "sharedLinkWrongApp" };
     }
 
