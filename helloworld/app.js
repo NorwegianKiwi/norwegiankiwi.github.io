@@ -60,13 +60,13 @@
       regionMapDescription:
         "Velg et område på kartet, eller bruk områdeknappene ved siden av.",
       interactiveWorldMap: "Interaktivt verdenskart",
-      shrinkShape: "Forminsk landformen",
-      enlargeShape: "Forstørr landformen",
+      shrinkShape: "Vis kartfiguren mindre",
+      enlargeShape: "Vis kartfiguren større",
       changeRegion: "Bytt region",
       exploreOnMap: "Utforsk {name} på kartet",
       backToResults: "Tilbake til resultatet",
       backToLevels: "Tilbake til nivåene",
-      highlightedMap: "Kart over {region} med ett land uthevet",
+      highlightedMap: "Kart over {region} med ett sted uthevet",
       heroKicker: "Lek. Lær. Utforsk.",
       heroTitleBefore: "Verden",
       heroTitleEmphasis: "venter.",
@@ -86,7 +86,7 @@
         "Åpne denne siden i Safari for å legge den til på Hjem-skjermen. Trykk deretter på Del, velg «Legg til på Hjem-skjermen», slå på «Åpne som webapp», og trykk «Legg til».",
       closeInstallHelp: "Lukk",
       review: "Gjennomgang",
-      reviewHeading: "{count} land å øve på",
+      reviewHeading: "{count} {count, plural, one {sted} other {steder}} å øve på",
       questionsLabel: "Spørsmål",
       startChallenge: "Start utfordringen",
       unverifiedScore:
@@ -117,7 +117,7 @@
       challengeUrlInvalid: "Dette er ikke en gyldig utfordringslenke.",
       chooseCountry: "Velg et sted",
       backToExplore: "Tilbake til Utforsk",
-      flashcards: "Flashcards",
+      flashcards: "Øvingskort",
       exploreTheseCountries: "Utforsk disse stedene",
       missedCountries: "Steder å øve på",
       wholeWorld: "Hele verden",
@@ -135,23 +135,23 @@
       chooseSingleRegion: "Velg en enkelt region",
       showCountryDetails: "Vis detaljer for {name}",
       countryDetails: "Stedsdetaljer: {name}",
-      flashcardsComplete: "Flashcards fullført",
-      roundComplete: "Runden er ferdig.",
+      flashcardsComplete: "Øvingskort",
+      roundComplete: "Runden er fullført",
       flashcardsSummaryBefore: "Du har gått gjennom",
       flashcardsSummaryAfter: "flagg fra",
       revealedFlashcard:
-        "{name}, {capital}. Trykk for neste flagg.",
+        "{name}, {capital}. Velg for å gå til neste flagg.",
       revealedRelatedFlashcard:
-        "{name}, {capital} ({relationship}). Trykk for neste flagg.",
+        "{name}, {capital} ({relationship}). Velg for å gå til neste flagg.",
       hiddenFlashcard:
-        "Flashcard {current} av {total}. Trykk for å vise svaret.",
+        "Øvingskort {current} av {total}. Velg for å vise svaret.",
       findFlag: "Finn flagget til",
       whichCountry: "Hvilket sted?",
       findCapital: "Finn hovedstaden til",
       option: "Alternativ {number}",
       flagOption: "Flaggalternativ {number}",
       correctContinue:
-        "{label}, riktig svar. Trykk for å gå videre.",
+        "{label}, riktig svar. Velg for å gå videre.",
       correctAnswer: "{label}, riktig svar",
       correctAnnouncement: "Riktig.",
       wrongAnnouncement:
@@ -185,13 +185,13 @@
       regionMapDescription:
         "Choose an area on the map, or use the area buttons beside it.",
       interactiveWorldMap: "Interactive world map",
-      shrinkShape: "Shrink the country shape",
-      enlargeShape: "Enlarge the country shape",
+      shrinkShape: "Show a smaller map shape",
+      enlargeShape: "Show a larger map shape",
       changeRegion: "Change region",
       exploreOnMap: "Explore {name} on the map",
       backToResults: "Back to results",
       backToLevels: "Back to levels",
-      highlightedMap: "Map of {region} with one country highlighted",
+      highlightedMap: "Map of {region} with one place highlighted",
       heroKicker: "Play. Learn. Explore.",
       heroTitleBefore: "The world",
       heroTitleEmphasis: "awaits.",
@@ -212,7 +212,7 @@
       closeInstallHelp: "Close",
       review: "Review",
       reviewHeading:
-        "{count} {count, plural, one {country} other {countries}} to review",
+        "{count} {count, plural, one {place} other {places}} to review",
       questionsLabel: "Questions",
       startChallenge: "Start challenge",
       unverifiedScore:
@@ -260,23 +260,23 @@
       chooseSingleRegion: "Choose a single region",
       showCountryDetails: "Show details for {name}",
       countryDetails: "Place details: {name}",
-      flashcardsComplete: "Flashcards complete",
-      roundComplete: "The round is complete.",
+      flashcardsComplete: "Flashcards",
+      roundComplete: "Round complete",
       flashcardsSummaryBefore: "You have reviewed",
       flashcardsSummaryAfter: "flags from",
       revealedFlashcard:
-        "{name}, {capital}. Press for the next flag.",
+        "{name}, {capital}. Choose to continue to the next flag.",
       revealedRelatedFlashcard:
-        "{name}, {capital} ({relationship}). Press for the next flag.",
+        "{name}, {capital} ({relationship}). Choose to continue to the next flag.",
       hiddenFlashcard:
-        "Flashcard {current} of {total}. Press to reveal the answer.",
+        "Flashcard {current} of {total}. Choose to reveal the answer.",
       findFlag: "Find the flag of",
       whichCountry: "Which place?",
       findCapital: "Find the capital of",
       option: "Option {number}",
       flagOption: "Flag option {number}",
       correctContinue:
-        "{label}, correct answer. Press to continue.",
+        "{label}, correct answer. Choose to continue.",
       correctAnswer: "{label}, correct answer",
       correctAnnouncement: "Correct.",
       wrongAnnouncement:
@@ -309,8 +309,8 @@
       newProfileName: "Navn på ny profil", settings: "Innstillinger",
       transferProfile: "Overfør denne profilen", copyTransferLink: "Kopier overføringslenke",
       transferCopied: "Overføringslenken er kopiert.", transferFailed: "Kunne ikke kopiere lenken.",
-      backupDevice: "Sikkerhetskopier denne enheten", downloadBackup: "Last ned sikkerhetskopi",
-      importBackup: "Importer sikkerhetskopi", importProgress: "Importer fremgang?",
+      backupHeading: "Sikkerhetskopi", downloadBackup: "Last ned sikkerhetskopi",
+      importBackup: "Importer sikkerhetskopi", importProgress: "Importer fremgang",
       createProfile: "Opprett profil", mergeProfile: "Slå sammen", mergeInto: "Slå sammen med {name}",
       importAll: "Importer alle profiler", importOne: "Importer", importCancel: "Avbryt",
       playedAndMastered: "{played} quizer spilt · {mastered} mestret", invalidImport: "Lenken eller sikkerhetskopien er ugyldig.",
@@ -318,31 +318,31 @@
       storageWriteFailed: "Fremgangen kunne ikke lagres på denne enheten.",
       quizMastered: "Quiz mestret", quizNotMastered: "Ikke helt ennå", scoreOutOf: "av {total}",
       scoreAnnouncement: "{score} av {total}", newRecord: "Ny rekord!", recordScore: "Rekord: {score} av {total}",
-      nextQuiz: "Neste quiz", congratulations: "Gratulerer!", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
+      nextQuiz: "Neste quiz", nextLevelAction: "Neste: Nivå {number}", congratulations: "Gratulerer!", tryAgainAction: "Prøv igjen", playAgain: "Spill igjen",
       milestones: "Milepæler", milestoneReached: "Milepæl nådd", milestoneSummary: "Du har mestret nivå {start}–{end}.",
-      celebrateMilestone: "Feir milepælen", replayMilestone: "Spill feiringen for {stage} igjen",
-      replayWorldCelebration: "Spill Verden mestret-feiringen igjen",
+      milestoneAction: "Milepæl nådd", replayMilestone: "Spill feiringen for {stage} igjen",
+      replayWorldCelebration: "Spill «Verden mestret»-feiringen igjen",
       milestoneLocked: "{stage} er ikke oppnådd ennå", nextStage: "Neste etappe: {stage}", continueWithStage: "Fortsett med: {stage}",
-      finalCelebration: "Finalefeiring", stageMastered: "Mestret",
-      viewProgress: "Til forsiden", worldCelebrationSummary: "Du har mestret alle {levels} nivåene og alle {quizzes} quizene.",
-      reviewCards: "Øv med flashcards", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
+      worldMasteredAction: "Verden mestret", stageMastered: "Mestret",
+      worldCelebrationSummary: "Du har mestret alle {levels} nivåene og alle {quizzes} quizene.",
+      reviewCards: "Øv med øvingskort", retryQuiz: "Prøv quizen igjen", backToLevel: "Tilbake til nivået",
       worldMastered: "Verden mestret", surpriseQuiz: "Overraskelsesquiz", chooseLevel: "Velg nivå",
       shareProgress: "Del fremgangen min", progressCopied: "Fremgangen er kopiert.", challengeThisQuiz: "Utfordre en venn",
       goToRecommended: "Gå til anbefalt neste quiz",
-      cards: "Øv med flashcards", questionsLong: "{count} spørsmål · lang utfordring",
-      resumeAttempt: "Fortsett lagret forsøk", quizInProgress: "Quiz pågår", continueMode: "Fortsett: {mode}",
+      cards: "Øv med øvingskort", questionsLong: "{count} spørsmål · lang quiz",
+      resumeAttempt: "Fortsett quizen", quizInProgress: "Quiz pågår", continueMode: "Fortsett: {mode}",
       answeredProgress: "{answered} / {total} besvart", keepSavedAttempt: "Behold lagret forsøk",
-      abandonAttemptTitle: "Starte en annen quiz?",
+      abandonAttemptTitle: "Vil du starte en annen quiz?",
       abandonAttemptDescription: "Du har besvart {answered} av {total} spørsmål i {savedTitle} · {savedMode}. Hvis du starter {nextTitle} · {nextMode}, slettes dette forsøket.",
       abandonAndStart: "Forkast forsøket og start quizen",
       addProfileTitle: "Legg til profil", addProfileDescription: "Fremgangen til den nye profilen lagres separat på denne enheten.",
       addProfileAction: "Opprett profil", renameProfileTitle: "Gi profilen nytt navn",
       renameProfileDescription: "Skriv inn et nytt navn for {name}.", renameProfileAction: "Lagre navn",
-      clearProgressTitle: "Nullstille fremgangen?", clearProgressDescription: "Alle quizresultater og eventuelle lagrede forsøk for {name} slettes. Profilen beholdes.",
-      clearProgressAction: "Nullstill fremgang", deleteProfileTitle: "Slette profilen?",
+      clearProgressTitle: "Vil du nullstille fremgangen?", clearProgressDescription: "Alle quizresultater og eventuelle lagrede forsøk for {name} slettes. Profilen beholdes.",
+      clearProgressAction: "Nullstill fremgang", deleteProfileTitle: "Vil du slette profilen?",
       deleteProfileDescription: "Profilen {name} og all fremgangen dens slettes fra denne enheten. Dette kan ikke angres.",
       deleteProfileAction: "Slett profil",
-      savedAttempt: "Du har et lagret forsøk på {title}.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
+      savedAttempt: "En quiz på {title} er påbegynt.", updatedQuizzes: "Noen quizer er oppdatert og klare til å spilles igjen.",
       challengeQuizTitle: "Quizutfordring", scoreToBeat: "Resultat å slå", approximateTime: "Omtrent {minutes} min",
       shareUnavailable: "Kunne ikke dele eller kopiere akkurat nå.", profilePrivacy: "Fremgangen lagres bare på denne enheten.",
     }),
@@ -357,8 +357,8 @@
       newProfileName: "New profile name", settings: "Settings",
       transferProfile: "Transfer this profile", copyTransferLink: "Copy transfer link",
       transferCopied: "Transfer link copied.", transferFailed: "Could not copy the link.",
-      backupDevice: "Back up this device", downloadBackup: "Download backup file",
-      importBackup: "Import backup file", importProgress: "Import progress?",
+      backupHeading: "Backup", downloadBackup: "Download backup file",
+      importBackup: "Import backup file", importProgress: "Import progress",
       createProfile: "Create profile", mergeProfile: "Merge", mergeInto: "Merge with {name}",
       importAll: "Import all profiles", importOne: "Import", importCancel: "Cancel",
       playedAndMastered: "{played} quizzes played · {mastered} mastered", invalidImport: "This link or backup file is invalid.",
@@ -366,19 +366,19 @@
       storageWriteFailed: "Progress could not be saved on this device.",
       quizMastered: "Quiz mastered", quizNotMastered: "Not quite yet", scoreOutOf: "of {total}",
       scoreAnnouncement: "{score} of {total}", newRecord: "New record!", recordScore: "Record: {score} of {total}",
-      nextQuiz: "Next quiz", congratulations: "Congratulations!", tryAgainAction: "Try again", playAgain: "Play again",
+      nextQuiz: "Next quiz", nextLevelAction: "Next: Level {number}", congratulations: "Congratulations!", tryAgainAction: "Try again", playAgain: "Play again",
       milestones: "Milestones", milestoneReached: "Milestone reached", milestoneSummary: "You mastered levels {start}–{end}.",
-      celebrateMilestone: "Celebrate milestone", replayMilestone: "Replay the {stage} celebration",
-      replayWorldCelebration: "Replay the World mastered celebration",
+      milestoneAction: "Milestone reached", replayMilestone: "Replay the {stage} celebration",
+      replayWorldCelebration: "Replay the world mastery celebration",
       milestoneLocked: "{stage} has not been earned yet", nextStage: "Next stage: {stage}", continueWithStage: "Continue with: {stage}",
-      finalCelebration: "Final celebration", stageMastered: "Mastered",
-      viewProgress: "Back home", worldCelebrationSummary: "You have mastered all {levels} levels and all {quizzes} quizzes.",
+      worldMasteredAction: "World mastered", stageMastered: "Mastered",
+      worldCelebrationSummary: "You have mastered all {levels} levels and all {quizzes} quizzes.",
       reviewCards: "Review with flashcards", retryQuiz: "Retry quiz", backToLevel: "Back to level",
       worldMastered: "World mastered", surpriseQuiz: "Surprise quiz", chooseLevel: "Choose a level",
       shareProgress: "Share my progress", progressCopied: "Progress copied.", challengeThisQuiz: "Challenge a friend",
       goToRecommended: "Go to the recommended next quiz",
-      cards: "Practice with flashcards", questionsLong: "{count} questions · long challenge",
-      resumeAttempt: "Resume saved attempt", quizInProgress: "Quiz in progress", continueMode: "Continue: {mode}",
+      cards: "Practice with flashcards", questionsLong: "{count} questions · long quiz",
+      resumeAttempt: "Resume quiz", quizInProgress: "Quiz in progress", continueMode: "Continue: {mode}",
       answeredProgress: "{answered} / {total} answered", keepSavedAttempt: "Keep saved attempt",
       abandonAttemptTitle: "Start a different quiz?",
       abandonAttemptDescription: "You have answered {answered} of {total} questions in {savedTitle} · {savedMode}. Starting {nextTitle} · {nextMode} will delete that attempt.",
@@ -390,7 +390,7 @@
       clearProgressAction: "Clear progress", deleteProfileTitle: "Delete profile?",
       deleteProfileDescription: "The profile {name} and all of its progress will be deleted from this device. This cannot be undone.",
       deleteProfileAction: "Delete profile",
-      savedAttempt: "You have a saved attempt for {title}.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
+      savedAttempt: "A quiz in {title} is in progress.", updatedQuizzes: "Some quizzes were updated and are ready to play again.",
       challengeQuizTitle: "Quiz challenge", scoreToBeat: "Score to beat", approximateTime: "About {minutes} min",
       shareUnavailable: "Could not share or copy right now.", profilePrivacy: "Progress is stored only on this device.",
     }),
@@ -1640,12 +1640,12 @@
       : "";
     const isFinalMilestone = selection.type === "all-mastered";
     const primaryAction = replay
-      ? `<button class="primary-button milestone-celebration-continue" data-action="close-milestone-celebration">${t(state.milestoneCelebrationOrigin === "levels-replay" ? "backToLevels" : "viewProgress")} <span aria-hidden="true">→</span></button>`
+      ? `<button class="primary-button milestone-celebration-continue" data-action="close-milestone-celebration"><span aria-hidden="true">←</span> ${t(state.milestoneCelebrationOrigin === "levels-replay" ? "levels" : "home")}</button>`
       : isFinalMilestone
-        ? `<button class="primary-button milestone-celebration-continue" data-action="open-world-celebration">${t("finalCelebration")} <span aria-hidden="true">✦</span></button>`
+        ? `<button class="primary-button milestone-celebration-continue" data-action="open-world-celebration">${t("worldMasteredAction")} <span aria-hidden="true">✦</span></button>`
         : nextQuiz
-          ? `<div class="milestone-next"><p>${escapeHtml(nextStageLabel)}</p><button class="primary-button milestone-celebration-continue" data-action="next-curriculum-quiz" data-next-quiz-id="${escapeHtml(nextQuiz.id)}">${t("level", { number: nextQuiz.levelIndex + 1 })} <span aria-hidden="true">→</span></button></div>`
-          : `<button class="primary-button milestone-celebration-continue" data-action="close-milestone-celebration">${t("viewProgress")} <span aria-hidden="true">→</span></button>`;
+          ? `<div class="milestone-next"><p>${escapeHtml(nextStageLabel)}</p><button class="primary-button milestone-celebration-continue" data-action="next-curriculum-quiz" data-next-quiz-id="${escapeHtml(nextQuiz.id)}">${t("nextLevelAction", { number: nextQuiz.levelIndex + 1 })} <span aria-hidden="true">→</span></button></div>`
+          : `<button class="primary-button milestone-celebration-continue" data-action="close-milestone-celebration"><span aria-hidden="true">←</span> ${t("home")}</button>`;
     return `
       <div class="world-celebration-overlay milestone-celebration-overlay level-stage-${escapeHtml(stage.id)} ${state.milestoneCelebrationSettled ? "is-settled" : ""}">
         <div class="world-fireworks" aria-hidden="true">${celebrationFireworksMarkup()}</div>
@@ -1676,7 +1676,7 @@
           <p class="kicker">${t("congratulations")}</p>
           <h2 id="world-celebration-title">${t("worldMastered")}</h2>
           <p id="world-celebration-description">${t("worldCelebrationSummary", { levels: curriculum.levels.length, quizzes: curriculum.levels.length * 4 })}</p>
-          <button class="primary-button world-celebration-continue" data-action="view-completed-progress">${t("viewProgress")} <span aria-hidden="true">→</span></button>
+          <button class="primary-button world-celebration-continue" data-action="view-completed-progress"><span aria-hidden="true">←</span> ${t("home")}</button>
         </section>
       </div>`;
   }
@@ -1702,7 +1702,7 @@
           <hr />
           <h3>${t("transferProfile")}</h3>
           <button class="primary-button action-feedback-button" data-action="copy-transfer">${t("copyTransferLink")}${actionFeedbackMarkup()}</button>
-          <h3>${t("backupDevice")}</h3>
+          <h3>${t("backupHeading")}</h3>
           <div class="profile-actions">
             <button class="secondary-button" data-action="download-backup">${t("downloadBackup")}</button>
             <label class="secondary-button file-button" role="button" tabindex="0">${t("importBackup")}<input type="file" tabindex="-1" accept="application/json,.json,.hello-world-backup" data-backup-input /></label>
@@ -1825,7 +1825,7 @@
 
   function importMarkup() {
     if (state.importError || !state.importProfiles?.length) return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup("cancel-import")}</header><section class="challenge-card"><h1>${t("invalidImport")}</h1><button class="primary-button" data-action="cancel-import">${t("home")}</button></section></main>`;
-    return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup("cancel-import")}</header><section class="challenge-card import-card"><p class="kicker">${t("importProgress")}</p><h1>${state.importProfiles.length === 1 ? escapeHtml(state.importProfiles[0].name) : t("backupDevice")}</h1>
+    return `<main class="quiz-shell challenge-shell"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${homeButtonMarkup("cancel-import")}</header><section class="challenge-card import-card"><p class="kicker">${t("importProgress")}</p><h1>${state.importProfiles.length === 1 ? escapeHtml(state.importProfiles[0].name) : t("backupHeading")}</h1>
       <div class="import-list">${state.importProfiles.map((profile, index) => { const totals = progress.summary(profile, curriculum.levels); return `<article><div><strong>${escapeHtml(profile.name)}</strong><span>${t("playedAndMastered", { played: totals.playedQuizzes, mastered: totals.masteredQuizzes })}</span></div><button class="secondary-button" data-action="import-one" data-import-index="${index}">${t("importOne")}</button></article>`; }).join("")}</div>
       <div class="import-actions">${state.importProfiles.length > 1 ? `<button class="primary-button" data-action="import-all">${t("importAll")}</button>` : `<button class="primary-button" data-action="create-imported-profile">${t("createProfile")}</button>${Object.values(progressStore.profiles).map((profile) => `<button class="secondary-button" data-action="merge-import" data-profile-id="${escapeHtml(profile.id)}">${t("mergeInto", { name: profile.name })}</button>`).join("")}`}<button class="quiet-button" data-action="cancel-import">${t("importCancel")}</button></div>
     </section></main>`;
@@ -1938,10 +1938,10 @@
     const primaryAction = !perfect
       ? { action: "retry-curriculum-quiz", className: "", label: t("tryAgainAction"), icon: "→" }
       : state.resultNewStageMastery
-        ? { action: "open-milestone-celebration", className: "is-curriculum-complete", label: t("celebrateMilestone"), icon: "✦" }
+        ? { action: "open-milestone-celebration", className: "is-curriculum-complete", label: t("milestoneAction"), icon: "✦" }
       : nextQuiz === null
         ? { action: "open-world-celebration", className: "is-curriculum-complete", label: t("congratulations"), icon: "✦" }
-        : { action: "next-curriculum-quiz", className: advancesToNextLevel ? "is-next-level" : "", label: advancesToNextLevel ? t("level", { number: nextQuiz.levelIndex + 1 }) : t("nextQuiz"), icon: "→" };
+        : { action: "next-curriculum-quiz", className: advancesToNextLevel ? "is-next-level" : "", label: advancesToNextLevel ? t("nextLevelAction", { number: nextQuiz.levelIndex + 1 }) : t("nextQuiz"), icon: "→" };
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker">${t("level", { number: quiz.levelIndex + 1 })} · ${escapeHtml(levelTitle(level))} · ${escapeHtml(modeLabel(quiz.mode))}</p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
       <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${nextQuiz ? ` data-next-quiz-id="${escapeHtml(nextQuiz.id)}"` : ""}>${primaryAction.label} <span aria-hidden="true">${primaryAction.icon}</span></button><button class="secondary-button result-replay-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? `${replayIcon}${t("playAgain")}` : t("nextQuiz")}</button></div><button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
@@ -2888,10 +2888,13 @@
 
   function flashcardMarkup() {
     const region = selectedRegion();
+    const level = curriculum.levelById.get(state.activeLevelId);
     const scopeLabel =
       state.flashcardReturn === "explore"
         ? exploreScopeLabel()
-        : regionLabel(region);
+        : level
+          ? levelTitle(level)
+          : regionLabel(region);
     const returnLabel = state.flashcardReturn === "explore"
       ? t("backToExplore")
       : state.flashcardReturn === "result"
@@ -2911,7 +2914,7 @@
             <p>
               ${t("flashcardsSummaryBefore")} ${state.flashcards.length}
               ${t("flashcardsSummaryAfter")}
-              ${escapeHtml(scopeLabel)}.
+              ${escapeHtml(scopeLabel)}${/[.!?]$/.test(scopeLabel) ? "" : "."}
             </p>
             <div class="flashcard-actions">
               <button class="primary-button" data-action="back-from-cards">${escapeHtml(returnLabel)}</button>

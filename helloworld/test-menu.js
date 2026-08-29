@@ -15,7 +15,7 @@
       finalQuestion: "Krever ett riktig svar.",
       sections: {
         basic: ["Grunnleggende resultater", "Resultater som fortsetter uten en etappefeiring."],
-        results: ["Etapperesultat → feiring", "Perfekt resultat med knapp som åpner den valgte etappefeiringen."],
+        results: ["Etapperesultat → feiring", "Perfekt resultat der «Milepæl nådd» fører videre til den valgte etappefeiringen."],
         celebrations: ["Direkte etappefeiringer", "Åpne hver feiring uten å spille en quiz."],
         replays: ["Spill feiringer igjen", "Test retur og fokus fra både forsiden og Nivåer."],
         questions: ["Én oppgave igjen", "Svar riktig én gang for å teste den ekte resultat- og feiringsflyten."],
@@ -31,7 +31,7 @@
       finalQuestion: "Requires one correct answer.",
       sections: {
         basic: ["Basic results", "Results that continue without a stage celebration."],
-        results: ["Stage result → celebration", "Perfect results whose primary action opens the selected stage celebration."],
+        results: ["Stage result → celebration", "Perfect results where “Milestone reached” continues to the selected stage celebration."],
         celebrations: ["Direct stage celebrations", "Open every celebration without playing a quiz."],
         replays: ["Replay celebrations", "Test return behavior and focus from both Home and Levels."],
         questions: ["One question remaining", "Answer correctly once to test the genuine result and celebration flow."],

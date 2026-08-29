@@ -378,6 +378,21 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
   .home-milestones .milestone-stickers { gap:.2rem; }
 }
 
+@media (max-width: 360px) and (max-height: 600px) {
+  .home-dashboard { gap:.35rem; padding-block:.35rem; }
+  .home-hero h1 { font-size:1.85rem; }
+  .progress-globe { width:4.5rem; }
+  .home-milestones { padding:.4rem .55rem; }
+  .home-primary-actions { gap:.55rem; }
+  .home-action-card { min-height:4rem; padding:.5rem .8rem; }
+  .home-action-card strong { font-size:1.15rem; }
+  .home-action-icon { width:2.65rem; height:2.65rem; font-size:1.3rem; }
+  .home-secondary-actions .secondary-button,
+  .home-secondary-actions .quiet-button { min-height:2rem; padding:.3rem .2rem; }
+  .progression-home footer { min-height:48px; gap:2px; font-size:9px; }
+  .progression-home .license-links { justify-content:flex-start; gap:2px 8px; }
+}
+
 @media (max-height: 320px) {
   .progression-home { height:auto; min-height:100dvh; overflow:auto; }
   .progression-home .setup-shell { height:auto; min-height:100dvh; }
