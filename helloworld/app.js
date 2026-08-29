@@ -3119,6 +3119,7 @@
     const quiz = curriculumQuiz();
     const answered = state.answerStatus !== "unanswered";
     const progress = ((state.questionIndex + 1) / state.questions.length) * 100;
+    const choiceCount = question.choices.length;
 
     const gridClass =
       state.mode === "country-flag"
@@ -3133,7 +3134,7 @@
         ? `
           <div class="map-quiz-layout">
             ${regionalQuestionMapMarkup(state.curriculumQuizId ? question.country.region : state.region, question.country.code)}
-            <div class="answer-grid ${gridClass}">
+            <div class="answer-grid ${gridClass}" data-choice-count="${choiceCount}">
               ${question.choices
                 .map((choice, index) =>
                   answerMarkup(choice, index, question),
@@ -3144,7 +3145,7 @@
         `
         : `
           <div class="answer-grid-stage">
-            <div class="answer-grid ${gridClass}">
+            <div class="answer-grid ${gridClass}" data-choice-count="${choiceCount}">
               ${question.choices
                 .map((choice, index) =>
                   answerMarkup(choice, index, question),
@@ -3155,7 +3156,7 @@
         `;
 
     return `
-      <main class="quiz-shell quiz-active mode-${state.mode} ${keyboardHintsVisible ? "show-keyboard-hints" : ""}">
+      <main class="quiz-shell quiz-active mode-${state.mode} ${keyboardHintsVisible ? "show-keyboard-hints" : ""}" data-choice-count="${choiceCount}">
         <header class="quiz-header app-header app-header-mobile-sticky">
           ${brandMarkup(true, false)}
           <div class="quiz-meta">

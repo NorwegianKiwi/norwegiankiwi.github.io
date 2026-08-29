@@ -59,6 +59,18 @@
     font-size: clamp(22px, 4.4vh, 34px) !important;
   }
 
+  .mode-country-flag[data-choice-count="3"] .question-prompt {
+    transform: translateY(clamp(48px, 10dvh, 90px));
+  }
+
+  .mode-country-flag:is(
+    [data-choice-count="4"],
+    [data-choice-count="5"],
+    [data-choice-count="6"]
+  ) .question-prompt {
+    transform: translateY(clamp(12px, 3dvh, 24px));
+  }
+
   .quiz-active .answer-grid {
     --answer-gap: clamp(6px, 1.1vh, 10px);
     min-height: 0;
@@ -111,12 +123,17 @@
   }
 
   .mode-flag-country .featured-flag {
-    width: min(318px, calc(43vh - 16px));
+    width: min(350px, calc(46dvh - 16px));
+  }
+
+  .mode-flag-country .question-prompt {
+    transform: translateY(clamp(0px, calc(6dvh - 36px), 18px));
   }
 
   .mode-flag-country .country-grid {
     grid-template-rows: repeat(3, minmax(58px, 72px));
     align-content: center;
+    transform: translateY(clamp(0px, calc(12dvh - 72px), 36px));
   }
 
   .mode-flag-country .country-grid .answer-card {
@@ -130,25 +147,94 @@
   }
 
   .mode-country-capital .prompt-flag {
-    width: clamp(110px, 18vh, 145px);
+    width: clamp(120px, 20dvh, 180px);
   }
 
   .mode-country-capital .question-instruction {
-    font-size: clamp(18px, 3.2vh, 25px);
+    font-size: clamp(20px, 3.6dvh, 30px);
   }
 
   .mode-country-capital .question-clue {
-    font-size: clamp(28px, 4.8vh, 40px);
+    font-size: clamp(30px, 5.3dvh, 46px);
+  }
+
+  .mode-country-capital .question-prompt {
+    transform: translateY(clamp(0px, calc(9dvh - 54px), 27px));
   }
 
   .mode-country-capital .capital-grid {
     grid-template-rows: repeat(3, minmax(64px, 82px));
     align-content: center;
+    transform: translateY(clamp(0px, calc(12dvh - 72px), 36px));
   }
 
   .mode-country-capital .capital-grid .answer-card {
     padding-top: 6px;
     padding-bottom: 6px;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid):is(
+    [data-choice-count="4"],
+    [data-choice-count="5"]
+  ) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .quiz-active .flag-grid:is(
+    [data-choice-count="4"],
+    [data-choice-count="5"]
+  ) {
+    grid-template-rows: repeat(2, auto);
+  }
+
+  .mode-flag-country .country-grid:is(
+    [data-choice-count="4"],
+    [data-choice-count="5"]
+  ) {
+    grid-template-rows: repeat(2, minmax(58px, 72px));
+  }
+
+  .mode-country-capital .capital-grid:is(
+    [data-choice-count="4"],
+    [data-choice-count="5"]
+  ) {
+    grid-template-rows: repeat(2, minmax(64px, 82px));
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="4"] > :nth-child(1) {
+    grid-area: 1 / 2 / auto / span 2;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="4"] > :nth-child(2) {
+    grid-area: 1 / 4 / auto / span 2;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="4"] > :nth-child(3) {
+    grid-area: 2 / 2 / auto / span 2;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="4"] > :nth-child(4) {
+    grid-area: 2 / 4 / auto / span 2;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="5"] > :nth-child(1) {
+    grid-area: 1 / 1 / auto / span 2;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="5"] > :nth-child(2) {
+    grid-area: 1 / 3 / auto / span 2;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="5"] > :nth-child(3) {
+    grid-area: 1 / 5 / auto / span 2;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="5"] > :nth-child(4) {
+    grid-area: 2 / 2 / auto / span 2;
+  }
+
+  .quiz-active .answer-grid:not(.map-answer-grid)[data-choice-count="5"] > :nth-child(5) {
+    grid-area: 2 / 4 / auto / span 2;
   }
 
   .mode-map-country .question-area {
