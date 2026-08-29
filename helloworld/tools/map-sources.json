@@ -1,0 +1,384 @@
+{
+  "naturalEarthVersion": "5.1.1",
+  "boundaryView": "Natural Earth default de facto viewpoint",
+  "datasets": {
+    "countries50m": {
+      "file": "ne_50m_admin_0_countries.zip",
+      "url": "https://naciscdn.org/naturalearth/5.1.1/50m/cultural/ne_50m_admin_0_countries.zip",
+      "sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139"
+    },
+    "tinyCountries50m": {
+      "file": "ne_50m_admin_0_tiny_countries.zip",
+      "url": "https://naciscdn.org/naturalearth/5.1.1/50m/cultural/ne_50m_admin_0_tiny_countries.zip",
+      "sha256": "e6b63e61220a65a78dfddd67cdec3aadd1e335e904de12c98442e693e62ce9d2"
+    },
+    "countries10m": {
+      "file": "ne_10m_admin_0_countries.zip",
+      "url": "https://naciscdn.org/naturalearth/5.1.1/10m/cultural/ne_10m_admin_0_countries.zip",
+      "sha256": "ce1ac7036499a0edd641fbc093cd209a98f96a49d2eca8480aaacad35138a7f6"
+    },
+    "populatedPlaces10m": {
+      "file": "ne_10m_populated_places.zip",
+      "url": "https://naciscdn.org/naturalearth/5.1.2/10m/cultural/ne_10m_populated_places.zip",
+      "sha256": "cd149186f03d2603e0410da399b980a4357d0ac32d3a2305a49ed3dffcc41d7b",
+      "version": "5.1.2"
+    }
+  },
+  "countryCodeField": "ISO_A2_EH",
+  "countryCodeOverrides": {
+    "Kosovo": "xk"
+  },
+  "quizRegions": {
+    "europe": {
+      "centerLongitude": 15,
+      "bounds": [-25, 34, 45, 72]
+    },
+    "africa": {
+      "centerLongitude": 17,
+      "bounds": [-25, -38, 58, 40]
+    },
+    "asia-west": {
+      "centerLongitude": 52,
+      "bounds": [20, 8, 89, 58]
+    },
+    "asia-east": {
+      "centerLongitude": 115,
+      "bounds": [18, -12, 192, 83]
+    },
+    "oceania": {
+      "centerLongitude": 180,
+      "bounds": [110, -52, 290, 32]
+    },
+    "north-central-america": {
+      "centerLongitude": -105,
+      "bounds": [-170, 5, -55, 84]
+    },
+    "south-america": {
+      "centerLongitude": -61,
+      "bounds": [-92, -58, -30, 18]
+    },
+    "caribbean": {
+      "centerLongitude": -74,
+      "bounds": [-90, 5, -58, 30]
+    }
+  },
+  "generatedOutput": {
+    "worldViewBox": "0 0 1000 520",
+    "worldProjection": "Natural Earth",
+    "quizProjection": "Azimuthal equidistant",
+    "silhouetteViewBox": "0 0 100 100",
+    "coordinatePrecision": 1
+  },
+  "capitalCountryCodeOverrides": {
+    "KOS": "xk"
+  },
+  "capitalExclusions": ["mc", "va"],
+  "capitalOverrides": {
+    "as": {"Pago Pago": {"coordinates": [-170.702, -14.278]}},
+    "aw": {"Oranjestad": {"coordinates": [-70.0358, 12.5211]}},
+    "ax": {"Mariehamn": {"coordinates": [19.9348, 60.0973]}},
+    "bm": {"Hamilton": {"coordinates": [-64.7814, 32.2948]}},
+    "bi": {
+      "Gitega": {"sourceName": "Gitega"}
+    },
+    "ck": {"Avarua": {"coordinates": [-159.775, -21.207]}},
+    "cw": {"Willemstad": {"coordinates": [-68.99, 12.1696]}},
+    "eh": {
+      "El Aaiún": {"coordinates": [-13.2033, 27.1536]},
+      "Tifariti": {"coordinates": [-9.552, 26.158]}
+    },
+    "et": {
+      "Addis Abeba": {"sourceName": "Addis Ababa"}
+    },
+    "fk": {"Stanley": {"coordinates": [-57.8517, -51.6977]}},
+    "fo": {"Tórshavn": {"coordinates": [-6.7716, 62.0079]}},
+    "gf": {"Cayenne": {"coordinates": [-52.3135, 4.9224]}},
+    "gg": {"Saint Peter Port": {"coordinates": [-2.5369, 49.4554]}},
+    "gi": {"Gibraltar": {"coordinates": [-5.3536, 36.1408]}},
+    "gl": {"Nuuk": {"coordinates": [-51.7216, 64.1835]}},
+    "gp": {"Basse-Terre": {"coordinates": [-61.732, 15.995]}},
+    "gu": {"Hagåtña": {"coordinates": [144.7504, 13.4757]}},
+    "hk": {"Hong Kong": {"coordinates": [114.1694, 22.3193]}},
+    "id": {
+      "Nusantara": {"coordinates": [116.6993, -0.9649]}
+    },
+    "im": {"Douglas": {"coordinates": [-4.4821, 54.1523]}},
+    "je": {"Saint Helier": {"coordinates": [-2.107, 49.1868]}},
+    "ky": {"George Town": {"coordinates": [-81.3674, 19.2866]}},
+    "mo": {"Macau": {"coordinates": [113.5439, 22.1987]}},
+    "mp": {"Saipan": {"coordinates": [145.7545, 15.1778]}},
+    "mq": {"Fort-de-France": {"coordinates": [-61.0588, 14.6161]}},
+    "nc": {"Nouméa": {"coordinates": [166.458, -22.2758]}},
+    "nu": {"Alofi": {"coordinates": [-169.9187, -19.0554]}},
+    "nr": {
+      "Yaren": {"coordinates": [166.9209, -0.5477]}
+    },
+    "pf": {"Papeete": {"coordinates": [-149.5585, -17.5516]}},
+    "pr": {"San Juan": {"coordinates": [-66.1057, 18.4655]}},
+    "ps": {
+      "East Jerusalem": {"coordinates": [35.2066, 31.7784]}
+    },
+    "pw": {
+      "Ngerulmud": {"coordinates": [134.6242, 7.5006]}
+    },
+    "re": {"Saint-Denis": {"coordinates": [55.4504, -20.8789]}},
+    "sx": {"Philipsburg": {"coordinates": [-63.0476, 18.026]}},
+    "tm": {
+      "Asjkhabad": {"sourceName": "Ashgabat"}
+    },
+    "tw": {"Taipei": {"coordinates": [121.5654, 25.033]}},
+    "vi": {"Charlotte Amalie": {"coordinates": [-64.9307, 18.3419]}},
+    "yt": {"Mamoudzou": {"coordinates": [45.2279, -12.7806]}}
+  },
+  "markerOverrides": {
+    "sc": [55.45, -4.62]
+  },
+  "worldGeometryOverrides": {
+    "Somaliland": "so",
+    "Northern Cyprus": "cy"
+  },
+  "regionalGeometryOverrides": {
+    "cy": {
+      "includeSourceNames": ["Northern Cyprus"]
+    },
+    "so": {
+      "includeSourceNames": ["Somaliland"]
+    }
+  },
+  "ringCodeOverrides": [
+    {"sourceCode": "fr", "targetCode": "gf", "bounds": [-55, 2, -50, 6]},
+    {"sourceCode": "fr", "targetCode": "gp", "bounds": [-62, 15, -60, 17]},
+    {"sourceCode": "fr", "targetCode": "mq", "bounds": [-62, 14, -60, 15.5]},
+    {"sourceCode": "fr", "targetCode": "re", "bounds": [54, -22, 57, -20]},
+    {"sourceCode": "fr", "targetCode": "yt", "bounds": [44, -14, 46, -12]}
+  ],
+  "silhouetteOverrides": {
+    "no": {
+      "main": [{"bounds": [4, 57, 35, 72]}],
+      "expandedMainFrame": [36, 4, 60, 92],
+      "insets": [
+        {"selection": [{"bounds": [8, 74, 36, 82]}], "frame": [4, 5, 28, 28]},
+        {"selection": [{"bounds": [-10, 70, -7, 72]}], "frame": [10, 43, 17, 25]}
+      ]
+    },
+    "fr": {
+      "main": [{"bounds": [-6, 41, 10, 52]}]
+    },
+    "es": {
+      "main": [
+        {"bounds": [-10, 36, 4, 44], "minArea": 1},
+        {"bounds": [1, 38, 5, 41]}
+      ],
+      "expandedMainFrame": [16, 4, 80, 64],
+      "insets": [
+        {"selection": [{"bounds": [-19, 27, -13, 30]}], "frame": [4, 72, 40, 23]}
+      ]
+    },
+    "pt": {
+      "main": [{"bounds": [-10, 36.8, -6, 42.3], "minArea": 1}],
+      "expandedMainFrame": [42, 4, 54, 92],
+      "insets": [
+        {"selection": [{"bounds": [-32, 36, -24, 40.5]}], "frame": [4, 14, 32, 28]},
+        {"selection": [{"bounds": [-18, 31.5, -15.5, 33.5]}], "frame": [10, 58, 25, 28]}
+      ]
+    },
+    "za": {
+      "main": [{"bounds": [15, -36, 34, -21]}]
+    },
+    "au": {
+      "main": [{"bounds": [110, -45, 155, -9], "sourceNames": ["Australia"]}]
+    },
+    "nz": {
+      "main": [{"bounds": [165, -48, 179, -33]}],
+      "expandedMainFrame": [4, 3, 59, 94],
+      "insets": [
+        {"selection": [{"bounds": [-178, -45, -175, -43]}], "frame": [68, 36, 27, 31]}
+      ]
+    },
+    "cr": {
+      "main": [{"bounds": [-86.5, 7, -82, 12]}]
+    },
+    "us": {
+      "main": [{"bounds": [-126, 24, -66, 50]}],
+      "expandedMainFrame": [31, 30, 65, 46],
+      "insets": [
+        {"selection": [{"bounds": [-180, 50, -126, 72]}, {"bounds": [170, 50, 180, 72]}], "frame": [4, 5, 37, 24]},
+        {"selection": [{"bounds": [-161, 18, -154, 23]}], "frame": [8, 76, 29, 18]}
+      ]
+    },
+    "cl": {
+      "main": [{"bounds": [-77, -57, -66, -17]}],
+      "expandedMainFrame": [42, 3, 54, 94],
+      "insets": [
+        {"selection": [{"bounds": [-82, -34.5, -78, -32.5]}], "frame": [16, 48, 23, 26]},
+        {"selection": [{"bounds": [-110, -28, -108, -26]}], "frame": [4, 16, 20, 22]}
+      ]
+    },
+    "ec": {
+      "main": [{"bounds": [-82, -6, -74, 2]}],
+      "expandedMainFrame": [40, 5, 56, 90],
+      "insets": [
+        {"selection": [{"bounds": [-93, -2, -89, 2]}], "frame": [4, 32, 31, 34]}
+      ]
+    },
+    "sc": {
+      "main": [{"bounds": [55.2, -4.9, 56, -3.7]}],
+      "expandedMainFrame": [34, 4, 62, 66],
+      "insets": [
+        {"selection": [{"bounds": [46, -10, 48, -9]}], "frame": [4, 67, 28, 29]}
+      ]
+    },
+    "mu": {
+      "main": [{"bounds": [57.2, -20.6, 57.9, -19.9]}],
+      "expandedMainFrame": [24, 30, 52, 66],
+      "insets": [
+        {"selection": [{"bounds": [56.4, -10.5, 56.7, -10.2]}], "frame": [4, 4, 24, 24]},
+        {"selection": [{"bounds": [63.2, -19.9, 63.6, -19.5]}], "frame": [72, 8, 24, 26]}
+      ]
+    },
+    "cy": {
+      "includeSourceNames": [
+        "Northern Cyprus",
+        "Cyprus No Mans Area",
+        "Akrotiri Sovereign Base Area",
+        "Dhekelia Sovereign Base Area"
+      ],
+      "main": [{"bounds": [32.2, 34.5, 34.7, 35.8]}],
+      "mergeStroke": true,
+      "expandedMainFrame": [4, 4, 92, 92],
+      "division": [{"bounds": [32.5, 34.9, 34.1, 35.3], "sourceNames": ["Cyprus No Mans Area"]}]
+    },
+    "so": {
+      "includeSourceNames": ["Somaliland"],
+      "main": [{"bounds": [40, -2, 52, 13]}],
+      "mergeStroke": true,
+      "expandedMainFrame": [4, 4, 92, 92],
+      "divisionSharedBoundary": {"sourceNames": ["Somalia", "Somaliland"]}
+    },
+    "fj": {
+      "main": [
+        {"bounds": [176, -21.2, 180, -15.8]},
+        {"bounds": [-180, -21.2, -177, -15.8]}
+      ],
+      "expandedMainFrame": [30, 26, 66, 70],
+      "insets": [
+        {"selection": [{"bounds": [176.8, -12.7, 177.3, -12.3]}], "frame": [4, 4, 24, 24]}
+      ]
+    },
+    "mh": {
+      "main": [{"bounds": [164, 4, 173, 15]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [170.9, 6.9, 172, 7.3]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "fm": {
+      "main": [{"bounds": [137, 0, 164, 11]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [157.8, 6.5, 158.5, 7.2]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "ki": {
+      "main": [
+        {"bounds": [168, -12, 180, 6]},
+        {"bounds": [-180, -12, -150, 6]}
+      ],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [172.8, 1.1, 173.3, 1.7]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "pw": {
+      "main": [{"bounds": [134, 6.7, 135, 8.3]}],
+      "expandedMainFrame": [38, 4, 58, 66],
+      "insets": [
+        {"selection": [{"bounds": [131.8, 4.8, 132.5, 5.6]}], "frame": [8, 48, 26, 20]},
+        {"selection": [{"bounds": [130.8, 2.6, 132, 3.3]}], "frame": [4, 73, 30, 23]}
+      ]
+    },
+    "to": {
+      "main": [{"bounds": [-177, -23, -173, -15]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [-175.6, -21.7, -174.7, -20.8]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "tv": {
+      "main": [{"bounds": [175, -10, 181, -5]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [178.9, -8.7, 179.4, -8.3]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "as": {
+      "main": [{"bounds": [-171, -14.5, -170.5, -14.15]}],
+      "expandedMainFrame": [4, 30, 50, 48],
+      "insets": [
+        {"selection": [{"bounds": [-171.2, -11.2, -170.95, -10.9]}], "frame": [65, 5, 25, 24]},
+        {"selection": [{"bounds": [-169.8, -14.4, -169.3, -14]}], "frame": [59, 48, 37, 30]}
+      ]
+    },
+    "ky": {
+      "main": [{"bounds": [-81.5, 19.2, -81, 19.5]}],
+      "expandedMainFrame": [4, 25, 55, 50],
+      "insets": [
+        {"selection": [{"bounds": [-80.2, 19.6, -79.6, 19.9]}], "frame": [64, 25, 32, 45]}
+      ]
+    },
+    "gg": {
+      "main": [{"bounds": [-2.75, 49.35, -2.3, 49.55]}],
+      "expandedMainFrame": [4, 18, 58, 72],
+      "insets": [
+        {"selection": [{"bounds": [-2.3, 49.65, -2.1, 49.8]}], "frame": [68, 8, 28, 30]}
+      ]
+    },
+    "nc": {
+      "main": [{"bounds": [163.5, -22.8, 167.2, -19.5]}],
+      "expandedMainFrame": [4, 4, 62, 92],
+      "insets": [
+        {"selection": [{"bounds": [167.2, -22, 168.3, -20.5]}], "frame": [70, 30, 26, 40]}
+      ]
+    },
+    "ck": {
+      "main": [{"bounds": [-166, -23, -156, -8]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 34, 92],
+      "insets": [
+        {"selection": [{"bounds": [-158.1, -9.05, -157.85, -8.85]}], "frame": [44, 4, 52, 42], "connectToSource": true},
+        {"selection": [{"bounds": [-160, -21.5, -159.5, -21]}], "frame": [44, 54, 52, 42], "connectToSource": true}
+      ]
+    },
+    "pf": {
+      "main": [{"bounds": [-155, -29, -134, -7]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [-153, -18.5, -148, -15.5]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    },
+    "mp": {
+      "main": [{"bounds": [144.5, 13.5, 146, 21]}],
+      "forceCompactMarkers": true,
+      "expandedMainFrame": [4, 4, 38, 92],
+      "insets": [
+        {"selection": [{"bounds": [145, 14, 146, 16]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      ]
+    }
+  },
+  "policy": {
+    "quizCountryList": "countries.js is authoritative; Natural Earth does not decide which entities are quiz countries",
+    "quizRegionMembership": "countries.js is the only source of region membership",
+    "russia": "Pedagogical exception: Russia belongs to Asia (East); both its regional map and silhouette show the complete country",
+    "somalia": "Pedagogical exception: Somaliland is included in Somalia on regional maps and silhouettes; the enlarged silhouette marks their shared de facto boundary",
+    "transcontinentalCountries": "Each quiz country has exactly one canonical region",
+    "territories": "Natural Earth features not present in countries.js are non-selectable context",
+    "disputedBoundaries": "Use the unmodified Natural Earth default de facto viewpoint, not a country-specific POV download",
+    "manualReview": "Every regenerated candidate must be visually compared with the checked-in map before replacement"
+  }
+}
