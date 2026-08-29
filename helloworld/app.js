@@ -489,14 +489,18 @@
     `;
   }
 
-  function quizReturnButtonMarkup() {
-    if (state.quizReturn !== "levels") return homeButtonMarkup();
+  function headerReturnButtonMarkup(action, destinationKey, accessibleLabelKey) {
     return `
-      <button class="quiet-button home-button" data-action="back-from-quiz">
+      <button class="quiet-button home-button" data-action="${action}" aria-label="${escapeHtml(t(accessibleLabelKey))}">
         <span aria-hidden="true">←</span>
-        ${t("backToLevels")}
+        ${escapeHtml(t(destinationKey))}
       </button>
     `;
+  }
+
+  function quizReturnButtonMarkup() {
+    if (state.quizReturn !== "levels") return homeButtonMarkup();
+    return headerReturnButtonMarkup("back-from-quiz", "levels", "backToLevels");
   }
 
   function actionFeedbackMarkup() {
@@ -2463,9 +2467,9 @@
             tabindex="-1"
           >${escapeHtml(t("explore"))}</h1>
           ${state.exploreReturn?.screen === "result"
-            ? `<button class="quiet-button home-button" data-action="back-from-explore"><span aria-hidden="true">←</span>${escapeHtml(t("backToResults"))}</button>`
+            ? headerReturnButtonMarkup("back-from-explore", "resultsDestination", "backToResults")
             : state.exploreReturn?.screen === "levels"
-              ? `<button class="quiet-button home-button" data-action="back-from-explore"><span aria-hidden="true">←</span>${escapeHtml(t("backToLevels"))}</button>`
+              ? headerReturnButtonMarkup("back-from-explore", "levels", "backToLevels")
               : homeButtonMarkup()}
         </header>
 
@@ -2495,10 +2499,21 @@
       : state.flashcardReturn === "result"
         ? t("backToResults")
         : t("backToLevels");
-    const levelScopeMarkup = state.flashcardReturn === "level" && level
+    const summaryLevelScopeMarkup = state.flashcardReturn === "level" && level
       ? levelReferenceMarkup(level, { size: "small" })
       : null;
-    const scopeMarkup = levelScopeMarkup ?? escapeHtml(scopeLabel);
+    const summaryScopeMarkup = summaryLevelScopeMarkup ?? escapeHtml(scopeLabel);
+    const headerLevel = state.flashcardReturn === "explore"
+      ? curriculum.levelById.get(state.exploreScope?.levelId)
+      : level;
+    const headerScopeMarkup = headerLevel
+      ? levelReferenceMarkup(headerLevel, { size: "small", showTitle: false })
+      : escapeHtml(scopeLabel);
+    const headerReturnButton = state.flashcardReturn === "explore"
+      ? headerReturnButtonMarkup("back-from-cards", "explore", "backToExplore")
+      : state.flashcardReturn === "result"
+        ? headerReturnButtonMarkup("back-from-cards", "resultsDestination", "backToResults")
+        : headerReturnButtonMarkup("back-from-cards", "levels", "backToLevels");
     const complete = state.flashcardIndex >= state.flashcards.length;
 
     if (complete) {
@@ -2513,7 +2528,7 @@
             <p>
               ${t("flashcardsSummaryBefore")} ${state.flashcards.length}
               ${t("flashcardsSummaryAfter")}
-              ${scopeMarkup}${/[.!?]$/.test(scopeLabel) ? "" : "."}
+              ${summaryScopeMarkup}${/[.!?]$/.test(scopeLabel) ? "" : "."}
             </p>
             <div class="flashcard-actions">
               <button class="primary-button" data-action="back-from-cards">${escapeHtml(returnLabel)}</button>
@@ -2533,10 +2548,10 @@
         <header class="quiz-header app-header">
           ${brandMarkup(true, false)}
           <div class="quiz-meta">
-            <span class="flashcard-scope">${scopeMarkup}</span>
+            <span class="flashcard-scope">${headerScopeMarkup}</span>
             <strong>${state.flashcardIndex + 1} / ${state.flashcards.length}</strong>
           </div>
-          <button class="quiet-button home-button" data-action="back-from-cards"><span aria-hidden="true">←</span>${escapeHtml(returnLabel)}</button>
+          ${headerReturnButton}
         </header>
         <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="${
           state.flashcards.length

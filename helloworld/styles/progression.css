@@ -362,7 +362,7 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
   .action-dialog-overlay { padding:1rem; }
   .action-dialog-actions { display:grid; }
   .action-dialog-actions button { width:100%; }
-  .progression-home .brand { font-size:clamp(1.25rem,6.15vw,1.5rem); }
+  .progression-home .brand { gap:8px; font-size:clamp(1.25rem,6.15vw,1.5rem); }
   .progression-home .brand > span { white-space:nowrap; }
   .profile-control { width:2.7rem; height:2.7rem; justify-content:center; gap:0; padding:.3rem; }
   .profile-control .profile-name { display:none; }

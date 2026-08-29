@@ -9,6 +9,8 @@ test("supports the complete Norwegian and English catalogs", () => {
   assert.equal(localization.translate("nb", "brandName"), "Hei verden!");
   assert.equal(localization.translate("en", "brandName"), "Hello World!");
   assert.equal(localization.translate("en", "continueGame"), "Continue game");
+  assert.equal(localization.translate("nb", "resultsDestination"), "Resultatet");
+  assert.equal(localization.translate("en", "resultsDestination"), "Results");
 });
 
 test("interpolates placeholders and simple plurals", () => {
