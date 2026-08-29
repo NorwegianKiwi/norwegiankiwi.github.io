@@ -122,8 +122,16 @@
     padding-bottom: 8px;
   }
 
+  .mode-flag-country .answer-card strong,
+  .mode-country-capital .answer-card strong {
+    max-width: 100%;
+    font-size: clamp(16px, 2vw, 21px);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
   .mode-flag-country .featured-flag {
-    width: min(350px, calc(46dvh - 16px));
+    width: min(100%, 500px, calc(80dvh - 220px));
   }
 
   .mode-flag-country .question-prompt {
@@ -133,7 +141,7 @@
   .mode-flag-country .country-grid {
     grid-template-rows: repeat(3, minmax(58px, 72px));
     align-content: center;
-    transform: translateY(clamp(0px, calc(12dvh - 72px), 36px));
+    transform: translateY(clamp(0px, calc(18dvh - 108px), 54px));
   }
 
   .mode-flag-country .country-grid .answer-card {
@@ -147,7 +155,10 @@
   }
 
   .mode-country-capital .prompt-flag {
-    width: clamp(120px, 20dvh, 180px);
+    width: min(
+      100%,
+      clamp(120px, calc(93.333dvh - 440px), 400px)
+    );
   }
 
   .mode-country-capital .question-instruction {
@@ -165,7 +176,7 @@
   .mode-country-capital .capital-grid {
     grid-template-rows: repeat(3, minmax(64px, 82px));
     align-content: center;
-    transform: translateY(clamp(0px, calc(12dvh - 72px), 36px));
+    transform: translateY(clamp(0px, calc(18dvh - 108px), 54px));
   }
 
   .mode-country-capital .capital-grid .answer-card {
@@ -313,6 +324,10 @@
 }
 
 @media (max-width: 820px) {
+  .quiz-active .quiz-level-context .level-reference-title {
+    display: none;
+  }
+
   .question-area {
     padding-top: 45px;
   }
