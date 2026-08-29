@@ -482,8 +482,11 @@ Map-quiz area selection is likewise session-only, but intentionally resets to
 the target country's regional extent for every new question. World and Nearby
 change only the rendered map geometry and must not alter attempt, answer,
 persistence or URL state. Nearby fits the target's regional geometry with
-threefold context padding, an 8× zoom ceiling and clamping to the generated
-regional bleed extent; marker coordinates are the zero-size fallback.
+threefold context padding. When that frame exceeds 60% of the regional view,
+half of the excess is retained so large countries receive gentle magnification
+without changing smaller-country framing. It retains an 8× zoom ceiling and
+clamps to the generated regional bleed extent; marker coordinates are the
+zero-size fallback.
 
 ## 18. Tests and validation
 

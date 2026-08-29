@@ -160,7 +160,9 @@ different level at any time.
 - Map questions open in a regional view with surrounding geography at normal
   prominence. A World–Region–Nearby scale control also provides global
   orientation and a fitted view of the target's immediate surroundings; each
-  new question returns to the regional view.
+  new question returns to the regional view. Nearby gently increases
+  magnification for large targets without changing the established close
+  framing of smaller targets.
 
 The existing corrective learning interaction should remain: after an incorrect
 answer, the correct option is clearly identified and the player confirms it

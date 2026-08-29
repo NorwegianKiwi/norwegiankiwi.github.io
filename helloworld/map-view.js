@@ -68,12 +68,15 @@
   ) {
     const targetWidth = Math.max(Number(targetBounds?.width) || 0, 0);
     const targetHeight = Math.max(Number(targetBounds?.height) || 0, 0);
+    const contextScale = Math.max(
+      (targetWidth * padding) / base.width,
+      (targetHeight * padding) / base.height,
+    );
+    const easedContextScale = contextScale <= 0.6
+      ? contextScale
+      : 0.6 + (contextScale - 0.6) * 0.5;
     const scale = clamp(
-      Math.max(
-        (targetWidth * padding) / base.width,
-        (targetHeight * padding) / base.height,
-        1 / maximumZoom,
-      ),
+      Math.max(easedContextScale, 1 / maximumZoom),
       1 / maximumZoom,
       1,
     );
