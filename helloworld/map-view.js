@@ -60,6 +60,47 @@
     };
   }
 
+  function nearbyViewBox(
+    base,
+    targetBounds,
+    extent = base,
+    { padding = 3, maximumZoom = 8 } = {},
+  ) {
+    const targetWidth = Math.max(Number(targetBounds?.width) || 0, 0);
+    const targetHeight = Math.max(Number(targetBounds?.height) || 0, 0);
+    const scale = clamp(
+      Math.max(
+        (targetWidth * padding) / base.width,
+        (targetHeight * padding) / base.height,
+        1 / maximumZoom,
+      ),
+      1 / maximumZoom,
+      1,
+    );
+    if (scale >= 1) return { ...base };
+
+    const width = base.width * scale;
+    const height = base.height * scale;
+    const centerX = (Number(targetBounds?.x) || 0) + targetWidth / 2;
+    const centerY = (Number(targetBounds?.y) || 0) + targetHeight / 2;
+    const clampExtent =
+      extent.width >= width && extent.height >= height ? extent : base;
+    return {
+      x: clamp(
+        centerX - width / 2,
+        clampExtent.x,
+        clampExtent.x + clampExtent.width - width,
+      ),
+      y: clamp(
+        centerY - height / 2,
+        clampExtent.y,
+        clampExtent.y + clampExtent.height - height,
+      ),
+      width,
+      height,
+    };
+  }
+
   function midpoint(first, second) {
     return {
       x: (first.x + second.x) / 2,
@@ -84,6 +125,7 @@
     distance,
     fitViewBoxToAspect,
     midpoint,
+    nearbyViewBox,
     parseViewBox,
     serializeViewBox,
     transformPoint,

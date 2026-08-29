@@ -44,6 +44,11 @@ const messages = Object.freeze({
     backToLevels: "Tilbake til nivåene",
     highlightedMap: "Kart over {region} med ett sted uthevet",
     highlightedWorldMap: "Verdenskart med ett sted uthevet",
+    highlightedNearbyMap:
+      "Kartutsnitt av nærområdet i {region} med ett sted uthevet",
+    mapViewWorld: "Verden",
+    mapViewRegion: "Region",
+    mapViewNearby: "Nærområde",
     heroKicker: "Lek. Lær. Utforsk.",
     heroTitleBefore: "Verden",
     heroTitleEmphasis: "venter.",
@@ -172,6 +177,11 @@ const messages = Object.freeze({
     backToLevels: "Back to levels",
     highlightedMap: "Map of {region} with one place highlighted",
     highlightedWorldMap: "World map with one place highlighted",
+    highlightedNearbyMap:
+      "Nearby view of {region} with one place highlighted",
+    mapViewWorld: "World",
+    mapViewRegion: "Region",
+    mapViewNearby: "Nearby",
     heroKicker: "Play. Learn. Explore.",
     heroTitleBefore: "The world",
     heroTitleEmphasis: "awaits.",

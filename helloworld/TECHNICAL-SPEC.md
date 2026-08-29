@@ -479,9 +479,11 @@ the world and detailed regional maps may be traversed while the
 scope list remains fixed. Contextual scopes are never persisted as saved lists.
 
 Map-quiz area selection is likewise session-only, but intentionally resets to
-the target country's regional extent for every new question. Switching to the
-world extent changes only the rendered map geometry and must not alter attempt,
-answer, persistence or URL state.
+the target country's regional extent for every new question. World and Nearby
+change only the rendered map geometry and must not alter attempt, answer,
+persistence or URL state. Nearby fits the target's regional geometry with
+threefold context padding, an 8× zoom ceiling and clamping to the generated
+regional bleed extent; marker coordinates are the zero-size fallback.
 
 ## 18. Tests and validation
 

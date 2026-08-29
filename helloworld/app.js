@@ -15,6 +15,7 @@
     distance: mapPointerDistance,
     fitViewBoxToAspect: fitMapViewBoxToAspect,
     midpoint: mapPointerMidpoint,
+    nearbyViewBox: nearbyMapViewBox,
     parseViewBox: parseMapViewBox,
     serializeViewBox: serializeMapViewBox,
     transformPoint: screenPointToMap,
@@ -1005,6 +1006,7 @@
   }
 
   function questionMapMarkup(regionId, targetCode) {
+    const mapAreas = ["world", "region", "nearby"];
     const isWorld = state.quizMapArea === "world";
     const view = isWorld
       ? {
@@ -1049,48 +1051,66 @@
           regionalMapMarkerMarkup(marker, className, radius),
         )
         .join("");
+    const mapLabel = isWorld
+      ? t("highlightedWorldMap")
+      : state.quizMapArea === "nearby"
+        ? t("highlightedNearbyMap", { region: regionLabel(region) })
+        : t("highlightedMap", { region: regionLabel(region) });
     return `
       <div class="map-quiz-visual${isWorld ? " is-world-area" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
-        <div class="question-map-area-controls" role="group" aria-label="${escapeHtml(t("mapAreaControls"))}">
-          <button
-            type="button"
-            class="secondary-button question-map-area-button"
-            data-action="quiz-map-area"
-            data-value="${isWorld ? "region" : "world"}"
-          >${escapeHtml(t(isWorld ? "showRegion" : "viewWorld"))}</button>
+        <div class="question-map-tabs" role="tablist" aria-label="${escapeHtml(t("mapAreaControls"))}">
+          ${mapAreas.map((area) => `
+            <button
+              type="button"
+              id="question-map-tab-${area}"
+              class="question-map-tab"
+              role="tab"
+              aria-selected="${state.quizMapArea === area}"
+              aria-controls="question-map-panel"
+              tabindex="${state.quizMapArea === area ? "0" : "-1"}"
+              data-action="quiz-map-area"
+              data-value="${area}"
+            >${escapeHtml(t(`mapView${area[0].toUpperCase()}${area.slice(1)}`))}</button>
+          `).join("")}
         </div>
-        <svg
-          class="question-map"
-          data-responsive-region-map
-          data-base-view-box="${view.viewBox}"
-          data-bleed-view-box="${view.bleedViewBox ?? view.viewBox}"
-          viewBox="${view.viewBox}"
-          role="img"
-          aria-label="${escapeHtml(isWorld
-            ? t("highlightedWorldMap")
-            : t("highlightedMap", { region: regionLabel(region) }))}"
-          preserveAspectRatio="xMidYMid meet"
+        <div
+          class="question-map-stage"
+          id="question-map-panel"
+          role="tabpanel"
+          aria-labelledby="question-map-tab-${state.quizMapArea}"
         >
-          <rect class="question-map-ocean" x="-10000" y="-10000" width="20000" height="20000" />
-          <g aria-hidden="true">
-            ${pathMarkup(contextFeatures, "question-map-country")}
-            ${pathMarkup(otherFeatures, "question-map-country")}
-            ${markerMarkup(otherMarkers, "question-map-marker", markerRadius)}
-            ${pathMarkup(targetFeatures, "question-map-target-halo")}
-            ${pathMarkup(targetFeatures, "question-map-country is-target")}
-            ${markerMarkup(
-              targetMarkers,
-              "question-map-marker is-target-halo",
-              markerRadius * 2.8,
-            )}
-            ${markerMarkup(
-              targetMarkers,
-              "question-map-marker is-target",
-              markerRadius * 1.35,
-            )}
-          </g>
-        </svg>
-        ${countrySilhouetteMarkup(targetCode)}
+          <svg
+            class="question-map"
+            data-responsive-region-map
+            data-question-map-area="${state.quizMapArea}"
+            data-base-view-box="${view.viewBox}"
+            data-bleed-view-box="${view.bleedViewBox ?? view.viewBox}"
+            viewBox="${view.viewBox}"
+            role="img"
+            aria-label="${escapeHtml(mapLabel)}"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <rect class="question-map-ocean" x="-10000" y="-10000" width="20000" height="20000" />
+            <g aria-hidden="true">
+              ${pathMarkup(contextFeatures, "question-map-country")}
+              ${pathMarkup(otherFeatures, "question-map-country")}
+              ${markerMarkup(otherMarkers, "question-map-marker", markerRadius)}
+              ${pathMarkup(targetFeatures, "question-map-target-halo")}
+              ${pathMarkup(targetFeatures, "question-map-country is-target")}
+              ${markerMarkup(
+                targetMarkers,
+                "question-map-marker is-target-halo",
+                markerRadius * 2.8,
+              )}
+              ${markerMarkup(
+                targetMarkers,
+                "question-map-marker is-target",
+                markerRadius * 1.35,
+              )}
+            </g>
+          </svg>
+          ${countrySilhouetteMarkup(targetCode)}
+        </div>
       </div>
     `;
   }
@@ -2003,6 +2023,45 @@
     exploreMapUiFrame = requestAnimationFrame(syncExploreMapZoomUi);
   }
 
+  function questionMapTargetBounds(svg) {
+    const boxes = [...svg.querySelectorAll(
+      ".question-map-country.is-target:not(.is-crop-edge)",
+    )]
+      .map((path) => {
+        try {
+          return path.getBBox();
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+    if (boxes.length > 0) {
+      const minimumX = Math.min(...boxes.map((box) => box.x));
+      const minimumY = Math.min(...boxes.map((box) => box.y));
+      const maximumX = Math.max(...boxes.map((box) => box.x + box.width));
+      const maximumY = Math.max(...boxes.map((box) => box.y + box.height));
+      if (maximumX > minimumX || maximumY > minimumY) {
+        return {
+          x: minimumX,
+          y: minimumY,
+          width: maximumX - minimumX,
+          height: maximumY - minimumY,
+        };
+      }
+    }
+
+    const marker = svg.querySelector(
+      ".question-map-marker.is-target:not(.is-target-halo)",
+    );
+    if (!marker) return null;
+    return {
+      x: Number(marker.getAttribute("cx")),
+      y: Number(marker.getAttribute("cy")),
+      width: 0,
+      height: 0,
+    };
+  }
+
   function syncResponsiveRegionMaps() {
     responsiveMapFrame = null;
     app.querySelectorAll("[data-responsive-region-map]").forEach((svg) => {
@@ -2012,9 +2071,19 @@
         base,
         bounds.width / Math.max(bounds.height, 1),
       );
-      svg.setAttribute("viewBox", serializeMapViewBox(fitted));
-      syncMapMarkerRadii(svg, fitted, bounds);
-      syncRegionalMarkerHandoffs(svg, fitted, bounds);
+      const targetBounds = svg.dataset.questionMapArea === "nearby"
+        ? questionMapTargetBounds(svg)
+        : null;
+      const view = targetBounds
+        ? nearbyMapViewBox(
+            fitted,
+            targetBounds,
+            parseMapViewBox(svg.dataset.bleedViewBox),
+          )
+        : fitted;
+      svg.setAttribute("viewBox", serializeMapViewBox(view));
+      syncMapMarkerRadii(svg, view, bounds);
+      syncRegionalMarkerHandoffs(svg, view, bounds);
     });
   }
 
@@ -3468,6 +3537,18 @@
       });
   }
 
+  function setQuizMapArea(area, { focus = true } = {}) {
+    if (
+      state.screen !== "quiz" ||
+      state.mode !== "map-country" ||
+      !["world", "region", "nearby"].includes(area)
+    ) return false;
+    state.quizMapArea = area;
+    state.silhouetteExpanded = false;
+    render(focus ? { focusQuizMapArea: area } : {});
+    return true;
+  }
+
   function advanceQuestion() {
     clearAutoAdvance();
     setKeyboardHintsVisible(false);
@@ -4316,15 +4397,7 @@
       return;
     }
     if (action === "quiz-map-area") {
-      if (
-        state.screen !== "quiz" ||
-        state.mode !== "map-country" ||
-        !["region", "world"].includes(control.dataset.value)
-      ) return;
-      state.quizMapArea = control.dataset.value;
-      render({
-        focusQuizMapArea: state.quizMapArea === "world" ? "region" : "world",
-      });
+      setQuizMapArea(control.dataset.value);
       return;
     }
     if (action === "open-milestone-celebration") {
@@ -4692,6 +4765,28 @@
     if (event.key !== "Enter" || event.target?.id !== "challenge-input") return;
     event.preventDefault();
     event.target.form?.requestSubmit();
+  });
+
+  app.addEventListener("keydown", (event) => {
+    const tab = event.target.closest?.(
+      '[role="tab"][data-action="quiz-map-area"]',
+    );
+    if (!tab || !app.contains(tab)) return;
+    const areas = ["world", "region", "nearby"];
+    const currentIndex = areas.indexOf(tab.dataset.value);
+    const nextIndex = event.key === "Home"
+      ? 0
+      : event.key === "End"
+        ? areas.length - 1
+        : event.key === "ArrowLeft"
+          ? (currentIndex - 1 + areas.length) % areas.length
+          : event.key === "ArrowRight"
+            ? (currentIndex + 1) % areas.length
+            : -1;
+    if (nextIndex < 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setQuizMapArea(areas[nextIndex]);
   });
 
   app.addEventListener(
