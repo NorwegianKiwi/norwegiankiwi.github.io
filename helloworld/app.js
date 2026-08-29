@@ -332,11 +332,11 @@
       cards: "Øv med øvingskort", questionsLong: "{count} spørsmål · lang quiz",
       resumeAttempt: "Fortsett quizen", quizInProgress: "Quiz pågår", continueMode: "Fortsett: {mode}",
       answeredProgress: "{answered} / {total} besvart", keepSavedAttempt: "Behold lagret forsøk",
-      abandonAttemptTitle: "Vil du starte en annen quiz?",
+      abandonAttemptTitle: "Vil du starte en annen lang quiz?",
       abandonAttemptProgress: "Du har besvart {answered} av {total} spørsmål i",
       abandonAttemptStarting: "Hvis du starter",
       abandonAttemptEnding: "slettes dette forsøket.",
-      abandonAndStart: "Forkast forsøket og start quizen",
+      abandonAndStart: "Forkast forsøket og start den lange quizen",
       addProfileTitle: "Legg til profil", addProfileDescription: "Fremgangen til den nye profilen lagres separat på denne enheten.",
       addProfileAction: "Opprett profil", renameProfileTitle: "Gi profilen nytt navn",
       renameProfileDescription: "Skriv inn et nytt navn for {name}.", renameProfileAction: "Lagre navn",
@@ -382,11 +382,11 @@
       cards: "Practice with flashcards", questionsLong: "{count} questions · long quiz",
       resumeAttempt: "Resume quiz", quizInProgress: "Quiz in progress", continueMode: "Continue: {mode}",
       answeredProgress: "{answered} / {total} answered", keepSavedAttempt: "Keep saved attempt",
-      abandonAttemptTitle: "Start a different quiz?",
+      abandonAttemptTitle: "Start a different long quiz?",
       abandonAttemptProgress: "You have answered {answered} of {total} questions in",
       abandonAttemptStarting: "Starting",
       abandonAttemptEnding: "will delete that attempt.",
-      abandonAndStart: "Abandon attempt and start quiz",
+      abandonAndStart: "Abandon attempt and start the long quiz",
       addProfileTitle: "Add profile", addProfileDescription: "The new profile’s progress will be stored separately on this device.",
       addProfileAction: "Create profile", renameProfileTitle: "Rename profile",
       renameProfileDescription: "Enter a new name for {name}.", renameProfileAction: "Save name",
@@ -3903,7 +3903,7 @@
     const saved = currentProfile().savedMasteryAttempt;
     const matchingAttempt = progress.matchingSavedAttempt(currentProfile(), quiz);
     const shouldResume = Boolean(matchingAttempt && (resume || !challengeRound));
-    if (!shouldResume && saved && !savedAttemptHandled) {
+    if (!shouldResume && saved && isMasteryQuiz(quiz) && !savedAttemptHandled) {
       openActionDialog("abandon-attempt", {
         quizId,
         startOptions: { challengeRound, source, historyMode },
