@@ -20,7 +20,7 @@
     serializeViewBox: serializeMapViewBox,
     transformPoint: screenPointToMap,
     viewBoxesEqual: mapViewBoxesEqual,
-    zoomForViewport: exploreMapZoom,
+    zoomForViewport: zoomForMapViewport,
   } = mapView;
   const initialUrl = new URL(window.location.href);
   const initialLocale = supportedLocales.includes(
@@ -226,6 +226,10 @@
     "ScrollLock",
     "ContextMenu",
   ]);
+
+  function exploreMapZoom(viewport = state.exploreMapViewport) {
+    return zoomForMapViewport(viewport);
+  }
 
   function t(key, values = {}) {
     return localization.translate(state.locale, key, values);
