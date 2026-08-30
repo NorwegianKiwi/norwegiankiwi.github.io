@@ -15,7 +15,7 @@
       finalQuestion: "Krever ett riktig svar.",
       sections: {
         basic: ["Grunnleggende resultater", "Resultater som fortsetter uten en etappefeiring."],
-        results: ["Etapperesultat → feiring", "Perfekt resultat der «Milepæl nådd» fører videre til den valgte etappefeiringen."],
+        results: ["Etapperesultat → feiring", "Perfekt resultat der «Fullført» fører videre til den valgte etappefeiringen."],
         celebrations: ["Direkte etappefeiringer", "Åpne hver feiring uten å spille en quiz."],
         replays: ["Spill feiringer igjen", "Test retur og fokus fra både forsiden og Nivåer."],
         questions: ["Én oppgave igjen", "Svar riktig én gang for å teste den ekte resultat- og feiringsflyten."],
@@ -31,7 +31,7 @@
       finalQuestion: "Requires one correct answer.",
       sections: {
         basic: ["Basic results", "Results that continue without a stage celebration."],
-        results: ["Stage result → celebration", "Perfect results where “Milestone reached” continues to the selected stage celebration."],
+        results: ["Stage result → celebration", "Perfect results where “Completed” continues to the selected stage celebration."],
         celebrations: ["Direct stage celebrations", "Open every celebration without playing a quiz."],
         replays: ["Replay celebrations", "Test return behavior and focus from both Home and Levels."],
         questions: ["One question remaining", "Answer correctly once to test the genuine result and celebration flow."],
@@ -68,7 +68,9 @@
         id: "basic",
         items: [
           { title: { nb: "Neste quiz", en: "Next quiz" }, description: { nb: "Perfekt resultat som fortsetter i samme nivå.", en: "Perfect result continuing within the same level." }, params: { preview: "result-next-quiz" } },
-          { title: { nb: "Neste nivå", en: "Next level" }, description: { nb: "Perfekt resultat som går videre til neste nivå.", en: "Perfect result advancing to the next level." }, params: { preview: "result-next-level" } },
+          { title: { nb: "Neste nivå · lengste navn", en: "Next level · longest name" }, description: { nb: "Perfekt resultat som går videre til nivået med det lengste norske navnet.", en: "Perfect result advancing to the level with the longest English name." }, params: { preview: "result-next-level" } },
+          { title: { nb: "Ikke mestret → neste nivå", en: "Not mastered → next level" }, description: { nb: "Prøv igjen er primær, med det lengste neste nivånavnet og Start nivå som sekundær.", en: "Try again is primary, followed by the longest next-level name and a secondary Start level action." }, params: { preview: "result-failed-next" } },
+          { title: { nb: "Ikke mestret → ingen neste", en: "Not mastered → no Next" }, description: { nb: "Neste quiz er allerede spilt, så Velg nivå blir sekundær.", en: "The next quiz was already played, so Choose a level becomes secondary." }, params: { preview: "result-failed-no-next" } },
           { title: { nb: "Deling uten delingsmeny", en: "Sharing without Share menu" }, description: { nb: "Resultat med e-post- og kopieringsdialogen som brukes i Firefox.", en: "Result with the email-and-copy dialog used in Firefox." }, params: { preview: "share-fallback" } },
         ],
       },

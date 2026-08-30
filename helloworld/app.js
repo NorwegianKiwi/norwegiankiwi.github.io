@@ -29,7 +29,7 @@
     ? initialUrl.searchParams.get("lang")
     : "nb";
   const initialPreview = new Set([
-    "result-next-quiz", "result-next-level", "share-fallback", "milestone-result", "milestone-celebration",
+    "result-next-quiz", "result-next-level", "result-failed-next", "result-failed-no-next", "share-fallback", "milestone-result", "milestone-celebration",
     "milestone-question", "milestone-replay", "navigator-tourist-gap-question",
     "tourist-world-final-question", "final-question", "final-result", "final-celebration",
   ]).has(initialUrl.searchParams.get("preview"))
@@ -1667,19 +1667,54 @@
     return `<p class="challenge-comparison">${message}</p>`;
   }
 
+  function resultLevelProgressMarkup(level, currentQuiz) {
+    const profile = currentProfile();
+    const levelValue = progress.levelProgress(profile, level);
+    const modeButtons = level.quizzes.map((baseQuiz) => {
+      const quiz = curriculum.quizById.get(baseQuiz.id);
+      const status = progress.quizState(profile, quiz);
+      const record = progress.currentRecord(profile, quiz);
+      const isCurrent = quiz.id === currentQuiz.id;
+      const statusMarkup = status === "mastered"
+        ? `<span class="result-mode-status is-mastered"><span class="mastery-check" aria-hidden="true">✓</span></span>`
+        : status === "played"
+          ? `<span class="result-mode-status is-played" aria-hidden="true">${record.bestScore}/${record.total}</span>`
+          : `<span class="result-mode-status is-unplayed"><span class="unread-dot" aria-hidden="true"></span></span>`;
+      const accessibleLabel = status === "mastered"
+        ? t("resultModeMastered", { mode: modeLabel(quiz.mode) })
+        : status === "played"
+          ? t("resultModePlayed", { mode: modeLabel(quiz.mode), score: record.bestScore, total: record.total })
+          : t("resultModeUnplayed", { mode: modeLabel(quiz.mode) });
+      return `<button class="result-mode-button ${status === "mastered" ? "is-mastered" : status === "played" ? "is-played" : "is-unplayed"} ${isCurrent ? "is-current" : ""}" data-action="start-curriculum-quiz" data-quiz-id="${escapeHtml(quiz.id)}" aria-label="${escapeHtml(accessibleLabel)}"${isCurrent ? ` aria-current="true"` : ""}><span class="result-mode-name">${escapeHtml(modeLabel(quiz.mode))}</span>${statusMarkup}</button>`;
+    }).join("");
+    return `<section class="result-level-progress" aria-labelledby="result-level-progress-title"><div class="result-level-progress-heading"><strong id="result-level-progress-title">${t("levelQuizProgress")}</strong><span>${t("quizzesMastered", { count: levelValue.mastered })}</span></div><div class="result-mode-grid">${modeButtons}</div></section>`;
+  }
+
+  function resultNextAction(nextQuiz, currentQuiz) {
+    if (nextQuiz.levelId === currentQuiz.levelId) {
+      return {
+        label: escapeHtml(t("nextResultMode", { mode: modeLabel(nextQuiz.mode) })),
+        destination: "",
+        ariaLabel: null,
+      };
+    }
+    const nextLevel = curriculum.levelById.get(nextQuiz.levelId);
+    const nextLevelNumber = levelIndexForLevel(nextLevel) + 1;
+    return {
+      label: escapeHtml(t("startResultLevel", { number: nextLevelNumber })),
+      destination: `<div class="result-next-destination"><span class="result-next-destination-label">${t("nextResultLevel")}</span>${levelReferenceMarkup(nextLevel, { size: "compact", className: "result-next-level-reference" })}</div>`,
+      ariaLabel: t("startResultLevelAccessible", { number: nextLevelNumber, title: levelTitle(nextLevel) }),
+    };
+  }
+
   function curriculumResultMarkup() {
     const quiz = curriculumQuiz();
     const level = curriculumLevel();
     const perfect = state.score === state.questions.length;
-    const previewNextQuiz = state.resultPreview === "result-next-quiz"
-      ? curriculum.quizById.get(curriculum.levels[0].quizzes[1].id)
-      : state.resultPreview === "result-next-level"
-        ? curriculum.quizById.get(curriculum.levels[1].quizzes[0].id)
-        : null;
-    const nextQuiz = perfect
-      ? previewNextQuiz ?? (state.resultPreview === null ? progress.nextUnmastered(currentProfile(), curriculum.levels, quiz.id) : null)
-      : null;
-    const advancesToNextLevel = nextQuiz !== null && nextQuiz.levelId !== quiz.levelId;
+    const nextQuiz = progress.nextUnplayedSuccessor(currentProfile(), curriculum.levels, quiz.id);
+    const stage = stageForLevelIndex(quiz.levelIndex);
+    const totals = progress.summary(currentProfile(), curriculum.levels);
+    const allMastered = totals.masteredQuizzes === totals.totalQuizzes;
     const best = state.resultBestScore ?? state.score;
     const isNewRecord = !perfect && state.resultPreviousBestScore !== null && state.score > state.resultPreviousBestScore;
     const recordMarkup = isNewRecord
@@ -1687,20 +1722,38 @@
       : best > state.score
         ? `<span class="result-record">${t("recordScore", { score: best, total: state.questions.length })}</span>`
         : "";
-    const replayIcon = `<span class="result-replay-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M20 11a8 8 0 1 0-2.35 5.65M20 4v7h-7" /></svg></span>`;
-    const levelMasteryMarkup = state.resultNewLevelMastery
-      ? `<div class="level-mastered-celebration ${state.resultCelebrationPending ? "is-celebrating" : ""}"><p class="level-mastered-callout">${levelReferenceMarkup(level, { size: "compact" })}<span class="mastery-trophy" aria-label="${escapeHtml(t("mastered"))}">🏆</span></p><span class="mastery-sparkles" aria-hidden="true">${Array.from({ length: 8 }, (_, index) => `<i style="--spark-index:${index}"></i>`).join("")}</span></div>`
+    const achievementTitle = state.resultNewLevelMastery ? t("levelMasteredResult") : perfect ? t("quizMastered") : t("quizNotMastered");
+    const achievementIcon = state.resultNewLevelMastery
+      ? `<span class="mastery-trophy result-level-trophy ${state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">🏆</span>`
+      : perfect
+        ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>`
+        : "";
+    const nextActionContent = nextQuiz ? resultNextAction(nextQuiz, quiz) : null;
+    const nextAction = nextQuiz
+      ? { action: "next-curriculum-quiz", className: nextQuiz.levelId !== quiz.levelId ? "is-next-level level-action" : "", ...nextActionContent, nextQuizId: nextQuiz.id }
+      : null;
+    const stageAction = state.resultNewStageMastery && stage
+      ? { action: "open-milestone-celebration", className: "is-curriculum-complete", label: `${t("milestoneAction")} <span class="result-stage-name"><span class="result-stage-icon level-stage-${escapeHtml(stage.id)}" aria-hidden="true">${stage.icon}</span> ${escapeHtml(stageTitle(stage))}</span>`, ariaLabel: t("openMilestoneCelebration", { stage: stageTitle(stage) }) }
+      : null;
+    const worldAction = allMastered
+      ? { action: "open-world-celebration", className: "is-curriculum-complete", label: escapeHtml(t("congratulations")) }
+      : null;
+    const primaryAction = perfect ? stageAction ?? worldAction ?? nextAction : { action: "retry-curriculum-quiz", className: "", label: escapeHtml(t("tryAgainAction")) };
+    const primaryIsChooseLevel = primaryAction === null;
+    const primaryButton = primaryIsChooseLevel
+      ? `<button class="primary-button result-primary-action" data-action="view-recommended-level">${t("chooseLevel")} <span aria-hidden="true">→</span></button>`
+      : `<button class="primary-button result-primary-action${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${primaryAction.nextQuizId ? ` data-next-quiz-id="${escapeHtml(primaryAction.nextQuizId)}"` : ""}${primaryAction.ariaLabel ? ` aria-label="${escapeHtml(primaryAction.ariaLabel)}"` : ""}>${primaryAction.label} <span class="result-action-arrow" aria-hidden="true">→</span></button>`;
+    const secondaryNextButton = !perfect && nextAction
+      ? `<button class="secondary-button result-next-button" data-action="next-curriculum-quiz" data-next-quiz-id="${escapeHtml(nextQuiz.id)}"${nextAction.ariaLabel ? ` aria-label="${escapeHtml(nextAction.ariaLabel)}"` : ""}>${nextAction.label} <span aria-hidden="true">→</span></button>`
       : "";
-    const primaryAction = !perfect
-      ? { action: "retry-curriculum-quiz", className: "", label: t("tryAgainAction"), icon: "→" }
-      : state.resultNewStageMastery
-        ? { action: "open-milestone-celebration", className: "is-curriculum-complete", label: t("milestoneAction"), icon: "✦" }
-      : nextQuiz === null
-        ? { action: "open-world-celebration", className: "is-curriculum-complete", label: t("congratulations"), icon: "✦" }
-        : { action: "next-curriculum-quiz", className: advancesToNextLevel ? "is-next-level level-action" : "", label: advancesToNextLevel ? `${t("nextLevelAction")} ${levelBadgeMarkup(nextQuiz.levelIndex, "compact")}` : t("nextQuiz"), icon: "→" };
+    const chooseLevelButton = primaryIsChooseLevel
+      ? ""
+      : perfect || !nextAction
+        ? `<button class="secondary-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button>`
+        : `<button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button>`;
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
-      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${perfect ? t("quizMastered") : t("quizNotMastered")}</h1>${perfect ? `<span class="mastery-check result-mastery-check ${state.resultNewQuizMastery && state.resultCelebrationPending ? "is-celebrating" : ""}" aria-hidden="true">✓</span>` : ""}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${levelMasteryMarkup}${challengeComparisonMarkup()}</div>
-      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions"><button class="primary-button${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${nextQuiz ? ` data-next-quiz-id="${escapeHtml(nextQuiz.id)}"` : ""}>${primaryAction.label} <span aria-hidden="true">${primaryAction.icon}</span></button><button class="secondary-button result-replay-button" data-action="${perfect ? "retry-curriculum-quiz" : "next-curriculum-quiz"}">${perfect ? `${replayIcon}${t("playAgain")}` : t("nextQuiz")}</button></div><button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button></div>
+      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${achievementTitle}</h1>${achievementIcon}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${resultLevelProgressMarkup(level, quiz)}${challengeComparisonMarkup()}</div>
+      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions">${perfect && primaryAction === nextAction ? nextAction.destination : ""}${primaryButton}${!perfect && nextAction ? nextAction.destination : ""}${secondaryNextButton}${chooseLevelButton}</div></div>
       <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="share-curriculum-challenge"${isCurriculumChallengeShareReady() ? "" : " disabled aria-busy=\"true\""}>${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
   }
 
@@ -5453,22 +5506,53 @@
       return;
     }
     if (initialPreview) {
-      const level = ["result-next-quiz", "result-next-level", "share-fallback"].includes(initialPreview)
-        ? curriculum.levels[0]
-        : curriculum.levels.at(-1);
-      const quizIndex = initialPreview === "result-next-quiz" || initialPreview === "share-fallback" ? 0 : 3;
+      resetPreviewProgress(initialPreview);
+      const basicResultPreviews = ["result-next-quiz", "result-next-level", "result-failed-next", "result-failed-no-next", "share-fallback"];
+      const longestLevelIndex = curriculum.levels.reduce((longestIndex, candidate, index) =>
+        levelTitle(candidate).length > levelTitle(curriculum.levels[longestIndex]).length ? index : longestIndex, 0);
+      const crossLevelPreview = initialPreview === "result-next-level" || initialPreview === "result-failed-next";
+      const level = crossLevelPreview
+        ? curriculum.levels[Math.max(0, longestLevelIndex - 1)]
+        : basicResultPreviews.includes(initialPreview)
+          ? curriculum.levels[0]
+          : curriculum.levels.at(-1);
+      const failedResult = initialPreview === "result-failed-next" || initialPreview === "result-failed-no-next";
+      const quizIndex = ["result-next-quiz", "result-failed-no-next", "share-fallback"].includes(initialPreview) ? 0 : 3;
       const quiz = curriculum.quizById.get(level.quizzes[quizIndex].id);
+      const resultScore = failedResult ? quiz.countryCodes.length - 1 : quiz.countryCodes.length;
+      if (initialPreview === "result-next-level") {
+        masterPreviewQuizzes((candidate) => candidate.levelId === level.id);
+      } else {
+        if (initialPreview === "result-failed-next") {
+          masterPreviewQuizzes((candidate) => candidate.levelId === level.id && candidate.id !== quiz.id);
+        }
+        progressStore = progress.recordResult(
+          progressStore,
+          progressStore.activeProfileId,
+          quiz,
+          resultScore,
+        );
+        if (initialPreview === "result-failed-no-next") {
+          const successor = curriculum.quizById.get(level.quizzes[quizIndex + 1].id);
+          progressStore = progress.recordResult(
+            progressStore,
+            progressStore.activeProfileId,
+            successor,
+            successor.countryCodes.length - 1,
+          );
+        }
+      }
       state.curriculumQuizId = quiz.id;
       state.activeLevelId = level.id;
       state.mode = quiz.mode;
       state.questions = quiz.countryCodes.map((code) => ({ country: countriesByCode.get(code), choices: [] }));
-      state.score = state.questions.length;
-      state.wrongAnswers = [];
+      state.score = resultScore;
+      state.wrongAnswers = failedResult ? [countriesByCode.get(quiz.countryCodes[0])] : [];
       state.resultRecorded = true;
       state.resultBestScore = state.score;
       state.resultPreviousBestScore = null;
-      state.resultNewQuizMastery = true;
-      state.resultNewLevelMastery = initialPreview !== "result-next-quiz";
+      state.resultNewQuizMastery = !failedResult;
+      state.resultNewLevelMastery = initialPreview === "result-next-level";
       state.resultNewStageMastery = false;
       state.resultCelebrationPending = false;
       state.resultPreview = initialPreview === "share-fallback" ? "result-next-quiz" : initialPreview;

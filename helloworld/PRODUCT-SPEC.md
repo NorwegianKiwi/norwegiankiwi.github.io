@@ -198,23 +198,36 @@ The result screen must minimise decision-making.
 
 After a perfect result:
 
-- A green checkmark recognises quiz mastery.
-- **Next quiz** is the primary action.
-- **Play again** is secondary.
-- **Choose a level** is a quiet tertiary action that opens the recommended
-  quiz on the level overview.
+- A green checkmark recognises quiz mastery. When the result newly completes
+  the level, **Level mastered** and the level trophy replace that quiz-level
+  heading; the completed quiz remains checked in the level-progress controls.
+- The primary action names the immediate next quiz in curriculum order, but
+  only when that quiz is unplayed. When it crosses a level boundary, it also
+  shows the next level badge and name above a compact **Start level** action,
+  without repeating the predictable first quiz mode.
+- **Choose a level** is secondary. If no unplayed immediate successor exists,
+  it becomes primary.
+- Replaying the completed quiz remains available through its level-progress
+  control rather than a separate **Play again** action.
 
 After a non-perfect result:
 
 - **Try again** is the primary action.
-- **Next quiz** is secondary.
-- **Choose a level** is a quiet tertiary action that opens the recommended
-  quiz on the level overview.
+- The immediate next quiz is secondary only when it is unplayed. The result
+  does not scan ahead or wrap when the player is revisiting earlier material.
+- **Choose a level** is a visible tertiary action, promoted to secondary when
+  no next action is offered.
 
 The result must state whether the quiz was mastered, show the current score and
-best score, and acknowledge newly earned level mastery with the same trophy used
-on the level overview. Wrong-answer review may remain available, but must not
-displace the primary next action.
+best score, and show all four quiz modes for the current level as direct,
+clickable navigation. Each mode shows whether it is mastered, played but not
+mastered, or unplayed; the quiz that produced the result is highlighted. A
+newly earned level mastery uses the same trophy as the level overview. Wrong-
+answer review may remain available, but must not displace the primary action.
+
+When a result earns a stage milestone, its action uses **Completed**, followed
+by the stage icon and localized stage name, rather than a generic milestone
+star. **Challenge a friend** remains less prominent than **Choose a level**.
 
 After a non-perfect result, an additional quiet **Review with flashcards**
 action opens an optional temporary flashcard deck containing only missed

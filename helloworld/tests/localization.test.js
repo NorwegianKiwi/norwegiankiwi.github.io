@@ -17,6 +17,8 @@ test("interpolates placeholders and simple plurals", () => {
   assert.equal(localization.translate("en", "countries", { count: 1 }), "1 country");
   assert.equal(localization.translate("en", "countries", { count: 2 }), "2 countries");
   assert.equal(localization.translate("nb", "levelRange", { start: 3, end: 7 }), "Nivå 3–7");
+  assert.equal(localization.translate("nb", "startResultLevel", { number: 40 }), "Start nivå 40");
+  assert.equal(localization.translate("en", "startResultLevel", { number: 36 }), "Start level 36");
 });
 
 test("builds personalized and anonymous share copy in both locales", () => {

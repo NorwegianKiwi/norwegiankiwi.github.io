@@ -199,6 +199,13 @@
     }
     return null;
   }
+  function nextUnplayedSuccessor(profile, levels, quizId) {
+    const quizzes = flatQuizzes(levels);
+    const currentIndex = quizzes.findIndex((quiz) => quiz.id === quizId);
+    if (currentIndex < 0 || currentIndex >= quizzes.length - 1) return null;
+    const successor = quizzes[currentIndex + 1];
+    return quizState(profile, successor) === "unplayed" ? successor : null;
+  }
   function surpriseQuiz(profile, levels, random = Math.random) {
     const quizzes = flatQuizzes(levels).filter((quiz) => quizState(profile, quiz) === "mastered");
     if (!quizzes.length) return null;
@@ -355,7 +362,8 @@
     STORAGE_KEY, SCHEMA_VERSION, TRANSFER_VERSION, createProfile, createEmptyStore,
     validateRoot, loadStore, saveStore, activeProfile, currentRecord, quizState,
     matchingSavedAttempt,
-    levelProgress, stageProgress, summary, continueSelection, nextUnmastered, surpriseQuiz,
+    levelProgress, stageProgress, summary, continueSelection, nextUnmastered,
+    nextUnplayedSuccessor, surpriseQuiz,
     recordResult, addProfile, switchProfile, renameProfile, clearProgress,
     deleteProfile, saveMasteryAttempt, abandonMasteryAttempt, transferableProfile,
     encodeTransfer, decodeTransfer, mergeProfiles, importAsNew, mergeInto,
