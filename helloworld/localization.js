@@ -59,6 +59,7 @@ const messages = Object.freeze({
     localFlagsLicence: "Lokale flagg · kildeinfo",
     globeLicence: "Jordklode fra Twemoji · CC BY 4.0",
     mapLicence: "Kart fra Natural Earth · public domain",
+    licencesAndPrivacy: "Lisenser og personvern",
     installApp: "Legg til på Hjem-skjermen",
     installHelpTitle: "Legg til på Hjem-skjermen",
     installHelpText:
@@ -192,6 +193,7 @@ const messages = Object.freeze({
     localFlagsLicence: "Local flags · source details",
     globeLicence: "Globe from Twemoji · CC BY 4.0",
     mapLicence: "Maps from Natural Earth · public domain",
+    licencesAndPrivacy: "Licences and privacy",
     installApp: "Add to Home Screen",
     installHelpTitle: "Add to Home Screen",
     installHelpText:

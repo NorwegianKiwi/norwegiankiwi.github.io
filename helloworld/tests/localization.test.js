@@ -9,6 +9,8 @@ test("supports the complete Norwegian and English catalogs", () => {
   assert.equal(localization.translate("nb", "brandName"), "Hei verden!");
   assert.equal(localization.translate("en", "brandName"), "Hello World!");
   assert.equal(localization.translate("en", "continueGame"), "Continue game");
+  assert.equal(localization.translate("nb", "licencesAndPrivacy"), "Lisenser og personvern");
+  assert.equal(localization.translate("en", "licencesAndPrivacy"), "Licences and privacy");
   assert.equal(localization.translate("nb", "resultsDestination"), "Resultatet");
   assert.equal(localization.translate("en", "resultsDestination"), "Results");
 });

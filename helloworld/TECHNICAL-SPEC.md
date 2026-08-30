@@ -368,6 +368,18 @@ checkbox-selection workflow while supporting both needs.
 - Import data is untrusted input and must be validated just like network data.
 - No secret key is embedded in client code to pretend that static data is
   authenticated.
+- Ordinary delivery still exposes request metadata such as IP address, user
+  agent, requested URL and time to the GitHub Pages origin and Cloudflare
+  reverse proxy. The operator uses only Cloudflare's aggregate edge dashboards
+  to estimate game document loads for service operation and improvement.
+- The app contains no analytics beacon, analytics cookie, browser fingerprint,
+  individual activity profile or in-game event reporting. An edge request
+  estimate is not a reliable unique-person count.
+- The dedicated `licenses-and-privacy.html` page identifies the operator,
+  contact address, legitimate-interest purpose, retention limits, processors,
+  international-transfer safeguards and data-subject rights. It contains both
+  locales in its static HTML; `legal-page.js` only selects the preferred
+  presentation language.
 
 ## 15. URL state and routing
 
@@ -391,6 +403,10 @@ checkbox-selection workflow while supporting both needs.
   requires the current origin and normalised app path, and classifies a current
   challenge, `#progress` transfer or ordinary Home invitation. Challenge query
   fields retain precedence if a link also contains a transfer fragment.
+
+The legal page is outside application routing. Norwegian is its default and
+`licenses-and-privacy.html?lang=en` selects English. This does not change the
+canonical game URL, route parameters, progress-transfer fragments or PWA scope.
 
 ## 16. Sharing and friend challenges
 
@@ -488,7 +504,25 @@ without changing smaller-country framing. It retains an 8× zoom ceiling and
 clamps to the generated regional bleed extent; marker coordinates are the
 zero-size fallback.
 
-## 18. Tests and validation
+## 18. Deployment and edge measurement
+
+- GitHub Pages remains the origin and deployment system for
+  `https://lanceolav.com/helloworld/`; Cloudflare proxies the apex domain.
+- Cloudflare's GitHub Pages A and AAAA records are proxied. One.com mail and
+  verification records are copied exactly and kept DNS-only before any
+  nameserver change.
+- GitHub Pages HTTPS remains enabled and Cloudflare uses Full (strict) TLS with
+  its default cache behaviour initially.
+- Cloudflare Web Analytics, automatic beacon injection, Browser Insights/RUM,
+  Zaraz and equivalent client instrumentation remain disabled.
+- Zone Analytics may be used for whole-domain context. The game-load estimate
+  uses successful `GET` HTML document requests for host `lanceolav.com` and path
+  `/helloworld/`, with available bot exclusions. It is labelled approximate
+  “game loads”, never unique people.
+- Operational reporting accounts for the free Security Analytics seven-day
+  retention and 24-hour maximum query window.
+
+## 19. Tests and validation
 
 At minimum, add automated coverage for:
 
@@ -540,7 +574,7 @@ Visual and interaction testing must cover phone, tablet and desktop layouts,
 keyboard operation, reduced motion, Norwegian and English, and both empty and
 heavily completed profiles.
 
-## 19. Acceptance criteria
+## 20. Acceptance criteria
 
 The progression system must continue to satisfy these criteria:
 

@@ -69,9 +69,10 @@ in [AGENTS.md](AGENTS.md).
 
 ## Project structure
 
-- `index.html`, `manifest.webmanifest`, and `icons/` — document shell and
-  installable-app metadata
+- `index.html`, `licenses-and-privacy.html`, `manifest.webmanifest`, and
+  `icons/` — document shells, legal information, and installable-app metadata
 - `app.js` — browser state, rendering orchestration, lifecycle, and events
+- `legal-page.js` — progressive language selection for the legal page
 - `localization.js` — bilingual interface catalogs and interpolation
 - `countries.js` — localized place, relationship, civic-centre, and region data
 - `curriculum.js` — ordered levels, stable quizzes, and deterministic attempts
@@ -131,3 +132,36 @@ projection settings, and editorial overrides are stored in
 
 The globe graphic is Twemoji’s Globe showing Europe–Africa, used unchanged under
 CC BY 4.0. Local licence copies are stored in `licenses/`.
+
+The home footer links to `licenses-and-privacy.html`, which explains these
+sources and the site's privacy practices in Norwegian and English. Both
+languages are present in the document and remain readable when JavaScript is
+unavailable.
+
+## Privacy and traffic measurement
+
+Game profiles and progress remain in the browser under `hello-world-progress`.
+They are not sent to the site operator unless a player deliberately shares a
+challenge or invitation, copies a progress-transfer link, or downloads and
+later imports a backup.
+
+The production site remains a GitHub Pages deployment at
+`https://lanceolav.com/helloworld/`, with Cloudflare acting as its reverse proxy.
+Traffic measurement is limited to Cloudflare's server-side zone and security
+dashboards. Do not enable Cloudflare Web Analytics, automatic beacon injection,
+Browser Insights/RUM, Zaraz, or any equivalent browser-side analytics. The app
+must not load `beacon.min.js`, set analytics cookies, fingerprint browsers, or
+send in-game events.
+
+For an approximate game-load count, filter Security Analytics to host
+`lanceolav.com`, path `/helloworld/`, method `GET`, successful HTML document
+responses, and available bot exclusions. Describe the result as “game loads”,
+not unique people. On the free plan this view has seven days of retained data
+and accepts a maximum 24-hour query window, so longer comparisons must be made
+from daily aggregate figures. Zone Analytics provides contextual whole-domain
+requests, bandwidth, visitor estimates, and countries.
+
+Cloudflare DNS must preserve the GitHub Pages A and AAAA origin records as
+proxied web records. One.com MX, SPF, DKIM, DMARC, verification, and other mail
+records remain DNS-only. GitHub Pages HTTPS stays enabled, Cloudflare TLS uses
+Full (strict), and default caching is the initial policy.
