@@ -322,6 +322,12 @@ Before replacing `world-map.js`:
   (West). Both the region map and the shape inset must show
   all of Russia, including Kaliningrad and the geometry at the date line.
 - Inspect Kosovo, Palestine, and all new code overrides separately.
+- Confirm that the Netherlands compact silhouette shows European Netherlands;
+  its expanded view places Saba and Sint Eustatius together above a separate
+  Bonaire inset, with Amsterdam marked only on the main form.
+- Confirm that the Equatorial Guinea compact silhouette shows Río Muni and
+  Bioko together; its expanded view places Annobón in a separate lower-left
+  inset, with Malabo marked only on Bioko.
 - Confirm that Somalia includes Somaliland in its active regional geometry and
   compact silhouette, while only the enlarged silhouette shows their shared
   boundary as an open dashed line that does not follow the coast.

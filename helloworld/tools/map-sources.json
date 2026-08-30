@@ -161,6 +161,14 @@
         {"selection": [{"bounds": [-10, 70, -7, 72]}], "frame": [10, 43, 17, 25]}
       ]
     },
+    "nl": {
+      "main": [{"bounds": [3, 50.5, 7.5, 54]}],
+      "expandedMainFrame": [38, 4, 58, 92],
+      "insets": [
+        {"selection": [{"bounds": [-63.4, 17.4, -62.8, 17.8]}], "frame": [4, 10, 29, 30]},
+        {"selection": [{"bounds": [-68.5, 11.9, -68.1, 12.4]}], "frame": [4, 60, 29, 30]}
+      ]
+    },
     "fr": {
       "main": [{"bounds": [-6, 41, 10, 52]}]
     },
@@ -184,6 +192,13 @@
     },
     "za": {
       "main": [{"bounds": [15, -36, 34, -21]}]
+    },
+    "gq": {
+      "main": [{"bounds": [8, 0.5, 11.5, 4]}],
+      "expandedMainFrame": [36, 4, 60, 92],
+      "insets": [
+        {"selection": [{"bounds": [5.5, -1.6, 5.8, -1.3]}], "frame": [4, 64, 27, 30]}
+      ]
     },
     "au": {
       "main": [{"bounds": [110, -45, 155, -9], "sourceNames": ["Australia"]}]
