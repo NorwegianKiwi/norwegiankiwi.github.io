@@ -142,8 +142,7 @@
 
 /* Responsive flashcards layout */
 @media (max-width: 600px) {
-  .quiz-active,
-    .flashcard-shell {
+  .flashcard-shell {
       --phone-quiz-header-height: 66px;
       --phone-quiz-header-height: clamp(58px, 8.5dvh, 72px);
       --phone-quiz-bottom-buffer: 18px;
@@ -177,8 +176,7 @@
 }
 
 @media (orientation: landscape) and (max-height: 599px) {
-  .quiz-active,
-    .flashcard-shell {
+  .flashcard-shell {
       --short-header-height: 52px;
       --short-bottom-space: max(6px, env(safe-area-inset-bottom));
       height: 100dvh;

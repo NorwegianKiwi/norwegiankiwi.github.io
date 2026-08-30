@@ -1113,6 +1113,13 @@
       width: min(100% - 24px, 1180px);
     }
 
+  .quiz-active {
+      --phone-quiz-header-height: 66px;
+      --phone-quiz-header-height: clamp(58px, 8.5dvh, 72px);
+      --phone-quiz-bottom-buffer: 18px;
+      --phone-quiz-bottom-buffer: max(18px, env(safe-area-inset-bottom));
+    }
+
   .brand-bar,
     .quiz-header {
       min-height: 72px;
@@ -1177,19 +1184,17 @@
   .quiz-active .answer-grid-stage {
       min-height: 0;
       display: grid;
-      align-items: center;
+      align-items: end;
     }
 
   .mode-country-flag .answer-grid-stage {
-      place-items: center;
+      place-items: end center;
       container-type: size;
     }
 
   .quiz-active .flag-grid {
-      width: min(100cqw, calc(133.333cqh - 10.667px));
       max-width: 100%;
-      grid-template-rows: repeat(3, auto);
-      align-content: center;
+      align-content: end;
     }
 
   .flag-grid .answer-card {
@@ -1198,35 +1203,35 @@
       gap: 0;
     }
 
-  .mode-flag-country .featured-flag {
-      width: min(
-        316px,
-        calc(72vw - 18px),
-        calc(32dvh - 18px)
-      );
-      margin-top: clamp(8px, 1.5dvh, 14px);
-    }
-
   .text-grid {
       grid-template-columns: 1fr;
     }
 
   .quiz-active .text-grid {
+      --mobile-answer-rows: 6;
       grid-template-rows: repeat(
-        6,
+        var(--mobile-answer-rows),
         minmax(clamp(52px, 7.5dvh, 60px), auto)
       );
-      align-content: center;
+      align-content: end;
+    }
+
+  .quiz-active .text-grid[data-choice-count="3"] {
+      --mobile-answer-rows: 3;
+    }
+
+  .quiz-active .text-grid[data-choice-count="4"] {
+      --mobile-answer-rows: 4;
+    }
+
+  .quiz-active .text-grid[data-choice-count="5"] {
+      --mobile-answer-rows: 5;
     }
 
   .quiz-active .text-grid .answer-card {
       min-height: clamp(52px, 7.5dvh, 60px);
       padding-top: clamp(8px, 1.2dvh, 12px);
       padding-bottom: clamp(8px, 1.2dvh, 12px);
-    }
-
-  .mode-country-capital .prompt-flag {
-      width: clamp(76px, 12dvh, 96px);
     }
 
   .mode-map-country .question-area {
@@ -1293,7 +1298,7 @@
     }
 
   .text-grid .answer-card {
-      min-height: 58px;
+      min-height: clamp(52px, 7.5dvh, 60px);
     }
 
   .text-grid .answer-card strong {
@@ -1301,7 +1306,240 @@
     }
 }
 
+@media (orientation: portrait) and (max-width: 600px) {
+  .quiz-active:not(.mode-map-country) .question-area {
+      --question-unit-space-top: clamp(10px, 1.6dvh, 16px);
+      --question-unit-space-bottom: clamp(15px, 2.4dvh, 24px);
+    }
+
+  .mode-country-flag .question-prompt {
+      padding-top: var(--question-unit-space-top);
+      padding-bottom: var(--question-unit-space-bottom);
+    }
+
+  .mode-flag-country .question-area,
+    .mode-country-capital .question-area {
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+  .mode-flag-country .question-prompt {
+      min-height: 0;
+      display: grid;
+      grid-template-rows:
+        minmax(var(--question-unit-space-top), 2fr)
+        auto
+        auto
+        minmax(var(--question-unit-space-bottom), 3fr);
+      align-items: center;
+      justify-items: center;
+      gap: 0;
+      container-type: size;
+    }
+
+  .mode-flag-country .question-heading {
+      grid-row: 2;
+    }
+
+  .mode-flag-country .featured-flag {
+      width: min(
+        100cqw,
+        calc(133.333cqh - clamp(88px, 13dvh, 104px))
+      );
+      max-width: 100%;
+      grid-row: 3;
+      margin: 12px 0 0;
+      align-self: center;
+    }
+
+  .mode-country-capital .question-prompt {
+      min-height: 0;
+      display: grid;
+      grid-template-rows:
+        minmax(var(--question-unit-space-top), 2fr)
+        auto
+        minmax(var(--question-unit-space-bottom), 3fr);
+      align-items: center;
+      justify-items: center;
+      container-type: size;
+    }
+
+  .mode-country-capital .question-capital {
+      height: auto;
+      min-height: 0;
+      grid-row: 2;
+      display: grid;
+      grid-template-rows: auto auto;
+      gap: 12px;
+    }
+
+  .mode-country-capital .capital-clue {
+      height: auto;
+      min-height: 0;
+      margin: 0;
+      grid-template-rows: auto auto;
+      align-items: center;
+      gap: 8px;
+    }
+
+  .mode-country-capital .question-clue {
+      margin-top: 0;
+    }
+
+  .mode-country-capital .prompt-flag {
+      width: min(
+        100cqw,
+        calc(133.333cqh - clamp(132px, 22dvh, 156px))
+      );
+      max-width: 100%;
+      align-self: center;
+    }
+
+  .mode-country-flag:is(
+      [data-choice-count="4"],
+      [data-choice-count="5"],
+      [data-choice-count="6"],
+      [data-choice-count="9"]
+    ) .question-area {
+      height: calc(100dvh - var(--phone-quiz-header-height) - 3px);
+      min-height: 0;
+      grid-template-rows:
+        minmax(var(--question-unit-space-top), 2fr)
+        auto
+        minmax(var(--question-unit-space-bottom), 3fr)
+        auto;
+      gap: 0;
+      container-type: size;
+    }
+
+  .mode-country-flag:is(
+      [data-choice-count="4"],
+      [data-choice-count="5"],
+      [data-choice-count="6"],
+      [data-choice-count="9"]
+    ) :is(.question-prompt, .answer-grid-stage) {
+      display: contents;
+    }
+
+  .mode-country-flag:is(
+      [data-choice-count="4"],
+      [data-choice-count="5"],
+      [data-choice-count="6"],
+      [data-choice-count="9"]
+    ) .question-heading {
+      grid-row: 2;
+      align-self: center;
+    }
+
+  .mode-country-flag:is(
+      [data-choice-count="4"],
+      [data-choice-count="5"],
+      [data-choice-count="6"],
+      [data-choice-count="9"]
+    ) .flag-grid {
+      grid-row: 4;
+      justify-self: center;
+      align-self: end;
+    }
+
+  .quiz-active .flag-grid[data-choice-count="3"] {
+      width: min(100cqw, calc(44.444cqh - 10.667px));
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: repeat(3, auto);
+    }
+
+  .quiz-active .flag-grid:is(
+      [data-choice-count="4"],
+      [data-choice-count="5"]
+    ) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+  .quiz-active .flag-grid:is(
+      [data-choice-count="4"],
+      [data-choice-count="5"]
+    ) > .answer-card {
+      grid-column: span 2;
+    }
+
+  .quiz-active .flag-grid[data-choice-count="4"] {
+      width: min(
+        100cqw,
+        calc(133.333cqh - clamp(120px, 18.667dvh, 146.667px) - 4px)
+      );
+      grid-template-rows: repeat(2, auto);
+    }
+
+  .quiz-active .flag-grid[data-choice-count="5"] {
+      width: min(
+        100cqw,
+        calc(88.889cqh - clamp(80px, 12.444dvh, 97.778px) - 9.333px)
+      );
+      grid-template-rows: repeat(3, auto);
+    }
+
+  .quiz-active .flag-grid[data-choice-count="5"] > :nth-child(5) {
+      grid-column: 2 / span 2;
+    }
+
+  .quiz-active .flag-grid[data-choice-count="6"] {
+      width: min(
+        100cqw,
+        calc(88.889cqh - clamp(80px, 12.444dvh, 97.778px) - 9.333px)
+      );
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, auto);
+    }
+
+  .quiz-active .flag-grid[data-choice-count="9"] {
+      width: min(
+        100cqw,
+        calc(53.333cqh - clamp(48px, 7.467dvh, 58.667px) - 15.6px)
+      );
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: repeat(5, auto);
+    }
+
+  .quiz-active .flag-grid[data-choice-count="9"] > .answer-card {
+      grid-column: span 2;
+    }
+
+  .quiz-active .flag-grid[data-choice-count="9"] > :nth-child(9) {
+      grid-column: 2 / span 2;
+    }
+}
+
+@media (
+    orientation: portrait
+  ) and (
+    max-width: 600px
+  ) and (
+    min-height: 740px
+  ) and (
+    max-aspect-ratio: 10 / 21
+  ) {
+  .mode-country-flag[data-choice-count="4"] .flag-grid {
+      width: min(
+        100cqw,
+        calc(33.333cqh - clamp(30px, 4.667dvh, 36.667px) - 12px)
+      );
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: repeat(4, auto);
+    }
+
+  .mode-country-flag[data-choice-count="4"] .flag-grid > .answer-card {
+      grid-column: auto;
+    }
+}
+
 @media (orientation: landscape) and (max-height: 599px) {
+  .quiz-active {
+      --short-header-height: 52px;
+      --short-bottom-space: max(6px, env(safe-area-inset-bottom));
+      height: 100dvh;
+      min-height: 0;
+      overflow: hidden;
+    }
+
   .quiz-active .question-area {
       width: min(1120px, 100%);
       height: calc(100dvh - var(--short-header-height) - 3px);
