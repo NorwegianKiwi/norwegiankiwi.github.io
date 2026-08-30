@@ -1582,9 +1582,15 @@
       align-items: stretch;
     }
 
+  .mode-country-flag .question-prompt {
+      padding-top: clamp(3px, 1.4dvh, 8px);
+      padding-bottom: clamp(5px, 2.1dvh, 12px);
+    }
+
   .mode-country-flag .answer-grid-stage {
       place-items: center;
       container-type: size;
+      container-name: landscape-flag-stage;
     }
 
   .quiz-active .answer-grid {
@@ -1595,9 +1601,60 @@
 
   .quiz-active .flag-grid {
       --answer-gap: clamp(7px, 2.5dvh, 12px);
-      width: min(100cqw, calc(133.333cqh - 10.667px));
-      grid-template-rows: repeat(3, auto);
+      max-width: 100%;
+      grid-template-rows: auto;
       align-content: center;
+      justify-content: center;
+    }
+
+  .quiz-active .flag-grid[data-choice-count="3"] {
+      width: min(
+        100cqw,
+        calc(400cqh + var(--answer-gap) + var(--answer-gap))
+      );
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+  .quiz-active .flag-grid[data-choice-count="4"] {
+      width: min(
+        100cqw,
+        calc(
+          533.333cqh + var(--answer-gap) + var(--answer-gap) +
+            var(--answer-gap)
+        )
+      );
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+  .quiz-active .flag-grid[data-choice-count="5"] {
+      width: min(
+        100cqw,
+        calc(
+          666.667cqh + var(--answer-gap) + var(--answer-gap) +
+            var(--answer-gap) + var(--answer-gap)
+        )
+      );
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+  .quiz-active .flag-grid[data-choice-count="6"] {
+      width: min(100cqw, 200cqh);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(2, auto);
+    }
+
+  .quiz-active .flag-grid[data-choice-count="9"] {
+      width: min(100cqw, 333.333cqh);
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-template-rows: repeat(2, auto);
+    }
+
+  .quiz-active .flag-grid[data-choice-count="9"] > .answer-card {
+      grid-column: span 2;
+    }
+
+  .quiz-active .flag-grid[data-choice-count="9"] > :nth-child(6) {
+      grid-column: 2 / span 2;
     }
 
   .quiz-active .flag-grid .answer-card {
@@ -1642,9 +1699,43 @@
 
   .mode-flag-country .text-grid,
     .mode-country-capital .text-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: repeat(3, minmax(0, 1fr));
-      align-content: stretch;
+      --short-text-row-height: clamp(64px, 27dvh, 106px);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-content: center;
+    }
+
+  .mode-flag-country .text-grid > .answer-card,
+    .mode-country-capital .text-grid > .answer-card {
+      grid-column: span 2;
+    }
+
+  .mode-flag-country .text-grid:is(
+      [data-choice-count="3"],
+      [data-choice-count="4"]
+    ),
+    .mode-country-capital .text-grid:is(
+      [data-choice-count="3"],
+      [data-choice-count="4"]
+    ) {
+      grid-template-rows: repeat(2, minmax(0, var(--short-text-row-height)));
+    }
+
+  .mode-flag-country .text-grid:is(
+      [data-choice-count="5"],
+      [data-choice-count="6"]
+    ),
+    .mode-country-capital .text-grid:is(
+      [data-choice-count="5"],
+      [data-choice-count="6"]
+    ) {
+      grid-template-rows: repeat(3, minmax(0, var(--short-text-row-height)));
+    }
+
+  .mode-flag-country .text-grid[data-choice-count="3"] > :nth-child(3),
+    .mode-country-capital .text-grid[data-choice-count="3"] > :nth-child(3),
+    .mode-flag-country .text-grid[data-choice-count="5"] > :nth-child(5),
+    .mode-country-capital .text-grid[data-choice-count="5"] > :nth-child(5) {
+      grid-column: 2 / span 2;
     }
 
   .mode-flag-country .text-grid .answer-card,
@@ -1683,9 +1774,33 @@
     }
 
   .mode-map-country .map-answer-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: repeat(3, minmax(0, 1fr));
+      --short-map-row-height: clamp(58px, 23dvh, 92px);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-content: center;
       padding: 5px;
+    }
+
+  .mode-map-country .map-answer-grid > .answer-card {
+      grid-column: span 2;
+    }
+
+  .mode-map-country .map-answer-grid:is(
+      [data-choice-count="3"],
+      [data-choice-count="4"]
+    ) {
+      grid-template-rows: repeat(2, minmax(0, var(--short-map-row-height)));
+    }
+
+  .mode-map-country .map-answer-grid:is(
+      [data-choice-count="5"],
+      [data-choice-count="6"]
+    ) {
+      grid-template-rows: repeat(3, minmax(0, var(--short-map-row-height)));
+    }
+
+  .mode-map-country .map-answer-grid[data-choice-count="3"] > :nth-child(3),
+    .mode-map-country .map-answer-grid[data-choice-count="5"] > :nth-child(5) {
+      grid-column: 2 / span 2;
     }
 
   .mode-map-country .map-answer-grid .answer-card {
@@ -1707,5 +1822,23 @@
       --silhouette-size: min(78px, 25dvh);
       padding: 6px;
       border-radius: 10px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 599px) {
+  @container landscape-flag-stage (max-width: 520px) {
+    .mode-country-flag .flag-grid[data-choice-count="5"] {
+        width: min(100cqw, 200cqh);
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-rows: repeat(2, auto);
+      }
+
+    .mode-country-flag .flag-grid[data-choice-count="5"] > .answer-card {
+        grid-column: span 2;
+      }
+
+    .mode-country-flag .flag-grid[data-choice-count="5"] > :nth-child(4) {
+        grid-column: 2 / span 2;
+      }
     }
 }
