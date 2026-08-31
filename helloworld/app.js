@@ -1105,14 +1105,17 @@
             <g aria-hidden="true">
               ${pathMarkup(contextFeatures, "question-map-country")}
               ${pathMarkup(otherFeatures, "question-map-country")}
-              ${markerMarkup(otherMarkers, "question-map-marker", markerRadius)}
-              ${pathMarkup(targetFeatures, "question-map-target-halo")}
               ${pathMarkup(targetFeatures, "question-map-country is-target")}
+              ${pathMarkup(targetFeatures, "question-map-target-halo")}
               ${markerMarkup(
                 targetMarkers,
                 "question-map-marker is-target-halo",
                 markerRadius * 2.8,
               )}
+              ${pathMarkup(contextFeatures, "question-map-country-border")}
+              ${pathMarkup(otherFeatures, "question-map-country-border")}
+              ${pathMarkup(targetFeatures, "question-map-country-border is-target")}
+              ${markerMarkup(otherMarkers, "question-map-marker", markerRadius)}
               ${markerMarkup(
                 targetMarkers,
                 "question-map-marker is-target",
