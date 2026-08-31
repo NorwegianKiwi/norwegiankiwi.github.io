@@ -30,7 +30,7 @@
     : "nb";
   const initialPreview = new Set([
     "result-next-quiz", "result-next-level", "result-failed-next", "result-failed-no-next", "share-fallback", "milestone-result", "milestone-celebration",
-    "milestone-question", "milestone-replay", "navigator-tourist-gap-question",
+    "milestone-question", "milestone-replay", "level-final-gap-question", "navigator-tourist-gap-question",
     "tourist-world-final-question", "final-question", "final-result", "final-celebration",
   ]).has(initialUrl.searchParams.get("preview"))
     ? initialUrl.searchParams.get("preview")
@@ -1753,7 +1753,7 @@
         : `<button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button>`;
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${achievementTitle}</h1>${achievementIcon}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${resultLevelProgressMarkup(level, quiz)}${challengeComparisonMarkup()}</div>
-      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions">${perfect && primaryAction === nextAction ? nextAction.destination : ""}${primaryButton}${!perfect && nextAction ? nextAction.destination : ""}${secondaryNextButton}${chooseLevelButton}</div></div>
+      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions">${perfect && nextAction && primaryAction === nextAction ? nextAction.destination : ""}${primaryButton}${!perfect && nextAction ? nextAction.destination : ""}${secondaryNextButton}${chooseLevelButton}</div></div>
       <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="share-curriculum-challenge"${isCurriculumChallengeShareReady() ? "" : " disabled aria-busy=\"true\""}>${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
   }
 
@@ -5428,6 +5428,14 @@
   }
 
   async function initialize() {
+    if (initialPreview === "level-final-gap-question") {
+      const level = curriculum.levels[0];
+      const targetQuiz = curriculum.quizById.get(level.quizzes[2].id);
+      resetPreviewProgress(initialPreview);
+      masterPreviewQuizzes((quiz) => quiz.levelId === level.id && quiz.id !== targetQuiz.id);
+      startLastQuestionPreview(targetQuiz, initialPreview);
+      return;
+    }
     if (initialPreview === "tourist-world-final-question") {
       const tourist = curriculum.stages.find((stage) => stage.id === "tourist");
       const targetQuiz = previewStageFinalQuiz(tourist, "country-flag");

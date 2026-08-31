@@ -64,6 +64,49 @@ test("profile progress, persistence, transfer, and recovery", () => {
     null,
     "a mastered immediate successor suppresses Next",
   );
+  const outOfOrderLevel = curriculum.levels[0];
+  const outOfOrderQuizzes = outOfOrderLevel.quizzes.map((quiz) => curriculum.quizById.get(quiz.id));
+  let outOfOrderStore = progress.createEmptyStore({ id: "out-of-order-profile", now: clock.now });
+  for (const index of [0, 1, 3]) {
+    const quiz = outOfOrderQuizzes[index];
+    outOfOrderStore = progress.recordResult(
+      outOfOrderStore,
+      outOfOrderStore.activeProfileId,
+      quiz,
+      quiz.countryCodes.length,
+    );
+  }
+  assert.deepEqual(
+    progress.levelProgress(progress.activeProfile(outOfOrderStore), outOfOrderLevel),
+    { mastered: 3, played: 3, total: 4 },
+  );
+  assert.equal(
+    progress.nextUnplayedSuccessor(
+      progress.activeProfile(outOfOrderStore),
+      curriculum.levels,
+      outOfOrderQuizzes[2].id,
+    ),
+    null,
+    "an already-mastered fourth quiz leaves no immediate successor for the third quiz",
+  );
+  outOfOrderStore = progress.recordResult(
+    outOfOrderStore,
+    outOfOrderStore.activeProfileId,
+    outOfOrderQuizzes[2],
+    outOfOrderQuizzes[2].countryCodes.length,
+  );
+  assert.deepEqual(
+    progress.levelProgress(progress.activeProfile(outOfOrderStore), outOfOrderLevel),
+    { mastered: 4, played: 4, total: 4 },
+  );
+  assert.equal(
+    progress.nextUnplayedSuccessor(
+      progress.activeProfile(outOfOrderStore),
+      curriculum.levels,
+      outOfOrderQuizzes[2].id,
+    ),
+    null,
+  );
   const lastQuizInFirstLevel = curriculum.quizById.get(curriculum.levels[0].quizzes.at(-1).id);
   assert.equal(
     progress.nextUnplayedSuccessor(

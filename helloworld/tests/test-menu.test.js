@@ -15,7 +15,7 @@ test("manual preview menu scenarios", () => {
 
   const groups = menu.scenarioGroups();
   const items = groups.flatMap((group) => group.items);
-  assert.equal(items.length, 40, "the test page should expose all curated scenarios");
+  assert.equal(items.length, 41, "the test page should expose all curated scenarios");
 
   const allowedPreviews = new Set([
     "result-next-quiz",
@@ -27,6 +27,7 @@ test("manual preview menu scenarios", () => {
     "milestone-celebration",
     "milestone-question",
     "milestone-replay",
+    "level-final-gap-question",
     "navigator-tourist-gap-question",
     "tourist-world-final-question",
     "final-question",
@@ -51,6 +52,7 @@ test("manual preview menu scenarios", () => {
     assert.equal(items.filter((item) => item.params.preview === preview).length, 6, preview);
   }
   assert.equal(items.filter((item) => item.params.preview === "milestone-replay").length, 12);
+  assert.equal(items.filter((item) => item.params.preview === "level-final-gap-question").length, 1);
   assert.equal(items.filter((item) => item.params.preview === "navigator-tourist-gap-question").length, 1);
   assert.equal(items.filter((item) => item.params.preview === "tourist-world-final-question").length, 1);
 });

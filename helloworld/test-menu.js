@@ -19,7 +19,7 @@
         celebrations: ["Direkte etappefeiringer", "Åpne hver feiring uten å spille en quiz."],
         replays: ["Spill feiringer igjen", "Test retur og fokus fra både forsiden og Nivåer."],
         questions: ["Én oppgave igjen", "Svar riktig én gang for å teste den ekte resultat- og feiringsflyten."],
-        edge: ["Uvanlig rekkefølge", "Test etapper som mestres i en annen rekkefølge enn læreplanen."],
+        edge: ["Uvanlig rekkefølge", "Test fremgang som mestres i en annen rekkefølge enn læreplanen."],
         world: ["Verden mestret", "Test den vanlige finaleflyten og sluttfeiringen direkte."],
         profiles: ["Testprofiler", "Importer fixtures/test-profiles-backup.json fra profilinnstillingene for varige testtilstander."],
       },
@@ -35,7 +35,7 @@
         celebrations: ["Direct stage celebrations", "Open every celebration without playing a quiz."],
         replays: ["Replay celebrations", "Test return behavior and focus from both Home and Levels."],
         questions: ["One question remaining", "Answer correctly once to test the genuine result and celebration flow."],
-        edge: ["Out-of-order progress", "Test stages mastered in a different order from the curriculum."],
+        edge: ["Out-of-order progress", "Test progress mastered in a different order from the curriculum."],
         world: ["World mastered", "Test the ordinary final flow and the finale directly."],
         profiles: ["Test profiles", "Import fixtures/test-profiles-backup.json from profile settings for persistent test states."],
       },
@@ -87,6 +87,7 @@
       {
         id: "edge",
         items: [
+          { title: { nb: "Siste hull i et nivå", en: "Final gap in a level" }, description: { nb: "Quiz 1, 2 og 4 er mestret; quiz 3 fullfører nivået.", en: "Quizzes 1, 2, and 4 are mastered; quiz 3 completes the level." }, params: { preview: "level-final-gap-question" }, oneQuestion: true },
           { title: { nb: "Turist er siste hull", en: "Tourist is the final gap" }, description: { nb: "Turist-feiring etterfølges av Verden mestret.", en: "Tourist celebration followed by World mastered." }, params: { preview: "tourist-world-final-question" }, oneQuestion: true },
           { title: { nb: "Navigatør før Turist", en: "Navigator before Tourist" }, description: { nb: "Navigatør mestres, deretter går fortsettelsen tilbake til Turist.", en: "Navigator is mastered, then continuation returns to Tourist." }, params: { preview: "navigator-tourist-gap-question" }, oneQuestion: true },
         ],
