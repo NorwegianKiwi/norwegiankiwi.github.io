@@ -59,7 +59,7 @@ For a new profile, the label is **Start game**. For an existing profile it is
 **Continue game** and includes concise context, for example:
 
 > Level 6 · Iberia and the Alps
-> Find the flag · 0/6
+> Find the flag
 
 Activating it starts the correct quiz immediately; it must not open another
 required choice screen.
@@ -127,16 +127,23 @@ allowing any other quiz to be selected.
 Continue must choose the next action without asking the player to configure a
 region, mode or difficulty:
 
-1. If the most recently played current quiz is not mastered, offer that quiz.
-2. Otherwise choose the first unmastered quiz in displayed curriculum order.
-3. After all regular levels are mastered, continue through regional mastery
-   and then whole-world mastery.
-4. If everything is mastered, return an explicit completed-world state whose
-   primary action is **Surprise quiz** and whose secondary action is
-   **Choose a level**.
+1. Resume a saved regional or world mastery attempt when its quiz ID and
+   revision still match the current curriculum.
+2. Otherwise, start with the quiz after the most recently completed quiz and
+   choose the next unmastered quiz in displayed curriculum order, wrapping to
+   the beginning when necessary. Attempted but unmastered quizzes remain eligible.
+3. With no previous completed quiz, or an unknown previous quiz ID, choose the
+   first unmastered quiz. Leaving a short quiz unfinished does not advance this
+   position; short quizzes restart when abandoned.
+4. If everything is mastered and no valid saved attempt exists, show
+   **Surprise quiz** with **Choose a level** as the secondary action.
 
-Because all content remains open, a player can ignore Continue and choose a
-different level at any time.
+The home page has no separate saved-attempt bar or Resume button. The Continue
+card shows the destination's level and quiz mode without an answered count.
+Answered progress remains visible on Levels and inside the quiz. A saved attempt uses **Continue game** even before the
+profile has completed its first quiz. Earned completion recognition remains
+based on mastery totals, including while replaying a saved mastery quiz.
+Players can choose any quiz from Levels at any time.
 
 ## 7. Quiz rules
 
@@ -176,8 +183,16 @@ previous answers cannot be changed, and resuming does not reset mistakes.
 Ordinary short quizzes restart when abandoned.
 On the Levels screen, the matching level and quiz visibly show the saved
 question position. Selecting that same quiz resumes it directly. Selecting a
-different scored quiz opens an in-app confirmation before the saved attempt is
-abandoned.
+different scored quiz, including a short quiz or shared challenge, opens an
+in-app confirmation before the saved attempt is cancelled. Confirming starts
+the selected quiz and clears only the unfinished attempt, keeping completed
+scores. Dismissing preserves the attempt and restores focus. Explore, flashcards,
+home navigation, and interruptions preserve it.
+
+The confirmation uses **Start another quiz?**, **Your unfinished mastery quiz
+will be cancelled.**, and **Go back** / **Start quiz**. Norwegian uses
+**Starte en annen quiz?**, **Den påbegynte mestringsquizen blir avbrutt.**, and
+**Tilbake** / **Start quiz**. It does not show counts or level references.
 
 ## 8. Mastery and scores
 
@@ -201,20 +216,28 @@ After a perfect result:
 - A green checkmark recognises quiz mastery. When the result newly completes
   the level, **Level mastered** and the level trophy replace that quiz-level
   heading; the completed quiz remains checked in the level-progress controls.
-- The primary action names the immediate next quiz in curriculum order, but
-  only when that quiz is unplayed. When it crosses a level boundary, it also
-  shows the next level badge and name above a compact **Start level** action,
-  without repeating the predictable first quiz mode.
-- **Choose a level** is secondary. If no unplayed immediate successor exists,
-  it becomes primary.
+- Outside milestone and world-completion celebrations, the primary action
+  offers the next unmastered quiz after the completed quiz, scanning forward
+  and wrapping at the end. It does not redirect to a separately paused mastery
+  attempt.
+- Every Next action uses **Next: {mode}**. For a destination in another level,
+  insert its numbered badge between **Next:** and the mode, and show its badge
+  and level name above the button. Same-level destinations have no badge inside
+  the button and no destination text above it.
+- These two layouts apply equally to immediate successors, skips, and wraps.
+  Accessible button names always identify the destination's level and mode.
+- **Choose a level** is secondary. If no other unmastered quiz exists, Next is
+  hidden and Choose a level becomes primary.
 - Replaying the completed quiz remains available through its level-progress
   control rather than a separate **Play again** action.
 
 After a non-perfect result:
 
-- **Try again** is the primary action.
-- The immediate next quiz is secondary only when it is unplayed. The result
-  does not scan ahead or wrap when the player is revisiting earlier material.
+- **Try again** is the primary action. When the Next action includes a level
+  heading, a subtle divider separates that heading from Try again.
+- Next is secondary and uses the same destination search, labels, and visible
+  destination as after a perfect result. It is hidden if only the current quiz
+  remains unmastered; Try again already offers that quiz.
 - **Choose a level** is a visible tertiary action, promoted to secondary when
   no next action is offered.
 
@@ -375,8 +398,9 @@ The player competes against their own previous results and the curriculum.
 - Regional and world mastery attempts are saved after every answer and can
   resume after navigation, reload or browser closure.
 - Reopening the matching mastery quiz resumes it directly from its saved
-  position. Starting a different scored quiz requires clear in-app confirmation
-  that the saved attempt will be abandoned.
+  position. Starting any different scored quiz requires clear in-app confirmation
+  that the saved attempt will be cancelled, including short quizzes and shared
+  challenges. Completed scores remain intact.
 - Motion must respect reduced-motion preferences.
 - Norwegian and English must expose the same interface capabilities and
   translation keys.

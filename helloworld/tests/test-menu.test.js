@@ -15,9 +15,13 @@ test("manual preview menu scenarios", () => {
 
   const groups = menu.scenarioGroups();
   const items = groups.flatMap((group) => group.items);
-  assert.equal(items.length, 41, "the test page should expose all curated scenarios");
+  assert.equal(items.length, 53, "the test page should expose all curated scenarios");
 
   const allowedPreviews = new Set([
+    "result-failed-next-quiz", "result-skip-quiz", "result-failed-skip-quiz",
+    "result-skip-level", "result-failed-skip-level", "result-wrap",
+    "result-failed-wrap", "result-new-record", "result-below-best",
+    "result-replay-mastered", "result-all-mastered", "result-failed-all-mastered",
     "result-next-quiz",
     "result-next-level",
     "result-failed-next",
@@ -34,6 +38,9 @@ test("manual preview menu scenarios", () => {
     "final-result",
     "final-celebration",
   ]);
+
+  assert.equal(groups.find((group) => group.id === "basic").items.length, 17);
+  for (const preview of allowedPreviews) assert.ok(items.some((item) => item.params.preview === preview), preview);
 
   for (const item of items) {
     assert.ok(allowedPreviews.has(item.params.preview), item.params.preview);

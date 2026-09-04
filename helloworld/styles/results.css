@@ -563,3 +563,10 @@ body.result-page {
       min-height: 38px;
     }
 }
+
+/* Destination details can exceed the fixed landscape panel height. */
+@media (orientation: landscape) and (max-height: 599px) {
+  .result-shell .curriculum-result-card {
+    height: auto;
+  }
+}

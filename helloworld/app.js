@@ -28,8 +28,15 @@
   )
     ? initialUrl.searchParams.get("lang")
     : "nb";
+  const resultPreviewNames = new Set([
+    "result-next-quiz", "result-next-level", "result-failed-next", "result-failed-no-next", "share-fallback",
+    "result-failed-next-quiz", "result-skip-quiz", "result-failed-skip-quiz",
+    "result-skip-level", "result-failed-skip-level", "result-wrap",
+    "result-failed-wrap", "result-new-record", "result-below-best",
+    "result-replay-mastered", "result-all-mastered", "result-failed-all-mastered",
+  ]);
   const initialPreview = new Set([
-    "result-next-quiz", "result-next-level", "result-failed-next", "result-failed-no-next", "share-fallback", "milestone-result", "milestone-celebration",
+    ...resultPreviewNames, "milestone-result", "milestone-celebration",
     "milestone-question", "milestone-replay", "level-final-gap-question", "navigator-tourist-gap-question",
     "tourist-world-final-question", "final-question", "final-result", "final-celebration",
   ]).has(initialUrl.searchParams.get("preview"))
@@ -1274,18 +1281,10 @@
     if (!dialog) return null;
     const profile = progressStore.profiles[dialog.profileId] ?? currentProfile();
     if (dialog.kind === "abandon-attempt") {
-      const saved = profile.savedMasteryAttempt;
-      const savedQuiz = saved ? curriculum.quizById.get(saved.quizId) : null;
-      const nextQuiz = curriculum.quizById.get(dialog.quizId);
-      if (!saved || !savedQuiz || !nextQuiz) return null;
-      const savedLevel = curriculum.levelById.get(savedQuiz.levelId);
-      const nextLevel = curriculum.levelById.get(nextQuiz.levelId);
+      if (!profile.savedMasteryAttempt || !curriculum.quizById.has(dialog.quizId)) return null;
       return {
         title: t("abandonAttemptTitle"),
-        descriptionMarkup: `${escapeHtml(t("abandonAttemptProgress", {
-          answered: saved.questionIndex,
-          total: savedQuiz.countryCodes.length,
-        }))} ${levelReferenceMarkup(savedLevel, { size: "compact" })} · ${escapeHtml(modeLabel(savedQuiz.mode))}. ${escapeHtml(t("abandonAttemptStarting"))} ${levelReferenceMarkup(nextLevel, { size: "compact" })} · ${escapeHtml(modeLabel(nextQuiz.mode))}, ${escapeHtml(t("abandonAttemptEnding"))}`,
+        description: t("abandonAttemptDescription"),
         confirmLabel: t("abandonAndStart"),
         cancelLabel: t("keepSavedAttempt"),
         danger: true,
@@ -1378,13 +1377,14 @@
     const stage = curriculum.stages.find((candidate) => candidate.id === state.milestoneCelebrationStageId);
     if (!stage) return "";
     const replay = state.milestoneCelebrationOrigin?.endsWith("-replay");
-    const selection = progress.continueSelection(currentProfile(), curriculum.levels);
-    const nextQuiz = selection.type === "quiz" ? curriculum.quizById.get(selection.quiz.id) : null;
+    const next = progress.nextUnmastered(currentProfile(), curriculum.levels, currentProfile().lastQuizId);
+    const nextQuiz = next ? curriculum.quizById.get(next.id) : null;
     const nextStage = nextQuiz ? stageForLevelIndex(nextQuiz.levelIndex) : null;
     const nextStageLabel = nextStage
       ? t(nextStage.startLevel > stage.endLevel ? "nextStage" : "continueWithStage", { stage: stageTitle(nextStage) })
       : "";
-    const isFinalMilestone = selection.type === "all-mastered";
+    const totals = progress.summary(currentProfile(), curriculum.levels);
+    const isFinalMilestone = totals.masteredQuizzes === totals.totalQuizzes;
     const primaryAction = replay
       ? `<button class="primary-button milestone-celebration-continue" data-action="close-milestone-celebration"><span aria-hidden="true">←</span> ${t(state.milestoneCelebrationOrigin === "levels-replay" ? "levels" : "home")}</button>`
       : isFinalMilestone
@@ -1483,11 +1483,12 @@
     const profile = currentProfile();
     const totals = progress.summary(profile, curriculum.levels);
     const next = progress.continueSelection(profile, curriculum.levels);
-    const allMastered = next.type === "all-mastered";
-    const quiz = allMastered ? null : curriculum.quizById.get(next.quiz.id);
-    const level = quiz ? curriculum.levels[quiz.levelIndex] : null;
-    const hasPlayed = totals.playedQuizzes > 0;
-    const continueIcon = allMastered
+    const allMastered = totals.masteredQuizzes === totals.totalQuizzes;
+    const quiz = next.type === "quiz" ? curriculum.quizById.get(next.quiz.id) : null;
+    const savedAttempt = progress.matchingSavedAttempt(profile, quiz);
+    const showSurprise = next.type === "all-mastered";
+    const hasPlayed = totals.playedQuizzes > 0 || Boolean(savedAttempt);
+    const continueIcon = showSurprise
       ? "✦"
       : hasPlayed && quiz
         ? stageForLevelIndex(quiz.levelIndex)?.icon ?? "→"
@@ -1497,8 +1498,6 @@
       const entry = profile.quizProgress?.[quiz.id];
       return entry && Object.keys(entry.revisions ?? {}).length > 0 && !entry.revisions[String(quiz.revision)];
     }));
-    const savedAttempt = profile.savedMasteryAttempt;
-    const savedQuiz = savedAttempt ? curriculum.quizById.get(savedAttempt.quizId) : null;
     return `
       <div class="setup-page progression-home"><main class="site-shell setup-shell">
         <header class="brand-bar app-header app-header-sticky">${brandMarkup(false, false)}<div class="setup-header-actions">${profileControlMarkup()}${siteHomeLinkMarkup()}</div></header>
@@ -1509,11 +1508,10 @@
           ${homeProgressMarkup(totals)}
         </section>
         <section class="home-milestones" aria-labelledby="home-milestones-title"><strong id="home-milestones-title">${t("milestones")}</strong>${milestoneStickersMarkup(profile, { interactive: true })}</section>
-        ${savedQuiz ? `<section class="saved-attempt-card"><p>${t("savedAttempt")} ${levelReferenceMarkup(curriculum.levelById.get(savedQuiz.levelId), { size: "compact" })}</p><button class="secondary-button" data-action="resume-mastery">${t("resumeAttempt")}</button></section>` : ""}
         <section class="home-primary-actions" aria-label="${escapeHtml(t("chooseActivity"))}">
-          <button class="home-action-card continue-card" data-action="${allMastered ? "surprise-quiz" : "continue-game"}">
+          <button class="home-action-card continue-card" data-action="${showSurprise ? "surprise-quiz" : "continue-game"}">
             <span class="home-action-icon" aria-hidden="true">${continueIcon}</span>
-            <span><strong>${allMastered ? t("surpriseQuiz") : hasPlayed ? t("continueGame") : t("startGame")}</strong>
+            <span><strong>${showSurprise ? t("surpriseQuiz") : hasPlayed ? t("continueGame") : t("startGame")}</strong>
             ${quiz && hasPlayed ? `<small class="home-level-context">${levelBadgeMarkup(quiz.levelIndex, "small")}<span>${escapeHtml(modeLabel(quiz.mode))}</span></small>` : ""}</span>
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
@@ -1694,19 +1692,15 @@
   }
 
   function resultNextAction(nextQuiz, currentQuiz) {
-    if (nextQuiz.levelId === currentQuiz.levelId) {
-      return {
-        label: escapeHtml(t("nextResultMode", { mode: modeLabel(nextQuiz.mode) })),
-        destination: "",
-        ariaLabel: null,
-      };
-    }
+    const sameLevel = nextQuiz.levelId === currentQuiz.levelId;
     const nextLevel = curriculum.levelById.get(nextQuiz.levelId);
-    const nextLevelNumber = levelIndexForLevel(nextLevel) + 1;
+    const nextLevelIndex = levelIndexForLevel(nextLevel);
+    const mode = modeLabel(nextQuiz.mode);
+    const modeMarkup = `${sameLevel ? "" : `${levelBadgeMarkup(nextLevelIndex, "compact")} `}<span class="result-next-mode-text">${escapeHtml(mode)}</span>`;
     return {
-      label: escapeHtml(t("startResultLevel", { number: nextLevelNumber })),
-      destination: `<div class="result-next-destination"><span class="result-next-destination-label">${t("nextResultLevel")}</span>${levelReferenceMarkup(nextLevel, { size: "compact", className: "result-next-level-reference" })}</div>`,
-      ariaLabel: t("startResultLevelAccessible", { number: nextLevelNumber, title: levelTitle(nextLevel) }),
+      label: t("nextResultMode", { mode: modeMarkup }),
+      destination: sameLevel ? "" : `<div class="result-next-destination">${levelReferenceMarkup(nextLevel, { size: "compact", className: "result-next-level-reference" })}</div>`,
+      ariaLabel: t("nextQuizDestination", { action: t("nextLevelAction"), number: nextLevelIndex + 1, title: levelTitle(nextLevel), mode }),
     };
   }
 
@@ -1714,7 +1708,8 @@
     const quiz = curriculumQuiz();
     const level = curriculumLevel();
     const perfect = state.score === state.questions.length;
-    const nextQuiz = progress.nextUnplayedSuccessor(currentProfile(), curriculum.levels, quiz.id);
+    const nextCandidate = progress.nextUnmastered(currentProfile(), curriculum.levels, quiz.id);
+    const nextQuiz = nextCandidate?.id !== quiz.id ? nextCandidate : null;
     const stage = stageForLevelIndex(quiz.levelIndex);
     const totals = progress.summary(currentProfile(), curriculum.levels);
     const allMastered = totals.masteredQuizzes === totals.totalQuizzes;
@@ -3702,7 +3697,7 @@
     const saved = currentProfile().savedMasteryAttempt;
     const matchingAttempt = progress.matchingSavedAttempt(currentProfile(), quiz);
     const shouldResume = Boolean(matchingAttempt && (resume || !challengeRound));
-    if (!shouldResume && saved && isMasteryQuiz(quiz) && !savedAttemptHandled) {
+    if (!shouldResume && saved && !savedAttemptHandled) {
       openActionDialog("abandon-attempt", {
         quizId,
         startOptions: { challengeRound, source, historyMode },
@@ -4506,7 +4501,8 @@
       return;
     }
     if (action === "replay-world-celebration") {
-      if (progress.continueSelection(currentProfile(), curriculum.levels).type === "all-mastered") {
+      const totals = progress.summary(currentProfile(), curriculum.levels);
+      if (totals.masteredQuizzes === totals.totalQuizzes) {
         openWorldCelebration("home-replay");
       }
       return;
@@ -4517,11 +4513,6 @@
     }
     if (action === "view-recommended-level") {
       showRecommendedLevels();
-      return;
-    }
-    if (action === "resume-mastery") {
-      const saved = currentProfile().savedMasteryAttempt;
-      if (saved) startCurriculumQuiz(saved.quizId, { resume: true });
       return;
     }
     if (action === "review-missed-cards") {
@@ -5516,43 +5507,38 @@
       else render();
       return;
     }
-    if (initialPreview) {
+    if (resultPreviewNames.has(initialPreview)) {
       resetPreviewProgress(initialPreview);
-      const basicResultPreviews = ["result-next-quiz", "result-next-level", "result-failed-next", "result-failed-no-next", "share-fallback"];
       const longestLevelIndex = curriculum.levels.reduce((longestIndex, candidate, index) =>
         levelTitle(candidate).length > levelTitle(curriculum.levels[longestIndex]).length ? index : longestIndex, 0);
-      const crossLevelPreview = initialPreview === "result-next-level" || initialPreview === "result-failed-next";
-      const level = crossLevelPreview
-        ? curriculum.levels[Math.max(0, longestLevelIndex - 1)]
-        : basicResultPreviews.includes(initialPreview)
-          ? curriculum.levels[0]
-          : curriculum.levels.at(-1);
-      const failedResult = initialPreview === "result-failed-next" || initialPreview === "result-failed-no-next";
-      const quizIndex = ["result-next-quiz", "result-failed-no-next", "share-fallback"].includes(initialPreview) ? 0 : 3;
-      const quiz = curriculum.quizById.get(level.quizzes[quizIndex].id);
-      const resultScore = failedResult ? quiz.countryCodes.length - 1 : quiz.countryCodes.length;
-      if (initialPreview === "result-next-level") {
-        masterPreviewQuizzes((candidate) => candidate.levelId === level.id);
-      } else {
-        if (initialPreview === "result-failed-next") {
-          masterPreviewQuizzes((candidate) => candidate.levelId === level.id && candidate.id !== quiz.id);
+      const crossLevel = ["result-next-level", "result-failed-next", "result-skip-level", "result-failed-skip-level"].includes(initialPreview);
+      const wraps = initialPreview.endsWith("wrap");
+      const skipsWithinLevel = initialPreview.endsWith("skip-quiz");
+      const skipsAcrossLevels = initialPreview.endsWith("skip-level");
+      const allMastered = initialPreview.endsWith("all-mastered");
+      const failedResult = initialPreview.startsWith("result-failed-") || ["result-new-record", "result-below-best"].includes(initialPreview);
+      const level = curriculum.levels[wraps ? curriculum.levels.length - 1 : crossLevel ? Math.max(0, longestLevelIndex - 1) : 0];
+      const quiz = curriculum.quizById.get(level.quizzes[wraps || crossLevel ? 3 : 0].id);
+      const resultScore = quiz.countryCodes.length - (failedResult ? 1 : 0);
+      if (allMastered) masterPreviewQuizzes(() => true);
+      else if (initialPreview === "result-failed-no-next") masterPreviewQuizzes((candidate) => candidate.id !== quiz.id);
+      else if (crossLevel) {
+        masterPreviewQuizzes((candidate) => candidate.levelId === level.id && candidate.id !== quiz.id);
+        if (skipsAcrossLevels) {
+          const firstNextQuiz = curriculum.levels[longestLevelIndex].quizzes[0];
+          masterPreviewQuizzes((candidate) => candidate.id === firstNextQuiz.id);
         }
-        progressStore = progress.recordResult(
-          progressStore,
-          progressStore.activeProfileId,
-          quiz,
-          resultScore,
-        );
-        if (initialPreview === "result-failed-no-next") {
-          const successor = curriculum.quizById.get(level.quizzes[quizIndex + 1].id);
-          progressStore = progress.recordResult(
-            progressStore,
-            progressStore.activeProfileId,
-            successor,
-            successor.countryCodes.length - 1,
-          );
-        }
+      } else if (skipsWithinLevel) {
+        masterPreviewQuizzes((candidate) => candidate.id === level.quizzes[1].id);
       }
+      if (["result-new-record", "result-below-best", "result-replay-mastered"].includes(initialPreview)) {
+        progressStore = progress.recordResult(progressStore, progressStore.activeProfileId, quiz,
+          quiz.countryCodes.length - (initialPreview === "result-new-record" ? 2 : 0));
+      }
+      const previousRecord = progress.currentRecord(currentProfile(), quiz);
+      const previousState = progress.quizState(currentProfile(), quiz);
+      const previousLevelMastered = progress.levelProgress(currentProfile(), level).mastered;
+      progressStore = progress.recordResult(progressStore, progressStore.activeProfileId, quiz, resultScore);
       state.curriculumQuizId = quiz.id;
       state.activeLevelId = level.id;
       state.mode = quiz.mode;
@@ -5560,10 +5546,10 @@
       state.score = resultScore;
       state.wrongAnswers = failedResult ? [countriesByCode.get(quiz.countryCodes[0])] : [];
       state.resultRecorded = true;
-      state.resultBestScore = state.score;
-      state.resultPreviousBestScore = null;
-      state.resultNewQuizMastery = !failedResult;
-      state.resultNewLevelMastery = initialPreview === "result-next-level";
+      state.resultBestScore = progress.currentRecord(currentProfile(), quiz).bestScore;
+      state.resultPreviousBestScore = previousRecord?.bestScore ?? null;
+      state.resultNewQuizMastery = !failedResult && previousState !== "mastered";
+      state.resultNewLevelMastery = previousLevelMastered < 4 && progress.levelProgress(currentProfile(), level).mastered === 4;
       state.resultNewStageMastery = false;
       state.resultCelebrationPending = false;
       state.resultPreview = initialPreview === "share-fallback" ? "result-next-quiz" : initialPreview;

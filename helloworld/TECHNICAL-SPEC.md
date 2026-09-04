@@ -210,19 +210,30 @@ stored.
 
 Given the active profile and ordered curriculum:
 
-1. Resolve `lastQuizId` against the current curriculum.
-2. If it exists and its current revision is not mastered, return it.
-3. Otherwise return the first current quiz in curriculum order that is not
-   mastered.
-4. If none exists, return an explicit `all-mastered` outcome whose primary
-   action selects a surprise mastered quiz that has not been played recently.
+1. Return the saved attempt's quiz if it belongs to a regional or world mastery
+   level and its ID and revision match the current curriculum.
+2. Resolve `lastQuizId` against the current curriculum. Search from the following
+   quiz for the first unmastered current revision, wrapping once. The previous
+   quiz is eligible only after all others have been considered.
+3. If `lastQuizId` is missing or unknown, search from the first quiz.
+4. If none exists, return `all-mastered`; the primary action selects a surprise
+   mastered quiz that has not been played recently.
 
-If a stored `lastQuizId` no longer exists, ignore it without deleting unrelated
-progress.
+The existing `{ type: "quiz", quiz }` / `{ type: "all-mastered" }` interface and
+storage schema remain unchanged. `lastQuizId` advances only on result recording.
+Stale saved attempts and unknown last-quiz IDs do not delete unrelated progress.
+Levels uses this same selection for its recommendation. Completion recognition
+uses mastery totals rather than the continuation outcome.
 
-After a perfect result, the result screen's Next Quiz uses the first subsequent
-unmastered quiz, wrapping to the first unmastered quiz only when necessary.
-After a non-perfect result, Try Again starts the same quiz revision.
+Results independently use the forward unmastered search after the completed
+quiz, excluding the current quiz from the offered Next action. They do not
+prioritize a paused mastery attempt. Results render only two Next layouts:
+same-level destinations use Next: {mode} without destination text above;
+different-level destinations use Next: {level badge} {mode} with the badge and
+level name above. Skips and wraps use the same layouts as immediate successors.
+Accessible button names always identify the destination's level and mode.
+Try Again remains primary after non-perfect results;
+celebrations retain precedence after perfect results.
 
 ## 9. Recording a result
 
@@ -273,8 +284,13 @@ Rules:
 - Language changes do not invalidate an attempt because stored identities are
   language-independent.
 - Starting the same current quiz ID and revision resumes the saved attempt
-  directly. Starting a different scored quiz requires an accessible in-app
-  confirmation; confirmation deletes the saved attempt.
+  directly. Starting any other scored quiz, including short quizzes and shared
+  challenges, passes through the same accessible confirmation guard. Explicitly
+  starting a fresh challenge round also requires confirmation when an attempt
+  is saved. Confirmation clears only the unfinished attempt before starting the
+  selected quiz; dismissal preserves it and restores focus. Explore and
+  flashcards do not clear saved attempts. Home Continue keeps saved-attempt
+  priority without displaying an answered count.
 - Completing the attempt records its best result and removes the saved attempt.
 - Saved attempts are local operational state and are excluded from profile
   transfer links and backup imports.
@@ -539,6 +555,13 @@ At minimum, add automated coverage for:
 Visual and interaction testing must cover phone, tablet and desktop layouts,
 keyboard operation, reduced motion, Norwegian and English, and both empty and
 heavily completed profiles.
+
+The result section of `test.html` includes both perfect and imperfect results
+for immediate successors, skipped quizzes within/across levels, and wrapping.
+It also covers the sole remaining unmastered quiz, new and previous records,
+mastered replays, and fully mastered profiles. Stage and final celebrations
+remain available in their own sections. All previews are temporary and must
+leave persisted player progress unchanged.
 
 ## 19. Acceptance criteria
 
