@@ -263,6 +263,32 @@ Celebration should be proportional: a subtle response for a correct answer,
 more visible recognition for quiz mastery, and a distinctive moment for level,
 regional or world mastery. Sound must be optional if introduced.
 
+### Stage picture rewards
+
+Each curriculum quiz's first mastery automatically reveals one fixed puzzle
+piece belonging to that quiz's stage. Replays and imperfect attempts award no
+additional pieces. Existing mastery counts immediately; several pictures may
+be in progress at once. There is no manual placement or reward currency.
+
+The six connected storybook pictures are Tourist's departure station (16
+pieces), Explorer's adventure island (40), Navigator's harbour and underwater
+world (52), Globetrotter's travel city (56), Cartographer's living map workshop
+(44), and World Master's miniature planet reunion (24).
+
+The result card presents the new fragment enlarged, then places it automatically
+within about two seconds once its artwork is visible and loaded. Result actions
+remain usable throughout. Reduced motion reveals it immediately. The animation
+does not repeat on returning to the same result. Unrevealed pieces are opaque.
+The final piece completes the image and fades its seams; the existing stage
+celebration features the completed picture and preserves onward navigation.
+
+Home has a Picture collection entry, and each Levels stage has a picture preview
+with its earned-piece count. The collection dialog provides all six thumbnails,
+a selected picture, zoom controls, mouse dragging, touch scrolling and keyboard
+scrolling. Opening and closing it preserves the underlying screen and restores
+focus. Image descriptions, progress counts and image-load errors exist in both
+languages. Missing artwork never blocks navigation or changes earned progress.
+
 ## 10. Profiles
 
 - Multiple local profiles must be supported so people sharing a device do not

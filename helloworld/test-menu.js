@@ -14,6 +14,7 @@
       open: "Åpne forhåndsvisning",
       finalQuestion: "Krever ett riktig svar.",
       sections: {
+        puzzles: ["Puslespillbelønninger", "Nye brikker, delvise bilder og hele samlingen."],
         basic: ["Grunnleggende resultater", "Resultater som fortsetter uten en etappefeiring."],
         results: ["Etapperesultat → feiring", "Perfekt resultat der «Fullført» fører videre til den valgte etappefeiringen."],
         celebrations: ["Direkte etappefeiringer", "Åpne hver feiring uten å spille en quiz."],
@@ -30,6 +31,7 @@
       open: "Open preview",
       finalQuestion: "Requires one correct answer.",
       sections: {
+        puzzles: ["Puzzle rewards", "New pieces, partial pictures, and the complete collection."],
         basic: ["Basic results", "Results that continue without a stage celebration."],
         results: ["Stage result → celebration", "Perfect results where “Completed” continues to the selected stage celebration."],
         celebrations: ["Direct stage celebrations", "Open every celebration without playing a quiz."],
@@ -64,6 +66,13 @@
 
   function scenarioGroups() {
     return [
+      { id: "puzzles", items: [
+        { title: { nb: "Første brikke", en: "First piece" }, description: { nb: "Første mestring avslører én brikke.", en: "First mastery reveals one piece." }, params: { preview: "puzzle-first" } },
+        { title: { nb: "Bildet tar form", en: "Picture in progress" }, description: { nb: "Ny brikke i Navigatør-bildet.", en: "A new piece in the Navigator picture." }, params: { preview: "puzzle-partial", stage: "navigator" } },
+        { title: { nb: "Siste brikke", en: "Final piece" }, description: { nb: "Fullfør bildet og åpne etappefeiringen.", en: "Complete the picture and open its milestone celebration." }, params: { preview: "puzzle-final" } },
+        { title: { nb: "Ingen ny brikke ved gjenspilling", en: "No new piece on replay" }, description: { nb: "En mestret quiz gir ikke en ekstra brikke.", en: "A mastered quiz does not award another piece." }, params: { preview: "puzzle-replay" } },
+        { title: { nb: "Komplett bildesamling", en: "Complete picture collection" }, description: { nb: "Alle seks bilder, zoom og tastaturnavigasjon.", en: "All six pictures, zoom, and keyboard navigation." }, params: { preview: "puzzle-collection" } },
+      ] },
       {
         id: "basic",
         items: [

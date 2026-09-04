@@ -588,3 +588,33 @@ The progression system must continue to satisfy these criteria:
 - Curriculum quiz challenges open directly and record valid current progress.
 - Progress achievements can be shared without exposing transferable progress.
 - The application remains static, bilingual and dependency-free at runtime.
+## Stage puzzle reward contract
+
+`puzzles.js` is a dependency-free browser/Node module exposed as
+`GEOGRAFI_PUZZLES`. It contains the checked-in stage manifest, permanent quiz ID
+to piece positions, artwork paths, fixed row layouts and SVG geometry. Its
+`pieceForQuiz(quizId)` returns a stage ID and piece; `stageProgress(profile,
+stageId, curriculum, progress)` derives earned flags, count, total and completion
+using the existing revision-aware `progress.quizState` contract. There is no
+puzzle persistence schema, backup field, transfer change or mastery migration.
+
+Geometry uses a 1536 × 1024 canvas. Adjacent pieces share exactly reversed
+curved boundaries; unequal row counts use shared straight horizontal boundaries.
+Do not reorder the manifest's quiz IDs or change layouts independently of the
+artwork. New curriculum or revision decisions must explicitly consider their
+effect on earned pictures.
+
+The app owns transient first-mastery animation, collection selection, zoom,
+focus restoration and pointer scrolling. Each render consumes any pending
+reward and replaces old animation elements; revisiting a result shows its settled
+picture. Visible SVG pictures load their local PNG through IntersectionObserver,
+with immediate loading when that API is unavailable. Loading failures retain
+opaque pieces and localized progress/error text. Collection dialogs make the
+underlying screen inert and participate in the existing keyboard focus trap.
+
+Artwork lives in `images/puzzles/`; `PROMPTS.md` records the built-in imagegen
+prompts and reference workflow. Before replacing an image, inspect every clipped
+piece at enlarged size and check its composition and edge details. Assets are
+ordinary local images; playing via `file://` needs no build, network or server.
+`test.html` includes five puzzle scenarios, which use temporary preview profiles.
+The canonical checker includes puzzle mapping, geometry and progress tests.

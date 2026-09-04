@@ -570,3 +570,39 @@ body.result-page {
     height: auto;
   }
 }
+.result-puzzle-reward { width: min(580px, 100%); margin: 20px auto; padding: 20px; border: 1px solid #ded7c5; border-radius: 22px; background: #fffaf0; box-sizing: border-box; }
+.puzzle-reward-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.puzzle-reward-heading h2 { margin: 4px 0; font-size: clamp(1.1rem, 3vw, 1.5rem); }
+.puzzle-reward-heading > span { flex-shrink: 0; font-size: .9rem; font-weight: 700; }
+.result-puzzle-reward > button { display: block; margin: 10px auto 0; }
+.puzzle-new-piece { animation: puzzle-piece-arrive 2s ease-in-out both paused; transform-box: view-box; filter: drop-shadow(0 10px 10px #34270d66); }
+.is-complete.is-revealing .puzzle-seams { animation: puzzle-seams-fade 2s ease both paused; }
+@keyframes puzzle-piece-arrive {
+  0%, 52% { transform: translate(var(--piece-x), var(--piece-y)) scale(var(--piece-scale)); }
+  100% { transform: translate(0, 0) scale(1); filter: none; }
+}
+@keyframes puzzle-seams-fade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+@media (max-width: 600px) {
+  .result-puzzle-reward { padding: 14px; }
+  .puzzle-reward-heading { align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-new-piece, .is-complete.is-revealing .puzzle-seams { animation: none; }
+}
+
+.is-art-ready .puzzle-new-piece, .is-complete.is-revealing.is-art-ready .puzzle-seams { animation-play-state: running; }
+.puzzle-new-piece > path:last-child { animation: puzzle-seams-fade 2s ease both paused; }
+.is-art-ready .puzzle-new-piece > path:last-child { animation-play-state: running; }
+
+.result-card.has-puzzle-reward { width: min(1060px, 100%); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "summary puzzle" "actions puzzle"; gap: 16px 28px; }
+.has-puzzle-reward .result-summary-main { grid-area: summary; align-self: end; }
+.has-puzzle-reward .result-summary-support { grid-area: actions; align-self: start; }
+.has-puzzle-reward .result-puzzle-reward { grid-area: puzzle; align-self: center; margin: 0; padding: 16px; }
+@media (max-width: 760px) and (orientation: portrait) {
+  .result-card.has-puzzle-reward { grid-template-columns: minmax(0, 1fr); grid-template-areas: "summary" "puzzle" "actions"; min-height: 0; padding: 18px 8px 24px; gap: 14px; }
+  .has-puzzle-reward .result-puzzle-reward { padding: 12px; width: 100%; }
+  .has-puzzle-reward .result-puzzle-reward .puzzle-picture { max-width: 270px; margin-inline: auto; }
+  .has-puzzle-reward .result-puzzle-reward > button { margin: 4px auto 0; min-height: 36px; }
+  .has-puzzle-reward .puzzle-reward-heading { margin-bottom: 8px; text-align: left; }
+  .has-puzzle-reward .puzzle-reward-heading .kicker { font-size: 10px; }
+}

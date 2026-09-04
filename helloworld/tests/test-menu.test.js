@@ -15,9 +15,10 @@ test("manual preview menu scenarios", () => {
 
   const groups = menu.scenarioGroups();
   const items = groups.flatMap((group) => group.items);
-  assert.equal(items.length, 53, "the test page should expose all curated scenarios");
+  assert.equal(items.length, 58, "the test page should expose all curated scenarios");
 
   const allowedPreviews = new Set([
+    "puzzle-first", "puzzle-partial", "puzzle-final", "puzzle-replay", "puzzle-collection",
     "result-failed-next-quiz", "result-skip-quiz", "result-failed-skip-quiz",
     "result-skip-level", "result-failed-skip-level", "result-wrap",
     "result-failed-wrap", "result-new-record", "result-below-best",

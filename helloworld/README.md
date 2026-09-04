@@ -51,7 +51,7 @@ This runs all JavaScript unit tests, country/flag/map validation, generated
 fixture checks, and repository-hygiene checks.
 
 Open `test.html` for the unlinked manual preview catalog. It contains result,
-celebration, replay, one-question, out-of-order progression, and final-completion
+puzzle reward, celebration, replay, one-question, out-of-order progression, and final-completion
 states in both languages. Preview progress is temporary and never changes saved
 profiles.
 
@@ -76,6 +76,7 @@ in [AGENTS.md](AGENTS.md).
 - `countries.js` — localized place, relationship, civic-centre, and region data
 - `curriculum.js` — ordered levels, stable quizzes, and deterministic attempts
 - `progress.js` — profiles, persistence, transfer, backup, and progress rules
+- `puzzles.js` and `images/puzzles/` — fixed reward pieces and local stage artwork
 - `navigation.js`, `challenge.js`, `shared-link.js`, and `sharing.js` — stable
   routes, friend challenges, pasted-link classification, and email drafts
 - `explore-state.js` and `map-view.js` — pure Explore scope and map viewport

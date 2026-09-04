@@ -36,6 +36,7 @@
     "result-replay-mastered", "result-all-mastered", "result-failed-all-mastered",
   ]);
   const initialPreview = new Set([
+    "puzzle-first", "puzzle-partial", "puzzle-final", "puzzle-replay", "puzzle-collection",
     ...resultPreviewNames, "milestone-result", "milestone-celebration",
     "milestone-question", "milestone-replay", "level-final-gap-question", "navigator-tourist-gap-question",
     "tourist-world-final-question", "final-question", "final-result", "final-celebration",
@@ -51,9 +52,10 @@
   const navigation = window.GEOGRAFI_NAVIGATION;
   const curriculum = window.GEOGRAFI_CURRICULUM;
   const progress = window.GEOGRAFI_PROGRESS;
+  const puzzles = window.GEOGRAFI_PUZZLES;
   const app = document.getElementById("app");
 
-  if (!data || !mapData || !challenge || !sharedLink || !sharing || !exploreState || !navigation || !curriculum || !progress || !app) {
+  if (!data || !mapData || !challenge || !sharedLink || !sharing || !exploreState || !navigation || !curriculum || !progress || !puzzles || !app) {
     throw new Error(
       initialLocale === "en"
         ? "Hello World! could not load the country data."
@@ -152,6 +154,9 @@
     resultNewLevelMastery: false,
     resultNewStageMastery: false,
     resultCelebrationPending: false,
+    puzzleRewardPending: false,
+    puzzleStageId: null,
+    puzzleZoom: 1,
     resultPreview: null,
     previewMode: initialPreview,
     profilePanelOpen: false,
@@ -1351,6 +1356,83 @@
       </div>`;
   }
 
+  let puzzleSvgId = 0;
+  let puzzleImageObserver = null;
+  let puzzleReturnFocus = null;
+  const failedPuzzleImages = new Set();
+
+  function puzzleValue(stageId) {
+    return puzzles.stageProgress(currentProfile(), stageId, curriculum, progress);
+  }
+
+  function puzzlePictureMarkup(stageId, { newPieceId = null, animate = false } = {}) {
+    const value = puzzleValue(stageId);
+    const { stage, earned, complete } = value;
+    const id = `puzzle-${++puzzleSvgId}`;
+    const paths = stage.pieces.map((piece) => `<path d="${piece.path}"/>`);
+    const newPiece = newPieceId === null ? null : stage.pieces[newPieceId];
+    const imageMarkup = `<image data-puzzle-src="${stage.image}" width="1536" height="1024" preserveAspectRatio="xMidYMid slice"/>`;
+    const clipPaths = paths.filter((_, index) => earned[index] && (!animate || index !== newPieceId)).join("");
+    const label = `${t("puzzleCount", { count: value.count, total: value.total })}. ${t(`puzzleDescription_${stage.id}`)}`;
+    return `<div class="puzzle-picture ${complete ? "is-complete" : ""} ${animate ? "is-revealing" : ""}">
+      <svg viewBox="0 0 1536 1024" role="img" aria-label="${escapeHtml(label)}">
+        <defs><clipPath id="${id}">${clipPaths}</clipPath>${newPiece && animate ? `<clipPath id="${id}-new">${paths[newPieceId]}</clipPath>` : ""}</defs>
+        <rect width="1536" height="1024" fill="#e6dfcf"/>
+        ${value.count ? `<g clip-path="url(#${id})">${imageMarkup}</g>` : ""}
+        <g class="puzzle-seams" fill="none" stroke="#948776" stroke-width="2">${paths.join("")}</g>
+        ${newPiece && animate ? `<g class="puzzle-new-piece" style="--piece-x:${768 - newPiece.x - newPiece.width / 2}px;--piece-y:${512 - newPiece.y - newPiece.height / 2}px;--piece-scale:${Math.min(3, 600 / newPiece.width)};transform-origin:${newPiece.x + newPiece.width / 2}px ${newPiece.y + newPiece.height / 2}px"><path d="${newPiece.path}" fill="#e6dfcf"/><g clip-path="url(#${id}-new)">${imageMarkup}</g><path d="${newPiece.path}" fill="none" stroke="#fff8e8" stroke-width="7"/></g>` : ""}
+      </svg>
+      <p class="puzzle-image-error" role="status" hidden>${t("puzzleImageUnavailable")}</p>
+    </div>`;
+  }
+
+  function puzzlePreviewMarkup(stageId) {
+    const value = puzzleValue(stageId);
+    return `<button class="stage-puzzle-preview" data-action="open-puzzles" data-stage-id="${stageId}" aria-label="${escapeHtml(`${t("pictureCollection")}: ${stageTitle(curriculum.stages.find((s) => s.id === stageId))}. ${t("puzzleCount", { count: value.count, total: value.total })}`)}">${puzzlePictureMarkup(stageId)}<span><strong>${t("stagePicture")}</strong><small>${t("puzzleCount", { count: value.count, total: value.total })}</small></span><span aria-hidden="true">↗</span></button>`;
+  }
+
+  function puzzleRewardMarkup() {
+    if (!state.resultNewQuizMastery) return "";
+    const reward = puzzles.pieceForQuiz(state.curriculumQuizId);
+    if (!reward) return "";
+    const value = puzzleValue(reward.stageId);
+    const animate = state.puzzleRewardPending && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return `<section class="result-puzzle-reward" aria-labelledby="puzzle-reward-title"><div class="puzzle-reward-heading"><div><p class="kicker">${escapeHtml(stageTitle(curriculum.stages.find((s) => s.id === reward.stageId)))}</p><h2 id="puzzle-reward-title">${t(value.complete ? "pictureComplete" : "newPuzzlePiece")}</h2></div><span role="status" aria-label="${escapeHtml(`${t(value.complete ? "pictureComplete" : "newPuzzlePiece")} ${t("puzzleCount", { count: value.count, total: value.total })}`)}">${t("puzzleCount", { count: value.count, total: value.total })}</span></div>${puzzlePictureMarkup(reward.stageId, { newPieceId: reward.piece.id, animate })}<button class="quiet-button" data-action="open-puzzles" data-stage-id="${reward.stageId}">${t("viewPicture")} <span aria-hidden="true">↗</span></button></section>`;
+  }
+
+  function puzzleCollectionMarkup() {
+    if (!state.puzzleStageId) return "";
+    const value = puzzleValue(state.puzzleStageId);
+    return `<div class="puzzle-overlay"><section class="puzzle-dialog" role="dialog" aria-modal="true" aria-labelledby="puzzle-collection-title" tabindex="-1"><header class="puzzle-dialog-header"><div><p class="kicker">${t("pictureCollection")}</p><h2 id="puzzle-collection-title">${escapeHtml(stageTitle(curriculum.stages.find((s) => s.id === state.puzzleStageId)))}</h2></div><button class="icon-close" data-action="close-puzzles" aria-label="${t("close")}">×</button></header><div class="puzzle-album" aria-label="${t("pictureCollection")}">${curriculum.stages.map((stage) => `<button class="puzzle-album-item" data-action="select-puzzle" data-stage-id="${stage.id}" aria-pressed="${stage.id === state.puzzleStageId}">${puzzlePictureMarkup(stage.id)}<span>${escapeHtml(stageTitle(stage))}</span><small>${t("puzzleCount", { count: puzzleValue(stage.id).count, total: puzzleValue(stage.id).total })}</small></button>`).join("")}</div><div class="puzzle-tools"><strong role="status">${t(value.complete ? "pictureComplete" : "puzzleCount", { count: value.count, total: value.total })}</strong><div><button class="secondary-button" data-action="puzzle-zoom-out" aria-label="${t("puzzleZoomOut")}">−</button><button class="quiet-button" data-action="puzzle-zoom-reset" aria-label="${t("puzzleZoomReset")}"><span data-puzzle-zoom-label>100%</span></button><button class="secondary-button" data-action="puzzle-zoom-in" aria-label="${t("puzzleZoomIn")}">+</button></div></div><p class="puzzle-help">${t("puzzleHelp")}</p><div class="puzzle-viewport" tabindex="0" role="region" aria-label="${t("puzzleInspect")}"><div class="puzzle-zoom-content">${puzzlePictureMarkup(state.puzzleStageId)}</div></div><p class="puzzle-description">${t(`puzzleDescription_${state.puzzleStageId}`)}</p></section></div>`;
+  }
+
+  function closePuzzles() {
+    state.puzzleStageId = null;
+    render({ focusActionDialogReturn: puzzleReturnFocus });
+  }
+
+  function loadPuzzleImages() {
+    puzzleImageObserver?.disconnect();
+    const load = (element) => {
+      const source = element.dataset.puzzleSrc;
+      const fail = () => {
+        failedPuzzleImages.add(source);
+        const picture = element.closest(".puzzle-picture");
+        picture.querySelector(".puzzle-image-error").hidden = false;
+      };
+      if (failedPuzzleImages.has(source)) { fail(); return; }
+      element.addEventListener("error", fail, { once: true });
+      element.addEventListener("load", () => element.closest(".puzzle-picture")?.classList.add("is-art-ready"), { once: true });
+      element.setAttribute("href", source);
+    };
+    if ("IntersectionObserver" in window) {
+      puzzleImageObserver = new IntersectionObserver((entries) => entries.forEach((entry) => {
+        if (entry.isIntersecting) { entry.target.querySelectorAll("[data-puzzle-src]").forEach(load); puzzleImageObserver.unobserve(entry.target); }
+      }), { threshold: 0.2 });
+      app.querySelectorAll(".puzzle-picture").forEach((element) => puzzleImageObserver.observe(element));
+    } else app.querySelectorAll("[data-puzzle-src]").forEach(load);
+  }
+
   function milestoneStickersMarkup(profile, { activeStageId = null, interactive = false } = {}) {
     return `<div class="milestone-stickers" aria-label="${escapeHtml(t("milestones"))}">${curriculum.stages.map((stage) => {
       const earned = progress.stageProgress(profile, stage, curriculum.levels).isMastered || stage.id === activeStageId;
@@ -1401,6 +1483,7 @@
           <p class="kicker">${t("milestoneReached")}</p>
           <h2 id="milestone-celebration-title">${escapeHtml(stageTitle(stage))}</h2>
           <p id="milestone-celebration-description">${t("milestoneSummary", { start: stage.startLevel, end: stage.endLevel })}</p>
+          <div class="milestone-puzzle">${puzzlePictureMarkup(stage.id)}</div>
           <div class="milestone-celebration-collection"><strong>${t("milestones")}</strong>${milestoneStickersMarkup(currentProfile(), { activeStageId: stage.id })}</div>
           <div class="celebration-actions">
             ${primaryAction}
@@ -1507,7 +1590,7 @@
           <div><p class="kicker">${t("heroKicker")}</p><h1>${allMastered ? t("worldMastered") : `${t("heroTitleBefore")} <em>${t("heroTitleEmphasis")}</em>`}</h1></div>
           ${homeProgressMarkup(totals)}
         </section>
-        <section class="home-milestones" aria-labelledby="home-milestones-title"><strong id="home-milestones-title">${t("milestones")}</strong>${milestoneStickersMarkup(profile, { interactive: true })}</section>
+        <section class="home-milestones" aria-labelledby="home-milestones-title"><strong id="home-milestones-title">${t("milestones")}</strong>${milestoneStickersMarkup(profile, { interactive: true })}<button class="quiet-button" data-action="open-puzzles">${t("pictureCollection")} ↗</button></section>
         <section class="home-primary-actions" aria-label="${escapeHtml(t("chooseActivity"))}">
           <button class="home-action-card continue-card" data-action="${showSurprise ? "surprise-quiz" : "continue-game"}">
             <span class="home-action-icon" aria-hidden="true">${continueIcon}</span>
@@ -1567,6 +1650,7 @@
             <span class="level-stage-copy"><strong>${escapeHtml(stage.title[state.locale])}</strong></span>
             <span class="level-stage-status"><span class="level-stage-range">${t("levelRange", { start: stage.startLevel, end: stage.endLevel })}</span>${stageValue.isMastered ? `<span class="level-stage-mastered">${t("stageMastered")}</span>` : ""}</span>
           </header>
+          ${puzzlePreviewMarkup(stage.id)}
           <div class="level-stage-list">${curriculum.levels.slice(stage.startLevel - 1, stage.endLevel).map((level, offset) => levelMarkup(level, stage.startLevel - 1 + offset)).join("")}</div>
         </section>`;
       }).join("")}</div>${recommendedNavigation}${milestoneCelebrationMarkup()}</main>`;
@@ -1750,7 +1834,7 @@
         ? `<button class="secondary-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button>`
         : `<button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button>`;
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
-      <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${achievementTitle}</h1>${achievementIcon}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${resultLevelProgressMarkup(level, quiz)}${challengeComparisonMarkup()}</div>
+      <section class="result-card curriculum-result-card ${state.resultNewQuizMastery ? "has-puzzle-reward" : ""}"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${achievementTitle}</h1>${achievementIcon}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${resultLevelProgressMarkup(level, quiz)}${challengeComparisonMarkup()}</div>${puzzleRewardMarkup()}
       <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions">${primaryButton}${secondaryNextButton}${chooseLevelButton}</div></div>
       <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="share-curriculum-challenge"${isCurriculumChallengeShareReady() ? "" : " disabled aria-busy=\"true\""}>${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
   }
@@ -3051,7 +3135,12 @@
       ? app.querySelector(".explore-country-list")?.scrollTop ?? null
       : null;
     updateDocumentMetadata();
-    app.innerHTML = `${screenMarkup()}${actionDialogMarkup()}`;
+    app.innerHTML = `${screenMarkup()}${actionDialogMarkup()}${puzzleCollectionMarkup()}`;
+    loadPuzzleImages();
+    if (state.puzzleStageId) {
+      [...app.children].filter((child) => !child.classList.contains("puzzle-overlay")).forEach((child) => { child.inert = true; child.setAttribute("aria-hidden", "true"); });
+    }
+    if (state.screen === "result") state.puzzleRewardPending = false;
     if (state.screen === "result") void prepareCurriculumChallengeShare();
     if (state.actionDialog) {
       [...app.children].forEach((child) => {
@@ -3087,9 +3176,11 @@
         state.profilePanelOpen ||
         state.actionDialog !== null ||
         state.milestoneCelebrationStageId !== null ||
-        state.worldCelebrationOpen,
+        state.worldCelebrationOpen || state.puzzleStageId !== null,
     );
 
+    if (options.focusPuzzleDialog) app.querySelector(".puzzle-dialog")?.focus({ preventScroll: true });
+    if (options.focusPuzzleSelection) app.querySelector(`[data-action="select-puzzle"][data-stage-id="${state.puzzleStageId}"]`)?.focus({ preventScroll: true });
     if (options.focusCorrect) app.querySelector(".is-correction")?.focus();
     if (options.focusCountryDetails) {
       app.querySelector(".country-details-dialog")?.focus();
@@ -3669,6 +3760,7 @@
     persist(progressStore);
     state.resultBestScore = progress.currentRecord(currentProfile(), quiz)?.bestScore ?? state.score;
     state.resultNewQuizMastery = previousQuizState !== "mastered" && state.score === quiz.countryCodes.length;
+    state.puzzleRewardPending = state.resultNewQuizMastery;
     state.resultNewLevelMastery = before < 4 && progress.levelProgress(currentProfile(), level).mastered === 4;
     state.resultNewStageMastery = Boolean(stage && !stageWasMastered && progress.stageProgress(currentProfile(), stage, curriculum.levels).isMastered);
     state.resultCelebrationPending = state.resultNewQuizMastery || state.resultNewLevelMastery || state.resultNewStageMastery;
@@ -3729,7 +3821,7 @@
     state.region = quiz.region ?? (regions.size === 1 ? [...regions][0] : "world");
     state.silhouetteExpanded = false; state.resultRecorded = false; state.resultBestScore = null;
     state.resultPreviousBestScore = null; state.resultNewQuizMastery = false; state.resultNewLevelMastery = false; state.resultNewStageMastery = false;
-    state.resultCelebrationPending = false; state.resultPreview = null;
+    state.resultCelebrationPending = false; state.puzzleRewardPending = false; state.resultPreview = null;
     state.screen = "quiz";
     if (savedAttempt && savedAttempt.questionIndex >= state.questions.length && !savedAttempt.correctionPending) {
       state.questionIndex = state.questions.length - 1; state.resultRecorded = false; finishCurriculumAttempt(); state.screen = "result";
@@ -4373,6 +4465,27 @@
     }
   }
 
+  let puzzlePan = null;
+  app.addEventListener("pointerdown", (event) => {
+    const viewport = event.target.closest(".puzzle-viewport");
+    if (!viewport || event.pointerType !== "mouse" || event.button !== 0 || state.puzzleZoom <= 1) return;
+    puzzlePan = { viewport, id: event.pointerId, x: event.clientX, y: event.clientY, left: viewport.scrollLeft, top: viewport.scrollTop };
+    viewport.setPointerCapture(event.pointerId);
+    viewport.classList.add("is-panning");
+    viewport.focus({ preventScroll: true });
+    event.preventDefault();
+  });
+  app.addEventListener("pointermove", (event) => {
+    if (!puzzlePan || event.pointerId !== puzzlePan.id) return;
+    puzzlePan.viewport.scrollLeft = puzzlePan.left + puzzlePan.x - event.clientX;
+    puzzlePan.viewport.scrollTop = puzzlePan.top + puzzlePan.y - event.clientY;
+  });
+  for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) app.addEventListener(type, (event) => {
+    if (!puzzlePan || event.pointerId !== puzzlePan.id) return;
+    puzzlePan.viewport.classList.remove("is-panning");
+    puzzlePan = null;
+  });
+
   app.addEventListener("click", (event) => {
     const control = event.target.closest("[data-action]");
     if (!control || !app.contains(control)) {
@@ -4388,6 +4501,39 @@
     }
 
     const action = control.dataset.action;
+    if (action === "open-puzzles") {
+      puzzleReturnFocus = { action, ...(control.dataset.stageId ? { stageId: control.dataset.stageId } : {}) };
+      state.puzzleStageId = puzzles.stages.some((s) => s.id === control.dataset.stageId) ? control.dataset.stageId : puzzles.stages[0].id;
+      state.puzzleZoom = 1;
+      render({ focusPuzzleDialog: true });
+      return;
+    }
+    if (action === "close-puzzles") { closePuzzles(); return; }
+    if (action === "select-puzzle") {
+      if (!puzzles.stages.some((s) => s.id === control.dataset.stageId)) return;
+      state.puzzleStageId = control.dataset.stageId;
+      state.puzzleZoom = 1;
+      render({ focusPuzzleSelection: true });
+      return;
+    }
+    if (action.startsWith("puzzle-zoom-")) {
+      const viewport = app.querySelector(".puzzle-viewport");
+      if (!viewport) return;
+      const before = state.puzzleZoom;
+      state.puzzleZoom = action === "puzzle-zoom-reset" ? 1 : clamp(before + (action === "puzzle-zoom-in" ? .5 : -.5), 1, 4);
+      const content = app.querySelector(".puzzle-zoom-content");
+      const centerX = (viewport.scrollLeft + viewport.clientWidth / 2) / before;
+      const centerY = (viewport.scrollTop + viewport.clientHeight / 2) / before;
+      content.style.width = `${state.puzzleZoom * 100}%`;
+      // SVG image dimensions settle during layout; center after that frame.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (!app.contains(viewport)) return;
+        viewport.scrollLeft = centerX * state.puzzleZoom - viewport.clientWidth / 2;
+        viewport.scrollTop = centerY * state.puzzleZoom - viewport.clientHeight / 2;
+      }));
+      app.querySelector("[data-puzzle-zoom-label]").textContent = `${state.puzzleZoom * 100}%`;
+      return;
+    }
 
     if (action === "close-action-dialog") {
       if (control.classList.contains("action-dialog-overlay") && event.target !== control) return;
@@ -5155,7 +5301,9 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    const activeDialog = state.actionDialog
+    const activeDialog = state.puzzleStageId
+      ? app.querySelector(".puzzle-dialog")
+      : state.actionDialog
       ? app.querySelector(".action-dialog")
       : state.milestoneCelebrationStageId !== null
       ? app.querySelector(".milestone-celebration-dialog")
@@ -5199,6 +5347,8 @@
     }
 
     if (event.key !== "Escape") return;
+
+    if (state.puzzleStageId) { event.preventDefault(); closePuzzles(); return; }
 
     if (state.actionDialog) {
       event.preventDefault();
@@ -5300,6 +5450,8 @@
   });
 
   window.addEventListener("popstate", (event) => {
+    state.puzzleStageId = null;
+    state.puzzleRewardPending = false;
     const route = navigation.readUrl(window.location.href, navigationContext);
     if (!route) {
       window.location.reload();
@@ -5422,6 +5574,31 @@
   }
 
   async function initialize() {
+    if (initialPreview?.startsWith("puzzle-")) {
+      const stage = curriculum.stages.find((candidate) => candidate.id === initialUrl.searchParams.get("stage")) ?? curriculum.stages[0];
+      const quizzes = previewStageQuizzes(stage);
+      const index = initialPreview === "puzzle-final" ? quizzes.length - 1 : initialPreview === "puzzle-partial" ? Math.floor(quizzes.length / 2) : 0;
+      const quiz = quizzes[index];
+      resetPreviewProgress(initialPreview);
+      const earnedIds = new Set(quizzes.slice(0, index + (initialPreview === "puzzle-replay" ? 1 : 0)).map((q) => q.id));
+      masterPreviewQuizzes((q) => initialPreview === "puzzle-collection" || earnedIds.has(q.id));
+      state.curriculumQuizId = quiz.id;
+      state.activeLevelId = quiz.levelId;
+      state.mode = quiz.mode;
+      state.questions = quiz.countryCodes.map((code) => ({ country: countriesByCode.get(code), choices: [] }));
+      state.score = state.questions.length;
+      state.wrongAnswers = [];
+      state.resultRecorded = false;
+      finishCurriculumAttempt();
+      state.screen = initialPreview === "puzzle-collection" ? "setup" : "result";
+      state.resultPreview = initialPreview;
+      if (initialPreview === "puzzle-collection") {
+        state.puzzleStageId = stage.id;
+        puzzleReturnFocus = { action: "open-puzzles" };
+      }
+      render({ focusPuzzleDialog: initialPreview === "puzzle-collection" });
+      return;
+    }
     if (initialPreview === "level-final-gap-question") {
       const level = curriculum.levels[0];
       const targetQuiz = curriculum.quizById.get(level.quizzes[2].id);
