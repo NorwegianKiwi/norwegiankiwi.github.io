@@ -229,8 +229,11 @@ Results independently use the forward unmastered search after the completed
 quiz, excluding the current quiz from the offered Next action. They do not
 prioritize a paused mastery attempt. Results render only two Next layouts:
 same-level destinations use Next: {mode} without destination text above;
-different-level destinations use Next: {level badge} {mode} with the badge and
-level name above. Skips and wraps use the same layouts as immediate successors.
+different-level destinations use one taller semantic button with a centered
+badge and level-name row followed by Next: {mode} and its arrow. The badge
+appears once, and no standalone heading or divider is rendered. Both rows have
+explicit text sizes, with the level name slightly stronger. Skips and wraps use
+the same layouts as immediate successors.
 Accessible button names always identify the destination's level and mode.
 Try Again remains primary after non-perfect results;
 celebrations retain precedence after perfect results.

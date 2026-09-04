@@ -221,9 +221,10 @@ After a perfect result:
   and wrapping at the end. It does not redirect to a separately paused mastery
   attempt.
 - Every Next action uses **Next: {mode}**. For a destination in another level,
-  insert its numbered badge between **Next:** and the mode, and show its badge
-  and level name above the button. Same-level destinations have no badge inside
-  the button and no destination text above it.
+  use one taller, rounded rectangular button: its first row pairs one numbered
+  badge with the level name; its second row reads **Next: {mode} →**. Long level
+  names wrap, with slightly stronger text than the mode. Same-level buttons
+  remain compact, without a badge or destination heading.
 - These two layouts apply equally to immediate successors, skips, and wraps.
   Accessible button names always identify the destination's level and mode.
 - **Choose a level** is secondary. If no other unmastered quiz exists, Next is
@@ -233,8 +234,8 @@ After a perfect result:
 
 After a non-perfect result:
 
-- **Try again** is the primary action. When the Next action includes a level
-  heading, a subtle divider separates that heading from Try again.
+- **Try again** is the primary action. Next follows with the standard 10px
+  action spacing; its button boundary groups the destination without a divider.
 - Next is secondary and uses the same destination search, labels, and visible
   destination as after a perfect result. It is hidden if only the current quiz
   remains unmastered; Try again already offers that quiz.

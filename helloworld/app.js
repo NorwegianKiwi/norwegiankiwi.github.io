@@ -1696,10 +1696,10 @@
     const nextLevel = curriculum.levelById.get(nextQuiz.levelId);
     const nextLevelIndex = levelIndexForLevel(nextLevel);
     const mode = modeLabel(nextQuiz.mode);
-    const modeMarkup = `${sameLevel ? "" : `${levelBadgeMarkup(nextLevelIndex, "compact")} `}<span class="result-next-mode-text">${escapeHtml(mode)}</span>`;
+    const modeMarkup = `<span class="result-next-mode-text">${escapeHtml(mode)}</span>`;
+    const nextLabel = `${t("nextResultMode", { mode: modeMarkup })} <span class="result-action-arrow" aria-hidden="true">→</span>`;
     return {
-      label: t("nextResultMode", { mode: modeMarkup }),
-      destination: sameLevel ? "" : `<div class="result-next-destination">${levelReferenceMarkup(nextLevel, { size: "compact", className: "result-next-level-reference" })}</div>`,
+      label: sameLevel ? nextLabel : `${levelReferenceMarkup(nextLevel, { size: "compact", className: "result-next-level-heading" })}<span class="result-next-mode-row">${nextLabel}</span>`,
       ariaLabel: t("nextQuizDestination", { action: t("nextLevelAction"), number: nextLevelIndex + 1, title: levelTitle(nextLevel), mode }),
     };
   }
@@ -1728,7 +1728,7 @@
         : "";
     const nextActionContent = nextQuiz ? resultNextAction(nextQuiz, quiz) : null;
     const nextAction = nextQuiz
-      ? { action: "next-curriculum-quiz", className: nextQuiz.levelId !== quiz.levelId ? "is-next-level level-action" : "", ...nextActionContent, nextQuizId: nextQuiz.id }
+      ? { action: "next-curriculum-quiz", className: nextQuiz.levelId !== quiz.levelId ? "is-next-level result-next-level-button" : "", ...nextActionContent, nextQuizId: nextQuiz.id }
       : null;
     const stageAction = state.resultNewStageMastery && stage
       ? { action: "open-milestone-celebration", className: "is-curriculum-complete", label: `${t("milestoneAction")} <span class="result-stage-name"><span class="result-stage-icon level-stage-${escapeHtml(stage.id)}" aria-hidden="true">${stage.icon}</span> ${escapeHtml(stageTitle(stage))}</span>`, ariaLabel: t("openMilestoneCelebration", { stage: stageTitle(stage) }) }
@@ -1740,9 +1740,9 @@
     const primaryIsChooseLevel = primaryAction === null;
     const primaryButton = primaryIsChooseLevel
       ? `<button class="primary-button result-primary-action" data-action="view-recommended-level">${t("chooseLevel")} <span aria-hidden="true">→</span></button>`
-      : `<button class="primary-button result-primary-action${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${primaryAction.nextQuizId ? ` data-next-quiz-id="${escapeHtml(primaryAction.nextQuizId)}"` : ""}${primaryAction.ariaLabel ? ` aria-label="${escapeHtml(primaryAction.ariaLabel)}"` : ""}>${primaryAction.label} <span class="result-action-arrow" aria-hidden="true">→</span></button>`;
+      : `<button class="primary-button result-primary-action${primaryAction.className ? ` ${primaryAction.className}` : ""}" data-action="${primaryAction.action}"${primaryAction.nextQuizId ? ` data-next-quiz-id="${escapeHtml(primaryAction.nextQuizId)}"` : ""}${primaryAction.ariaLabel ? ` aria-label="${escapeHtml(primaryAction.ariaLabel)}"` : ""}>${primaryAction.label}${primaryAction.action === "next-curriculum-quiz" ? "" : ' <span class="result-action-arrow" aria-hidden="true">→</span>'}</button>`;
     const secondaryNextButton = !perfect && nextAction
-      ? `<button class="secondary-button result-next-button" data-action="next-curriculum-quiz" data-next-quiz-id="${escapeHtml(nextQuiz.id)}"${nextAction.ariaLabel ? ` aria-label="${escapeHtml(nextAction.ariaLabel)}"` : ""}>${nextAction.label} <span aria-hidden="true">→</span></button>`
+      ? `<button class="secondary-button result-next-button${nextAction.className ? ` ${nextAction.className}` : ""}" data-action="next-curriculum-quiz" data-next-quiz-id="${escapeHtml(nextQuiz.id)}"${nextAction.ariaLabel ? ` aria-label="${escapeHtml(nextAction.ariaLabel)}"` : ""}>${nextAction.label}</button>`
       : "";
     const chooseLevelButton = primaryIsChooseLevel
       ? ""
@@ -1751,7 +1751,7 @@
         : `<button class="quiet-button result-level-button" data-action="view-recommended-level">${t("chooseLevel")}</button>`;
     return `<main class="quiz-shell result-shell ${state.wrongAnswers.length ? "has-review" : ""}"><header class="quiz-header app-header app-header-sticky">${brandMarkup(true, false)}${quizReturnButtonMarkup()}</header>
       <section class="result-card curriculum-result-card"><div class="result-summary-main"><p class="kicker result-level-context">${levelReferenceMarkup(level, { size: "small" })}<span aria-hidden="true">·</span><span>${escapeHtml(modeLabel(quiz.mode))}</span></p><div class="result-mastery-title"><h1>${achievementTitle}</h1>${achievementIcon}</div><div class="curriculum-result-score" aria-label="${t("scoreAnnouncement", { score: state.score, total: state.questions.length })}"><div class="result-score-value" aria-hidden="true"><strong>${state.score}</strong><span>${t("scoreOutOf", { total: state.questions.length })}</span></div>${recordMarkup}</div>${resultLevelProgressMarkup(level, quiz)}${challengeComparisonMarkup()}</div>
-      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions">${perfect && nextAction && primaryAction === nextAction ? nextAction.destination : ""}${primaryButton}${!perfect && nextAction ? nextAction.destination : ""}${secondaryNextButton}${chooseLevelButton}</div></div>
+      <div class="result-summary-support"><div class="result-actions"><div class="result-main-actions">${primaryButton}${secondaryNextButton}${chooseLevelButton}</div></div>
       <div class="challenge-share-actions"><button class="quiet-button action-feedback-button" data-action="share-curriculum-challenge"${isCurriculumChallengeShareReady() ? "" : " disabled aria-busy=\"true\""}>${t("challengeThisQuiz")}${actionFeedbackMarkup()}</button></div></div></section>${reviewMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}</main>`;
   }
 
