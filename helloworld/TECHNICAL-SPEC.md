@@ -613,7 +613,11 @@ returning to results never reopens it. Piece-arrival animation completion settle
 the displayed count and localized live announcement without rerendering; the final
 piece also triggers a single decorative confetti burst. Failed artwork settles the
 count without celebrating. Reduced motion starts settled and switching it on
-during a reveal also settles the count.
+during a reveal also settles the count. Completed pictures render one unclipped
+SVG image with no piece paths or masks. When the final-piece animation settles,
+including a reduced-motion change mid-reveal, the app moves the existing image
+node directly into the SVG and removes all clipping and seam geometry. This
+retains the loaded artwork and avoids antialiasing gaps between clipped pieces.
 
 Puzzle rewards and stage celebrations must fit the viewport without document or
 dialog scrolling, or clipped controls. Reward artwork fits the remaining grid
@@ -628,7 +632,8 @@ and has no cross-stage selector. Its overlay stacks above stage celebrations.
 The dialog uses a viewport-bounded grid with stage identity, zoom controls and
 Close outside the image scroller; gesture help and progress descriptions are
 accessible without visible explanatory text. Its stage background matches the
-reward. The image is fitted to the available viewport at 100%; zoom scales that
+reward; the inner viewport is transparent so its unused space does not create
+a second background boundary. The image fits the available viewport at 100%; zoom scales that
 3:2 size through 4×. Size and anchored scroll position update together. Image
 geometry and edge shadows explicitly disable transition properties so the global
 reduced-motion duration override cannot delay these updates. Button steps are

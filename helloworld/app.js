@@ -1371,19 +1371,22 @@
   function puzzlePictureMarkup(stageId, { newPieceId = null, animate = false } = {}) {
     const value = puzzleValue(stageId);
     const { stage, earned, complete } = value;
+    const showWholePicture = complete && !animate;
     const id = `puzzle-${++puzzleSvgId}`;
-    const paths = stage.pieces.map((piece) => `<path d="${piece.path}"/>`);
+    const paths = showWholePicture ? [] : stage.pieces.map((piece) => `<path d="${piece.path}"/>`);
     const newPiece = newPieceId === null ? null : stage.pieces[newPieceId];
     const imageMarkup = `<image data-puzzle-src="${stage.image}" width="1536" height="1024" preserveAspectRatio="xMidYMid slice"/>`;
     const clipPaths = paths.filter((_, index) => earned[index] && (!animate || index !== newPieceId)).join("");
     const label = `${t("puzzleCount", { count: value.count, total: value.total })}. ${t(`puzzleDescription_${stage.id}`)}`;
     return `<div class="puzzle-picture ${complete ? "is-complete" : ""} ${animate ? "is-revealing" : ""}">
       <svg viewBox="0 0 1536 1024" role="img" aria-label="${escapeHtml(label)}">
+        ${showWholePicture ? imageMarkup : `
         <defs><clipPath id="${id}">${clipPaths}</clipPath>${newPiece && animate ? `<clipPath id="${id}-new">${paths[newPieceId]}</clipPath>` : ""}</defs>
         <rect width="1536" height="1024" fill="#e6dfcf"/>
         ${value.count ? `<g clip-path="url(#${id})">${imageMarkup}</g>` : ""}
         <g class="puzzle-seams" fill="none" stroke="#948776" stroke-width="2">${paths.join("")}</g>
         ${newPiece && animate ? `<g class="puzzle-new-piece" style="--piece-x:${768 - newPiece.x - newPiece.width / 2}px;--piece-y:${512 - newPiece.y - newPiece.height / 2}px;--piece-scale:${Math.min(3, 600 / newPiece.width)};transform-origin:${newPiece.x + newPiece.width / 2}px ${newPiece.y + newPiece.height / 2}px"><path d="${newPiece.path}" fill="#e6dfcf"/><g clip-path="url(#${id}-new)">${imageMarkup}</g><path d="${newPiece.path}" fill="none" stroke="#fff8e8" stroke-width="7"/></g>` : ""}
+        `}
       </svg>
       <p class="puzzle-image-error" role="status" hidden>${t("puzzleImageUnavailable")}</p>
     </div>`;
@@ -1431,6 +1434,14 @@
   function settlePuzzleReward(card, celebrate = true) {
     if (!card?.classList.contains("is-counting")) return;
     const value = puzzleValue(card.dataset.stageId);
+    if (value.complete) {
+      const picture = card.querySelector(".puzzle-picture");
+      const svg = picture.querySelector("svg");
+      // Reuse the loaded artwork, removing every clipping boundary rather than
+      // just hiding the strokes: clip-edge antialiasing can leave visible seams.
+      svg.replaceChildren(svg.querySelector("image"));
+      picture.classList.remove("is-revealing");
+    }
     card.classList.remove("is-counting");
     card.querySelector("[data-puzzle-reward-count]").textContent = `${value.count}/${value.total}`;
     card.querySelector("[data-puzzle-reward-announcement]").textContent = puzzleRewardAnnouncement(value);

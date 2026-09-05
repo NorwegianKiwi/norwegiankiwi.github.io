@@ -281,8 +281,10 @@ artwork loads. The stage icon and name identify the picture against a background
 using the stage's celebration colors. Above the fitted image, stage identity is
 left-aligned and an unframed puzzle icon with a compact earned/total count is
 right-aligned. Continue is centered below; short landscape retains a side layout.
-The earned-piece count increases as the piece lands; the final piece fades the seams and triggers one brief confetti
-burst. Explanatory reward text is announced accessibly rather than shown as a
+The earned-piece count increases as the piece lands; the final piece fades the
+seams and triggers one brief confetti burst. Once settled, completed pictures show
+the uninterrupted artwork without piece outlines or clipping boundaries, including
+in thumbnails and the viewer. Explanatory reward text is announced accessibly rather than shown as a
 headline. Continue opens results immediately, even during animation. Reduced
 motion shows the settled picture and final count without animated effects;
 rerenders and returning to results do not replay the reveal. Unrevealed pieces
@@ -300,6 +302,8 @@ to these celebrations. Puzzle rewards and stage celebrations fit within the
 viewport without scrolling or clipping controls, including short landscape layouts.
 The viewer opens above the originating screen or celebration and contains only
 the explicitly selected stage. Its background matches the stage's puzzle reward.
+The inner viewing area is transparent, letting that gradient continue seamlessly
+around the fitted picture without exposing the area available for zooming.
 The header has the circular stage icon and name left, Explore-style grouped zoom
 controls in the center, and Close right. On phones the controls occupy a second
 row. Completion text and gesture help are not shown; progress, image descriptions
