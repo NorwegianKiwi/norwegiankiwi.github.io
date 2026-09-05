@@ -15,10 +15,12 @@ test("manual preview menu scenarios", () => {
 
   const groups = menu.scenarioGroups();
   const items = groups.flatMap((group) => group.items);
-  assert.equal(items.length, 58, "the test page should expose all curated scenarios");
+  assert.equal(items.length, 68, "the test page should expose all curated scenarios");
 
   const allowedPreviews = new Set([
-    "puzzle-first", "puzzle-partial", "puzzle-final", "puzzle-replay", "puzzle-collection",
+    "puzzle-first", "puzzle-partial", "puzzle-final", "puzzle-replay",
+    "puzzle-level", "puzzle-world", "puzzle-missing-image",
+    "puzzle-view-empty", "puzzle-view-partial", "puzzle-view-complete",
     "result-failed-next-quiz", "result-skip-quiz", "result-failed-skip-quiz",
     "result-skip-level", "result-failed-skip-level", "result-wrap",
     "result-failed-wrap", "result-new-record", "result-below-best",
@@ -43,7 +45,13 @@ test("manual preview menu scenarios", () => {
   assert.equal(groups.find((group) => group.id === "basic").items.length, 17);
   for (const preview of allowedPreviews) assert.ok(items.some((item) => item.params.preview === preview), preview);
 
+  assert.equal(new Set(items.map((item) => menu.buildHref(item.params))).size, items.length, "no duplicate preview links");
+  assert.ok(!items.some((item) => item.params.preview === "puzzle-collection"), "obsolete collection entry is replaced by stage viewers");
   for (const item of items) {
+    for (const locale of ["nb", "en"]) {
+      assert.ok(item.title[locale]?.trim(), `${item.params.preview}: ${locale} title`);
+      assert.ok(item.description[locale]?.trim(), `${item.params.preview}: ${locale} description`);
+    }
     assert.ok(allowedPreviews.has(item.params.preview), item.params.preview);
     if (item.params.stage) assert.ok(stageIds.includes(item.params.stage), item.params.stage);
     if (item.params.source) assert.equal(item.params.source, "levels");
@@ -56,7 +64,7 @@ test("manual preview menu scenarios", () => {
     assert.equal(english.searchParams.get("preview"), item.params.preview);
   }
 
-  for (const preview of ["milestone-result", "milestone-celebration", "milestone-question"]) {
+  for (const preview of ["milestone-result", "milestone-celebration", "milestone-question", "puzzle-final"]) {
     assert.equal(items.filter((item) => item.params.preview === preview).length, 6, preview);
   }
   assert.equal(items.filter((item) => item.params.preview === "milestone-replay").length, 12);

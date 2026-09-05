@@ -19,7 +19,7 @@
         results: ["Etapperesultat → feiring", "Perfekt resultat der «Fullført» fører videre til den valgte etappefeiringen."],
         celebrations: ["Direkte etappefeiringer", "Åpne hver feiring uten å spille en quiz."],
         replays: ["Spill feiringer igjen", "Test retur og fokus fra både forsiden og Nivåer."],
-        questions: ["Én oppgave igjen", "Svar riktig én gang for å teste den ekte resultat- og feiringsflyten."],
+        questions: ["Én oppgave igjen", "Svar riktig én gang: brikke → resultat → etappefeiring."],
         edge: ["Uvanlig rekkefølge", "Test fremgang som mestres i en annen rekkefølge enn læreplanen."],
         world: ["Verden mestret", "Test den vanlige finaleflyten og sluttfeiringen direkte."],
         profiles: ["Testprofiler", "Importer fixtures/test-profiles-backup.json fra profilinnstillingene for varige testtilstander."],
@@ -36,7 +36,7 @@
         results: ["Stage result → celebration", "Perfect results where “Completed” continues to the selected stage celebration."],
         celebrations: ["Direct stage celebrations", "Open every celebration without playing a quiz."],
         replays: ["Replay celebrations", "Test return behavior and focus from both Home and Levels."],
-        questions: ["One question remaining", "Answer correctly once to test the genuine result and celebration flow."],
+        questions: ["One question remaining", "Answer correctly once: piece → result → stage celebration."],
         edge: ["Out-of-order progress", "Test progress mastered in a different order from the curriculum."],
         world: ["World mastered", "Test the ordinary final flow and the finale directly."],
         profiles: ["Test profiles", "Import fixtures/test-profiles-backup.json from profile settings for persistent test states."],
@@ -67,11 +67,19 @@
   function scenarioGroups() {
     return [
       { id: "puzzles", items: [
-        { title: { nb: "Første brikke", en: "First piece" }, description: { nb: "Første mestring avslører én brikke.", en: "First mastery reveals one piece." }, params: { preview: "puzzle-first" } },
+        { title: { nb: "Første brikke", en: "First piece" }, description: { nb: "Første mestring → brikke → resultat. Test også Fortsett før animasjonen er ferdig.", en: "First mastery → piece → result. Also test Continue before the animation finishes." }, params: { preview: "puzzle-first" } },
         { title: { nb: "Bildet tar form", en: "Picture in progress" }, description: { nb: "Ny brikke i Navigatør-bildet.", en: "A new piece in the Navigator picture." }, params: { preview: "puzzle-partial", stage: "navigator" } },
-        { title: { nb: "Siste brikke", en: "Final piece" }, description: { nb: "Fullfør bildet og åpne etappefeiringen.", en: "Complete the picture and open its milestone celebration." }, params: { preview: "puzzle-final" } },
-        { title: { nb: "Ingen ny brikke ved gjenspilling", en: "No new piece on replay" }, description: { nb: "En mestret quiz gir ikke en ekstra brikke.", en: "A mastered quiz does not award another piece." }, params: { preview: "puzzle-replay" } },
-        { title: { nb: "Ferdig etappebilde", en: "Completed stage picture" }, description: { nb: "Ett etappebilde, zoom og tastaturnavigasjon.", en: "One stage picture, zoom, and keyboard navigation." }, params: { preview: "puzzle-collection" } },
+        { title: { nb: "Brikke → nivå mestret", en: "Piece → level mastered" }, description: { nb: "Fjerde quiz gir en brikke, så et resultat med nivåtrofé. Ingen etappefeiring.", en: "The fourth quiz earns a piece, then a result with a level trophy. No stage celebration." }, params: { preview: "puzzle-level" } },
+        ...stageList.map((stage) => ({
+          title: { nb: `Siste brikke · ${stage.title.nb}`, en: `Final piece · ${stage.title.en}` },
+          description: { nb: "Brikke → ferdig bilde → resultat → etappefeiring. Andre etapper er ikke mestret.", en: "Piece → completed picture → result → stage celebration. Other stages remain unmastered." },
+          params: { preview: "puzzle-final", stage: stage.id },
+        })),
+        { title: { nb: "Ingen ny brikke ved gjenspilling", en: "No new piece on replay" }, description: { nb: "En mestret quiz går rett til resultatet. Se etappebildet og lukk det uten ny belønning.", en: "A mastered quiz goes straight to results. View and close its stage picture without another reward." }, params: { preview: "puzzle-replay" } },
+        { title: { nb: "Bildet kan ikke lastes", en: "Artwork unavailable" }, description: { nb: "Simulert bildefeil. Antall brikker og Fortsett virker fortsatt.", en: "Simulated image failure. The piece count and Continue remain available." }, params: { preview: "puzzle-missing-image" } },
+        { title: { nb: "Etappebilde · ingen brikker", en: "Stage picture · no pieces" }, description: { nb: "Ingen av bildet er avslørt. Lukk for å gå tilbake til Nivåer.", en: "No artwork is revealed. Close to return to Levels." }, params: { preview: "puzzle-view-empty" } },
+        { title: { nb: "Etappebilde · delvis ferdig", en: "Stage picture · partly complete" }, description: { nb: "Test zoom, rulling og retur til riktig etappe i Nivåer.", en: "Test zoom, scrolling, and return to the correct stage in Levels." }, params: { preview: "puzzle-view-partial", stage: "navigator" } },
+        { title: { nb: "Etappebilde · ferdig", en: "Stage picture · complete" }, description: { nb: "Bare denne etappen er mestret. Ett bilde, uten bildesamling.", en: "Only this stage is mastered. One picture, without a gallery." }, params: { preview: "puzzle-view-complete" } },
       ] },
       {
         id: "basic",
@@ -100,8 +108,8 @@
       {
         id: "replays",
         items: stageList.flatMap((stage) => [
-          { title: { nb: `${stage.icon} ${stage.title.nb} · Forsiden`, en: `${stage.icon} ${stage.title.en} · Home` }, description: { nb: "Spill feiringen igjen fra forsiden.", en: "Replay the celebration from Home." }, params: { preview: "milestone-replay", stage: stage.id } },
-          { title: { nb: `${stage.icon} ${stage.title.nb} · Nivåer`, en: `${stage.icon} ${stage.title.en} · Levels` }, description: { nb: "Spill feiringen igjen fra Nivåer.", en: "Replay the celebration from Levels." }, params: { preview: "milestone-replay", stage: stage.id, source: "levels" } },
+          { title: { nb: `${stage.icon} ${stage.title.nb} · Forsiden`, en: `${stage.icon} ${stage.title.en} · Home` }, description: { nb: "Åpne bildet fra feiringen; lukk bildet og feiringen og kontroller returfokus på forsiden.", en: "Open the picture from the celebration; close both and check return focus on Home." }, params: { preview: "milestone-replay", stage: stage.id } },
+          { title: { nb: `${stage.icon} ${stage.title.nb} · Nivåer`, en: `${stage.icon} ${stage.title.en} · Levels` }, description: { nb: "Åpne bildet fra feiringen; lukk bildet og feiringen og kontroller returfokus i Nivåer.", en: "Open the picture from the celebration; close both and check return focus in Levels." }, params: { preview: "milestone-replay", stage: stage.id, source: "levels" } },
         ]),
       },
       { id: "questions", items: stageItems("milestone-question") },
@@ -117,6 +125,7 @@
         id: "world",
         items: [
           { title: { nb: "Siste oppgave", en: "Final question" }, description: { nb: "Den vanlige finaleflyten med ett svar igjen.", en: "The ordinary finale with one answer remaining." }, params: { preview: "final-question" }, oneQuestion: true },
+          { title: { nb: "Siste brikke → hele verden mestret", en: "Final piece → whole world mastered" }, description: { nb: "Ferdig bilde → resultat → Verdensmester-etappen → Verden mestret, uten å svare på en oppgave.", en: "Completed picture → result → World Master stage → World mastered, without answering a question." }, params: { preview: "puzzle-world" } },
           { title: { nb: "Siste resultat", en: "Final result" }, description: { nb: "Resultat → Verdensmester → Verden mestret.", en: "Result → World Master → World mastered." }, params: { preview: "final-result" } },
           { title: { nb: "Sluttfeiring", en: "Final celebration" }, description: { nb: "Åpne Verden mestret direkte.", en: "Open World mastered directly." }, params: { preview: "final-celebration" } },
         ],

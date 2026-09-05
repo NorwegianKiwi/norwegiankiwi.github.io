@@ -37,6 +37,8 @@
   ]);
   const initialPreview = new Set([
     "puzzle-first", "puzzle-partial", "puzzle-final", "puzzle-replay", "puzzle-collection",
+    "puzzle-level", "puzzle-world", "puzzle-missing-image",
+    "puzzle-view-empty", "puzzle-view-partial", "puzzle-view-complete",
     ...resultPreviewNames, "milestone-result", "milestone-celebration",
     "milestone-question", "milestone-replay", "level-final-gap-question", "navigator-tourist-gap-question",
     "tourist-world-final-question", "final-question", "final-result", "final-celebration",
@@ -5592,13 +5594,30 @@
 
   async function initialize() {
     if (initialPreview?.startsWith("puzzle-")) {
-      const stage = curriculum.stages.find((candidate) => candidate.id === initialUrl.searchParams.get("stage")) ?? curriculum.stages[0];
+      const stage = initialPreview === "puzzle-world"
+        ? curriculum.stages.at(-1)
+        : curriculum.stages.find((candidate) => candidate.id === initialUrl.searchParams.get("stage")) ?? curriculum.stages[0];
       const quizzes = previewStageQuizzes(stage);
-      const index = initialPreview === "puzzle-final" ? quizzes.length - 1 : initialPreview === "puzzle-partial" ? Math.floor(quizzes.length / 2) : 0;
+      const isViewer = initialPreview.startsWith("puzzle-view-") || initialPreview === "puzzle-collection";
+      const index = ["puzzle-final", "puzzle-world"].includes(initialPreview) ? quizzes.length - 1
+        : ["puzzle-partial", "puzzle-view-partial"].includes(initialPreview) ? Math.floor(quizzes.length / 2)
+        : initialPreview === "puzzle-level" ? 3 : 0;
       const quiz = quizzes[index];
       resetPreviewProgress(initialPreview);
-      const earnedIds = new Set(quizzes.slice(0, index + (initialPreview === "puzzle-replay" ? 1 : 0)).map((q) => q.id));
-      masterPreviewQuizzes((q) => initialPreview === "puzzle-collection" || earnedIds.has(q.id));
+      const earnedCount = initialPreview === "puzzle-view-empty" ? 0
+        : ["puzzle-view-complete", "puzzle-collection"].includes(initialPreview) ? quizzes.length
+        : index + (initialPreview === "puzzle-replay" ? 1 : 0);
+      const earnedIds = new Set(quizzes.slice(0, earnedCount).map((q) => q.id));
+      masterPreviewQuizzes((q) => initialPreview === "puzzle-world" ? q.id !== quiz.id : earnedIds.has(q.id));
+      if (isViewer) {
+        state.screen = "levels";
+        state.puzzleStageId = stage.id;
+        puzzleReturnFocus = { action: "open-puzzles", stageId: stage.id };
+        render({ focusPuzzleDialog: true });
+        return;
+      }
+      // Exercise the normal localized failure UI without a missing-file request.
+      if (initialPreview === "puzzle-missing-image") failedPuzzleImages.add(puzzles.stages.find((candidate) => candidate.id === stage.id).image);
       state.curriculumQuizId = quiz.id;
       state.activeLevelId = quiz.levelId;
       state.mode = quiz.mode;
@@ -5607,13 +5626,9 @@
       state.wrongAnswers = [];
       state.resultRecorded = false;
       finishCurriculumAttempt();
-      state.screen = initialPreview === "puzzle-collection" ? "levels" : "result";
+      state.screen = "result";
       state.resultPreview = initialPreview;
-      if (initialPreview === "puzzle-collection") {
-        state.puzzleStageId = stage.id;
-        puzzleReturnFocus = { action: "open-puzzles", stageId: stage.id };
-      }
-      render({ focusPuzzleDialog: initialPreview === "puzzle-collection" });
+      render();
       return;
     }
     if (initialPreview === "level-final-gap-question") {

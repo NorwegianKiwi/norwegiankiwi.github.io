@@ -630,5 +630,12 @@ keep supports, vehicle connections, scale and physical actions coherent. Repair
 local defects and recheck the whole image before installing it. Preserve the
 1536 × 1024 dimensions, geometry and permanent quiz mappings. Assets are
 ordinary local images; playing via `file://` needs no build, network or server.
-`test.html` includes five puzzle scenarios, which use temporary preview profiles.
+`test.html` covers first/intermediate pieces, level mastery, final pieces for all
+six stages, the full-world reward sequence, mastered replay, unavailable artwork,
+and empty/partial/completed stage viewers. These use temporary preview profiles;
+viewer previews do not record a quiz result. The former `puzzle-collection` URL
+remains an alias for a completed stage viewer but is not listed in the menu.
+Use system reduced-motion settings to check settled rewards; also exercise early
+Continue, picture zoom/scrolling, Escape and focus restoration through the existing
+Home/Levels celebration replay entries.
 The canonical checker includes puzzle mapping, geometry and progress tests.
