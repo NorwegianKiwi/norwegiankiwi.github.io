@@ -42,10 +42,19 @@ The implementation should maintain clear boundaries:
 - `sharing.js`: dependency-free construction of encoded email draft URLs
 - `localization.js`: complete bilingual interface catalogs and interpolation
 - `map-view.js`: pure map viewport, zoom, pan and coordinate calculations
+- `preview.js`: manual preview URL recognition and isolated scenario data
 - `app.js`: application state, rendering and interaction orchestration
 
 Curriculum and progress logic must remain outside the browser orchestration in
 `app.js`.
+
+`preview.js` exposes `GEOGRAFI_PREVIEW` in the browser and the same API through
+CommonJS. `readName(params)` recognizes existing preview URL parameters;
+`prepare(params, locale, dependencies, timestamp)` returns a temporary store,
+state overrides, and a startup action, or `null` for an unrecognized preview.
+Dependencies are curriculum, progress, and a country-code lookup. The module
+does not access the DOM or storage. `app.js` applies the prepared data and owns
+rendering, focus, simulated image failures, and normal quiz/celebration startup.
 
 ## 3. Curriculum data model
 

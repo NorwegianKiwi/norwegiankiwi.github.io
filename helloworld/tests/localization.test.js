@@ -75,3 +75,15 @@ test("compact result actions and mastery cancellation copy are complete in both 
     assert.equal(localization.translate(locale, "abandonAndStart"), "Start quiz");
   }
 });
+
+test("dynamic map labels and every stage description remain translated", () => {
+  const curriculum = require("../curriculum.js");
+  for (const locale of localization.supportedLocales) {
+    for (const area of ["world", "region", "nearby"]) {
+      assert.ok(localization.translate(locale, `mapView${area[0].toUpperCase()}${area.slice(1)}`).trim());
+    }
+    for (const stage of curriculum.stages) {
+      assert.ok(localization.translate(locale, `puzzleDescription_${stage.id}`).trim());
+    }
+  }
+});

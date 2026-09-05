@@ -85,6 +85,7 @@ in [AGENTS.md](AGENTS.md).
 - `styles/` — shared and feature-owned CSS
 - `tests/` — dependency-free Node tests
 - `test.html` and `test-menu.js` — standalone manual preview catalog
+- `preview.js` — preview URL recognition and isolated scenario preparation
 - `tools/` — unified checks, map maintenance/generation, and test-profile
   generation
 - `flags/` and `licenses/` — local assets and their source/licence records

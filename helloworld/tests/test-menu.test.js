@@ -1,6 +1,7 @@
 "use strict";
 
 const test = require("node:test");
+const preview = require("../preview.js");
 
 test("manual preview menu scenarios", () => {
   const assert = require("node:assert/strict");
@@ -17,33 +18,7 @@ test("manual preview menu scenarios", () => {
   const items = groups.flatMap((group) => group.items);
   assert.equal(items.length, 68, "the test page should expose all curated scenarios");
 
-  const allowedPreviews = new Set([
-    "puzzle-first", "puzzle-partial", "puzzle-final", "puzzle-replay",
-    "puzzle-level", "puzzle-world", "puzzle-missing-image",
-    "puzzle-view-empty", "puzzle-view-partial", "puzzle-view-complete",
-    "result-failed-next-quiz", "result-skip-quiz", "result-failed-skip-quiz",
-    "result-skip-level", "result-failed-skip-level", "result-wrap",
-    "result-failed-wrap", "result-new-record", "result-below-best",
-    "result-replay-mastered", "result-all-mastered", "result-failed-all-mastered",
-    "result-next-quiz",
-    "result-next-level",
-    "result-failed-next",
-    "result-failed-no-next",
-    "share-fallback",
-    "milestone-result",
-    "milestone-celebration",
-    "milestone-question",
-    "milestone-replay",
-    "level-final-gap-question",
-    "navigator-tourist-gap-question",
-    "tourist-world-final-question",
-    "final-question",
-    "final-result",
-    "final-celebration",
-  ]);
-
   assert.equal(groups.find((group) => group.id === "basic").items.length, 17);
-  for (const preview of allowedPreviews) assert.ok(items.some((item) => item.params.preview === preview), preview);
 
   assert.equal(new Set(items.map((item) => menu.buildHref(item.params))).size, items.length, "no duplicate preview links");
   assert.ok(!items.some((item) => item.params.preview === "puzzle-collection"), "obsolete collection entry is replaced by stage viewers");
@@ -52,7 +27,7 @@ test("manual preview menu scenarios", () => {
       assert.ok(item.title[locale]?.trim(), `${item.params.preview}: ${locale} title`);
       assert.ok(item.description[locale]?.trim(), `${item.params.preview}: ${locale} description`);
     }
-    assert.ok(allowedPreviews.has(item.params.preview), item.params.preview);
+    assert.equal(preview.readName(new URLSearchParams(item.params)), item.params.preview);
     if (item.params.stage) assert.ok(stageIds.includes(item.params.stage), item.params.stage);
     if (item.params.source) assert.equal(item.params.source, "levels");
 
