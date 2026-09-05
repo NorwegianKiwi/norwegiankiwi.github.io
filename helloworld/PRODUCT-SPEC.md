@@ -278,8 +278,10 @@ world (52), Globetrotter's travel city (56), Cartographer's living map workshop
 A separate reward screen precedes results on first mastery. It presents the new
 fragment enlarged, then places it automatically within about two seconds once
 artwork loads. The stage icon and name identify the picture against a background
-using the stage's celebration colors. The earned-piece count increases as the
-piece lands; the final piece fades the seams and triggers one brief confetti
+using the stage's celebration colors. Above the fitted image, stage identity is
+left-aligned and an unframed puzzle icon with a compact earned/total count is
+right-aligned. Continue is centered below; short landscape retains a side layout.
+The earned-piece count increases as the piece lands; the final piece fades the seams and triggers one brief confetti
 burst. Explanatory reward text is announced accessibly rather than shown as a
 headline. Continue opens results immediately, even during animation. Reduced
 motion shows the settled picture and final count without animated effects;
@@ -297,12 +299,22 @@ combining a picture thumbnail with View picture; Home's earned stage icons lead
 to these celebrations. Puzzle rewards and stage celebrations fit within the
 viewport without scrolling or clipping controls, including short landscape layouts.
 The viewer opens above the originating screen or celebration and contains only
-the explicitly selected stage. It initially fits the entire picture, keeping
-Close and zoom controls visible. Only the zoomed picture area scrolls, supporting
-mouse dragging, touch scrolling and keyboard scrolling. Closing or Escape restores
-the underlying screen or celebration and trigger focus. Image descriptions,
-progress counts and image-load errors exist in both languages. Missing artwork never blocks navigation
-or changes earned progress. Existing mastery does not trigger retrospective rewards.
+the explicitly selected stage. Its background matches the stage's puzzle reward.
+The header has the circular stage icon and name left, Explore-style grouped zoom
+controls in the center, and Close right. On phones the controls occupy a second
+row. Completion text and gesture help are not shown; progress, image descriptions
+and instructions remain accessible to assistive technology.
+
+The entire image initially fits at 100%. Zoom buttons step through 100%, 150%,
+200%, 300% and 400%, with disabled controls at the limits. Like Explore, the viewer
+supports mouse/pen dragging, one-finger panning, two-finger pinch and trackpad
+pinch/Ctrl+wheel zoom. Gesture zoom follows the pointer or pinch midpoint; buttons
+preserve the viewed center and Reset fits the whole picture. Only the picture
+area pans or scrolls, including through the keyboard. Directional edge shadows
+indicate hidden picture content and disappear at the corresponding boundary.
+Closing or Escape restores the underlying screen or celebration and trigger focus.
+Localized image-load errors never block navigation or change earned progress.
+Existing mastery does not trigger retrospective rewards.
 
 
 ## 10. Profiles

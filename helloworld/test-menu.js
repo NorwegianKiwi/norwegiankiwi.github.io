@@ -68,7 +68,7 @@
     return [
       { id: "puzzles", items: [
         { title: { nb: "Første brikke", en: "First piece" }, description: { nb: "Første mestring → brikke → resultat. Telleren øker når brikken lander. Test også tidlig Fortsett og redusert bevegelse.", en: "First mastery → piece → result. The count increases as the piece lands. Also test early Continue and reduced motion." }, params: { preview: "puzzle-first" } },
-        { title: { nb: "Bildet tar form", en: "Picture in progress" }, description: { nb: "Ny brikke i Navigatør-bildet.", en: "A new piece in the Navigator picture." }, params: { preview: "puzzle-partial", stage: "navigator" } },
+        { title: { nb: "Bildet tar form", en: "Picture in progress" }, description: { nb: "Ny brikke i Navigatør-bildet. Etappen og brikketelleren følger bildets øvre hjørner.", en: "A new piece in the Navigator picture. Stage identity and piece count align with the upper image corners." }, params: { preview: "puzzle-partial", stage: "navigator" } },
         { title: { nb: "Brikke → nivå mestret", en: "Piece → level mastered" }, description: { nb: "Fjerde quiz gir en brikke, så et resultat med nivåtrofé. Ingen etappefeiring.", en: "The fourth quiz earns a piece, then a result with a level trophy. No stage celebration." }, params: { preview: "puzzle-level" } },
         ...stageList.map((stage) => ({
           title: { nb: `Siste brikke · ${stage.title.nb}`, en: `Final piece · ${stage.title.en}` },
@@ -78,7 +78,7 @@
         { title: { nb: "Ingen ny brikke ved gjenspilling", en: "No new piece on replay" }, description: { nb: "En mestret quiz går rett til resultatet. Se etappebildet og lukk det uten ny belønning.", en: "A mastered quiz goes straight to results. View and close its stage picture without another reward." }, params: { preview: "puzzle-replay" } },
         { title: { nb: "Bildet kan ikke lastes", en: "Artwork unavailable" }, description: { nb: "Simulert bildefeil. Antall brikker og Fortsett virker fortsatt.", en: "Simulated image failure. The piece count and Continue remain available." }, params: { preview: "puzzle-missing-image" } },
         { title: { nb: "Etappebilde · ingen brikker", en: "Stage picture · no pieces" }, description: { nb: "Ingen av bildet er avslørt. Lukk for å gå tilbake til Nivåer.", en: "No artwork is revealed. Close to return to Levels." }, params: { preview: "puzzle-view-empty" } },
-        { title: { nb: "Etappebilde · delvis ferdig", en: "Stage picture · partly complete" }, description: { nb: "Test zoom, rulling og retur til riktig etappe i Nivåer.", en: "Test zoom, scrolling, and return to the correct stage in Levels." }, params: { preview: "puzzle-view-partial", stage: "navigator" } },
+        { title: { nb: "Etappebilde · delvis ferdig", en: "Stage picture · partly complete" }, description: { nb: "Test kniping, draing, piltaster, kantskygger og retur til riktig etappe i Nivåer.", en: "Test pinch, drag, arrow keys, edge shadows, and return to the correct stage in Levels." }, params: { preview: "puzzle-view-partial", stage: "navigator" } },
         { title: { nb: "Etappebilde · ferdig", en: "Stage picture · complete" }, description: { nb: "Bare denne etappen er mestret. Ett bilde, uten bildesamling.", en: "Only this stage is mastered. One picture, without a gallery." }, params: { preview: "puzzle-view-complete" } },
       ] },
       {

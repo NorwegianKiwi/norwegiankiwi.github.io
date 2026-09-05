@@ -572,11 +572,15 @@ body.result-page {
 }
 /* First-mastery reward is a separate presentation of the recorded result. */
 .puzzle-reward-shell { width: 100%; margin: 0; height: 100dvh; min-height: 0; display: grid; place-items: center; padding: clamp(12px, 3vmin, 28px); color: #fff; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--stage-accent) 80%, #334c48), #102a28); }
-.puzzle-reward-card { width: min(1000px, 100%); height: min(850px, 100%, calc(66.667vw + 210px)); min-width: 0; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; justify-items: center; gap: clamp(10px, 2dvh, 20px); text-align: center; }
-.puzzle-reward-stage { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: clamp(1.1rem, 3vmin, 1.5rem); font-weight: 800; }
-.puzzle-reward-art { position: relative; width: 100%; min-height: 0; container-type: size; display: grid; place-items: center; }
-.puzzle-reward-art .puzzle-picture { width: min(100cqw, 150cqh); box-shadow: 0 16px 50px #061c2855, 0 0 0 1px #ffffff40; }
-.puzzle-reward-count { margin: 0; font-size: clamp(1.1rem, 3vmin, 1.5rem); font-weight: 800; font-variant-numeric: tabular-nums; color: #fff4ce; }
+.puzzle-reward-card { width: min(1000px, 100%); height: min(850px, 100%, calc(66.667vw + 160px)); min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: clamp(10px, 2dvh, 20px); text-align: center; }
+.puzzle-reward-presentation { width: 100%; min-height: 0; container-type: size; display: grid; place-items: center; }
+.puzzle-reward-figure { width: min(100cqw, calc((100cqh - 68px) * 1.5)); min-width: 0; }
+.puzzle-reward-header { height: 52px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.puzzle-reward-stage { min-width: 0; display: flex; align-items: center; gap: 10px; font-size: clamp(1rem, 2.5vmin, 1.4rem); font-weight: 800; text-align: left; }
+.puzzle-reward-stage .level-stage-icon { flex: 0 0 auto; }
+.puzzle-reward-art { position: relative; width: 100%; min-height: 0; }
+.puzzle-reward-art .puzzle-picture { box-shadow: 0 16px 50px #061c2855, 0 0 0 1px #ffffff40; }
+.puzzle-reward-count { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; margin: 0; font-size: clamp(1rem, 2.5vmin, 1.4rem); font-weight: 800; font-variant-numeric: tabular-nums; color: #fff4ce; }
 .puzzle-reward-card > button { min-width: 180px; background: var(--gold); color: var(--ink); }
 .puzzle-reward-card > button:hover { background: #f0c75f; }
 .is-piece-landed .puzzle-reward-count { animation: puzzle-count-pop 400ms ease-out both; }
@@ -591,10 +595,14 @@ body.result-page {
 }
 @media (orientation: landscape) and (max-height: 599px) {
   .puzzle-reward-card { height: 100%; grid-template-columns: minmax(0, 1fr) minmax(180px, .6fr); grid-template-rows: 1fr auto auto 1fr; column-gap: 24px; }
-  .puzzle-reward-art { grid-column: 1; grid-row: 1 / 5; height: 100%; }
-  .puzzle-reward-stage { grid-column: 2; align-self: end; flex-direction: column; gap: 8px; }
-  .puzzle-reward-count, .puzzle-reward-card > button { grid-column: 2; }
+  .puzzle-reward-presentation, .puzzle-reward-figure { display: contents; container-type: normal; }
+  .puzzle-reward-art { grid-column: 1; grid-row: 1 / 5; height: 100%; container-type: size; display: grid; place-items: center; }
+  .puzzle-reward-art .puzzle-picture { width: min(100cqw, 150cqh); }
+  .puzzle-reward-header { grid-column: 2; grid-row: 1 / 3; align-self: end; flex-direction: column; height: auto; margin: 0; gap: 12px; }
+  .puzzle-reward-stage { flex-direction: column; gap: 8px; text-align: center; }
+  .puzzle-reward-card > button { grid-column: 2; grid-row: 3; }
 }
+
 .result-picture-link { margin-top: 8px; }
 .puzzle-new-piece { animation: puzzle-piece-arrive 2s ease-in-out both paused; transform-box: view-box; filter: drop-shadow(0 10px 10px #34270d66); }
 .is-complete.is-revealing .puzzle-seams { animation: puzzle-seams-fade 2s ease both paused; }

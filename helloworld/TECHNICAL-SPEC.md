@@ -617,19 +617,36 @@ during a reveal also settles the count.
 
 Puzzle rewards and stage celebrations must fit the viewport without document or
 dialog scrolling, or clipped controls. Reward artwork fits the remaining grid
-space; short landscape uses two columns. Stage celebrations use a compact thumbnail
+space; its header shares the fitted image width, with stage identity left and
+a compact puzzle-icon count right. Short landscape uses two columns. Stage celebrations use a compact thumbnail
 and text in one picture-viewer button rather than a large embedded image.
 
 Visible SVG pictures load their local PNG through IntersectionObserver, with
 immediate loading when that API is unavailable. Loading failures retain opaque
 pieces and localized progress/error text. The viewer requires an explicit stage
 and has no cross-stage selector. Its overlay stacks above stage celebrations.
-The dialog uses a viewport-bounded grid with Close, zoom controls and help outside
-the image scroller. Container-relative sizing fits the entire 3:2 image at 100%;
-zoom scales that fitted size, with scrolling confined to the image area.
-It makes the underlying screen inert and participates in the existing keyboard
-focus trap, restoring the originating control even when opened from a stage
-celebration.
+The dialog uses a viewport-bounded grid with stage identity, zoom controls and
+Close outside the image scroller; gesture help and progress descriptions are
+accessible without visible explanatory text. Its stage background matches the
+reward. The image is fitted to the available viewport at 100%; zoom scales that
+3:2 size through 4×. Size and anchored scroll position update together. Image
+geometry and edge shadows explicitly disable transition properties so the global
+reduced-motion duration override cannot delay these updates. Button steps are
+1, 1.5, 2, 3 and 4, with disabled controls excluded from dialog focus trapping.
+
+The app owns transient picture pointer capture and a pan/pinch gesture snapshot.
+Image-relative anchors account for centering margins on either axis; touch and
+Ctrl+wheel zoom preserve the anchor under the moving midpoint or pointer, subject
+to image boundaries. Touch panning is handled by pointer events within the image
+area. Ordinary scrolling and keyboard panning stay local to that area. Ending a
+pinch rebases the remaining finger as a pan; cancellation, lost capture, blur,
+render and closing release gesture state. ResizeObserver (or window resize as a
+fallback) refits the image and refreshes zoom and boundary indicators. Four
+noninteractive edge shadows reflect actual remaining scroll extent, and disappear
+at the corresponding boundary or when the full image fits.
+The viewer makes the underlying screen inert and participates in the existing
+keyboard focus trap, restoring the originating control even when opened from a
+stage celebration.
 
 Artwork lives in `images/puzzles/`. `PROMPTS.md` contains shared art direction,
 six stage maintenance prompts and the review checklist. Tourist supplies the
