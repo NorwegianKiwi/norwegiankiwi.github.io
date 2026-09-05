@@ -612,12 +612,11 @@ with immediate loading when that API is unavailable. Loading failures retain
 opaque pieces and localized progress/error text. Collection dialogs make the
 underlying screen inert and participate in the existing keyboard focus trap.
 
-Artwork lives in `images/puzzles/`; `PROMPTS.md` links to the current built-in
-imagegen briefs, exact prompts and review notes in `revisions/`. The second
-edition uses the approved Tourist image as its style and character reference.
-Originals are preserved in `revisions/originals/`; `installed-sha256.json`
-records original and replacement hashes. Open `revisions/review.html` directly
-to compare each edition and inspect its actual clipped pieces.
+Artwork lives in `images/puzzles/`. `PROMPTS.md` contains shared art direction,
+six stage maintenance prompts and the review checklist. Tourist supplies the
+style and recurring-character reference. Open `review.html` in that directory
+to inspect the active pictures and their actual clipped fragments. Keep only
+the six runtime PNGs; Git retains asset and documentation history.
 Before replacing an image, review scene structure, anatomy and object construction,
 then every clipped piece at enlarged size. Make intentional fantasy explicit;
 keep supports, vehicle connections, scale and physical actions coherent. Repair

@@ -1,41 +1,150 @@
-# Stage illustration sources
+# Stage artwork prompts and maintenance
 
-These are the original generation prompts. For the current revision workflow,
-use [the revised briefs](revisions/BRIEFS.md) and [review record](revisions/REVIEW.md).
-All six installed images now use the reviewed second edition. Originals are
-preserved in `revisions/originals/`; exact executed revision prompts and review
-notes are in `revisions/`.
+These maintenance prompts describe the finished artwork requirements. They are
+not verbatim generation records. Use the shared art direction with the relevant
+stage prompt when creating an illustration with the built-in imagegen tool.
+The six PNGs in this directory are the runtime assets. Use `tourist.png` as the
+style and recurring-character reference for the other stages.
 
-Created with the built-in imagegen tool. Final local PNGs use a 1536 × 1024
-canvas. Tourist established the style; the other five used Tourist as their
-style and recurring-character reference. Puzzle seams are rendered by the app,
-not painted into these assets.
+## Shared art direction
 
-The fixed piece layouts and quiz mappings are in `puzzles.js`. Review every
-piece against those shapes before replacing artwork. Keep interesting objects
-inside individual pieces, including those along the image edges.
+Create a 1536 × 1024 landscape, full-bleed storybook illustration in warm
+textured gouache and fine ink. Use golden light, teal, coral, mustard and cream,
+with cute expressive faces and readable details. Include each recurring
+traveller once: a child in a yellow raincoat with a red backpack, a child in a
+blue cap with round spectacles, and a small russet fox carrying a rolled map.
 
-## tourist.png
+Establish one coherent viewpoint, ground surfaces and scale relationships.
+Figures have natural joints, coherent species-appropriate anatomy, readable
+hands and grips, and convincing contact with their surroundings. Vehicles have
+connected components and traceable tracks or suspension. Objects have clear
+supports, handles and contact shadows. Occlusion should explain hidden parts.
 
-Use case: illustration-story. Create a finished landscape 1536x1024 full-bleed illustration for a geography game's collectible picture, chapter 1 TOURIST: a bustling whimsical departure railway station. Warm hand-painted storybook gouache with crisp fine ink details, rich teal, coral, mustard and cream, charming expressive characters, polished detailed children's seek-and-find book art, suitable for all ages. Establish recurring travellers: child with yellow raincoat and red backpack, child with blue cap and round spectacles, small russet fox carrying a rolled map, pigeon stealing a ticket. Fill the entire station scene with 16 distinct amusing micro-stories distributed across an invisible 4 by 4 grid: overhead luggage mishaps, clockwork birds, cat in suitcase, globe trolley, pastry theft, maps upside down, tiny train conductor, plants and lost boots, people waving, playful travel objects. Picture will be revealed as jigsaw pieces, so EVERY part including all edges must contain recognizable interesting objects, no empty sky or blank floor. Cohesive scene, generous readable characters, not separate panels. Geography and travel motifs. No words, lettering, numbers, watermarks, border or drawn puzzle seams. Illustration only.
+The upright clothed fox is intentional fantasy. Additional fantasy is specified
+per scene; ordinary gravity, water flow, construction and perspective still
+apply. Avoid fused objects, accidental character duplication, extra limbs,
+floating props and untraceable machinery. Simplify crowded actions and complex
+mechanisms when needed for clarity.
 
-## explorer.png
+Distribute recognizable characters, props, animals, architecture and nature
+across the fixed puzzle layout. Calmer clouds, foliage, stone and paving are
+welcome where they help the composition; each piece need not contain a whole
+character or a separate joke. No lettering, pseudo-writing, logos, borders,
+panels, painted grids or puzzle seams. Printed maps use simple route lines and
+recognizable symbols; clocks use clear tick marks and two hands.
 
-Use case: illustration-story. Create a NEW landscape 1536x1024 full-bleed image chapter 2 EXPLORER, using attached image solely as style and recurring character reference. Same warm detailed hand-painted gouache and fine ink storybook illustration. A dense cutaway adventure island filled edge-to-edge with jungle treehouses, rope bridges, explorers, birds, turtles, curious monkeys, caves with glowing minerals, underground streams, camp cooking mishaps, mountain goats, miniature boats, archaeological discoveries. The child in yellow raincoat/red backpack, child in blue cap/round spectacles and russet fox with rolled map are exploring different small corners. Bird stealing a compass, monkey wearing binoculars backwards, turtle carrying camp supplies. MANY small distinct stories evenly distributed across invisible 8 columns by 5 rows, each fragment must include an interesting recognizable object or animal. Tiny characters throughout, no single oversized central character. No empty sky, blank earth or empty water. Cohesive island cutaway, not panels. No lettering, numbers, borders or puzzle seams. Family-friendly and joyful. Not an exact geographic map.
+## Tourist — 16 pieces, 4 × 4
 
-## navigator.png
+A bustling departure station viewed almost side-on. One straight track runs
+left to right behind a parallel foreground platform. A black steam locomotive
+faces left, its boiler parallel to the rails, cab immediately behind it and
+cream-and-teal carriages coupled behind the cab to the right. Wheels rest on
+the rails; the engine, carriages and track share one continuous alignment.
+Teal columns and roof beams support the canopy, clock, lamps, flowers and nest.
 
-Use case: illustration-story. NEW landscape 1536x1024 full-bleed detailed storybook illustration chapter 3 NAVIGATOR. Attached reference is ONLY for warm gouache/fine ink style and recurring characters. A bustling whimsical harbour above and ocean cutaway below, every corner packed with small readable amusing scenes: lighthouse keepers, seagulls stealing picnic, fishing boats, floating market, sailors tangled in bunting, dockside cats, navigating with upside-down maps, miniature sailing school; underwater submarine windows, octopus holding compasses, diving fox, friendly whales and turtles, fish exploring a shipwreck, crab tea party, coral castles. Recurring child yellow raincoat/red backpack, child blue cap/round spectacles, russet fox rolled map appear in little scenes. Warm coral/mustard above and luminous turquoise underwater, brighter than reference in dark areas. Invisible six rows alternating 9 and 8 pieces wide: each small region needs a recognizable funny creature or object. No empty water or sky, no large plain hull, no single dominating character. Unified elaborate seek-and-find illustration, not panels. No text, numbers, borders, watermarks or puzzle seams.
+The yellow-coat child waves towards a carriage window; the blue-cap child holds
+a simple local route map in both hands; the fox holds its rolled map. Separate
+poses keep gestures readable. A pastry seller stands behind a supported counter
+on the left. A pigeon grips a plain bordered ticket bearing a train symbol.
+An adult traveller with a camera stands beside a luggage trolley with a load
+bed, connected handle and wheels. Include a cat inside a visibly hinged open
+suitcase, a dog beside a picnic basket, a paper boat and travel journal on the
+platform. Passengers remain distinct within carriage windows. Fantasy is the
+clothed fox; the station and train have ordinary physical construction.
 
-## globetrotter.png
+## Explorer — 40 pieces, 8 × 5
 
-Use case: illustration-story. Create NEW landscape 1536x1024 full-bleed seek-and-find storybook illustration chapter 4 GLOBETROTTER. Reference solely warm detailed gouache/ink style and recurring travellers: yellow raincoat child/red backpack, blue cap child/round spectacles, russet fox with rolled map. A fantastical densely built hillside travel city, interconnected terraced neighbourhoods, canals, bridges, bustling markets, trams, tiny funiculars, elevated trains, cable cars, bicycle couriers, hot-air balloons and whimsical little planes. Many tiny amusing incidents: cats riding luggage, pigeon conductor, dog pilot, fox boarding wrong balloon, runaway oranges, traveller taking photo upside down, rooftop picnic, duck crossing stopping bicycles. Geography-inspired varied architecture without caricatures. 56 rewards cut on invisible 8 columns x 7 rows: EVERY small tile needs a recognizable object or character, including all corners. Fill sky with balloons, bridges and roof gardens, foreground with crowded little market and canal stories. Small characters distributed widely, no enormous central figures. Bright warm coral mustard teal, joyful family-friendly rich fine details. Cohesive continuous scene, no panels, text, numbers, watermark, border or puzzle seams.
+An elevated three-quarter view of a lush island hillside. A treehouse rests on
+a sturdy trunk and braces. A short rope bridge has continuous planks, handrails,
+anchor posts and solid landings across a ravine. The three travellers stand
+together on a broad path leading to a campsite. A stream descends over rocks
+into a lower pool. A cutaway rock face reveals caves with distinct stone walls
+and dry floors above the pool; separate water from dry passages clearly.
 
-## regional-expert.png
+Include a monkey with a stolen hat, birds, butterflies, a lizard, roots,
+crystals, a closed chest, tent and kettle hanging from a supported frame.
+Distribute these discoveries among foliage and rock. The cutaway is an
+illustration convention; the clothed fox is fantasy. Terrain, bridge supports
+and water flow remain convincing.
 
-Use case: illustration-story. Create NEW landscape 1536x1024 full-bleed detailed storybook illustration chapter 5 CARTOGRAPHER. Attached reference only for warm gouache/fine ink style and recurring yellow raincoat child/red backpack, blue cap child/round glasses and russet fox with rolled map. A magical mapmaker's workshop: huge table whose unlettered maps become miniature real mountain ranges, rivers pouring between sheets, tiny harbours, trains crossing rulers, towns made of pencil shavings, waterfalls into teacups, animals carrying surveying equipment, pigeon stealing measuring tape. Shelves filled with globes and miniature landscapes, little explorers climbing a compass, fox surveying a ridge, paper boats sailing spilled ink, turtle delivering map scrolls, cartographer studying through giant magnifying glass. Distinct amusing discoveries throughout every small region: invisible six rows alternating 7 and 8 columns. No empty desk, blank wall or blank parchment, no single oversized person. Bright inviting warm lamp light, teal/coral/mustard, clear readable details, all ages. Continuous playful scene not panels. No written text, numbers, borders, watermark or puzzle seams.
+## Navigator — 52 pieces, row counts 9, 8, 9, 9, 8, 9
 
-## world-master.png
+An oblique coastal harbour above a clearly defined water surface, with an
+illustrative underwater cross-section below. The three travellers stand once
+on a broad timber pier with a continuous deck and posts extending below water.
+A rowboat and a modest single-mast sailboat float at the surface with coherent
+hulls and simple connected rigging. A lighthouse rests on a rocky headland.
+Village houses, baskets, flowers and seabirds enliven the shore.
 
-Use case: illustration-story. Create NEW landscape 1536x1024 full-bleed warm detailed gouache and ink storybook illustration chapter 6 WORLD MASTER. Attached reference is style and recurring characters only. A joyful miniature planet reunion: round-ish tiny globe nearly filling frame, charming patchwork miniature landscapes, mountains, harbour, railway station, jungle treehouse, mapmaker workshop, canals and bridges around the curved planet, all hosting a playful travelling festival. Recurring yellow raincoat child/red backpack, blue cap child/round glasses, russet fox with rolled map, pigeon, turtle, cat in suitcase, miniature conductor, submarine octopus all reunited across the world. Balloons, tiny trains, picnic feasts, dancing animals and travel mishaps fill every edge. 24 pieces on invisible six columns by four rows: EACH region has a distinct funny readable character or object. Fill corners with nearby balloons, paper planes, birds and floating miniature islands, no empty outer space. Bright celebratory coral teal mustard, warm luminous colours, expressive faces and generous readable details. Fictional globe not an accurate political map. No text, numbers, panels, watermark, border, or puzzle seams. Family friendly, magical and joyful.
+Below water, a small sealed yellow submarine has a distinct adult operator
+visible through a glazed porthole, an enclosed hull and connected propulsion.
+No exposed humans or foxes breathe underwater. A wooden wreck rests on the
+seabed among coral, shells, fish, a turtle, seahorse and starfish. A crab arranges
+shells for a playful picnic. Animal play and the clothed fox are fantasy;
+marine anatomy, buoyancy, supports and air spaces remain coherent.
 
+## Globetrotter — 56 pieces, 8 × 7
+
+An elevated view across a terraced travel town with buildings supported by
+visible streets and terraces. One teal tram runs along continuous rails on a
+stone bridge with grounded arches. One cable car hangs from a continuous cable
+between visible stations. Two balloons have conventional baskets attached by
+clear suspension ropes. Keep these transport systems visually traceable.
+
+The three travellers stand together in a cobbled market square. Separate bakery
+and fruit sellers, a fountain flowing into its basin, flowers, window boxes,
+rooftop gardens, bird nests, a duck family and a cat beside luggage provide
+discoveries. A parked bicycle has two wheels and a coherent frame. Small travel
+props rest on the foreground paving: a simple compass, closed journal, folded
+route leaflet and feather, all with sensible perspective and contact shadows.
+The picturesque town and clothed fox are fantasy; vehicles and structures have
+convincing connections and supports.
+
+## Cartographer — 44 pieces, row counts 7, 8, 7, 7, 8, 7
+
+An oblique view of a cozy mapmaker's workshop with a sturdy rectangular table.
+The children and fox stand behind it at one scale, their hands visibly resting
+on its edge or holding a map. A cream paper map on the tabletop becomes a
+miniature landscape at a distinct smaller scale. Paper edges remain visible
+beneath hills, trees and towns. One aligned miniature train follows continuous
+rails across a supported bridge over a river.
+
+The river flows towards the front map edge and falls into a teacup on a stool
+below the table. Its source, descending fall and receiving cup are clear.
+Shelves hold books, rolled maps and jars; a globe has a conventional ring stand.
+Dividers, pencils, brushes, twine and a magnifying glass are recognizable tools.
+Include a window bird, plants, a suitcase cat, mouse and puzzle tray. The living
+map and clothed fox are magic; ordinary objects retain coherent scale, support,
+contact and anatomy. Use filename `regional-expert.png` for this stage.
+
+## World Master — 24 pieces, 6 × 4
+
+A small floating fictional world seen in three-quarter perspective. Its rounded
+rocky underside supports a broad grassy picnic terrace. The three travellers
+appear once, seated together with clearly separated limbs, cups and pastries.
+A cat sleeps in an open suitcase, a dog rests on grass, and birds, flowers,
+butterflies, a journal and picnic basket surround them.
+
+Smaller landmarks recall the journey: a supported treehouse, cottages, a
+lighthouse on rock and a yellow submarine floating in a contained harbour.
+A short railway follows a supported front terrace; locomotive, cab and coupled
+carriage align with the rails under their wheels. Buildings follow their local
+ground plane. Balloons have connected baskets. Roots and crystals enliven the
+rock underside. The floating world, miniature landmarks and clothed fox are
+intentional fantasy; local supports, anatomy and physical actions are coherent.
+
+## Maintenance checklist
+
+- Preserve the six runtime filenames, 1536 × 1024 dimensions, fixed geometry and
+  permanent quiz-to-piece mappings in `../../puzzles.js`.
+- Review scene structure first: perspective, scale, supports, machinery,
+  connections, ground contact and readable actions.
+- Inspect anatomy, faces, grips and object construction at full resolution.
+  Repair isolated defects and recheck the whole illustration for regressions.
+- Open [the artwork viewer](review.html) and inspect every actual clipped
+  fragment at enlarged size for recognizable detail and useful composition.
+- Verify replacement artwork in result reveals, collection zoom and milestone
+  celebrations on desktop and phone, with both locales and direct-file access.
+  Check keyboard operation, reduced motion and image-load failure behavior.
+- Run `python3 tools/check.py` from the repository root. Keep only active images
+  here; Git retains earlier assets and documentation.
