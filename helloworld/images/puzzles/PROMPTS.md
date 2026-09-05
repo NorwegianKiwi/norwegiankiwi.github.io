@@ -1,5 +1,9 @@
 # Stage illustration sources
 
+These are the original generation prompts. For the current revision workflow,
+use [the revised briefs](revisions/BRIEFS.md) and [review record](revisions/REVIEW.md).
+The Tourist pilot is awaiting visual calibration; installed artwork is unchanged.
+
 Created with the built-in imagegen tool. Final local PNGs use a 1536 × 1024
 canvas. Tourist established the style; the other five used Tourist as their
 style and recurring-character reference. Puzzle seams are rendered by the app,
