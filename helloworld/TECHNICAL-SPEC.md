@@ -604,13 +604,20 @@ Do not reorder the manifest's quiz IDs or change layouts independently of the
 artwork. New curriculum or revision decisions must explicitly consider their
 effect on earned pictures.
 
-The app owns transient first-mastery animation, collection selection, zoom,
-focus restoration and pointer scrolling. Each render consumes any pending
-reward and replaces old animation elements; revisiting a result shows its settled
-picture. Visible SVG pictures load their local PNG through IntersectionObserver,
-with immediate loading when that API is unavailable. Loading failures retain
-opaque pieces and localized progress/error text. Collection dialogs make the
-underlying screen inert and participate in the existing keyboard focus trap.
+The app owns transient first-mastery reward presentation, stage-specific viewing,
+zoom, focus restoration and pointer scrolling. Mastery is recorded before opening
+the reward presentation within the existing result route; no new URL or persistent
+reward state is introduced. A render consumes the pending animation without
+consuming the later result mastery animation. Continue dismisses the reward;
+returning to results never reopens it. The final-piece animation completion updates
+the reward heading without rerendering. Reduced motion starts settled.
+
+Visible SVG pictures load their local PNG through IntersectionObserver, with
+immediate loading when that API is unavailable. Loading failures retain opaque
+pieces and localized progress/error text. The viewer requires an explicit stage
+and has no cross-stage selector. It makes the underlying screen inert and
+participates in the existing keyboard focus trap, restoring the originating
+control even when opened from a stage celebration.
 
 Artwork lives in `images/puzzles/`. `PROMPTS.md` contains shared art direction,
 six stage maintenance prompts and the review checklist. Tourist supplies the
