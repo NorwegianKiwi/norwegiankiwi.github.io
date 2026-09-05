@@ -478,29 +478,46 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
 .stage-puzzle-preview > span:nth-child(2) { display: grid; gap: 3px; flex: 1; }
 .stage-puzzle-preview small { color: #635c53; }
 .stage-puzzle-preview .puzzle-image-error { position: static; font-size: .7rem; }
-.puzzle-overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgb(23 36 39 / 65%); }
-.puzzle-dialog { width: min(1020px, 100%); max-height: 94dvh; min-width: 0; overflow: auto; overscroll-behavior: contain; padding: 24px; border-radius: 24px; background: #fffaf0; color: #263b3d; box-shadow: 0 24px 90px #17242755; }
+.puzzle-overlay { position: fixed; inset: 0; z-index: 190; display: grid; place-items: center; padding: clamp(8px, 2vmin, 20px); background: rgb(23 36 39 / 80%); }
+.puzzle-dialog { width: min(1100px, 100%); height: min(900px, 100%); min-height: 0; min-width: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 12px; padding: clamp(12px, 2vmin, 24px); border-radius: 24px; background: #fffaf0; color: #263b3d; box-shadow: 0 24px 90px #17242755; }
 .puzzle-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.puzzle-dialog-header h2 { margin: 4px 0 16px; }
+.puzzle-dialog-header h2 { margin: 0; font-size: clamp(1.15rem, 3vmin, 1.6rem); }
 .puzzle-dialog-header .icon-close { position: static; flex: 0 0 auto; }
 .puzzle-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .puzzle-tools > div { display: flex; gap: 6px; }
 .puzzle-tools button { min-width: 44px; min-height: 44px; padding: 8px 12px; }
-.puzzle-help, .puzzle-description { font-size: .9rem; line-height: 1.5; }
-.puzzle-viewport { width: 100%; max-height: 55dvh; overflow: auto; overscroll-behavior: contain; border-radius: 12px; background: #e6dfcf; touch-action: pan-x pan-y; }
+.puzzle-help { margin: 0; font-size: .85rem; line-height: 1.35; }
+.puzzle-viewport { width: 100%; height: 100%; min-height: 0; container-type: size; overflow: auto; overscroll-behavior: contain; border-radius: 12px; background: #e6dfcf; touch-action: pan-x pan-y; }
 .puzzle-viewport:focus-visible { outline: 3px solid #26786d; outline-offset: 3px; }
-.puzzle-zoom-content { width: 100%; }
+.puzzle-zoom-content { width: calc(min(100cqw, 150cqh) * var(--puzzle-zoom, 1)); margin-inline: auto; margin-block: max(0px, calc((100cqh - min(100cqw, 150cqh) * var(--puzzle-zoom, 1) / 1.5) / 2)); }
 .puzzle-viewport.is-panning { cursor: grabbing; user-select: none; }
 .puzzle-viewport .puzzle-picture { border-radius: 0; }
-.milestone-puzzle { width: min(560px, 100%); margin: 16px auto; }
-.milestone-celebration-dialog { overflow-y: auto; overscroll-behavior: contain; }
+.milestone-identity { display: grid; justify-items: center; min-width: 0; }
+.milestone-picture-button { display: flex; align-items: center; gap: 12px; max-width: 100%; margin: 0 0 clamp(10px, 2dvh, 20px); padding: 6px 12px 6px 6px; border: 1px solid #ffffff50; border-radius: 12px; background: #ffffff12; color: #fff; font: inherit; font-size: .9rem; font-weight: 700; cursor: pointer; }
+.milestone-picture-button:hover { background: #ffffff26; border-color: #ffffffa0; }
+.milestone-picture-button > span:nth-child(2) { text-decoration: underline; text-underline-offset: 3px; }
+.milestone-picture-thumbnail { width: clamp(60px, 12dvh, 90px); flex: 0 0 auto; }
+.milestone-picture-thumbnail .puzzle-picture { border-radius: 6px; }
+.milestone-picture-thumbnail .puzzle-image-error { display: none; }
 @media (max-width: 600px) {
-  .puzzle-overlay { padding: 8px; }
-  .puzzle-dialog { padding: 16px; border-radius: 16px; max-height: 96dvh; }
-  .puzzle-viewport { max-height: 45dvh; }
+  .puzzle-dialog { border-radius: 16px; }
   .stage-puzzle-preview { padding: 10px 12px; }
 }
-@media (max-height: 500px) and (min-width: 601px) {
-  .puzzle-dialog { padding: 12px 20px; }
-  .puzzle-viewport { max-height: 55dvh; }
+@media (max-height: 750px) {
+  .milestone-celebration-dialog { padding: 16px 20px; }
+  .milestone-celebration-icon { width: clamp(56px, 13dvh, 90px); height: clamp(56px, 13dvh, 90px); font-size: clamp(2rem, 8dvh, 3.5rem); margin-bottom: 8px; }
+  .milestone-celebration-dialog h2 { font-size: clamp(1.8rem, 7dvh, 3.2rem); }
+  .milestone-celebration-dialog .kicker { margin-bottom: 6px; }
+  .milestone-celebration-dialog p:not(.kicker) { margin: 8px auto 12px; font-size: .85rem; }
+  .milestone-celebration-collection { gap: 6px; margin-bottom: 12px; }
+}
+@media (orientation: landscape) and (max-height: 599px) {
+  .milestone-celebration-dialog { width: min(800px, 100%); grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 10px 24px; align-items: center; }
+  .milestone-identity { grid-column: 1; grid-row: 1 / 4; }
+  .milestone-picture-button, .milestone-celebration-collection, .milestone-celebration-dialog .celebration-actions { grid-column: 2; margin: 0; }
+  .milestone-celebration-dialog .celebration-actions { display: grid; gap: 4px; }
+  .milestone-celebration-dialog .milestone-next { gap: 4px; }
+  .milestone-celebration-dialog .milestone-next p { margin: 0; }
+  .milestone-celebration-dialog .celebration-actions > .quiet-button { margin: 0; padding: 4px 8px; }
+  .puzzle-dialog { gap: 8px; }
 }

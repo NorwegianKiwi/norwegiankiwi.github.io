@@ -277,11 +277,14 @@ world (52), Globetrotter's travel city (56), Cartographer's living map workshop
 
 A separate reward screen precedes results on first mastery. It presents the new
 fragment enlarged, then places it automatically within about two seconds once
-artwork loads, alongside the stage name and earned-piece count. Continue opens
-results immediately, even during animation. Reduced motion reveals it immediately;
+artwork loads. The stage icon and name identify the picture against a background
+using the stage's celebration colors. The earned-piece count increases as the
+piece lands; the final piece fades the seams and triggers one brief confetti
+burst. Explanatory reward text is announced accessibly rather than shown as a
+headline. Continue opens results immediately, even during animation. Reduced
+motion shows the settled picture and final count without animated effects;
 rerenders and returning to results do not replay the reveal. Unrevealed pieces
-are opaque. The final piece fades the seams and changes the heading to Picture
-complete within this same screen.
+are opaque. Image failure still settles the count and leaves Continue available.
 
 Results retain their score, mastery indicators and existing actions, with a quiet
 View stage picture action instead of the large puzzle panel. Stage completion
@@ -289,11 +292,16 @@ flows from picture reward to results to the existing stage celebration; whole-
 curriculum completion then offers the existing World Master celebration.
 
 Each Levels stage has a compact picture preview and earned-piece count. Home has
-no picture-collection link. Completed stage celebrations also offer their picture.
-The viewer contains only the explicitly selected stage, with zoom controls, mouse
-dragging, touch scrolling and keyboard scrolling. Closing restores the underlying
-screen or celebration and trigger focus. Image descriptions, progress counts and
-image-load errors exist in both languages. Missing artwork never blocks navigation
+no picture-collection link. Completed stage celebrations offer one compact button
+combining a picture thumbnail with View picture; Home's earned stage icons lead
+to these celebrations. Puzzle rewards and stage celebrations fit within the
+viewport without scrolling or clipping controls, including short landscape layouts.
+The viewer opens above the originating screen or celebration and contains only
+the explicitly selected stage. It initially fits the entire picture, keeping
+Close and zoom controls visible. Only the zoomed picture area scrolls, supporting
+mouse dragging, touch scrolling and keyboard scrolling. Closing or Escape restores
+the underlying screen or celebration and trigger focus. Image descriptions,
+progress counts and image-load errors exist in both languages. Missing artwork never blocks navigation
 or changes earned progress. Existing mastery does not trigger retrospective rewards.
 
 

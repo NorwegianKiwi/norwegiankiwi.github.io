@@ -1404,14 +1404,45 @@
   function puzzleRewardMarkup() {
     const reward = puzzles.pieceForQuiz(state.curriculumQuizId);
     const value = puzzleValue(reward.stageId);
+    const stage = curriculum.stages.find((candidate) => candidate.id === reward.stageId);
     const animate = state.puzzleRewardPending && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    return `<main class="quiz-shell puzzle-reward-shell"><section class="puzzle-reward-card" aria-labelledby="puzzle-reward-title"><p class="kicker">${escapeHtml(stageTitle(curriculum.stages.find((s) => s.id === reward.stageId)))}</p><h1 id="puzzle-reward-title" aria-live="polite">${t(value.complete && !animate ? "pictureComplete" : "newPuzzlePiece")}</h1><p>${t("puzzleCount", { count: value.count, total: value.total })}</p>${puzzlePictureMarkup(reward.stageId, { newPieceId: reward.piece.id, animate })}<button class="primary-button" data-action="continue-puzzle-reward">${t("puzzleContinue")} <span aria-hidden="true">→</span></button></section></main>`;
+    return `<main class="quiz-shell puzzle-reward-shell level-stage-${stage.id}">
+      <section class="puzzle-reward-card ${animate ? "is-counting" : ""}" data-stage-id="${stage.id}" aria-labelledby="puzzle-reward-title">
+        <h1 class="sr-only" id="puzzle-reward-title">${t("stagePicture")}</h1>
+        <div class="puzzle-reward-stage"><span class="level-stage-icon" aria-hidden="true">${stage.icon}</span><span>${escapeHtml(stageTitle(stage))}</span></div>
+        <div class="puzzle-reward-art">${puzzlePictureMarkup(reward.stageId, { newPieceId: reward.piece.id, animate })}
+          ${value.complete ? `<div class="puzzle-confetti" aria-hidden="true">${Array.from({ length: 24 }, (_, index) => `<i style="--confetti-angle:${index * 15}deg;--confetti-distance:${70 + index % 4 * 15}px;--confetti-color:${["#f8d981", "#ffffff", "var(--stage-badge)"][index % 3]}"></i>`).join("")}</div>` : ""}
+        </div>
+        <p class="puzzle-reward-count" aria-hidden="true">${t("puzzleCount", { count: value.count - (animate ? 1 : 0), total: value.total })}</p>
+        <p class="sr-only" data-puzzle-reward-announcement role="status">${animate ? "" : puzzleRewardAnnouncement(value)}</p>
+        <button class="primary-button" data-action="continue-puzzle-reward">${t("puzzleContinue")} <span aria-hidden="true">→</span></button>
+      </section>
+    </main>`;
+  }
+
+  function puzzleRewardAnnouncement(value) {
+    return `${t(value.complete ? "pictureComplete" : "newPuzzlePiece")} ${t("puzzleCount", { count: value.count, total: value.total })}`;
+  }
+
+  function settlePuzzleReward(card, celebrate = true) {
+    if (!card?.classList.contains("is-counting")) return;
+    const value = puzzleValue(card.dataset.stageId);
+    card.classList.remove("is-counting");
+    card.querySelector(".puzzle-reward-count").textContent = t("puzzleCount", { count: value.count, total: value.total });
+    card.querySelector("[data-puzzle-reward-announcement]").textContent = puzzleRewardAnnouncement(value);
+    if (celebrate) card.classList.add("is-piece-landed");
   }
 
   function puzzleCollectionMarkup() {
     if (!state.puzzleStageId) return "";
     const value = puzzleValue(state.puzzleStageId);
-    return `<div class="puzzle-overlay"><section class="puzzle-dialog" role="dialog" aria-modal="true" aria-labelledby="puzzle-collection-title" tabindex="-1"><header class="puzzle-dialog-header"><div><p class="kicker">${t("stagePicture")}</p><h2 id="puzzle-collection-title">${escapeHtml(stageTitle(curriculum.stages.find((s) => s.id === state.puzzleStageId)))}</h2></div><button class="icon-close" data-action="close-puzzles" aria-label="${t("close")}">×</button></header><div class="puzzle-tools"><strong role="status">${t(value.complete ? "pictureComplete" : "puzzleCount", { count: value.count, total: value.total })}</strong><div><button class="secondary-button" data-action="puzzle-zoom-out" aria-label="${t("puzzleZoomOut")}">−</button><button class="quiet-button" data-action="puzzle-zoom-reset" aria-label="${t("puzzleZoomReset")}"><span data-puzzle-zoom-label>100%</span></button><button class="secondary-button" data-action="puzzle-zoom-in" aria-label="${t("puzzleZoomIn")}">+</button></div></div><p class="puzzle-help">${t("puzzleHelp")}</p><div class="puzzle-viewport" tabindex="0" role="region" aria-label="${t("puzzleInspect")}"><div class="puzzle-zoom-content">${puzzlePictureMarkup(state.puzzleStageId)}</div></div><p class="puzzle-description">${t(`puzzleDescription_${state.puzzleStageId}`)}</p></section></div>`;
+    const stage = curriculum.stages.find((candidate) => candidate.id === state.puzzleStageId);
+    return `<div class="puzzle-overlay"><section class="puzzle-dialog level-stage-${stage.id}" role="dialog" aria-modal="true" aria-labelledby="puzzle-collection-title" tabindex="-1">
+      <header class="puzzle-dialog-header"><h2 id="puzzle-collection-title"><span aria-hidden="true">${stage.icon}</span> ${escapeHtml(stageTitle(stage))}</h2><button class="icon-close" data-action="close-puzzles" aria-label="${t("close")}">×</button></header>
+      <div class="puzzle-tools"><strong role="status">${t(value.complete ? "pictureComplete" : "puzzleCount", { count: value.count, total: value.total })}</strong><div><button class="secondary-button" data-action="puzzle-zoom-out" aria-label="${t("puzzleZoomOut")}">−</button><button class="quiet-button" data-action="puzzle-zoom-reset" aria-label="${t("puzzleZoomReset")}"><span data-puzzle-zoom-label>100%</span></button><button class="secondary-button" data-action="puzzle-zoom-in" aria-label="${t("puzzleZoomIn")}">+</button></div></div>
+      <div class="puzzle-viewport" tabindex="0" role="region" aria-label="${t("puzzleInspect")}"><div class="puzzle-zoom-content">${puzzlePictureMarkup(state.puzzleStageId)}</div></div>
+      <p class="puzzle-help">${t("puzzleHelp")}</p>
+    </section></div>`;
   }
 
   function closePuzzles() {
@@ -1421,8 +1452,17 @@
 
   app.addEventListener("animationend", (event) => {
     if (event.animationName !== "puzzle-piece-arrive" || !event.target.closest(".puzzle-reward-card")) return;
-    const heading = app.querySelector("#puzzle-reward-title");
-    if (heading && event.target.closest(".is-complete")) heading.textContent = t("pictureComplete");
+    settlePuzzleReward(event.target.closest(".puzzle-reward-card"));
+  });
+
+  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (event) => {
+    const card = app.querySelector(".puzzle-reward-card");
+    if (!event.matches || !card) return;
+    settlePuzzleReward(card, false);
+    card.classList.remove("is-piece-landed");
+    // Re-enabling motion must not restart a reveal that has already settled.
+    card.querySelectorAll(".puzzle-new-piece, .puzzle-new-piece > path:last-child, .puzzle-seams")
+      .forEach((element) => { element.style.animation = "none"; });
   });
 
   function loadPuzzleImages() {
@@ -1432,7 +1472,11 @@
       const fail = () => {
         failedPuzzleImages.add(source);
         const picture = element.closest(".puzzle-picture");
+        if (!picture) return;
         picture.querySelector(".puzzle-image-error").hidden = false;
+        picture.classList.remove("is-revealing");
+        picture.querySelector(".puzzle-new-piece")?.remove();
+        settlePuzzleReward(picture.closest(".puzzle-reward-card"), false);
       };
       if (failedPuzzleImages.has(source)) { fail(); return; }
       element.addEventListener("error", fail, { once: true });
@@ -1493,11 +1537,11 @@
         <div class="world-fireworks" aria-hidden="true">${celebrationFireworksMarkup()}</div>
         <section class="world-celebration-dialog milestone-celebration-dialog" role="dialog" aria-modal="true" aria-labelledby="milestone-celebration-title" aria-describedby="milestone-celebration-description" tabindex="-1">
           <button class="icon-close milestone-celebration-close" data-action="dismiss-milestone-celebration" aria-label="${t("close")}">×</button>
-          <span class="world-celebration-trophy milestone-celebration-icon" aria-hidden="true">${stage.icon}</span>
+          <div class="milestone-identity"><span class="world-celebration-trophy milestone-celebration-icon" aria-hidden="true">${stage.icon}</span>
           <p class="kicker">${t("milestoneReached")}</p>
           <h2 id="milestone-celebration-title">${escapeHtml(stageTitle(stage))}</h2>
-          <p id="milestone-celebration-description">${t("milestoneSummary", { start: stage.startLevel, end: stage.endLevel })}</p>
-          <div class="milestone-puzzle">${puzzlePictureMarkup(stage.id)}<button class="quiet-button" data-puzzle-origin="milestone" data-action="open-puzzles" data-stage-id="${stage.id}">${t("viewPicture")} ↗</button></div>
+          <p id="milestone-celebration-description">${t("milestoneSummary", { start: stage.startLevel, end: stage.endLevel })}</p></div>
+          <button class="milestone-picture-button" data-puzzle-origin="milestone" data-action="open-puzzles" data-stage-id="${stage.id}"><span class="milestone-picture-thumbnail" aria-hidden="true">${puzzlePictureMarkup(stage.id)}</span><span>${t("viewPicture")}</span><span aria-hidden="true">↗</span></button>
           <div class="milestone-celebration-collection"><strong>${t("milestones")}</strong>${milestoneStickersMarkup(currentProfile(), { activeStageId: stage.id })}</div>
           <div class="celebration-actions">
             ${primaryAction}
@@ -4540,14 +4584,17 @@
       const before = state.puzzleZoom;
       state.puzzleZoom = action === "puzzle-zoom-reset" ? 1 : clamp(before + (action === "puzzle-zoom-in" ? .5 : -.5), 1, 4);
       const content = app.querySelector(".puzzle-zoom-content");
-      const centerX = (viewport.scrollLeft + viewport.clientWidth / 2) / before;
-      const centerY = (viewport.scrollTop + viewport.clientHeight / 2) / before;
-      content.style.width = `${state.puzzleZoom * 100}%`;
+      const viewportBounds = viewport.getBoundingClientRect();
+      const contentBounds = content.getBoundingClientRect();
+      // Measure in picture coordinates: a fitted picture may have centering margins.
+      const centerX = (viewportBounds.left + viewport.clientWidth / 2 - contentBounds.left) / contentBounds.width;
+      const centerY = (viewportBounds.top + viewport.clientHeight / 2 - contentBounds.top) / contentBounds.height;
+      content.style.setProperty("--puzzle-zoom", state.puzzleZoom);
       // SVG image dimensions settle during layout; center after that frame.
       requestAnimationFrame(() => requestAnimationFrame(() => {
         if (!app.contains(viewport)) return;
-        viewport.scrollLeft = centerX * state.puzzleZoom - viewport.clientWidth / 2;
-        viewport.scrollTop = centerY * state.puzzleZoom - viewport.clientHeight / 2;
+        viewport.scrollLeft = centerX * content.clientWidth - viewport.clientWidth / 2;
+        viewport.scrollTop = centerY * content.clientHeight - viewport.clientHeight / 2;
       }));
       app.querySelector("[data-puzzle-zoom-label]").textContent = `${state.puzzleZoom * 100}%`;
       return;

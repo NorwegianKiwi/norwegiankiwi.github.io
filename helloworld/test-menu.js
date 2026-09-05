@@ -67,12 +67,12 @@
   function scenarioGroups() {
     return [
       { id: "puzzles", items: [
-        { title: { nb: "Første brikke", en: "First piece" }, description: { nb: "Første mestring → brikke → resultat. Test også Fortsett før animasjonen er ferdig.", en: "First mastery → piece → result. Also test Continue before the animation finishes." }, params: { preview: "puzzle-first" } },
+        { title: { nb: "Første brikke", en: "First piece" }, description: { nb: "Første mestring → brikke → resultat. Telleren øker når brikken lander. Test også tidlig Fortsett og redusert bevegelse.", en: "First mastery → piece → result. The count increases as the piece lands. Also test early Continue and reduced motion." }, params: { preview: "puzzle-first" } },
         { title: { nb: "Bildet tar form", en: "Picture in progress" }, description: { nb: "Ny brikke i Navigatør-bildet.", en: "A new piece in the Navigator picture." }, params: { preview: "puzzle-partial", stage: "navigator" } },
         { title: { nb: "Brikke → nivå mestret", en: "Piece → level mastered" }, description: { nb: "Fjerde quiz gir en brikke, så et resultat med nivåtrofé. Ingen etappefeiring.", en: "The fourth quiz earns a piece, then a result with a level trophy. No stage celebration." }, params: { preview: "puzzle-level" } },
         ...stageList.map((stage) => ({
           title: { nb: `Siste brikke · ${stage.title.nb}`, en: `Final piece · ${stage.title.en}` },
-          description: { nb: "Brikke → ferdig bilde → resultat → etappefeiring. Andre etapper er ikke mestret.", en: "Piece → completed picture → result → stage celebration. Other stages remain unmastered." },
+          description: { nb: "Brikke → ferdig bilde med konfetti → resultat → etappefeiring. Belønningsskjermene skal passe uten rulling.", en: "Piece → completed picture with confetti → result → stage celebration. Reward screens must fit without scrolling." },
           params: { preview: "puzzle-final", stage: stage.id },
         })),
         { title: { nb: "Ingen ny brikke ved gjenspilling", en: "No new piece on replay" }, description: { nb: "En mestret quiz går rett til resultatet. Se etappebildet og lukk det uten ny belønning.", en: "A mastered quiz goes straight to results. View and close its stage picture without another reward." }, params: { preview: "puzzle-replay" } },

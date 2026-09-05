@@ -609,15 +609,27 @@ zoom, focus restoration and pointer scrolling. Mastery is recorded before openin
 the reward presentation within the existing result route; no new URL or persistent
 reward state is introduced. A render consumes the pending animation without
 consuming the later result mastery animation. Continue dismisses the reward;
-returning to results never reopens it. The final-piece animation completion updates
-the reward heading without rerendering. Reduced motion starts settled.
+returning to results never reopens it. Piece-arrival animation completion settles
+the displayed count and localized live announcement without rerendering; the final
+piece also triggers a single decorative confetti burst. Failed artwork settles the
+count without celebrating. Reduced motion starts settled and switching it on
+during a reveal also settles the count.
+
+Puzzle rewards and stage celebrations must fit the viewport without document or
+dialog scrolling, or clipped controls. Reward artwork fits the remaining grid
+space; short landscape uses two columns. Stage celebrations use a compact thumbnail
+and text in one picture-viewer button rather than a large embedded image.
 
 Visible SVG pictures load their local PNG through IntersectionObserver, with
 immediate loading when that API is unavailable. Loading failures retain opaque
 pieces and localized progress/error text. The viewer requires an explicit stage
-and has no cross-stage selector. It makes the underlying screen inert and
-participates in the existing keyboard focus trap, restoring the originating
-control even when opened from a stage celebration.
+and has no cross-stage selector. Its overlay stacks above stage celebrations.
+The dialog uses a viewport-bounded grid with Close, zoom controls and help outside
+the image scroller. Container-relative sizing fits the entire 3:2 image at 100%;
+zoom scales that fitted size, with scrolling confined to the image area.
+It makes the underlying screen inert and participates in the existing keyboard
+focus trap, restoring the originating control even when opened from a stage
+celebration.
 
 Artwork lives in `images/puzzles/`. `PROMPTS.md` contains shared art direction,
 six stage maintenance prompts and the review checklist. Tourist supplies the
