@@ -2,7 +2,9 @@
 
 These are the original generation prompts. For the current revision workflow,
 use [the revised briefs](revisions/BRIEFS.md) and [review record](revisions/REVIEW.md).
-The Tourist pilot is awaiting visual calibration; installed artwork is unchanged.
+All six installed images now use the reviewed second edition. Originals are
+preserved in `revisions/originals/`; exact executed revision prompts and review
+notes are in `revisions/`.
 
 Created with the built-in imagegen tool. Final local PNGs use a 1536 × 1024
 canvas. Tourist established the style; the other five used Tourist as their

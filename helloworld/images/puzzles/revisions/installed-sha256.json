@@ -1,0 +1,50 @@
+{
+  "tourist": {
+    "originalSha256": "c86cc7a7f56f40c4e8dd36b186886204d8f2ddb354da11690c5d83d8f1da57f0",
+    "revisedSha256": "a1ef55324b249474a4c3708e02e2068583c5d83433f5289eeebe764f8f1a272e",
+    "size": [
+      1536,
+      1024
+    ]
+  },
+  "explorer": {
+    "originalSha256": "5b20522a3dcf7594b2d9868f0c22d8e19f303d35087982eb7e9fe034e3db5e3d",
+    "revisedSha256": "e5f3aac9b31e4d269c15de1579d5549972d7a5fd986184c5a779998cb2877972",
+    "size": [
+      1536,
+      1024
+    ]
+  },
+  "navigator": {
+    "originalSha256": "84fa4d1ec6714a3eb45146849108a9c7f9c1cbaf2671066b5fda956d0fa7300e",
+    "revisedSha256": "5228b80b56b401b0f201791080d06c41a34ffe37616f341c85c059c32e28a163",
+    "size": [
+      1536,
+      1024
+    ]
+  },
+  "globetrotter": {
+    "originalSha256": "ae0ed8aa0497e48ce4af82d753c814d42b8e6877363b30b7a895aa226b95cc4a",
+    "revisedSha256": "fb4f130c00c8ffce0ba48830abec5a0032cc507e43151ff42c5d5f718e4dcfa5",
+    "size": [
+      1536,
+      1024
+    ]
+  },
+  "regional-expert": {
+    "originalSha256": "46a7781f61230a3431e17d208a7618655f4b8087e57ec433528eca0956a1c75e",
+    "revisedSha256": "2fd31725f2107dcd4e30caf4cac3052dde3b0428f2f172910462eb129939eeab",
+    "size": [
+      1536,
+      1024
+    ]
+  },
+  "world-master": {
+    "originalSha256": "c5b0d18c8eff9c6c3bcd4468e1e70e239b719201e295ecdb58360d247d7c91d5",
+    "revisedSha256": "e8d8831ce391d2f55320b4ca706edc32de985b8193b9ad950d5b1dbea4b99456",
+    "size": [
+      1536,
+      1024
+    ]
+  }
+}

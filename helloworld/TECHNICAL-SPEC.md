@@ -612,9 +612,17 @@ with immediate loading when that API is unavailable. Loading failures retain
 opaque pieces and localized progress/error text. Collection dialogs make the
 underlying screen inert and participate in the existing keyboard focus trap.
 
-Artwork lives in `images/puzzles/`; `PROMPTS.md` records the built-in imagegen
-prompts and reference workflow. Before replacing an image, inspect every clipped
-piece at enlarged size and check its composition and edge details. Assets are
+Artwork lives in `images/puzzles/`; `PROMPTS.md` links to the current built-in
+imagegen briefs, exact prompts and review notes in `revisions/`. The second
+edition uses the approved Tourist image as its style and character reference.
+Originals are preserved in `revisions/originals/`; `installed-sha256.json`
+records original and replacement hashes. Open `revisions/review.html` directly
+to compare each edition and inspect its actual clipped pieces.
+Before replacing an image, review scene structure, anatomy and object construction,
+then every clipped piece at enlarged size. Make intentional fantasy explicit;
+keep supports, vehicle connections, scale and physical actions coherent. Repair
+local defects and recheck the whole image before installing it. Preserve the
+1536 × 1024 dimensions, geometry and permanent quiz mappings. Assets are
 ordinary local images; playing via `file://` needs no build, network or server.
 `test.html` includes five puzzle scenarios, which use temporary preview profiles.
 The canonical checker includes puzzle mapping, geometry and progress tests.

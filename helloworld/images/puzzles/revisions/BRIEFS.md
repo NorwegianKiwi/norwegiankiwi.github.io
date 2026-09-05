@@ -1,10 +1,11 @@
 # Revised illustration briefs
 
 These supersede the density-first directions in the original `../PROMPTS.md`.
-That file remains the provenance record for the currently installed images.
+That file remains the provenance record for the archived original images.
 Tourist's exact executed prompts are in `tourist-v2-prompt.txt` and
-`tourist-v2-correction.txt`. The following five scene briefs are prepared for
-generation after the Tourist calibration checkpoint, not yet executed prompts.
+`tourist-v2-correction.txt`. The other exact executed prompts are in `<stage-id>-v2-prompt.txt`. All six
+revisions are installed after the approved Tourist calibration checkpoint.
+`globetrotter-v2-correction.txt` records the foreground-detail edit.
 
 ## Shared generation instructions
 
