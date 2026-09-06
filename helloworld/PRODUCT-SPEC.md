@@ -377,6 +377,14 @@ The interface uses action-oriented labels such as **Download backup file** and
 
 ## 12. Explore
 
+- Details may show a short bilingual note that helps explain a place. Keep notes
+  conservative, verifiable, and useful for learning geography; most places do
+  not need one. Burundi, Lesotho, and Nepal cover capital history, an enclosed
+  country, and an unusual flag. Notes appear only in Details.
+- Visible capital labels keep individual city names of at most 10 characters
+  (including spaces) together. Lists can wrap between cities, retaining their
+  existing order. Longer names, including Kuala Lumpur and Port of Spain, wrap
+  naturally.
 - Explore remains available independently of profiles and game progress.
 - Explore opens in the unified map-and-list workspace from the home screen.
 - Whole world is a selectable workspace with 197 countries and 30 other places,

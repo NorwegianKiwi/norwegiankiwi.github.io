@@ -285,6 +285,13 @@
     return country.capital[state.locale];
   }
 
+  // Keep short city names together; canonical labels stay unchanged.
+  function capitalDisplayText(capital) {
+    return capital.split(" / ").map((name) =>
+      Array.from(name).length <= 10 ? name.replaceAll(" ", "\u00a0") : name,
+    ).join(" / ");
+  }
+
   function countryNote(country) {
     return country.note?.[state.locale] ?? null;
   }
@@ -1761,7 +1768,7 @@
                   ${flagMarkup(country, "review-flag", true)}
                   <div>
                     <strong>${escapeHtml(countryName(country))}</strong>
-                    <span>${escapeHtml(countryCapital(country))}</span>
+                    <span>${escapeHtml(capitalDisplayText(countryCapital(country)))}</span>
                   </div>
                   <span class="review-row-action" aria-hidden="true">↗</span>
                 </button>
@@ -1928,7 +1935,7 @@
         ${flagMarkup(country, "explore-status-flag", false, true)}
         <span>
           <strong>${escapeHtml(countryName(country))}</strong>
-          <small>${escapeHtml(countryCapital(country))}</small>
+          <small>${escapeHtml(capitalDisplayText(countryCapital(country)))}</small>
         </span>
         <span class="explore-country-status-action" aria-hidden="true">↗</span>
       </button>
@@ -1958,10 +1965,10 @@
             }))}</span>
             <span aria-hidden="true">${escapeHtml(countryName(country))}</span>
           </h2>
-          <p class="country-details-capital">${escapeHtml(countryCapital(country))}</p>
+          <p class="country-details-capital">${escapeHtml(capitalDisplayText(countryCapital(country)))}</p>
           ${country.category === "other-place" ? `<div class="place-metadata">${relationshipChipMarkup(country)}${country.flagStatus === "established-local" ? `<p class="place-flag-status">${escapeHtml(t("establishedLocalFlag"))}</p>` : ""}</div>` : ""}
           ${showCentreExplanation ? `<dl class="place-centres place-centres-explanation">
-            ${country.centres.map((centre) => `<div class="place-centre place-centre-${centre.kind}"><dt>${escapeHtml(centreRole(centre))}</dt><dd>${escapeHtml(centre.name[state.locale])}</dd></div>`).join("")}
+            ${country.centres.map((centre) => `<div class="place-centre place-centre-${centre.kind}"><dt>${escapeHtml(centreRole(centre))}</dt><dd>${escapeHtml(capitalDisplayText(centre.name[state.locale]))}</dd></div>`).join("")}
           </dl>` : ""}
           ${note ? `<p class="country-note">${escapeHtml(note)}</p>` : ""}
         </div>
@@ -2602,7 +2609,7 @@
             ${flagMarkup(country, "explore-country-flag", false, true)}
             <span>
               <strong>${escapeHtml(countryName(country))}</strong>
-              <small>${escapeHtml(countryCapital(country))}</small>
+              <small>${escapeHtml(capitalDisplayText(countryCapital(country)))}</small>
             </span>
           </button>
         `).join("")}
@@ -2914,7 +2921,7 @@
           ${flagMarkup(country, "flashcard-flag", state.flashcardRevealed, true)}
           <span class="flashcard-answer">
             ${state.flashcardRevealed
-              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(countryCapital(country))}</span>${relationshipLabel ? `<span class="flashcard-relationship">(${escapeHtml(relationshipLabel)})</span>` : ""}`
+              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(capitalDisplayText(countryCapital(country)))}</span>${relationshipLabel ? `<span class="flashcard-relationship">(${escapeHtml(relationshipLabel)})</span>` : ""}`
               : `<strong class="flashcard-question" aria-hidden="true">?</strong>`}
           </span>
         </button>
@@ -3016,7 +3023,7 @@
                   <strong>${escapeHtml(label)}</strong>
                 </span>
               `
-              : `<strong>${escapeHtml(label)}</strong>`
+              : `<strong>${escapeHtml(state.mode === "country-capital" ? capitalDisplayText(label) : label)}</strong>`
         }
         <span class="keyboard-hint-index" aria-hidden="true">${index + 1}</span>
       </button>

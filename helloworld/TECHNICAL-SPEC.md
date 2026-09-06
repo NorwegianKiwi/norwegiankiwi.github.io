@@ -48,6 +48,23 @@ The implementation should maintain clear boundaries:
 Curriculum and progress logic must remain outside the browser orchestration in
 `app.js`.
 
+Capital wrapping is presentation-only: `app.js` splits capital text at ` / `
+and replaces spaces within each city name with nonbreaking spaces if the name
+has at most 10 Unicode code points, including spaces. This applies to visible
+capital text, including centre explanations. Longer names wrap naturally.
+Slash separators retain ordinary spaces. Canonical geography strings, explicit
+accessible labels, quiz identity, persistence, and transfer data are unchanged.
+The formatted text is HTML-escaped at each rendering boundary.
+
+Explore notes use the existing `note: { nb, en }` country field. Both translations
+are required; the existing Details dialog renders them. Sources for the three
+educational notes (reviewed September 2026):
+
+- Burundi: World Bank, [political capital since 2019](https://documents1.worldbank.org/curated/en/099053124080519348/pdf/P17714610b5d0f0851859a1dd1e33af47c1.pdf)
+  and [Bujumbura as the largest city](https://documents1.worldbank.org/curated/en/319821634531563444/pdf/Groundswell-Africa-Internal-Climate-Migration-in-the-Lake-Victoria-Basin-Countries.pdf).
+- Lesotho: Government of Lesotho, [national circumstances](https://www.gov.ls/wp-content/uploads/2022/03/Lesotho-Biennial-Update-Report.pdf).
+- Nepal: Government of Nepal, [Filming in Nepal guide](https://film.gov.np/media/filmgov/uploads/Filming_in_Nepal_2010_a_Guide_bOok_Chiranjibi_Guragain1.pdf).
+
 `preview.js` exposes `GEOGRAFI_PREVIEW` in the browser and the same API through
 CommonJS. `readName(params)` recognizes existing preview URL parameters;
 `prepare(params, locale, dependencies, timestamp)` returns a temporary store,
