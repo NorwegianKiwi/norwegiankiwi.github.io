@@ -214,8 +214,9 @@ The result screen must minimise decision-making.
 After a perfect result:
 
 - A green checkmark recognises quiz mastery. When the result newly completes
-  the level, **Level mastered** and the level trophy replace that quiz-level
-  heading; the completed quiz remains checked in the level-progress controls.
+  the level, **Level mastered** and the level trophy replace the quiz heading.
+  The numbered badge stays beside the level name and mode; the score retains
+  its usual prominence and the completed quiz stays checked below.
 - Outside milestone and world-completion celebrations, the primary action
   offers the next unmastered quiz after the completed quiz, scanning forward
   and wrapping at the end. It does not redirect to a separately paused mastery
@@ -246,8 +247,24 @@ The result must state whether the quiz was mastered, show the current score and
 best score, and show all four quiz modes for the current level as direct,
 clickable navigation. Each mode shows whether it is mastered, played but not
 mastered, or unplayed; the quiz that produced the result is highlighted. A
-newly earned level mastery uses the same trophy as the level overview. Wrong-
-answer review may remain available, but must not displace the primary action.
+newly earned level mastery uses the same separate trophy as the level overview.
+Every level-number badge has a four-segment ring, filled clockwise from 12 o'clock
+according to that level's current mastered quizzes. Filled arcs use the darker
+stage accent; unfilled arcs are faint neutral tracks. A small gap separates the
+ring from the unchanged numbered disc. Accessible labels include the mastery
+count; stage badges retain their separate completion treatment.
+
+On newly completing a level, after the puzzle reward, a large centred decorative
+badge completes its fourth ring segment, then shrinks into its normal context
+slot. The trophy pops into its heading position as the result returns from softly
+faded to fully visible. This takes about 1.5 seconds, adds no layout space or
+extra action, and does not replay on return. Reduced motion shows the finished
+result immediately. Interaction, resize, navigation, rerender, or a motion
+preference change settles the animation without blocking the user's action.
+
+Perfect results fit the viewport without page or internal scrolling, clipping,
+or hidden controls. Short landscape places the summary beside the actions.
+Results with mistake review may scroll; review must not displace the primary action.
 
 When a result earns a stage milestone, its action uses **Completed**, followed
 by the stage icon and localized stage name, rather than a generic milestone

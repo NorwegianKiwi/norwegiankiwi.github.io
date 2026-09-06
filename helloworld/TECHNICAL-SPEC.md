@@ -588,7 +588,11 @@ heavily completed profiles.
 The result section of `test.html` includes both perfect and imperfect results
 for immediate successors, skipped quizzes within/across levels, and wrapping.
 It also covers the sole remaining unmastered quiz, new and previous records,
-mastered replays, and fully mastered profiles. Stage and final celebrations
+mastered replays, and fully mastered profiles. `result-level-mastered` opens the
+earned level badge directly, with a two-digit level and the longest localized
+next-level name, for no-scroll layout checks. `puzzle-level` retains the full
+piece-to-level-result flow. `levels-ring-progress` shows the first five levels
+with 0–4 mastered quizzes. Stage and final celebrations
 remain available in their own sections. All previews are temporary and must
 leave persisted player progress unchanged.
 
@@ -699,3 +703,18 @@ Use system reduced-motion settings to check settled rewards; also exercise early
 Continue, picture zoom/scrolling, Escape and focus restoration through the existing
 Home/Levels celebration replay entries.
 The canonical checker includes puzzle mapping, geometry and progress tests.
+
+
+### Level badge progress and result animation
+
+The shared badge renderer derives four SVG arcs from the active profile's
+current-revision level progress; destination badges use their own level. No
+additional persisted state is needed. The existing result celebration flag is
+consumed when the result is first presented after its puzzle reward.
+
+Browser-side animation clones the context badge into a fixed, pointer-transparent,
+accessibility-hidden element and measures the original badge's final bounds.
+Web Animations draws the fourth arc, moves the clone, fades the result, and pops
+the separate trophy. One cleanup cancels pending frames and animations, removes
+the clone, and restores target visibility on completion or interruption. Reduced
+motion and unavailable animation APIs render the ordinary final result directly.

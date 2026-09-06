@@ -261,7 +261,10 @@
   function levelBadgeMarkup(levelIndex, size = "regular") {
     if (!Number.isInteger(levelIndex) || levelIndex < 0) return "";
     const stage = stageForLevelIndex(levelIndex);
-    return `<span class="level-badge level-badge-${escapeHtml(size)} level-stage-${escapeHtml(stage?.id ?? "")}" aria-label="${escapeHtml(t("level", { number: levelIndex + 1 }))}"><span aria-hidden="true">${levelIndex + 1}</span></span>`;
+    const mastered = progress.levelProgress(currentProfile(), curriculum.levels[levelIndex]).mastered;
+    const label = `${t("level", { number: levelIndex + 1 })} · ${t("quizzesMastered", { count: mastered })}`;
+    const ring = Array.from({ length: 4 }, (_, index) => `<path class="level-ring-segment${index < mastered ? " is-filled" : ""}" d="M 59.63 4.13 A 52 52 0 0 1 107.87 52.37" transform="rotate(${index * 90} 56 56)" pathLength="1"/>`).join("");
+    return `<span role="img" class="level-badge level-badge-${escapeHtml(size)} level-stage-${escapeHtml(stage?.id ?? "")}" data-mastered="${mastered}" aria-label="${escapeHtml(label)}"><svg class="level-progress-ring" viewBox="0 0 112 112" aria-hidden="true">${ring}</svg><span aria-hidden="true">${levelIndex + 1}</span></span>`;
   }
   function levelReferenceMarkup(level, { size = "compact", showTitle = true, className = "" } = {}) {
     const levelIndex = levelIndexForLevel(level);
@@ -3192,7 +3195,79 @@
     recommendedNavigationFrame = requestAnimationFrame(updateRecommendedNavigation);
   }
 
+  let settleLevelCelebration = null;
+
+  function finishLevelCelebration() {
+    settleLevelCelebration?.();
+  }
+
+  function startLevelCelebration() {
+    const card = app.querySelector(".curriculum-result-card");
+    const target = card?.querySelector(".result-level-context .level-badge");
+    const trophy = card?.querySelector(".result-level-trophy");
+    if (!target || !trophy || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !target.animate) return;
+    trophy.classList.remove("is-celebrating");
+    const copy = target.cloneNode(true);
+    copy.classList.add("level-celebration-badge");
+    copy.setAttribute("aria-hidden", "true");
+    copy.removeAttribute("role");
+    copy.removeAttribute("aria-label");
+    const animations = [];
+    let frame;
+    const settle = () => {
+      cancelAnimationFrame(frame);
+      animations.forEach((animation) => animation.cancel());
+      copy.remove();
+      card.classList.remove("is-level-celebrating");
+      target.style.removeProperty("opacity");
+      trophy.style.removeProperty("visibility");
+      if (settleLevelCelebration === settle) settleLevelCelebration = null;
+    };
+    settleLevelCelebration = settle;
+    frame = requestAnimationFrame(() => {
+      if (!target.isConnected) { settle(); return; }
+      const bounds = target.getBoundingClientRect();
+      const scale = Math.min(180, window.innerHeight * .32, window.innerWidth * .45) / (bounds.width + 10);
+      const size = bounds.width * scale;
+      const left = (window.innerWidth - size) / 2;
+      const top = (window.innerHeight - size) / 2;
+      copy.style.cssText = `--level-badge-size:${bounds.width}px;left:${left}px;top:${top}px;font-size:${getComputedStyle(target).fontSize}`;
+      document.body.append(copy);
+      target.style.opacity = "0";
+      trophy.style.visibility = "hidden";
+      card.classList.add("is-level-celebrating");
+      const fourth = copy.querySelector(".level-ring-segment:last-child");
+      const track = fourth.cloneNode(true);
+      track.setAttribute("class", "level-ring-segment");
+      fourth.before(track);
+      animations.push(fourth.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration:500, delay:100, fill:"both", easing:"ease-in-out" }));
+      const travel = copy.animate([
+        { transform:`translate(0, 0) scale(${scale})`, offset:0 },
+        { transform:`translate(0, 0) scale(${scale})`, offset:.5 },
+        { transform:`translate(${bounds.left - left}px, ${bounds.top - top}px) scale(1)`, offset:1 },
+      ], { duration:1200, fill:"forwards", easing:"ease-in-out" });
+      animations.push(travel);
+      animations.push(card.animate([{ opacity:.25 }, { opacity:.25, offset:.5 }, { opacity:1 }], { duration:1200, fill:"forwards" }));
+      travel.finished.then(() => {
+        if (settleLevelCelebration !== settle) return;
+        copy.remove();
+        target.style.removeProperty("opacity");
+        trophy.style.removeProperty("visibility");
+        const pop = trophy.animate([{ transform:"scale(.6)", opacity:0 }, { transform:"scale(1.12)", opacity:1, offset:.65 }, { transform:"scale(1)", opacity:1 }], { duration:300, easing:"ease-out" });
+        animations.push(pop);
+        pop.finished.then(settle, () => {});
+      }, () => {});
+    });
+  }
+
+  window.addEventListener("pointerdown", finishLevelCelebration, true);
+  window.addEventListener("keydown", finishLevelCelebration, true);
+  window.addEventListener("resize", finishLevelCelebration);
+  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", finishLevelCelebration);
+
   function render(options = {}) {
+    finishLevelCelebration();
+    const animateLevel = state.screen === "result" && !state.puzzleRewardOpen && state.resultNewLevelMastery && state.resultCelebrationPending;
     hideExplorePointerLabel();
     state.explorePreviewCode = null;
     const exploreListScrollTop = options.preserveExploreListScroll
@@ -3366,6 +3441,7 @@
         )
         ?.focus({ preventScroll: true });
     }
+    if (animateLevel) startLevelCelebration();
     if (Number.isFinite(options.restoreWindowScrollY)) {
       window.scrollTo({ top: options.restoreWindowScrollY, behavior: "auto" });
     }

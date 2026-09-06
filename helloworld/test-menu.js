@@ -69,7 +69,7 @@
       { id: "puzzles", items: [
         { title: { nb: "Første brikke", en: "First piece" }, description: { nb: "Første mestring → brikke → resultat. Telleren øker når brikken lander. Test også tidlig Fortsett og redusert bevegelse.", en: "First mastery → piece → result. The count increases as the piece lands. Also test early Continue and reduced motion." }, params: { preview: "puzzle-first" } },
         { title: { nb: "Bildet tar form", en: "Picture in progress" }, description: { nb: "Ny brikke i Navigatør-bildet. Etappen og brikketelleren følger bildets øvre hjørner.", en: "A new piece in the Navigator picture. Stage identity and piece count align with the upper image corners." }, params: { preview: "puzzle-partial", stage: "navigator" } },
-        { title: { nb: "Brikke → nivå mestret", en: "Piece → level mastered" }, description: { nb: "Fjerde quiz gir en brikke, så et resultat med nivåtrofé. Ingen etappefeiring.", en: "The fourth quiz earns a piece, then a result with a level trophy. No stage celebration." }, params: { preview: "puzzle-level" } },
+        { title: { nb: "Brikke → nivå mestret", en: "Piece → level mastered" }, description: { nb: "Fjerde quiz gir en brikke, så en animert nivå-ring og det vanlige resultatet. Resultatet skal passe uten rulling. Ingen etappefeiring.", en: "The fourth quiz earns a piece, then an animated level ring and the usual result. Results must fit without scrolling. No stage celebration." }, params: { preview: "puzzle-level" } },
         ...stageList.map((stage) => ({
           title: { nb: `Siste brikke · ${stage.title.nb}`, en: `Final piece · ${stage.title.en}` },
           description: { nb: "Brikke → ferdig bilde med konfetti → resultat → etappefeiring. Belønningsskjermene skal passe uten rulling.", en: "Piece → completed picture with confetti → result → stage celebration. Reward screens must fit without scrolling." },
@@ -84,6 +84,8 @@
       {
         id: "basic",
         items: [
+          { title: { nb: "Nivåringer · 0–4", en: "Level rings · 0–4" }, description: { nb: "De fem første nivåene viser null til fire mestrede quizer.", en: "The first five levels show zero through four mastered quizzes." }, params: { preview: "levels-ring-progress" } },
+          { title: { nb: "Nivå mestret", en: "Level mastered" }, description: { nb: "Nivåringen fullføres, merket flytter til sin vanlige plass og trofeet vises. Tosifret nivå og langt neste-navn; ingen rulling.", en: "The ring completes, the badge moves into its usual slot, and the trophy appears. Two-digit level and long next name; no scrolling." }, params: { preview: "result-level-mastered" } },
           { title: { nb: "Neste quiz", en: "Next quiz" }, description: { nb: "Perfekt resultat som fortsetter i samme nivå.", en: "Perfect result continuing within the same level." }, params: { preview: "result-next-quiz" } },
           { title: { nb: "Neste nivå · lengste navn", en: "Next level · longest name" }, description: { nb: "Perfekt resultat som går videre til nivået med det lengste norske navnet.", en: "Perfect result advancing to the level with the longest English name." }, params: { preview: "result-next-level" } },
           { title: { nb: "Ikke mestret → neste nivå", en: "Not mastered → next level" }, description: { nb: "Prøv igjen er primær. Neste-knappen har nivåmerke og navn på første rad, og Neste med quiztype på andre rad.", en: "Try again is primary. One taller Next button groups the badge and level name above the Next action and quiz mode." }, params: { preview: "result-failed-next" } },

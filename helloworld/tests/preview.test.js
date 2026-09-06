@@ -181,3 +181,30 @@ test("preview preparation is repeatable and independent between calls", () => {
   assert.deepEqual(first, before);
   assert.deepEqual(prepare("puzzle-view-empty"), before);
 });
+
+test("direct level mastery preview exposes the earned badge with a long next destination", () => {
+  for (const locale of ["nb", "en"]) {
+    const prepared = prepare("result-level-mastered", {}, locale);
+    const quiz = curriculum.quizById.get(prepared.state.curriculumQuizId);
+    assert.ok(quiz.levelIndex + 1 >= 10);
+    assert.equal(prepared.state.resultNewLevelMastery, true);
+    assert.equal(prepared.state.resultNewQuizMastery, true);
+    assert.equal(prepared.state.resultNewStageMastery, false);
+    assert.equal(prepared.state.resultCelebrationPending, true);
+    assert.ok(!prepared.state.puzzleRewardOpen);
+    assert.equal(prepared.state.wrongAnswers.length, 0);
+    assert.equal(prepared.action.type, "render");
+    const next = progress.nextUnmastered(profile(prepared), curriculum.levels, quiz.id);
+    const longest = Math.max(...curriculum.levels.map((level) => level.title[locale].length));
+    assert.equal(curriculum.levels[curriculum.quizById.get(next.id).levelIndex].title[locale].length, longest);
+  }
+});
+
+
+test("level ring preview covers every mastery count without recording a result", () => {
+  const prepared = prepare("levels-ring-progress");
+  assert.equal(prepared.state.screen, "levels");
+  assert.equal(prepared.action.type, "render");
+  assert.deepEqual(curriculum.levels.slice(0, 5).map(level => progress.levelProgress(profile(prepared), level).mastered), [0, 1, 2, 3, 4]);
+  assert.equal(prepared.state.resultNewLevelMastery, undefined);
+});
