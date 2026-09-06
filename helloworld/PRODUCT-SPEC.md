@@ -394,6 +394,12 @@ The interface uses action-oriented labels such as **Download backup file** and
   Neither kind creates a saved list.
 - The existing regional map navigation, country selection, zoom, silhouettes,
   capital markers, notes and country list should be preserved.
+- Hovering a map country or small-place marker shows its localized name beside
+  the pointer and highlights its list row without scrolling. With no selection,
+  hover or keyboard focus previews the flag, name and capital in the Choose
+  country slot; the preview is noninteractive and clears on exit. A selected
+  country stays in the slot and retains its distinct list highlight. Pointer
+  labels hide during dragging, touch interaction, dialogs and navigation.
 - The workspace stays within the viewport and exposes region selection, the
   selected country's large flag and region-scoped Flashcards contextually.
 - Flashcards launched from Explore contain exactly the countries visible in the

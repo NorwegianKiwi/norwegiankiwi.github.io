@@ -205,6 +205,7 @@
   let exploreMapGesture = null;
   let exploreMapDrag = null;
   let exploreMapUiFrame = null;
+  let explorePointerLabel = null;
   let responsiveMapFrame = null;
   let scrollAffordanceFrame = null;
   let recommendedNavigationFrame = null;
@@ -1922,23 +1923,24 @@
       `;
     }
 
+    const isSelected = countryCode === state.explorePinnedCode;
     return `
-      <button
-        type="button"
-        class="explore-country-status"
+      <${isSelected ? "button" : "div"}
+        ${isSelected ? `type="button"
         data-action="open-country-details"
-        data-code="${country.code}"
         aria-label="${escapeHtml(t("showCountryDetails", {
           name: countryName(country),
-        }))}"
+        }))}"` : 'data-explore-preview-status'}
+        class="explore-country-status"
+        data-code="${country.code}"
       >
         ${flagMarkup(country, "explore-status-flag", false, true)}
         <span>
           <strong>${escapeHtml(countryName(country))}</strong>
           <small>${escapeHtml(capitalDisplayText(countryCapital(country)))}</small>
         </span>
-        <span class="explore-country-status-action" aria-hidden="true">↗</span>
-      </button>
+        ${isSelected ? '<span class="explore-country-status-action" aria-hidden="true">↗</span>' : ""}
+      </${isSelected ? "button" : "div"}>
     `;
   }
 
@@ -2524,6 +2526,8 @@
     }
 
     if (!drag.dragging) {
+      hideExplorePointerLabel();
+      setExplorePreview(null);
       drag.dragging = true;
       drag.map.classList.add("is-dragging");
       try {
@@ -2657,7 +2661,7 @@
       <div class="explore-map-layout">
         <div class="explore-map-column">
           <div class="explore-country-status-wrap" aria-live="polite">
-            ${exploreCountryStatusMarkup(state.explorePinnedCode)}
+            ${exploreCountryStatusMarkup(state.explorePinnedCode ?? state.explorePreviewCode)}
           </div>
           <div class="explore-map-stage">
             <div class="explore-region-map${extent === "world" ? " is-world-extent" : ""}${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}"${worldAspectStyle}>
@@ -3189,6 +3193,8 @@
   }
 
   function render(options = {}) {
+    hideExplorePointerLabel();
+    state.explorePreviewCode = null;
     const exploreListScrollTop = options.preserveExploreListScroll
       ? app.querySelector(".explore-country-list")?.scrollTop ?? null
       : null;
@@ -3610,9 +3616,14 @@
     });
 
     const status = app.querySelector(".explore-country-status-wrap");
-    if (status) {
+    const statusCode = state.explorePinnedCode ?? state.explorePreviewCode;
+    const statusSelected = Boolean(state.explorePinnedCode);
+    if (status && (
+      (status.firstElementChild?.dataset.code ?? null) !== statusCode ||
+      (status.firstElementChild?.tagName === "BUTTON") !== statusSelected
+    )) {
       status.innerHTML = exploreCountryStatusMarkup(
-        state.explorePinnedCode,
+        statusCode,
       );
     }
 
@@ -3630,7 +3641,8 @@
   function setExplorePreview(code) {
     if (
       state.screen !== "explore" ||
-      state.exploreRegionPickerOpen
+      state.exploreRegionPickerOpen ||
+      (code && (state.countryDetailsCode || exploreMapDrag?.dragging || exploreMapGesture))
     ) {
       return;
     }
@@ -3640,6 +3652,38 @@
     state.explorePreviewCode = previewCode;
     if (!state.explorePinnedCode) state.silhouetteExpanded = false;
     syncExploreCountryUi();
+  }
+
+  function hideExplorePointerLabel() {
+    explorePointerLabel?.remove();
+    explorePointerLabel = null;
+  }
+
+  function updateExplorePointerLabel(event) {
+    const control = event.target.closest?.(
+      ".explore-map-country, .explore-map-marker-control",
+    );
+    const country = countriesByCode.get(control?.dataset.exploreCode);
+    if (!country || !app.contains(control) || event.pointerType === "touch" ||
+        state.screen !== "explore" || state.exploreRegionPickerOpen ||
+        state.countryDetailsCode || exploreMapDrag?.dragging || exploreMapGesture) {
+      hideExplorePointerLabel();
+      return;
+    }
+    if (!explorePointerLabel) {
+      explorePointerLabel = document.createElement("div");
+      explorePointerLabel.className = "explore-pointer-label";
+      explorePointerLabel.setAttribute("aria-hidden", "true");
+      document.body.append(explorePointerLabel);
+    }
+    explorePointerLabel.textContent = countryName(country);
+    const bounds = explorePointerLabel.getBoundingClientRect();
+    const left = event.clientX + 14 + bounds.width <= window.innerWidth - 8
+      ? event.clientX + 14 : event.clientX - bounds.width - 14;
+    const top = event.clientY + 18 + bounds.height <= window.innerHeight - 8
+      ? event.clientY + 18 : event.clientY - bounds.height - 18;
+    explorePointerLabel.style.left = `${Math.max(8, left)}px`;
+    explorePointerLabel.style.top = `${Math.max(8, top)}px`;
   }
 
   function clearExploreCountrySelection() {
@@ -4623,6 +4667,8 @@
   }
 
   app.addEventListener("pointerdown", (event) => {
+    hideExplorePointerLabel();
+    if (event.pointerType === "touch") setExplorePreview(null);
     const viewport = event.target.closest(".puzzle-viewport");
     if (!viewport || (event.pointerType !== "touch" && event.button !== 0)) return;
     if (puzzlePointers.size >= 2) return;
@@ -4641,6 +4687,7 @@
   });
 
   window.addEventListener("pointermove", (event) => {
+    updateExplorePointerLabel(event);
     const point = puzzlePointers.get(event.pointerId);
     const gesture = puzzleGesture;
     if (!point || !gesture) return;
@@ -5264,6 +5311,10 @@
   });
 
   function finishExploreMapPointer(event) {
+    if (event.type === "pointercancel") {
+      hideExplorePointerLabel();
+      setExplorePreview(null);
+    }
     if (exploreMapDrag?.pointerId === event.pointerId) {
       if (exploreMapDrag.dragging) {
         suppressExploreMapClickUntil = Date.now() + 500;
@@ -5287,7 +5338,10 @@
 
   window.addEventListener("pointerup", finishExploreMapPointer);
   window.addEventListener("pointercancel", finishExploreMapPointer);
+  window.addEventListener("blur", hideExplorePointerLabel);
+  window.addEventListener("scroll", hideExplorePointerLabel, true);
   window.addEventListener("resize", () => {
+    hideExplorePointerLabel();
     scheduleScrollAffordanceUpdate();
     scheduleRecommendedNavigationUpdate();
     scheduleResponsiveRegionMaps();
@@ -5311,6 +5365,7 @@
   );
 
   app.addEventListener("pointerover", (event) => {
+    updateExplorePointerLabel(event);
     const countryControl = event.target.closest("[data-explore-code]");
     if (
       countryControl &&
@@ -5341,6 +5396,7 @@
       app.contains(countryControl) &&
       !countryControl.contains(event.relatedTarget)
     ) {
+      hideExplorePointerLabel();
       if (event.pointerType !== "touch") {
         setExplorePreview(null);
       }
