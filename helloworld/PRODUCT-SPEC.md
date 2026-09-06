@@ -129,19 +129,21 @@ region, mode or difficulty:
 
 1. Resume a saved regional or world mastery attempt when its quiz ID and
    revision still match the current curriculum.
-2. Otherwise, start with the quiz after the most recently completed quiz and
+2. Otherwise, restart the most recently started unfinished quiz when its ID and
+   revision still match. Short quizzes begin a fresh attempt from question one.
+3. Otherwise, start with the quiz after the most recently completed quiz and
    choose the next unmastered quiz in displayed curriculum order, wrapping to
    the beginning when necessary. Attempted but unmastered quizzes remain eligible.
-3. With no previous completed quiz, or an unknown previous quiz ID, choose the
-   first unmastered quiz. Leaving a short quiz unfinished does not advance this
-   position; short quizzes restart when abandoned.
-4. If everything is mastered and no valid saved attempt exists, show
-   **Surprise quiz** with **Choose a level** as the secondary action.
+4. With no previous completed quiz, or an unknown previous quiz ID, choose the
+   first unmastered quiz.
+5. If everything is mastered and no valid saved attempt or unfinished quiz
+   exists, show **Surprise quiz** with **Choose a level** as the secondary action.
 
 The home page has no separate saved-attempt bar or Resume button. The Continue
 card shows the destination's level and quiz mode without an answered count.
-Answered progress remains visible on Levels and inside the quiz. A saved attempt uses **Continue game** even before the
-profile has completed its first quiz. Earned completion recognition remains
+Answered progress remains visible on Levels and inside the quiz. A saved
+attempt or unfinished quiz uses **Continue game** even before the profile has
+completed its first quiz. Earned completion recognition remains
 based on mastery totals, including while replaying a saved mastery quiz.
 Players can choose any quiz from Levels at any time.
 
@@ -180,7 +182,13 @@ The interface must not use lives or prevent further play because of mistakes.
 
 Regional and world mastery attempts are resumable. They remain one attempt:
 previous answers cannot be changed, and resuming does not reset mistakes.
-Ordinary short quizzes restart when abandoned.
+Ordinary short quizzes restart when abandoned. The unfinished destination is
+remembered per profile immediately on quiz startup, including retries, and
+survives Home navigation and reload. Finishing clears it; starting another quiz
+replaces it after any required mastery-abandonment confirmation. Scores and
+mastery change only on completion. Reset clears the destination. It is local
+activity and is excluded from backups and transfers; merging preserves the
+local destination, while importing a new profile starts without one.
 On the Levels screen, the matching level and quiz visibly show the saved
 question position. Selecting that same quiz resumes it directly. Selecting a
 different scored quiz, including a short quiz or shared challenge, opens an

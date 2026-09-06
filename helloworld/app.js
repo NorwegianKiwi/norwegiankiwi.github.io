@@ -1647,7 +1647,7 @@
     const quiz = next.type === "quiz" ? curriculum.quizById.get(next.quiz.id) : null;
     const savedAttempt = progress.matchingSavedAttempt(profile, quiz);
     const showSurprise = next.type === "all-mastered";
-    const hasPlayed = totals.playedQuizzes > 0 || Boolean(savedAttempt);
+    const hasPlayed = totals.playedQuizzes > 0 || Boolean(savedAttempt) || progress.matchesUnfinishedQuiz(profile, quiz);
     const continueIcon = showSurprise
       ? "✦"
       : hasPlayed && quiz
@@ -3990,6 +3990,7 @@
     state.resultPreviousBestScore = null; state.resultNewQuizMastery = false; state.resultNewLevelMastery = false; state.resultNewStageMastery = false;
     state.resultCelebrationPending = false; state.puzzleRewardPending = false; state.puzzleRewardOpen = false;
     state.screen = "quiz";
+    persist(progress.markQuizStarted(progressStore, progressStore.activeProfileId, quiz));
     if (savedAttempt && savedAttempt.questionIndex >= state.questions.length && !savedAttempt.correctionPending) {
       state.questionIndex = state.questions.length - 1; state.resultRecorded = false; finishCurriculumAttempt(); state.screen = "result";
     }

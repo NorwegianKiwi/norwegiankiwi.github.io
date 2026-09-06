@@ -163,6 +163,7 @@ The stored root object should have a versioned schema:
       createdAt: "2026-08-22T10:00:00.000Z",
       updatedAt: "2026-08-22T10:30:00.000Z",
       lastQuizId: "pack-nordics:country-flag",
+      unfinishedQuiz: null, // Or { quizId, revision }; local continuation destination.
       savedMasteryAttempt: null,
       quizProgress: {
         "pack-nordics:country-flag": {
@@ -238,15 +239,26 @@ Given the active profile and ordered curriculum:
 
 1. Return the saved attempt's quiz if it belongs to a regional or world mastery
    level and its ID and revision match the current curriculum.
-2. Resolve `lastQuizId` against the current curriculum. Search from the following
+2. Return `unfinishedQuiz` when its ID and revision match the current curriculum,
+   even if that quiz is already mastered.
+3. Resolve `lastQuizId` against the current curriculum. Search from the following
    quiz for the first unmastered current revision, wrapping once. The previous
    quiz is eligible only after all others have been considered.
-3. If `lastQuizId` is missing or unknown, search from the first quiz.
-4. If none exists, return `all-mastered`; the primary action selects a surprise
+4. If `lastQuizId` is missing or unknown, search from the first quiz.
+5. If none exists, return `all-mastered`; the primary action selects a surprise
    mastered quiz that has not been played recently.
 
 The existing `{ type: "quiz", quiz }` / `{ type: "all-mastered" }` interface and
-storage schema remain unchanged. `lastQuizId` advances only on result recording.
+storage schema version remain unchanged. `lastQuizId` advances only on result
+recording.
+The optional profile field `unfinishedQuiz: { quizId, revision }` defaults to null
+for older profiles or invalid input. `markQuizStarted` sets it after startup
+passes the saved-attempt confirmation guard, without recording a result.
+`matchesUnfinishedQuiz` checks identity and revision. Recording a matching result
+or explicitly abandoning the matching saved mastery attempt clears the marker.
+Starting another quiz replaces it; Home and reload preserve it. Reset clears it.
+Transfers and backups exclude it, imports as new clear it, and merges preserve
+the local marker. Short-quiz answers and seeds are not persisted.
 Stale saved attempts and unknown last-quiz IDs do not delete unrelated progress.
 Levels uses this same selection for its recommendation. Completion recognition
 uses mastery totals rather than the continuation outcome.
@@ -281,7 +293,8 @@ identifies and faithfully reproduces a current curriculum quiz revision.
 ## 10. Saved mastery attempts
 
 Each profile may have at most one saved regional or world mastery attempt.
-Ordinary short quizzes are not persisted mid-attempt.
+Ordinary short quizzes persist only their unfinished destination, not answers or
+question order.
 
 A saved attempt contains only the state necessary to reproduce and continue the
 same immutable attempt, conceptually:
