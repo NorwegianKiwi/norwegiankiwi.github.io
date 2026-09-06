@@ -179,6 +179,8 @@ before continuing. The interface should explicitly say what was correct and
 how to proceed rather than relying on colour alone.
 The correct-option pulse contracts within the option's normal size rather than
 enlarging it, keeping the animation from extending beyond the layout.
+Wrong-answer and correction outlines sit inside the answer boxes so adjacent
+options retain their normal gap.
 
 The interface must not use lives or prevent further play because of mistakes.
 
