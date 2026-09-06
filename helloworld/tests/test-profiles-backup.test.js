@@ -70,7 +70,8 @@ test("generated test-profile backup fixture", () => {
   assert.equal(progress.quizState(navigatorGapProfile, touristNameQuiz), "unplayed");
   assert.deepEqual(
     progress.continueSelection(navigatorGapProfile, curriculum.levels).quiz.id,
-    touristNameQuiz.id,
+    curriculum.levels[4].quizzes[0].id,
+    "continue forward from the last completed quiz instead of jumping back to the Tourist gap",
   );
   assert.deepEqual(
     curriculum.stages.filter((stage) => progress.stageProgress(navigatorGapProfile, stage, curriculum.levels).isMastered).map((stage) => stage.id),

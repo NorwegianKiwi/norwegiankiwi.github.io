@@ -42,10 +42,19 @@ The implementation should maintain clear boundaries:
 - `sharing.js`: dependency-free construction of encoded email draft URLs
 - `localization.js`: complete bilingual interface catalogs and interpolation
 - `map-view.js`: pure map viewport, zoom, pan and coordinate calculations
+- `preview.js`: manual preview URL recognition and isolated scenario data
 - `app.js`: application state, rendering and interaction orchestration
 
 Curriculum and progress logic must remain outside the browser orchestration in
 `app.js`.
+
+`preview.js` exposes `GEOGRAFI_PREVIEW` in the browser and the same API through
+CommonJS. `readName(params)` recognizes existing preview URL parameters;
+`prepare(params, locale, dependencies, timestamp)` returns a temporary store,
+state overrides, and a startup action, or `null` for an unrecognized preview.
+Dependencies are curriculum, progress, and a country-code lookup. The module
+does not access the DOM or storage. `app.js` applies the prepared data and owns
+rendering, focus, simulated image failures, and normal quiz/celebration startup.
 
 ## 3. Curriculum data model
 
@@ -210,19 +219,33 @@ stored.
 
 Given the active profile and ordered curriculum:
 
-1. Resolve `lastQuizId` against the current curriculum.
-2. If it exists and its current revision is not mastered, return it.
-3. Otherwise return the first current quiz in curriculum order that is not
-   mastered.
-4. If none exists, return an explicit `all-mastered` outcome whose primary
-   action selects a surprise mastered quiz that has not been played recently.
+1. Return the saved attempt's quiz if it belongs to a regional or world mastery
+   level and its ID and revision match the current curriculum.
+2. Resolve `lastQuizId` against the current curriculum. Search from the following
+   quiz for the first unmastered current revision, wrapping once. The previous
+   quiz is eligible only after all others have been considered.
+3. If `lastQuizId` is missing or unknown, search from the first quiz.
+4. If none exists, return `all-mastered`; the primary action selects a surprise
+   mastered quiz that has not been played recently.
 
-If a stored `lastQuizId` no longer exists, ignore it without deleting unrelated
-progress.
+The existing `{ type: "quiz", quiz }` / `{ type: "all-mastered" }` interface and
+storage schema remain unchanged. `lastQuizId` advances only on result recording.
+Stale saved attempts and unknown last-quiz IDs do not delete unrelated progress.
+Levels uses this same selection for its recommendation. Completion recognition
+uses mastery totals rather than the continuation outcome.
 
-After a perfect result, the result screen's Next Quiz uses the first subsequent
-unmastered quiz, wrapping to the first unmastered quiz only when necessary.
-After a non-perfect result, Try Again starts the same quiz revision.
+Results independently use the forward unmastered search after the completed
+quiz, excluding the current quiz from the offered Next action. They do not
+prioritize a paused mastery attempt. Results render only two Next layouts:
+same-level destinations use Next: {mode} without destination text above;
+different-level destinations use one taller semantic button with a centered
+badge and level-name row followed by Next: {mode} and its arrow. The badge
+appears once, and no standalone heading or divider is rendered. Both rows have
+explicit text sizes, with the level name slightly stronger. Skips and wraps use
+the same layouts as immediate successors.
+Accessible button names always identify the destination's level and mode.
+Try Again remains primary after non-perfect results;
+celebrations retain precedence after perfect results.
 
 ## 9. Recording a result
 
@@ -273,8 +296,13 @@ Rules:
 - Language changes do not invalidate an attempt because stored identities are
   language-independent.
 - Starting the same current quiz ID and revision resumes the saved attempt
-  directly. Starting a different scored quiz requires an accessible in-app
-  confirmation; confirmation deletes the saved attempt.
+  directly. Starting any other scored quiz, including short quizzes and shared
+  challenges, passes through the same accessible confirmation guard. Explicitly
+  starting a fresh challenge round also requires confirmation when an attempt
+  is saved. Confirmation clears only the unfinished attempt before starting the
+  selected quiz; dismissal preserves it and restores focus. Explore and
+  flashcards do not clear saved attempts. Home Continue keeps saved-attempt
+  priority without displaying an answered count.
 - Completing the attempt records its best result and removes the saved attempt.
 - Saved attempts are local operational state and are excluded from profile
   transfer links and backup imports.
@@ -574,6 +602,13 @@ Visual and interaction testing must cover phone, tablet and desktop layouts,
 keyboard operation, reduced motion, Norwegian and English, and both empty and
 heavily completed profiles.
 
+The result section of `test.html` includes both perfect and imperfect results
+for immediate successors, skipped quizzes within/across levels, and wrapping.
+It also covers the sole remaining unmastered quiz, new and previous records,
+mastered replays, and fully mastered profiles. Stage and final celebrations
+remain available in their own sections. All previews are temporary and must
+leave persisted player progress unchanged.
+
 ## 20. Acceptance criteria
 
 The progression system must continue to satisfy these criteria:
@@ -596,3 +631,88 @@ The progression system must continue to satisfy these criteria:
 - Curriculum quiz challenges open directly and record valid current progress.
 - Progress achievements can be shared without exposing transferable progress.
 - The application remains static, bilingual and dependency-free at runtime.
+## Stage puzzle reward contract
+
+`puzzles.js` is a dependency-free browser/Node module exposed as
+`GEOGRAFI_PUZZLES`. It contains the checked-in stage manifest, permanent quiz ID
+to piece positions, artwork paths, fixed row layouts and SVG geometry. Its
+`pieceForQuiz(quizId)` returns a stage ID and piece; `stageProgress(profile,
+stageId, curriculum, progress)` derives earned flags, count, total and completion
+using the existing revision-aware `progress.quizState` contract. There is no
+puzzle persistence schema, backup field, transfer change or mastery migration.
+
+Geometry uses a 1536 × 1024 canvas. Adjacent pieces share exactly reversed
+curved boundaries; unequal row counts use shared straight horizontal boundaries.
+Do not reorder the manifest's quiz IDs or change layouts independently of the
+artwork. New curriculum or revision decisions must explicitly consider their
+effect on earned pictures.
+
+The app owns transient first-mastery reward presentation, stage-specific viewing,
+zoom, focus restoration and pointer scrolling. Mastery is recorded before opening
+the reward presentation within the existing result route; no new URL or persistent
+reward state is introduced. A render consumes the pending animation without
+consuming the later result mastery animation. Continue dismisses the reward;
+returning to results never reopens it. Piece-arrival animation completion settles
+the displayed count and localized live announcement without rerendering; the final
+piece also triggers a single decorative confetti burst. Failed artwork settles the
+count without celebrating. Reduced motion starts settled and switching it on
+during a reveal also settles the count. Completed pictures render one unclipped
+SVG image with no piece paths or masks. When the final-piece animation settles,
+including a reduced-motion change mid-reveal, the app moves the existing image
+node directly into the SVG and removes all clipping and seam geometry. This
+retains the loaded artwork and avoids antialiasing gaps between clipped pieces.
+
+Puzzle rewards and stage celebrations must fit the viewport without document or
+dialog scrolling, or clipped controls. Reward artwork fits the remaining grid
+space; its header shares the fitted image width, with stage identity left and
+a compact puzzle-icon count right. Short landscape uses two columns. Stage celebrations use a compact thumbnail
+and text in one picture-viewer button rather than a large embedded image.
+
+Visible SVG pictures load their local PNG through IntersectionObserver, with
+immediate loading when that API is unavailable. Loading failures retain opaque
+pieces and localized progress/error text. The viewer requires an explicit stage
+and has no cross-stage selector. Its overlay stacks above stage celebrations.
+The dialog uses a viewport-bounded grid with stage identity, zoom controls and
+Close outside the image scroller; gesture help and progress descriptions are
+accessible without visible explanatory text. Its stage background matches the
+reward; the inner viewport is transparent so its unused space does not create
+a second background boundary. The image fits the available viewport at 100%; zoom scales that
+3:2 size through 4×. Size and anchored scroll position update together. Image
+geometry and edge shadows explicitly disable transition properties so the global
+reduced-motion duration override cannot delay these updates. Button steps are
+1, 1.5, 2, 3 and 4, with disabled controls excluded from dialog focus trapping.
+
+The app owns transient picture pointer capture and a pan/pinch gesture snapshot.
+Image-relative anchors account for centering margins on either axis; touch and
+Ctrl+wheel zoom preserve the anchor under the moving midpoint or pointer, subject
+to image boundaries. Touch panning is handled by pointer events within the image
+area. Ordinary scrolling and keyboard panning stay local to that area. Ending a
+pinch rebases the remaining finger as a pan; cancellation, lost capture, blur,
+render and closing release gesture state. ResizeObserver (or window resize as a
+fallback) refits the image and refreshes zoom and boundary indicators. Four
+noninteractive edge shadows reflect actual remaining scroll extent, and disappear
+at the corresponding boundary or when the full image fits.
+The viewer makes the underlying screen inert and participates in the existing
+keyboard focus trap, restoring the originating control even when opened from a
+stage celebration.
+
+Artwork lives in `images/puzzles/`. `PROMPTS.md` contains shared art direction,
+six stage maintenance prompts and the review checklist. Tourist supplies the
+style and recurring-character reference. Open `review.html` in that directory
+to inspect the active pictures and their actual clipped fragments. Keep only
+the six runtime PNGs; Git retains asset and documentation history.
+Before replacing an image, review scene structure, anatomy and object construction,
+then every clipped piece at enlarged size. Make intentional fantasy explicit;
+keep supports, vehicle connections, scale and physical actions coherent. Repair
+local defects and recheck the whole image before installing it. Preserve the
+1536 × 1024 dimensions, geometry and permanent quiz mappings. Assets are
+ordinary local images; playing via `file://` needs no build, network or server.
+`test.html` covers first/intermediate pieces, level mastery, final pieces for all
+six stages, the full-world reward sequence, mastered replay, unavailable artwork,
+and empty/partial/completed stage viewers. These use temporary preview profiles;
+viewer previews do not record a quiz result. The former `puzzle-collection` URL
+remains an alias for a completed stage viewer but is not listed in the menu.
+Use system reduced-motion settings to check settled rewards; also exercise early
+Continue, picture zoom/scrolling, Escape and focus restoration through the existing
+Home/Levels celebration replay entries.
+The canonical checker includes puzzle mapping, geometry and progress tests.

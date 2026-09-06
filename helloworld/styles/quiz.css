@@ -292,13 +292,23 @@
 
 .question-map-country {
   fill: #b8c5bc;
-  stroke: rgba(255, 253, 247, 0.94);
-  stroke-width: 1;
-  fill-rule: evenodd;
   paint-order: stroke fill;
 }
 
-.question-map-country.is-crop-edge {
+.question-map-country,
+.question-map-country-border {
+  stroke: rgba(255, 253, 247, 0.94);
+  stroke-width: 1;
+  fill-rule: evenodd;
+}
+
+.question-map-country-border {
+  fill: none;
+  pointer-events: none;
+}
+
+.question-map-country.is-crop-edge,
+.question-map-country-border.is-crop-edge {
   fill: none;
   stroke: var(--blue-soft);
   stroke-width: 4;
@@ -319,15 +329,16 @@
   display: none;
 }
 
-.question-map-country.is-target {
+.question-map-country.is-target:not(.is-crop-edge) {
   fill: var(--coral);
+}
+
+.question-map-country-border.is-target:not(.is-crop-edge) {
   stroke: var(--ink);
-  stroke-width: 3.5;
-  stroke-linejoin: round;
-  paint-order: stroke fill;
 }
 
 .question-map-country.is-locator-hidden,
+.question-map-country-border.is-locator-hidden,
 .question-map-target-halo.is-locator-hidden {
   opacity: 0;
 }

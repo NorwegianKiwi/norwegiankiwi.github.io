@@ -184,20 +184,29 @@
     return levels.flatMap((level) => level.quizzes.map((quiz) => ({ ...quiz, countryCodes: level.countryCodes, levelId: level.id })));
   }
   function continueSelection(profile, levels) {
-    const quizzes = flatQuizzes(levels);
-    const last = quizzes.find((quiz) => quiz.id === profile?.lastQuizId);
-    if (last && quizState(profile, last) !== "mastered") return { type: "quiz", quiz: last };
-    const quiz = quizzes.find((candidate) => quizState(profile, candidate) !== "mastered");
+    const savedQuiz = flatQuizzes(levels.filter((level) =>
+      level.kind === "regional-mastery" || level.kind === "world-mastery",
+    )).find((quiz) => matchingSavedAttempt(profile, quiz));
+    if (savedQuiz) return { type: "quiz", quiz: savedQuiz };
+    const quiz = nextUnmastered(profile, levels, profile?.lastQuizId);
     return quiz ? { type: "quiz", quiz } : { type: "all-mastered" };
   }
+
   function nextUnmastered(profile, levels, quizId) {
     const quizzes = flatQuizzes(levels);
-    const start = Math.max(0, quizzes.findIndex((quiz) => quiz.id === quizId));
+    const start = quizzes.findIndex((quiz) => quiz.id === quizId);
     for (let offset = 1; offset <= quizzes.length; offset += 1) {
       const quiz = quizzes[(start + offset) % quizzes.length];
       if (quizState(profile, quiz) !== "mastered") return quiz;
     }
     return null;
+  }
+  function nextUnplayedSuccessor(profile, levels, quizId) {
+    const quizzes = flatQuizzes(levels);
+    const currentIndex = quizzes.findIndex((quiz) => quiz.id === quizId);
+    if (currentIndex < 0 || currentIndex >= quizzes.length - 1) return null;
+    const successor = quizzes[currentIndex + 1];
+    return quizState(profile, successor) === "unplayed" ? successor : null;
   }
   function surpriseQuiz(profile, levels, random = Math.random) {
     const quizzes = flatQuizzes(levels).filter((quiz) => quizState(profile, quiz) === "mastered");
@@ -355,7 +364,8 @@
     STORAGE_KEY, SCHEMA_VERSION, TRANSFER_VERSION, createProfile, createEmptyStore,
     validateRoot, loadStore, saveStore, activeProfile, currentRecord, quizState,
     matchingSavedAttempt,
-    levelProgress, stageProgress, summary, continueSelection, nextUnmastered, surpriseQuiz,
+    levelProgress, stageProgress, summary, continueSelection, nextUnmastered,
+    nextUnplayedSuccessor, surpriseQuiz,
     recordResult, addProfile, switchProfile, renameProfile, clearProgress,
     deleteProfile, saveMasteryAttempt, abandonMasteryAttempt, transferableProfile,
     encodeTransfer, decodeTransfer, mergeProfiles, importAsNew, mergeInto,

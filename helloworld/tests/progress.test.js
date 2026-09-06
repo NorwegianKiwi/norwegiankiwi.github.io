@@ -28,6 +28,104 @@ test("profile progress, persistence, transfer, and recovery", () => {
   assert.equal(progress.quizState(mismatched, firstQuiz), "played");
 
   assert.equal(progress.continueSelection(progress.activeProfile(store), curriculum.levels).quiz.id, curriculum.levels[0].quizzes[1].id);
+  assert.equal(
+    progress.nextUnplayedSuccessor(progress.activeProfile(store), curriculum.levels, firstQuiz.id).id,
+    curriculum.levels[0].quizzes[1].id,
+    "the immediate unplayed quiz is offered after the current quiz",
+  );
+  const secondQuiz = curriculum.quizById.get("tour-hello-world:flag-country");
+  let successorStore = progress.recordResult(
+    store,
+    store.activeProfileId,
+    secondQuiz,
+    secondQuiz.countryCodes.length - 1,
+  );
+  assert.equal(
+    progress.nextUnplayedSuccessor(
+      progress.activeProfile(successorStore),
+      curriculum.levels,
+      firstQuiz.id,
+    ),
+    null,
+    "a played but unmastered immediate successor suppresses Next",
+  );
+  successorStore = progress.recordResult(
+    successorStore,
+    successorStore.activeProfileId,
+    secondQuiz,
+    secondQuiz.countryCodes.length,
+  );
+  assert.equal(
+    progress.nextUnplayedSuccessor(
+      progress.activeProfile(successorStore),
+      curriculum.levels,
+      firstQuiz.id,
+    ),
+    null,
+    "a mastered immediate successor suppresses Next",
+  );
+  const outOfOrderLevel = curriculum.levels[0];
+  const outOfOrderQuizzes = outOfOrderLevel.quizzes.map((quiz) => curriculum.quizById.get(quiz.id));
+  let outOfOrderStore = progress.createEmptyStore({ id: "out-of-order-profile", now: clock.now });
+  for (const index of [0, 1, 3]) {
+    const quiz = outOfOrderQuizzes[index];
+    outOfOrderStore = progress.recordResult(
+      outOfOrderStore,
+      outOfOrderStore.activeProfileId,
+      quiz,
+      quiz.countryCodes.length,
+    );
+  }
+  assert.deepEqual(
+    progress.levelProgress(progress.activeProfile(outOfOrderStore), outOfOrderLevel),
+    { mastered: 3, played: 3, total: 4 },
+  );
+  assert.equal(
+    progress.nextUnplayedSuccessor(
+      progress.activeProfile(outOfOrderStore),
+      curriculum.levels,
+      outOfOrderQuizzes[2].id,
+    ),
+    null,
+    "an already-mastered fourth quiz leaves no immediate successor for the third quiz",
+  );
+  outOfOrderStore = progress.recordResult(
+    outOfOrderStore,
+    outOfOrderStore.activeProfileId,
+    outOfOrderQuizzes[2],
+    outOfOrderQuizzes[2].countryCodes.length,
+  );
+  assert.deepEqual(
+    progress.levelProgress(progress.activeProfile(outOfOrderStore), outOfOrderLevel),
+    { mastered: 4, played: 4, total: 4 },
+  );
+  assert.equal(
+    progress.nextUnplayedSuccessor(
+      progress.activeProfile(outOfOrderStore),
+      curriculum.levels,
+      outOfOrderQuizzes[2].id,
+    ),
+    null,
+  );
+  const lastQuizInFirstLevel = curriculum.quizById.get(curriculum.levels[0].quizzes.at(-1).id);
+  assert.equal(
+    progress.nextUnplayedSuccessor(
+      progress.activeProfile(store),
+      curriculum.levels,
+      lastQuizInFirstLevel.id,
+    ).id,
+    curriculum.levels[1].quizzes[0].id,
+    "the immediate successor may cross a level boundary",
+  );
+  assert.equal(
+    progress.nextUnplayedSuccessor(
+      progress.activeProfile(store),
+      curriculum.levels,
+      curriculum.levels.at(-1).quizzes.at(-1).id,
+    ),
+    null,
+    "the selector does not wrap at the end of the curriculum",
+  );
   const originalId = store.activeProfileId;
   store = progress.addProfile(store, "Ada", { id: "profile-two", now: clock.now });
   assert.equal(store.activeProfileId, "profile-two");
@@ -150,7 +248,6 @@ test("profile progress, persistence, transfer, and recovery", () => {
     "2026-08-22T10:03:00.000Z",
   );
 
-  const secondQuiz = curriculum.quizById.get("tour-hello-world:flag-country");
   let recencyStore = progress.createEmptyStore({ id: "recency-profile", now: clock.now });
   recencyStore = progress.recordResult(
     recencyStore,

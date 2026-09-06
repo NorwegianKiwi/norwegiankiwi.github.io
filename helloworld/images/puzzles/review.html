@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stage artwork viewer</title>
+  <link rel="icon" href="data:,">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f6f0e4; color: #253e35; font: 16px/1.5 system-ui, sans-serif; }
+    main { max-width: 1500px; margin: auto; padding: 24px; }
+    h1, h2 { font-family: Georgia, serif; }
+    figure { margin: 0; min-width: 0; }
+    .picture { max-width: 1000px; }
+    .picture img { display: block; width: 100%; border-radius: 12px; }
+    figcaption { margin: 8px 0; font-weight: 650; }
+    a { color: #216c57; }
+    select { max-width: 100%; font: inherit; padding: 8px; margin-bottom: 20px; }
+    :focus-visible { outline: 3px solid #d77a35; outline-offset: 3px; }
+    .pieces { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+    .pieces svg { display: block; width: 100%; height: 245px; background: #e3dbca; border-radius: 8px; }
+    .pieces figcaption { font-size: 14px; }
+    @media (max-width: 700px) {
+      main { padding: 16px; }
+      .pieces { grid-template-columns: 1fr; }
+      .pieces svg { height: 280px; }
+    }
+  </style>
+  <script src="../../puzzles.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Stage artwork viewer</h1>
+    <p>Inspect the game's illustrations and puzzle fragments. Open a picture to view it at full resolution.</p>
+    <label for="stage">Picture</label>
+    <select id="stage">
+      <option value="tourist">Tourist</option>
+      <option value="explorer">Explorer</option>
+      <option value="navigator">Navigator</option>
+      <option value="globetrotter">Globetrotter</option>
+      <option value="regional-expert">Cartographer</option>
+      <option value="world-master">World Master</option>
+    </select>
+    <figure class="picture">
+      <a id="full-picture" href="tourist.png"><img id="artwork" src="tourist.png" width="1536" height="1024" style="height:auto" alt="A bustling departure station with travellers, a steam train and playful animals."></a>
+      <figcaption id="picture-caption">Tourist</figcaption>
+    </figure>
+    <h2>Puzzle fragments</h2>
+    <p id="piece-count" role="status"></p>
+    <p>Inspect drawing quality and recognizable details using the game's fixed piece boundaries.</p>
+    <div class="pieces" id="pieces" role="group" aria-label="Puzzle fragments"></div>
+    <p><a href="PROMPTS.md">Artwork prompts and maintenance checklist</a></p>
+  </main>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const descriptions = {
+        tourist: "A bustling departure station with travellers, a steam train and playful animals.",
+        explorer: "An island hillside with a supported treehouse, rope bridge, caves and exploring travellers.",
+        navigator: "A harbour above an underwater world with boats, marine animals and a sealed submarine.",
+        globetrotter: "A terraced travel town with a tram, cable car, balloons and a lively market square.",
+        "regional-expert": "A mapmaker's workshop with a living miniature landscape and a river falling into a teacup.",
+        "world-master": "Travellers and animals sharing a picnic on a floating world surrounded by miniature landmarks."
+      };
+      const select = document.getElementById("stage");
+      const container = document.getElementById("pieces");
+      const render = () => {
+        const stage = window.GEOGRAFI_PUZZLES.stages.find((s) => s.id === select.value);
+        if (!stage) return;
+        const title = select.selectedOptions[0].textContent;
+        // The manifest image paths are relative to the application entry point.
+        const source = new URL(stage.image, new URL("../../", location.href)).href;
+        document.getElementById("full-picture").href = source;
+        const artwork = document.getElementById("artwork");
+        artwork.src = source;
+        artwork.alt = descriptions[stage.id];
+        document.getElementById("picture-caption").textContent = title;
+        document.getElementById("piece-count").textContent = `${title}: ${stage.pieces.length} pieces`;
+        container.setAttribute("aria-label", `${title} puzzle fragments`);
+        container.replaceChildren();
+        const ns = "http://www.w3.org/2000/svg";
+        for (const piece of stage.pieces) {
+          const figure = document.createElement("figure");
+          const svg = document.createElementNS(ns, "svg");
+          svg.setAttribute("viewBox", piece.bounds.join(" "));
+          svg.setAttribute("role", "img");
+          svg.setAttribute("aria-label", `${title}, piece ${piece.id + 1}`);
+          const defs = document.createElementNS(ns, "defs");
+          const clip = document.createElementNS(ns, "clipPath");
+          clip.id = `piece-${piece.id}`;
+          const path = document.createElementNS(ns, "path");
+          path.setAttribute("d", piece.path);
+          clip.append(path);
+          defs.append(clip);
+          const image = document.createElementNS(ns, "image");
+          image.setAttribute("href", source);
+          image.setAttribute("width", "1536");
+          image.setAttribute("height", "1024");
+          image.setAttribute("clip-path", `url(#${clip.id})`);
+          svg.append(defs, image);
+          const caption = document.createElement("figcaption");
+          caption.textContent = `Piece ${piece.id + 1}`;
+          figure.append(svg, caption);
+          container.append(figure);
+        }
+      };
+      select.addEventListener("change", render);
+      render();
+    });
+  </script>
+</body>
+</html>

@@ -59,7 +59,7 @@ For a new profile, the label is **Start game**. For an existing profile it is
 **Continue game** and includes concise context, for example:
 
 > Level 6 · Iberia and the Alps
-> Find the flag · 0/6
+> Find the flag
 
 Activating it starts the correct quiz immediately; it must not open another
 required choice screen.
@@ -133,16 +133,23 @@ allowing any other quiz to be selected.
 Continue must choose the next action without asking the player to configure a
 region, mode or difficulty:
 
-1. If the most recently played current quiz is not mastered, offer that quiz.
-2. Otherwise choose the first unmastered quiz in displayed curriculum order.
-3. After all regular levels are mastered, continue through regional mastery
-   and then whole-world mastery.
-4. If everything is mastered, return an explicit completed-world state whose
-   primary action is **Surprise quiz** and whose secondary action is
-   **Choose a level**.
+1. Resume a saved regional or world mastery attempt when its quiz ID and
+   revision still match the current curriculum.
+2. Otherwise, start with the quiz after the most recently completed quiz and
+   choose the next unmastered quiz in displayed curriculum order, wrapping to
+   the beginning when necessary. Attempted but unmastered quizzes remain eligible.
+3. With no previous completed quiz, or an unknown previous quiz ID, choose the
+   first unmastered quiz. Leaving a short quiz unfinished does not advance this
+   position; short quizzes restart when abandoned.
+4. If everything is mastered and no valid saved attempt exists, show
+   **Surprise quiz** with **Choose a level** as the secondary action.
 
-Because all content remains open, a player can ignore Continue and choose a
-different level at any time.
+The home page has no separate saved-attempt bar or Resume button. The Continue
+card shows the destination's level and quiz mode without an answered count.
+Answered progress remains visible on Levels and inside the quiz. A saved attempt uses **Continue game** even before the
+profile has completed its first quiz. Earned completion recognition remains
+based on mastery totals, including while replaying a saved mastery quiz.
+Players can choose any quiz from Levels at any time.
 
 ## 7. Quiz rules
 
@@ -182,8 +189,16 @@ previous answers cannot be changed, and resuming does not reset mistakes.
 Ordinary short quizzes restart when abandoned.
 On the Levels screen, the matching level and quiz visibly show the saved
 question position. Selecting that same quiz resumes it directly. Selecting a
-different scored quiz opens an in-app confirmation before the saved attempt is
-abandoned.
+different scored quiz, including a short quiz or shared challenge, opens an
+in-app confirmation before the saved attempt is cancelled. Confirming starts
+the selected quiz and clears only the unfinished attempt, keeping completed
+scores. Dismissing preserves the attempt and restores focus. Explore, flashcards,
+home navigation, and interruptions preserve it.
+
+The confirmation uses **Start another quiz?**, **Your unfinished mastery quiz
+will be cancelled.**, and **Go back** / **Start quiz**. Norwegian uses
+**Starte en annen quiz?**, **Den påbegynte mestringsquizen blir avbrutt.**, and
+**Tilbake** / **Start quiz**. It does not show counts or level references.
 
 ## 8. Mastery and scores
 
@@ -204,23 +219,45 @@ The result screen must minimise decision-making.
 
 After a perfect result:
 
-- A green checkmark recognises quiz mastery.
-- **Next quiz** is the primary action.
-- **Play again** is secondary.
-- **Choose a level** is a quiet tertiary action that opens the recommended
-  quiz on the level overview.
+- A green checkmark recognises quiz mastery. When the result newly completes
+  the level, **Level mastered** and the level trophy replace that quiz-level
+  heading; the completed quiz remains checked in the level-progress controls.
+- Outside milestone and world-completion celebrations, the primary action
+  offers the next unmastered quiz after the completed quiz, scanning forward
+  and wrapping at the end. It does not redirect to a separately paused mastery
+  attempt.
+- Every Next action uses **Next: {mode}**. For a destination in another level,
+  use one taller, rounded rectangular button: its first row pairs one numbered
+  badge with the level name; its second row reads **Next: {mode} →**. Long level
+  names wrap, with slightly stronger text than the mode. Same-level buttons
+  remain compact, without a badge or destination heading.
+- These two layouts apply equally to immediate successors, skips, and wraps.
+  Accessible button names always identify the destination's level and mode.
+- **Choose a level** is secondary. If no other unmastered quiz exists, Next is
+  hidden and Choose a level becomes primary.
+- Replaying the completed quiz remains available through its level-progress
+  control rather than a separate **Play again** action.
 
 After a non-perfect result:
 
-- **Try again** is the primary action.
-- **Next quiz** is secondary.
-- **Choose a level** is a quiet tertiary action that opens the recommended
-  quiz on the level overview.
+- **Try again** is the primary action. Next follows with the standard 10px
+  action spacing; its button boundary groups the destination without a divider.
+- Next is secondary and uses the same destination search, labels, and visible
+  destination as after a perfect result. It is hidden if only the current quiz
+  remains unmastered; Try again already offers that quiz.
+- **Choose a level** is a visible tertiary action, promoted to secondary when
+  no next action is offered.
 
 The result must state whether the quiz was mastered, show the current score and
-best score, and acknowledge newly earned level mastery with the same trophy used
-on the level overview. Wrong-answer review may remain available, but must not
-displace the primary next action.
+best score, and show all four quiz modes for the current level as direct,
+clickable navigation. Each mode shows whether it is mastered, played but not
+mastered, or unplayed; the quiz that produced the result is highlighted. A
+newly earned level mastery uses the same trophy as the level overview. Wrong-
+answer review may remain available, but must not displace the primary action.
+
+When a result earns a stage milestone, its action uses **Completed**, followed
+by the stage icon and localized stage name, rather than a generic milestone
+star. **Challenge a friend** remains less prominent than **Choose a level**.
 
 After a non-perfect result, an additional quiet **Review with flashcards**
 action opens an optional temporary flashcard deck containing only missed
@@ -231,6 +268,64 @@ alter scores or mastery.
 Celebration should be proportional: a subtle response for a correct answer,
 more visible recognition for quiz mastery, and a distinctive moment for level,
 regional or world mastery. Sound must be optional if introduced.
+
+### Stage picture rewards
+
+Each curriculum quiz's first mastery automatically reveals one fixed puzzle
+piece belonging to that quiz's stage. Replays and imperfect attempts award no
+additional pieces. Existing mastery counts immediately; several pictures may
+be in progress at once. There is no manual placement or reward currency.
+
+The six connected storybook pictures are Tourist's departure station (16
+pieces), Explorer's adventure island (40), Navigator's harbour and underwater
+world (52), Globetrotter's travel city (56), Cartographer's living map workshop
+(44), and World Master's miniature planet reunion (24).
+
+A separate reward screen precedes results on first mastery. It presents the new
+fragment enlarged, then places it automatically within about two seconds once
+artwork loads. The stage icon and name identify the picture against a background
+using the stage's celebration colors. Above the fitted image, stage identity is
+left-aligned and an unframed puzzle icon with a compact earned/total count is
+right-aligned. Continue is centered below; short landscape retains a side layout.
+The earned-piece count increases as the piece lands; the final piece fades the
+seams and triggers one brief confetti burst. Once settled, completed pictures show
+the uninterrupted artwork without piece outlines or clipping boundaries, including
+in thumbnails and the viewer. Explanatory reward text is announced accessibly rather than shown as a
+headline. Continue opens results immediately, even during animation. Reduced
+motion shows the settled picture and final count without animated effects;
+rerenders and returning to results do not replay the reveal. Unrevealed pieces
+are opaque. Image failure still settles the count and leaves Continue available.
+
+Results retain their score, mastery indicators and existing actions, with a quiet
+View stage picture action instead of the large puzzle panel. Stage completion
+flows from picture reward to results to the existing stage celebration; whole-
+curriculum completion then offers the existing World Master celebration.
+
+Each Levels stage has a compact picture preview and earned-piece count. Home has
+no picture-collection link. Completed stage celebrations offer one compact button
+combining a picture thumbnail with View picture; Home's earned stage icons lead
+to these celebrations. Puzzle rewards and stage celebrations fit within the
+viewport without scrolling or clipping controls, including short landscape layouts.
+The viewer opens above the originating screen or celebration and contains only
+the explicitly selected stage. Its background matches the stage's puzzle reward.
+The inner viewing area is transparent, letting that gradient continue seamlessly
+around the fitted picture without exposing the area available for zooming.
+The header has the circular stage icon and name left, Explore-style grouped zoom
+controls in the center, and Close right. On phones the controls occupy a second
+row. Completion text and gesture help are not shown; progress, image descriptions
+and instructions remain accessible to assistive technology.
+
+The entire image initially fits at 100%. Zoom buttons step through 100%, 150%,
+200%, 300% and 400%, with disabled controls at the limits. Like Explore, the viewer
+supports mouse/pen dragging, one-finger panning, two-finger pinch and trackpad
+pinch/Ctrl+wheel zoom. Gesture zoom follows the pointer or pinch midpoint; buttons
+preserve the viewed center and Reset fits the whole picture. Only the picture
+area pans or scrolls, including through the keyboard. Directional edge shadows
+indicate hidden picture content and disappear at the corresponding boundary.
+Closing or Escape restores the underlying screen or celebration and trigger focus.
+Localized image-load errors never block navigation or change earned progress.
+Existing mastery does not trigger retrospective rewards.
+
 
 ## 10. Profiles
 
@@ -368,8 +463,9 @@ The player competes against their own previous results and the curriculum.
 - Regional and world mastery attempts are saved after every answer and can
   resume after navigation, reload or browser closure.
 - Reopening the matching mastery quiz resumes it directly from its saved
-  position. Starting a different scored quiz requires clear in-app confirmation
-  that the saved attempt will be abandoned.
+  position. Starting any different scored quiz requires clear in-app confirmation
+  that the saved attempt will be cancelled, including short quizzes and shared
+  challenges. Completed scores remain intact.
 - Motion must respect reduced-motion preferences.
 - Norwegian and English must expose the same interface capabilities and
   translation keys.

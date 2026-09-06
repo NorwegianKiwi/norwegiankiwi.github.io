@@ -523,7 +523,7 @@ footer {
 }
 
 .action-feedback-icon {
-  display: inline-grid;
+  display: none;
   width: 1em;
   min-width: 1em;
   place-items: center;
@@ -531,6 +531,10 @@ footer {
   font-size: 1em !important;
   font-weight: 900;
   line-height: 1;
+}
+
+.action-feedback-button.is-copied .action-feedback-icon {
+  display: inline-grid;
 }
 
 .action-feedback-button.is-copied .action-feedback-icon::before {
