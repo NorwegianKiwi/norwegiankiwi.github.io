@@ -177,6 +177,8 @@ The existing corrective learning interaction should remain: after an incorrect
 answer, the correct option is clearly identified and the player confirms it
 before continuing. The interface should explicitly say what was correct and
 how to proceed rather than relying on colour alone.
+The correct-option pulse contracts within the option's normal size rather than
+enlarging it, keeping the animation from extending beyond the layout.
 
 The interface must not use lives or prevent further play because of mistakes.
 
