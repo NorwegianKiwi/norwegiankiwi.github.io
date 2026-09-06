@@ -96,11 +96,12 @@ documented expected counts together.
 The committed geometry consists of three separate products:
 
 1. World map: 1:50m, Natural Earth, `0 0 1000 520`.
-2. Region maps: 1:50m, north-up, region-centered azimuthal equidistant
+2. Region maps: 1:10m, north-up, region-centered azimuthal equidistant
    projection with an automatically fitted camera based on active countries.
-   Active countries with a Natural Earth tiny-country point use 1:10m geometry,
-   so islands missing from the 1:50m source remain available when zoomed in.
-   Background geography remains at 1:50m. Oceania wraps around 180°.
+   Active countries and background geography use the same source resolution,
+   including small countries and islands. Mixing 1:10m country outlines with
+   1:50m neighbours produces mismatched land borders when zoomed in. Oceania
+   wraps around 180°.
 3. Shape inset: 1:10m, north-up silhouette, `0 0 100 100`. Very small
    components are retained as separate polygon geometry with lighter stroke
    treatment. Countries whose entire geometry is below the readability
@@ -160,7 +161,15 @@ does not become a separate quiz country. The enlarged Somalia silhouette marks
 their shared de facto boundary with the same dashed guide style used for other
 internal geographic context.
 
-The geometry was simplified and coordinates were rounded to one decimal place.
+World and regional geometry is simplified as a shared polygon mesh. Projected
+vertices are normalized to eight decimal places to remove floating-point noise;
+this is not a geographic snapping tolerance. Shared arcs are split at junctions,
+simplified once in a canonical direction, and reused by adjoining polygons.
+Additional shared anchors keep closed rings and enclave holes from collapsing.
+World maps use the 1:50m source consistently; regional maps use 1:10m consistently.
+Background clipping happens after shared simplification, with no subsequent
+simplification of the clipped ring. Final coordinates are rounded to one decimal
+place. Shape insets retain their independent silhouette simplification.
 Natural Earth tiny-country points are used when a polygon is too small to be
 readable. Country membership in region maps must always be looked up in
 `countries.js`; the `CONTINENT`, `REGION_UN`, and `SUBREGION` fields in Natural
@@ -185,6 +194,17 @@ python3 tools/generate_map_data.py \
   /tmp/geografi-map-sources \
   /tmp/world-map.candidate.js \
   --base-map world-map.js
+```
+
+To refresh both world and regional geometry while preserving shape insets,
+first run the regional command above, then use its candidate as the base:
+
+```sh
+python3 tools/generate_map_data.py \
+  /tmp/geografi-map-sources \
+  /tmp/world-map.all-candidate.js \
+  --base-map /tmp/world-map.candidate.js \
+  --refresh-world
 ```
 
 To reproject only the world map while retaining every regional view and
@@ -241,6 +261,8 @@ legacy world projection must remain unchanged.
 Each region map has active countries in `features` and `markers`, while
 `backgroundFeatures` contains only inactive geography. All three collections
 use the same central meridian, projection, and simplification tolerance.
+The shared-arc regression tests run as part of `python3 tools/check.py`; they
+cover ring direction, junctions, enclaves, and clipped background borders.
 Each tiny-country marker has a `readableSize`, calculated from the largest
 minor axis of an actual polygon component. The interface therefore does not
 show the polygon until a single component is readable; the combined bounding

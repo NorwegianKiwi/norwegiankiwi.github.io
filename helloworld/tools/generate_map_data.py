@@ -10,6 +10,7 @@ import json
 import math
 import struct
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 from map_maintenance import (
@@ -137,12 +138,12 @@ def point_line_distance(point, start, end):
     )
 
 
-def simplify(points, tolerance):
-    if len(points) <= 3:
+def simplify(points, tolerance, minimum_points=4):
+    if len(points) <= minimum_points:
         return points
     closed = points[0] == points[-1]
     work = points[:-1] if closed else points
-    if len(work) <= 3:
+    if len(work) < minimum_points:
         return points
 
     def recurse(items):
@@ -161,7 +162,85 @@ def simplify(points, tolerance):
     result = recurse(work)
     if closed and result[0] != result[-1]:
         result.append(result[0])
-    return result if len(result) >= 4 else points
+    return result if len(result) >= minimum_points else points
+
+
+def simplify_feature_rings(features, tolerance):
+    """Simplify a projected polygon mesh, reusing arcs between junctions.
+
+    Eight decimal places only remove floating-point projection noise (far
+    below the output's 0.1-unit precision); this is not a geographic snap.
+    Ring membership remains intact, including holes and context polygons.
+    """
+    neighbours = defaultdict(set)
+    rings = []
+    for feature in features:
+        for source in feature["rings"]:
+            ring = []
+            for point in source:
+                point = tuple(round(value, 8) for value in point)
+                if not ring or point != ring[-1]:
+                    ring.append(point)
+            if ring and ring[-1] == ring[0]:
+                ring.pop()
+            rings.append(ring)
+            for start, end in zip(ring, ring[1:] + ring[:1]):
+                neighbours[start].add(end)
+                neighbours[end].add(start)
+
+    junctions = {
+        point for point, adjacent in neighbours.items() if len(adjacent) != 2
+    }
+    # Give every ring at least three retained vertices. Add these globally so
+    # an enclave and the surrounding hole use the very same split points.
+    ring_anchors = set()
+    for ring in rings:
+        if len(ring) < 3:
+            continue
+        anchors = sorted(set(ring) & junctions)
+        if not anchors:
+            anchors.append(min(ring))
+        if len(anchors) == 1:
+            anchors.append(max(
+                ring, key=lambda point: (math.dist(point, anchors[0]), point)
+            ))
+        if len(anchors) == 2:
+            anchors.append(max(ring, key=lambda point: (
+                point_line_distance(point, anchors[0], anchors[1]), point,
+            )))
+        ring_anchors.update(anchors)
+    junctions.update(ring_anchors)
+
+    arcs = {}
+    simplified_rings = []
+    for ring in rings:
+        if len(ring) < 3:
+            simplified_rings.append([])
+            continue
+        start = next(
+            index for index, point in enumerate(ring) if point in junctions
+        )
+        rotated = ring[start:] + ring[:start] + [ring[start]]
+        output = []
+        arc_start = 0
+        for index in range(1, len(rotated)):
+            if rotated[index] not in junctions:
+                continue
+            arc = tuple(rotated[arc_start:index + 1])
+            reverse = arc[::-1]
+            key = min(arc, reverse)
+            if key not in arcs:
+                arcs[key] = simplify(list(key), tolerance, minimum_points=2)
+            points = arcs[key] if arc == key else arcs[key][::-1]
+            output.extend(points[:-1])
+            arc_start = index
+        simplified_rings.append(output + output[:1])
+
+    iterator = iter(simplified_rings)
+    return [
+        {**feature, "rings": [next(iterator) for _ in feature["rings"]]}
+        for feature in features
+    ]
 
 
 def path_from_rings(rings, precision=1):
@@ -321,12 +400,16 @@ def fitted_transform(points, width, height, padding=PADDING):
 
 
 def project_feature_rings(features, projection, transform, tolerance):
+    projected_features = [
+        {**feature, "rings": [
+            [transform(projection(*point)) for point in ring]
+            for ring in feature["rings"]
+        ]}
+        for feature in features
+    ]
     output = []
-    for feature in features:
-        rings = []
-        for ring in feature["rings"]:
-            projected = [transform(projection(*point)) for point in ring]
-            rings.append(simplify(projected, tolerance))
+    for feature in simplify_feature_rings(projected_features, tolerance):
+        rings = feature["rings"]
         path = path_from_rings(rings)
         if path:
             item = {
@@ -572,15 +655,8 @@ def point_in_bounds(point, bounds, center):
     return west <= longitude <= east and south <= latitude <= north
 
 
-def build_active_features(
-    features,
-    local_names,
-    active_codes,
-    selection_bounds,
-    center,
-    projection,
-    transform,
-):
+def build_active_features(features, local_names, active_codes):
+    """Serialize active rings already simplified with their background."""
     output = []
     points_by_code = {}
     readable_sizes_by_code = {}
@@ -590,21 +666,12 @@ def build_active_features(
             continue
         projected_rings = []
         for ring in feature["rings"]:
-            if not ring_intersects_bounds(ring, selection_bounds, center):
+            if not ring:
                 continue
-            projected = [
-                transform(projection(*point))
-                for point in unwrap_ring(ring, center)
-            ]
-            simplified = simplify(projected, REGION_SIMPLIFY_TOLERANCE)
-            projected_rings.append(simplified)
-            points_by_code.setdefault(code, []).extend(simplified)
-            width = max(x for x, _ in simplified) - min(
-                x for x, _ in simplified
-            )
-            height = max(y for _, y in simplified) - min(
-                y for _, y in simplified
-            )
+            projected_rings.append(ring)
+            points_by_code.setdefault(code, []).extend(ring)
+            width = max(x for x, _ in ring) - min(x for x, _ in ring)
+            height = max(y for _, y in ring) - min(y for _, y in ring)
             readable_sizes_by_code[code] = max(
                 readable_sizes_by_code.get(code, 0), min(width, height)
             )
@@ -704,45 +771,21 @@ def bleed_view_box(camera):
     )
 
 
-def build_background_features(
-    features,
-    local_names,
-    active_codes,
-    center,
-    projection,
-    transform,
-    bleed,
-    excluded_feature_names=None,
-):
-    excluded_feature_names = excluded_feature_names or set()
+def build_background_features(features, local_names, active_codes, bleed):
+    """Clip only after shared simplification; never resimplify clipped rings."""
     output = []
-    longitude_window = (center - 180, -85, center + 180, 85)
     for feature in features:
-        if feature["name"] in excluded_feature_names:
-            continue
         code = feature["code"]
         if code in active_codes:
             continue
         rings = []
         crop_segments = []
         for ring in feature["rings"]:
-            geographically_clipped = clip_ring_to_bounds(
-                ring, longitude_window, center
-            )
-            if not geographically_clipped:
-                continue
-            raw_projected = [
-                projection(*point) for point in geographically_clipped
-            ]
-            if crosses_azimuthal_antipode(raw_projected):
-                continue
-            projected = [transform(point) for point in raw_projected]
-            clipped = clip_projected_ring_to_rectangle(projected, bleed)
+            clipped = clip_projected_ring_to_rectangle(ring, bleed)
             if not clipped:
                 continue
-            simplified = simplify(clipped, REGION_SIMPLIFY_TOLERANCE)
-            rings.append(simplified)
-            crop_segments.extend(rectangle_crop_segments(simplified, bleed))
+            rings.append(clipped)
+            crop_segments.extend(rectangle_crop_segments(clipped, bleed))
         path = path_from_rings(rings)
         if not path:
             continue
@@ -863,6 +906,39 @@ def apply_world_geometry_overrides(features, overrides, local_names):
     ]
 
 
+def project_region_features(
+    active_features, background_features, active_codes, selection_bounds,
+    center, projection, transform, excluded_background_names,
+):
+    """Prepare the complete visible mesh before any polygon simplification."""
+    output = []
+    longitude_window = (center - 180, -85, center + 180, 85)
+    selected = [feature for feature in active_features if feature["code"] in active_codes]
+    selected.extend(
+        feature for feature in background_features
+        if feature["code"] not in active_codes
+        and feature["name"] not in excluded_background_names
+    )
+    for feature in selected:
+        active = feature["code"] in active_codes
+        rings = []
+        for ring in feature["rings"]:
+            if active:
+                if not ring_intersects_bounds(ring, selection_bounds, center):
+                    continue
+                geographic = unwrap_ring(ring, center)
+            else:
+                geographic = clip_ring_to_bounds(ring, longitude_window, center)
+            if not geographic:
+                continue
+            projected = [projection(*point) for point in geographic]
+            if not active and crosses_azimuthal_antipode(projected):
+                continue
+            rings.append([transform(point) for point in projected])
+        output.append({**feature, "rings": rings})
+    return output
+
+
 def build_region_views(
     active_features,
     background_features,
@@ -891,19 +967,16 @@ def build_region_views(
             .get("includeSourceNames", [])
         }
         selection_bounds = expanded_selection_bounds(bounds, center)
+        projected = project_region_features(
+            active_features, background_features, active_codes, selection_bounds,
+            center, projection, transform, excluded_background_names,
+        )
+        simplified = simplify_feature_rings(projected, REGION_SIMPLIFY_TOLERANCE)
         (
             output_features,
             feature_points,
             readable_sizes_by_code,
-        ) = build_active_features(
-            active_features,
-            local_names,
-            active_codes,
-            selection_bounds,
-            center,
-            projection,
-            transform,
-        )
+        ) = build_active_features(simplified, local_names, active_codes)
         markers, marker_points = build_active_markers(
             tiny_features,
             local_names,
@@ -923,14 +996,7 @@ def build_region_views(
             "features": output_features,
             "markers": markers,
             "backgroundFeatures": build_background_features(
-                background_features,
-                local_names,
-                active_codes,
-                center,
-                projection,
-                transform,
-                bleed,
-                excluded_background_names,
+                simplified, local_names, active_codes, bleed,
             ),
         }
         regions[region] = view
@@ -1681,22 +1747,13 @@ def main():
         capital_points = resolve_capital_points(
             populated_places, countries, manifest
         )
-        tiny_codes = {
-            feature["code"]
-            for feature in tiny50
-            if feature["code"] in country_codes
-        }
         marker_overrides = manifest.get("markerOverrides", {})
-        regional_countries50 = apply_regional_geometry_overrides(
-            countries50, manifest.get("regionalGeometryOverrides", {})
+        # A single resolution is essential: 10m tiny-country borders cannot
+        # share arcs with 50m neighbours. Keep detailed geometry for all regional
+        # countries and context; the world map continues to use 50m throughout.
+        regional_active_features = apply_regional_geometry_overrides(
+            countries10, manifest.get("regionalGeometryOverrides", {})
         )
-        regional_active_features = [
-            feature
-            for feature in regional_countries50
-            if feature["code"] not in tiny_codes
-        ] + [
-            feature for feature in countries10 if feature["code"] in tiny_codes
-        ]
         existing = (
             load_generated_map(args.base_map)
             if args.base_map
@@ -1759,7 +1816,7 @@ def main():
         else:
             quiz_regions = build_region_views(
                 regional_active_features,
-                countries50,
+                countries10,
                 tiny50,
                 local_names,
                 manifest["quizRegions"],
