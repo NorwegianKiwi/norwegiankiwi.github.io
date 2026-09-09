@@ -48,6 +48,23 @@ The implementation should maintain clear boundaries:
 Curriculum and progress logic must remain outside the browser orchestration in
 `app.js`.
 
+Capital wrapping is presentation-only: `app.js` splits capital text at ` / `
+and replaces spaces within each city name with nonbreaking spaces if the name
+has at most 10 Unicode code points, including spaces. This applies to visible
+capital text, including centre explanations. Longer names wrap naturally.
+Slash separators retain ordinary spaces. Canonical geography strings, explicit
+accessible labels, quiz identity, persistence, and transfer data are unchanged.
+The formatted text is HTML-escaped at each rendering boundary.
+
+Explore notes use the existing `note: { nb, en }` country field. Both translations
+are required; the existing Details dialog renders them. Sources for the three
+educational notes (reviewed September 2026):
+
+- Burundi: World Bank, [political capital since 2019](https://documents1.worldbank.org/curated/en/099053124080519348/pdf/P17714610b5d0f0851859a1dd1e33af47c1.pdf)
+  and [Bujumbura as the largest city](https://documents1.worldbank.org/curated/en/319821634531563444/pdf/Groundswell-Africa-Internal-Climate-Migration-in-the-Lake-Victoria-Basin-Countries.pdf).
+- Lesotho: Government of Lesotho, [national circumstances](https://www.gov.ls/wp-content/uploads/2022/03/Lesotho-Biennial-Update-Report.pdf).
+- Nepal: Government of Nepal, [Filming in Nepal guide](https://film.gov.np/media/filmgov/uploads/Filming_in_Nepal_2010_a_Guide_bOok_Chiranjibi_Guragain1.pdf).
+
 `preview.js` exposes `GEOGRAFI_PREVIEW` in the browser and the same API through
 CommonJS. `readName(params)` recognizes existing preview URL parameters;
 `prepare(params, locale, dependencies, timestamp)` returns a temporary store,
@@ -146,6 +163,7 @@ The stored root object should have a versioned schema:
       createdAt: "2026-08-22T10:00:00.000Z",
       updatedAt: "2026-08-22T10:30:00.000Z",
       lastQuizId: "pack-nordics:country-flag",
+      unfinishedQuiz: null, // Or { quizId, revision }; local continuation destination.
       savedMasteryAttempt: null,
       quizProgress: {
         "pack-nordics:country-flag": {
@@ -221,15 +239,26 @@ Given the active profile and ordered curriculum:
 
 1. Return the saved attempt's quiz if it belongs to a regional or world mastery
    level and its ID and revision match the current curriculum.
-2. Resolve `lastQuizId` against the current curriculum. Search from the following
+2. Return `unfinishedQuiz` when its ID and revision match the current curriculum,
+   even if that quiz is already mastered.
+3. Resolve `lastQuizId` against the current curriculum. Search from the following
    quiz for the first unmastered current revision, wrapping once. The previous
    quiz is eligible only after all others have been considered.
-3. If `lastQuizId` is missing or unknown, search from the first quiz.
-4. If none exists, return `all-mastered`; the primary action selects a surprise
+4. If `lastQuizId` is missing or unknown, search from the first quiz.
+5. If none exists, return `all-mastered`; the primary action selects a surprise
    mastered quiz that has not been played recently.
 
 The existing `{ type: "quiz", quiz }` / `{ type: "all-mastered" }` interface and
-storage schema remain unchanged. `lastQuizId` advances only on result recording.
+storage schema version remain unchanged. `lastQuizId` advances only on result
+recording.
+The optional profile field `unfinishedQuiz: { quizId, revision }` defaults to null
+for older profiles or invalid input. `markQuizStarted` sets it after startup
+passes the saved-attempt confirmation guard, without recording a result.
+`matchesUnfinishedQuiz` checks identity and revision. Recording a matching result
+or explicitly abandoning the matching saved mastery attempt clears the marker.
+Starting another quiz replaces it; Home and reload preserve it. Reset clears it.
+Transfers and backups exclude it, imports as new clear it, and merges preserve
+the local marker. Short-quiz answers and seeds are not persisted.
 Stale saved attempts and unknown last-quiz IDs do not delete unrelated progress.
 Levels uses this same selection for its recommendation. Completion recognition
 uses mastery totals rather than the continuation outcome.
@@ -264,7 +293,8 @@ identifies and faithfully reproduces a current curriculum quiz revision.
 ## 10. Saved mastery attempts
 
 Each profile may have at most one saved regional or world mastery attempt.
-Ordinary short quizzes are not persisted mid-attempt.
+Ordinary short quizzes persist only their unfinished destination, not answers or
+question order.
 
 A saved attempt contains only the state necessary to reproduce and continue the
 same immutable attempt, conceptually:
@@ -605,7 +635,11 @@ heavily completed profiles.
 The result section of `test.html` includes both perfect and imperfect results
 for immediate successors, skipped quizzes within/across levels, and wrapping.
 It also covers the sole remaining unmastered quiz, new and previous records,
-mastered replays, and fully mastered profiles. Stage and final celebrations
+mastered replays, and fully mastered profiles. `result-level-mastered` opens the
+earned level badge directly, with a two-digit level and the longest localized
+next-level name, for no-scroll layout checks. `puzzle-level` retains the full
+piece-to-level-result flow. `levels-ring-progress` shows the first five levels
+with 0–4 mastered quizzes. Stage and final celebrations
 remain available in their own sections. All previews are temporary and must
 leave persisted player progress unchanged.
 
@@ -716,3 +750,18 @@ Use system reduced-motion settings to check settled rewards; also exercise early
 Continue, picture zoom/scrolling, Escape and focus restoration through the existing
 Home/Levels celebration replay entries.
 The canonical checker includes puzzle mapping, geometry and progress tests.
+
+
+### Level badge progress and result animation
+
+The shared badge renderer derives four SVG arcs from the active profile's
+current-revision level progress; destination badges use their own level. No
+additional persisted state is needed. The existing result celebration flag is
+consumed when the result is first presented after its puzzle reward.
+
+Browser-side animation clones the context badge into a fixed, pointer-transparent,
+accessibility-hidden element and measures the original badge's final bounds.
+Web Animations draws the fourth arc, moves the clone, fades the result, and pops
+the separate trophy. One cleanup cancels pending frames and animations, removes
+the clone, and restores target visibility on completion or interruption. Reduced
+motion and unavailable animation APIs render the ordinary final result directly.

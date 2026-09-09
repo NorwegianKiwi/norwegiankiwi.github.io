@@ -135,19 +135,21 @@ region, mode or difficulty:
 
 1. Resume a saved regional or world mastery attempt when its quiz ID and
    revision still match the current curriculum.
-2. Otherwise, start with the quiz after the most recently completed quiz and
+2. Otherwise, restart the most recently started unfinished quiz when its ID and
+   revision still match. Short quizzes begin a fresh attempt from question one.
+3. Otherwise, start with the quiz after the most recently completed quiz and
    choose the next unmastered quiz in displayed curriculum order, wrapping to
    the beginning when necessary. Attempted but unmastered quizzes remain eligible.
-3. With no previous completed quiz, or an unknown previous quiz ID, choose the
-   first unmastered quiz. Leaving a short quiz unfinished does not advance this
-   position; short quizzes restart when abandoned.
-4. If everything is mastered and no valid saved attempt exists, show
-   **Surprise quiz** with **Choose a level** as the secondary action.
+4. With no previous completed quiz, or an unknown previous quiz ID, choose the
+   first unmastered quiz.
+5. If everything is mastered and no valid saved attempt or unfinished quiz
+   exists, show **Surprise quiz** with **Choose a level** as the secondary action.
 
 The home page has no separate saved-attempt bar or Resume button. The Continue
 card shows the destination's level and quiz mode without an answered count.
-Answered progress remains visible on Levels and inside the quiz. A saved attempt uses **Continue game** even before the
-profile has completed its first quiz. Earned completion recognition remains
+Answered progress remains visible on Levels and inside the quiz. A saved
+attempt or unfinished quiz uses **Continue game** even before the profile has
+completed its first quiz. Earned completion recognition remains
 based on mastery totals, including while replaying a saved mastery quiz.
 Players can choose any quiz from Levels at any time.
 
@@ -181,12 +183,22 @@ The existing corrective learning interaction should remain: after an incorrect
 answer, the correct option is clearly identified and the player confirms it
 before continuing. The interface should explicitly say what was correct and
 how to proceed rather than relying on colour alone.
+The correct-option pulse contracts within the option's normal size rather than
+enlarging it, keeping the animation from extending beyond the layout.
+Wrong-answer and correction outlines sit inside the answer boxes so adjacent
+options retain their normal gap.
 
 The interface must not use lives or prevent further play because of mistakes.
 
 Regional and world mastery attempts are resumable. They remain one attempt:
 previous answers cannot be changed, and resuming does not reset mistakes.
-Ordinary short quizzes restart when abandoned.
+Ordinary short quizzes restart when abandoned. The unfinished destination is
+remembered per profile immediately on quiz startup, including retries, and
+survives Home navigation and reload. Finishing clears it; starting another quiz
+replaces it after any required mastery-abandonment confirmation. Scores and
+mastery change only on completion. Reset clears the destination. It is local
+activity and is excluded from backups and transfers; merging preserves the
+local destination, while importing a new profile starts without one.
 On the Levels screen, the matching level and quiz visibly show the saved
 question position. Selecting that same quiz resumes it directly. Selecting a
 different scored quiz, including a short quiz or shared challenge, opens an
@@ -220,8 +232,9 @@ The result screen must minimise decision-making.
 After a perfect result:
 
 - A green checkmark recognises quiz mastery. When the result newly completes
-  the level, **Level mastered** and the level trophy replace that quiz-level
-  heading; the completed quiz remains checked in the level-progress controls.
+  the level, **Level mastered** and the level trophy replace the quiz heading.
+  The numbered badge stays beside the level name and mode; the score retains
+  its usual prominence and the completed quiz stays checked below.
 - Outside milestone and world-completion celebrations, the primary action
   offers the next unmastered quiz after the completed quiz, scanning forward
   and wrapping at the end. It does not redirect to a separately paused mastery
@@ -252,8 +265,24 @@ The result must state whether the quiz was mastered, show the current score and
 best score, and show all four quiz modes for the current level as direct,
 clickable navigation. Each mode shows whether it is mastered, played but not
 mastered, or unplayed; the quiz that produced the result is highlighted. A
-newly earned level mastery uses the same trophy as the level overview. Wrong-
-answer review may remain available, but must not displace the primary action.
+newly earned level mastery uses the same separate trophy as the level overview.
+Every level-number badge has a four-segment ring, filled clockwise from 12 o'clock
+according to that level's current mastered quizzes. Filled arcs use the darker
+stage accent; unfilled arcs are faint neutral tracks. A small gap separates the
+ring from the unchanged numbered disc. Accessible labels include the mastery
+count; stage badges retain their separate completion treatment.
+
+On newly completing a level, after the puzzle reward, a large centred decorative
+badge completes its fourth ring segment, then shrinks into its normal context
+slot. The trophy pops into its heading position as the result returns from softly
+faded to fully visible. This takes about 1.5 seconds, adds no layout space or
+extra action, and does not replay on return. Reduced motion shows the finished
+result immediately. Interaction, resize, navigation, rerender, or a motion
+preference change settles the animation without blocking the user's action.
+
+Perfect results fit the viewport without page or internal scrolling, clipping,
+or hidden controls. Short landscape places the summary beside the actions.
+Results with mistake review may scroll; review must not displace the primary action.
 
 When a result earns a stage milestone, its action uses **Completed**, followed
 by the stage icon and localized stage name, rather than a generic milestone
@@ -383,6 +412,14 @@ The interface uses action-oriented labels such as **Download backup file** and
 
 ## 12. Explore
 
+- Details may show a short bilingual note that helps explain a place. Keep notes
+  conservative, verifiable, and useful for learning geography; most places do
+  not need one. Burundi, Lesotho, and Nepal cover capital history, an enclosed
+  country, and an unusual flag. Notes appear only in Details.
+- Visible capital labels keep individual city names of at most 10 characters
+  (including spaces) together. Lists can wrap between cities, retaining their
+  existing order. Longer names, including Kuala Lumpur and Port of Spain, wrap
+  naturally.
 - Explore remains available independently of profiles and game progress.
 - Explore opens in the unified map-and-list workspace from the home screen.
 - Whole world is a selectable workspace with 197 countries and 30 other places,
@@ -392,6 +429,12 @@ The interface uses action-oriented labels such as **Download backup file** and
   Neither kind creates a saved list.
 - The existing regional map navigation, country selection, zoom, silhouettes,
   capital markers, notes and country list should be preserved.
+- Hovering a map country or small-place marker shows its localized name beside
+  the pointer and highlights its list row without scrolling. With no selection,
+  hover or keyboard focus previews the flag, name and capital in the Choose
+  country slot; the preview is noninteractive and clears on exit. A selected
+  country stays in the slot and retains its distinct list highlight. Pointer
+  labels hide during dragging, touch interaction, dialogs and navigation.
 - The workspace stays within the viewport and exposes region selection, the
   selected country's large flag and region-scoped Flashcards contextually.
 - Flashcards launched from Explore contain exactly the countries visible in the

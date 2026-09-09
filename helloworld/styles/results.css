@@ -564,9 +564,9 @@ body.result-page {
     }
 }
 
-/* Destination details can exceed the fixed landscape panel height. */
+/* Mistake review may extend below the viewport. */
 @media (orientation: landscape) and (max-height: 599px) {
-  .result-shell .curriculum-result-card {
+  .result-shell.has-review .curriculum-result-card {
     height: auto;
   }
 }
@@ -619,3 +619,44 @@ body.result-page {
 @media (prefers-reduced-motion: reduce) {
   .puzzle-new-piece, .is-complete.is-revealing .puzzle-seams, .puzzle-new-piece > path:last-child, .is-piece-landed .puzzle-reward-count, .is-piece-landed .puzzle-confetti i { animation: none; }
 }
+
+/* Perfect results fit the viewport without concealing content or controls. */
+.result-shell:not(.has-review) .curriculum-result-card {
+  min-height:calc(100dvh - var(--result-header-height));
+  padding-block:clamp(10px, 2dvh, 24px);
+  gap:clamp(8px, 1.8dvh, 18px);
+}
+@media (max-height:800px) {
+  .result-shell:not(.has-review) .result-level-context { margin-bottom:6px; }
+  .result-shell:not(.has-review) .curriculum-result-score { margin:8px auto; padding:.4rem .8rem; }
+  .result-shell:not(.has-review) .result-main-actions { gap:6px; }
+  .result-shell:not(.has-review) .challenge-share-actions { margin-top:3px; }
+  .result-shell:not(.has-review) .result-picture-link { margin-top:3px; }
+  .result-shell:not(.has-review) .result-level-progress { gap:5px; }
+}
+@media (orientation:landscape) and (max-height:599px) {
+  .result-shell:not(.has-review) .curriculum-result-card { height:calc(100dvh - var(--result-header-height)); padding:8px 12px; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); gap:18px; }
+  .result-shell:not(.has-review) .result-level-progress-heading { gap:6px; font-size:11px; }
+  .result-shell:not(.has-review) .result-level-progress-heading strong { font-size:11px; }
+  .result-shell:not(.has-review) .result-mode-button { padding:5px; min-height:38px; gap:4px; }
+  .result-shell:not(.has-review) .result-mode-name { font-size:11px; }
+  .result-shell:not(.has-review) .result-mode-grid { gap:4px; }
+}
+@media (orientation:portrait) and (max-height:700px) {
+  .result-shell:not(.has-review) { --result-header-height:52px; }
+  .result-shell:not(.has-review) .quiz-header { height:var(--result-header-height); min-height:var(--result-header-height); }
+  .result-shell:not(.has-review) .curriculum-result-card { padding:8px; gap:8px; }
+  .result-shell:not(.has-review) h1 { font-size:26px; }
+  .result-shell:not(.has-review) .result-level-progress-heading { gap:4px; font-size:10px; }
+  .result-shell:not(.has-review) .result-level-progress-heading strong { font-size:10px; }
+  .result-shell:not(.has-review) .result-mode-button { min-height:40px; padding:5px 7px; }
+  .result-shell:not(.has-review) .result-mode-name { font-size:11px; }
+  .result-shell:not(.has-review) .result-mode-grid { gap:5px; }
+  .result-shell:not(.has-review) .result-main-actions > button { min-height:40px; padding:8px 10px; }
+  .result-shell:not(.has-review) .result-next-level-button .level-reference-title { font-size:14px; }
+  .result-shell:not(.has-review) .result-summary-support .quiet-button { padding:6px 8px; min-height:30px; font-size:12px; }
+}
+
+/* Decorative flight never participates in layout or pointer targeting. */
+.level-celebration-badge { position:fixed; z-index:45; margin:0 !important; pointer-events:none; transform-origin:top left; font-size:calc(var(--level-badge-size) * .42); }
+.level-celebration-badge .level-ring-segment:last-child { stroke-dasharray:1; }

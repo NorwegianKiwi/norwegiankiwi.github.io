@@ -682,7 +682,7 @@
   border-color: var(--coral);
   background: var(--card);
   outline: 6px solid var(--coral);
-  outline-offset: 0;
+  outline-offset: -6px;
 }
 
 .answer-card.is-muted {
@@ -693,7 +693,7 @@
   border-color: var(--green);
   background: var(--card);
   outline: 6px solid var(--green);
-  outline-offset: 0;
+  outline-offset: -6px;
   box-shadow: none;
 }
 
@@ -764,7 +764,7 @@
 .flag-grid .answer-card.is-wrong .answer-flag {
   background: #efb7a6;
   outline: 6px solid var(--coral);
-  outline-offset: 0;
+  outline-offset: -6px;
 }
 
 .flag-grid .answer-card.is-wrong .answer-flag .flag {
@@ -772,9 +772,17 @@
   filter: saturate(0.4) contrast(0.9);
 }
 
+.flag-grid .answer-card.is-wrong .answer-flag::after {
+  border: 6px solid var(--coral);
+}
+
+.flag-grid .answer-card.is-correction .answer-flag::after {
+  border: 6px solid var(--green);
+}
+
 .flag-grid .answer-card.is-correction .answer-flag {
   outline: 6px solid var(--green);
-  outline-offset: 0;
+  outline-offset: -6px;
   animation: correction-flag-pulse 1s ease-in-out infinite;
   will-change: transform;
 }
@@ -816,11 +824,11 @@
 @keyframes correction-flag-pulse {
   0%,
   100% {
-    transform: scale(1.06);
+    transform: scale(1);
   }
 
   50% {
-    transform: scale(0.98);
+    transform: scale(0.96);
   }
 }
 

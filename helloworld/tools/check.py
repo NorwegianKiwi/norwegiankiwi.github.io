@@ -49,6 +49,10 @@ def main() -> None:
 
     run([node, "--test", *tests], "JavaScript unit tests")
     run(
+        [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"],
+        "Map generator unit tests",
+    )
+    run(
         [sys.executable, "tools/map_maintenance.py", "validate"],
         "Map, country, and generated-asset validation",
     )

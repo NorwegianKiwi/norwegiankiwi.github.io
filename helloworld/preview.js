@@ -8,14 +8,14 @@
   "use strict";
 
   const resultPreviewNames = new Set([
-    "result-next-quiz", "result-next-level", "result-failed-next", "result-failed-no-next", "share-fallback",
+    "result-level-mastered", "result-next-quiz", "result-next-level", "result-failed-next", "result-failed-no-next", "share-fallback",
     "result-failed-next-quiz", "result-skip-quiz", "result-failed-skip-quiz",
     "result-skip-level", "result-failed-skip-level", "result-wrap",
     "result-failed-wrap", "result-new-record", "result-below-best",
     "result-replay-mastered", "result-all-mastered", "result-failed-all-mastered",
   ]);
   const previewNames = new Set([
-    "puzzle-first", "puzzle-partial", "puzzle-final", "puzzle-replay", "puzzle-collection",
+    "levels-ring-progress", "puzzle-first", "puzzle-partial", "puzzle-final", "puzzle-replay", "puzzle-collection",
     "puzzle-level", "puzzle-world", "puzzle-missing-image",
     "puzzle-view-empty", "puzzle-view-partial", "puzzle-view-complete",
     ...resultPreviewNames, "milestone-result", "milestone-celebration",
@@ -122,6 +122,15 @@
       return prepared({ type: "start-quiz", quizId: quiz.id });
     }
 
+    if (initialPreview === "levels-ring-progress") {
+      resetPreviewProgress(initialPreview);
+      const levels = curriculum.levels.slice(0, 5);
+      const ids = new Set(levels.flatMap((level, index) => level.quizzes.slice(0, index).map((quiz) => quiz.id)));
+      masterPreviewQuizzes((quiz) => ids.has(quiz.id));
+      state.screen = "levels";
+      state.selectedLevelId = null;
+      return prepared();
+    }
     if (initialPreview.startsWith("puzzle-")) {
       const stage = initialPreview === "puzzle-world"
         ? curriculum.stages.at(-1)
@@ -225,7 +234,7 @@
       resetPreviewProgress(initialPreview);
       const longestLevelIndex = curriculum.levels.reduce((longestIndex, candidate, index) =>
         candidate.title[locale].length > curriculum.levels[longestIndex].title[locale].length ? index : longestIndex, 0);
-      const crossLevel = ["result-next-level", "result-failed-next", "result-skip-level", "result-failed-skip-level"].includes(initialPreview);
+      const crossLevel = ["result-level-mastered", "result-next-level", "result-failed-next", "result-skip-level", "result-failed-skip-level"].includes(initialPreview);
       const wraps = initialPreview.endsWith("wrap");
       const skipsWithinLevel = initialPreview.endsWith("skip-quiz");
       const skipsAcrossLevels = initialPreview.endsWith("skip-level");
@@ -260,7 +269,7 @@
       state.resultNewQuizMastery = !failedResult && previousState !== "mastered";
       state.resultNewLevelMastery = previousLevelMastered < 4 && progress.levelProgress(currentProfile(), level).mastered === 4;
       state.resultNewStageMastery = false;
-      state.resultCelebrationPending = false;
+      state.resultCelebrationPending = initialPreview === "result-level-mastered";
       state.screen = "result";
       return prepared();
     }

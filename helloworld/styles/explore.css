@@ -394,6 +394,27 @@ body.explore-page {
   cursor: default;
 }
 
+.explore-country-status[data-explore-preview-status] {
+  cursor: default;
+}
+
+.explore-pointer-label {
+  position: fixed;
+  width: max-content;
+  z-index: 100;
+  pointer-events: none;
+  max-width: calc(100vw - 16px);
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  box-shadow: 0 2px 8px #0002;
+}
+
 .explore-country-status span {
   min-width: 0;
   display: grid;

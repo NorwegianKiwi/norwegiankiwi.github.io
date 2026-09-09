@@ -36,6 +36,7 @@
       createdAt: timestamp,
       updatedAt: timestamp,
       lastQuizId: null,
+      unfinishedQuiz: null,
       savedMasteryAttempt: null,
       quizProgress: {},
     };
@@ -94,6 +95,27 @@
     };
   }
 
+  function normalizeUnfinishedQuiz(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value) ||
+        typeof value.quizId !== "string" || value.quizId.length > 100 ||
+        !/^[a-z0-9-]+:[a-z-]+$/.test(value.quizId) ||
+        !Number.isSafeInteger(value.revision) || value.revision < 1) return null;
+    return { quizId: value.quizId, revision: value.revision };
+  }
+
+  function markQuizStarted(store, profileId, quiz, options = {}) {
+    const profile = store.profiles[profileId];
+    const unfinishedQuiz = normalizeUnfinishedQuiz({ quizId: quiz?.id, revision: quiz?.revision });
+    return profile && unfinishedQuiz
+      ? withProfile(store, { ...profile, unfinishedQuiz, updatedAt: options.now ?? now() })
+      : store;
+  }
+
+  function matchesUnfinishedQuiz(profile, quiz) {
+    return Boolean(quiz && profile?.unfinishedQuiz && profile.unfinishedQuiz.quizId === quiz.id &&
+      profile.unfinishedQuiz.revision === quiz.revision);
+  }
+
   function normalizeProfile(value, fallbackId) {
     if (!value || typeof value !== "object") return null;
     const id = typeof value.id === "string" && /^[A-Za-z0-9._-]{3,80}$/.test(value.id) ? value.id : fallbackId;
@@ -104,6 +126,7 @@
       updatedAt: validDate(value.updatedAt) ? value.updatedAt : createdAt,
       lastQuizId: typeof value.lastQuizId === "string" && value.lastQuizId.length <= 100 ? value.lastQuizId : null,
       savedMasteryAttempt: normalizeAttempt(value.savedMasteryAttempt),
+      unfinishedQuiz: normalizeUnfinishedQuiz(value.unfinishedQuiz),
       quizProgress: normalizeQuizProgress(value.quizProgress),
     };
   }
@@ -188,6 +211,8 @@
       level.kind === "regional-mastery" || level.kind === "world-mastery",
     )).find((quiz) => matchingSavedAttempt(profile, quiz));
     if (savedQuiz) return { type: "quiz", quiz: savedQuiz };
+    const unfinished = flatQuizzes(levels).find((quiz) => matchesUnfinishedQuiz(profile, quiz));
+    if (unfinished) return { type: "quiz", quiz: unfinished };
     const quiz = nextUnmastered(profile, levels, profile?.lastQuizId);
     return quiz ? { type: "quiz", quiz } : { type: "all-mastered" };
   }
@@ -224,7 +249,7 @@
     const existingEntry = profile.quizProgress[quiz.id] ?? { revisions: {} };
     const existing = existingEntry.revisions[String(quiz.revision)];
     const record = { revision: quiz.revision, bestScore: Math.max(existing?.bestScore ?? 0, score), total, lastPlayedAt: timestamp };
-    const updated = { ...profile, updatedAt: timestamp, lastQuizId: quiz.id, quizProgress: { ...profile.quizProgress, [quiz.id]: { revisions: { ...existingEntry.revisions, [String(quiz.revision)]: record } } } };
+    const updated = { ...profile, updatedAt: timestamp, lastQuizId: quiz.id, unfinishedQuiz: matchesUnfinishedQuiz(profile, quiz) ? null : profile.unfinishedQuiz ?? null, quizProgress: { ...profile.quizProgress, [quiz.id]: { revisions: { ...existingEntry.revisions, [String(quiz.revision)]: record } } } };
     return withProfile(store, updated);
   }
   function addProfile(store, name, options = {}) {
@@ -238,7 +263,7 @@
   }
   function clearProgress(store, profileId, options = {}) {
     const profile = store.profiles[profileId];
-    return profile ? withProfile(store, { ...profile, quizProgress: {}, lastQuizId: null, savedMasteryAttempt: null, updatedAt: options.now ?? now() }) : store;
+    return profile ? withProfile(store, { ...profile, quizProgress: {}, lastQuizId: null, unfinishedQuiz: null, savedMasteryAttempt: null, updatedAt: options.now ?? now() }) : store;
   }
   function deleteProfile(store, profileId, options = {}) {
     if (!store.profiles[profileId]) return store;
@@ -253,7 +278,13 @@
   }
   function abandonMasteryAttempt(store, profileId, options = {}) {
     const profile = store.profiles[profileId];
-    return profile ? withProfile(store, { ...profile, savedMasteryAttempt: null, updatedAt: options.now ?? now() }) : store;
+    return profile ? withProfile(store, {
+      ...profile, savedMasteryAttempt: null,
+      unfinishedQuiz: matchesUnfinishedQuiz(profile, {
+        id: profile.savedMasteryAttempt?.quizId, revision: profile.savedMasteryAttempt?.revision,
+      }) ? null : profile.unfinishedQuiz ?? null,
+      updatedAt: options.now ?? now(),
+    }) : store;
   }
 
   function transferableProfile(profile) {
@@ -336,12 +367,13 @@
     if (String(imported.updatedAt ?? "") > String(existing.updatedAt ?? "")) merged.lastQuizId = imported.lastQuizId ?? merged.lastQuizId;
     merged.updatedAt = options.now ?? [existing.updatedAt, imported.updatedAt].sort().at(-1) ?? now();
     merged.savedMasteryAttempt = existing.savedMasteryAttempt ?? null;
+    merged.unfinishedQuiz = existing.unfinishedQuiz ?? null;
     return merged;
   }
   function importAsNew(store, imported, options = {}) {
     let id = imported.id;
     if (store.profiles[id]) id = generateId(options.cryptoObject);
-    const profile = { ...clone(imported), id, name: cleanName(imported.name), savedMasteryAttempt: null };
+    const profile = { ...clone(imported), id, name: cleanName(imported.name), savedMasteryAttempt: null, unfinishedQuiz: null };
     return { ...withProfile(store, profile), activeProfileId: id };
   }
   function mergeInto(store, profileId, imported) {
@@ -355,7 +387,7 @@
     if (typeof text !== "string" || text.length > MAX_STORED_BYTES) throw new Error("Invalid backup file");
     const value = JSON.parse(text);
     if (value.backupVersion !== 1 || !Array.isArray(value.profiles) || value.profiles.length > MAX_PROFILES) throw new Error("Unsupported backup file");
-    const profiles = value.profiles.map((profile) => normalizeProfile({ ...profile, savedMasteryAttempt: null }, profile?.id)).filter(Boolean);
+    const profiles = value.profiles.map((profile) => normalizeProfile({ ...profile, savedMasteryAttempt: null, unfinishedQuiz: null }, profile?.id)).filter(Boolean);
     if (!profiles.length) throw new Error("Backup contains no profiles");
     return profiles;
   }
@@ -366,7 +398,7 @@
     matchingSavedAttempt,
     levelProgress, stageProgress, summary, continueSelection, nextUnmastered,
     nextUnplayedSuccessor, surpriseQuiz,
-    recordResult, addProfile, switchProfile, renameProfile, clearProgress,
+    markQuizStarted, matchesUnfinishedQuiz, recordResult, addProfile, switchProfile, renameProfile, clearProgress,
     deleteProfile, saveMasteryAttempt, abandonMasteryAttempt, transferableProfile,
     encodeTransfer, decodeTransfer, mergeProfiles, importAsNew, mergeInto,
     createBackup, parseBackup, cleanName,

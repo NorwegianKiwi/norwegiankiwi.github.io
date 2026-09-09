@@ -205,6 +205,7 @@
   let exploreMapGesture = null;
   let exploreMapDrag = null;
   let exploreMapUiFrame = null;
+  let explorePointerLabel = null;
   let responsiveMapFrame = null;
   let scrollAffordanceFrame = null;
   let recommendedNavigationFrame = null;
@@ -260,7 +261,10 @@
   function levelBadgeMarkup(levelIndex, size = "regular") {
     if (!Number.isInteger(levelIndex) || levelIndex < 0) return "";
     const stage = stageForLevelIndex(levelIndex);
-    return `<span class="level-badge level-badge-${escapeHtml(size)} level-stage-${escapeHtml(stage?.id ?? "")}" aria-label="${escapeHtml(t("level", { number: levelIndex + 1 }))}"><span aria-hidden="true">${levelIndex + 1}</span></span>`;
+    const mastered = progress.levelProgress(currentProfile(), curriculum.levels[levelIndex]).mastered;
+    const label = `${t("level", { number: levelIndex + 1 })} · ${t("quizzesMastered", { count: mastered })}`;
+    const ring = Array.from({ length: 4 }, (_, index) => `<path class="level-ring-segment${index < mastered ? " is-filled" : ""}" d="M 59.63 4.13 A 52 52 0 0 1 107.87 52.37" transform="rotate(${index * 90} 56 56)" pathLength="1"/>`).join("");
+    return `<span role="img" class="level-badge level-badge-${escapeHtml(size)} level-stage-${escapeHtml(stage?.id ?? "")}" data-mastered="${mastered}" aria-label="${escapeHtml(label)}"><svg class="level-progress-ring" viewBox="0 0 112 112" aria-hidden="true">${ring}</svg><span aria-hidden="true">${levelIndex + 1}</span></span>`;
   }
   function levelReferenceMarkup(level, { size = "compact", showTitle = true, className = "" } = {}) {
     const levelIndex = levelIndexForLevel(level);
@@ -283,6 +287,13 @@
 
   function countryCapital(country) {
     return country.capital[state.locale];
+  }
+
+  // Keep short city names together; canonical labels stay unchanged.
+  function capitalDisplayText(capital) {
+    return capital.split(" / ").map((name) =>
+      Array.from(name).length <= 10 ? name.replaceAll(" ", "\u00a0") : name,
+    ).join(" / ");
   }
 
   function countryNote(country) {
@@ -1636,7 +1647,7 @@
     const quiz = next.type === "quiz" ? curriculum.quizById.get(next.quiz.id) : null;
     const savedAttempt = progress.matchingSavedAttempt(profile, quiz);
     const showSurprise = next.type === "all-mastered";
-    const hasPlayed = totals.playedQuizzes > 0 || Boolean(savedAttempt);
+    const hasPlayed = totals.playedQuizzes > 0 || Boolean(savedAttempt) || progress.matchesUnfinishedQuiz(profile, quiz);
     const continueIcon = showSurprise
       ? "✦"
       : hasPlayed && quiz
@@ -1761,7 +1772,7 @@
                   ${flagMarkup(country, "review-flag", true)}
                   <div>
                     <strong>${escapeHtml(countryName(country))}</strong>
-                    <span>${escapeHtml(countryCapital(country))}</span>
+                    <span>${escapeHtml(capitalDisplayText(countryCapital(country)))}</span>
                   </div>
                   <span class="review-row-action" aria-hidden="true">↗</span>
                 </button>
@@ -1915,23 +1926,24 @@
       `;
     }
 
+    const isSelected = countryCode === state.explorePinnedCode;
     return `
-      <button
-        type="button"
-        class="explore-country-status"
+      <${isSelected ? "button" : "div"}
+        ${isSelected ? `type="button"
         data-action="open-country-details"
-        data-code="${country.code}"
         aria-label="${escapeHtml(t("showCountryDetails", {
           name: countryName(country),
-        }))}"
+        }))}"` : 'data-explore-preview-status'}
+        class="explore-country-status"
+        data-code="${country.code}"
       >
         ${flagMarkup(country, "explore-status-flag", false, true)}
         <span>
           <strong>${escapeHtml(countryName(country))}</strong>
-          <small>${escapeHtml(countryCapital(country))}</small>
+          <small>${escapeHtml(capitalDisplayText(countryCapital(country)))}</small>
         </span>
-        <span class="explore-country-status-action" aria-hidden="true">↗</span>
-      </button>
+        ${isSelected ? '<span class="explore-country-status-action" aria-hidden="true">↗</span>' : ""}
+      </${isSelected ? "button" : "div"}>
     `;
   }
 
@@ -1958,10 +1970,10 @@
             }))}</span>
             <span aria-hidden="true">${escapeHtml(countryName(country))}</span>
           </h2>
-          <p class="country-details-capital">${escapeHtml(countryCapital(country))}</p>
+          <p class="country-details-capital">${escapeHtml(capitalDisplayText(countryCapital(country)))}</p>
           ${country.category === "other-place" ? `<div class="place-metadata">${relationshipChipMarkup(country)}${country.flagStatus === "established-local" ? `<p class="place-flag-status">${escapeHtml(t("establishedLocalFlag"))}</p>` : ""}</div>` : ""}
           ${showCentreExplanation ? `<dl class="place-centres place-centres-explanation">
-            ${country.centres.map((centre) => `<div class="place-centre place-centre-${centre.kind}"><dt>${escapeHtml(centreRole(centre))}</dt><dd>${escapeHtml(centre.name[state.locale])}</dd></div>`).join("")}
+            ${country.centres.map((centre) => `<div class="place-centre place-centre-${centre.kind}"><dt>${escapeHtml(centreRole(centre))}</dt><dd>${escapeHtml(capitalDisplayText(centre.name[state.locale]))}</dd></div>`).join("")}
           </dl>` : ""}
           ${note ? `<p class="country-note">${escapeHtml(note)}</p>` : ""}
         </div>
@@ -2517,6 +2529,8 @@
     }
 
     if (!drag.dragging) {
+      hideExplorePointerLabel();
+      setExplorePreview(null);
       drag.dragging = true;
       drag.map.classList.add("is-dragging");
       try {
@@ -2602,7 +2616,7 @@
             ${flagMarkup(country, "explore-country-flag", false, true)}
             <span>
               <strong>${escapeHtml(countryName(country))}</strong>
-              <small>${escapeHtml(countryCapital(country))}</small>
+              <small>${escapeHtml(capitalDisplayText(countryCapital(country)))}</small>
             </span>
           </button>
         `).join("")}
@@ -2650,7 +2664,7 @@
       <div class="explore-map-layout">
         <div class="explore-map-column">
           <div class="explore-country-status-wrap" aria-live="polite">
-            ${exploreCountryStatusMarkup(state.explorePinnedCode)}
+            ${exploreCountryStatusMarkup(state.explorePinnedCode ?? state.explorePreviewCode)}
           </div>
           <div class="explore-map-stage">
             <div class="explore-region-map${extent === "world" ? " is-world-extent" : ""}${zoom > 1.001 ? " is-zoomed" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}"${worldAspectStyle}>
@@ -2914,7 +2928,7 @@
           ${flagMarkup(country, "flashcard-flag", state.flashcardRevealed, true)}
           <span class="flashcard-answer">
             ${state.flashcardRevealed
-              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(countryCapital(country))}</span>${relationshipLabel ? `<span class="flashcard-relationship">(${escapeHtml(relationshipLabel)})</span>` : ""}`
+              ? `<strong>${escapeHtml(countryName(country))}</strong><span>${escapeHtml(capitalDisplayText(countryCapital(country)))}</span>${relationshipLabel ? `<span class="flashcard-relationship">(${escapeHtml(relationshipLabel)})</span>` : ""}`
               : `<strong class="flashcard-question" aria-hidden="true">?</strong>`}
           </span>
         </button>
@@ -3016,7 +3030,7 @@
                   <strong>${escapeHtml(label)}</strong>
                 </span>
               `
-              : `<strong>${escapeHtml(label)}</strong>`
+              : `<strong>${escapeHtml(state.mode === "country-capital" ? capitalDisplayText(label) : label)}</strong>`
         }
         <span class="keyboard-hint-index" aria-hidden="true">${index + 1}</span>
       </button>
@@ -3181,7 +3195,81 @@
     recommendedNavigationFrame = requestAnimationFrame(updateRecommendedNavigation);
   }
 
+  let settleLevelCelebration = null;
+
+  function finishLevelCelebration() {
+    settleLevelCelebration?.();
+  }
+
+  function startLevelCelebration() {
+    const card = app.querySelector(".curriculum-result-card");
+    const target = card?.querySelector(".result-level-context .level-badge");
+    const trophy = card?.querySelector(".result-level-trophy");
+    if (!target || !trophy || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !target.animate) return;
+    trophy.classList.remove("is-celebrating");
+    const copy = target.cloneNode(true);
+    copy.classList.add("level-celebration-badge");
+    copy.setAttribute("aria-hidden", "true");
+    copy.removeAttribute("role");
+    copy.removeAttribute("aria-label");
+    const animations = [];
+    let frame;
+    const settle = () => {
+      cancelAnimationFrame(frame);
+      animations.forEach((animation) => animation.cancel());
+      copy.remove();
+      card.classList.remove("is-level-celebrating");
+      target.style.removeProperty("opacity");
+      trophy.style.removeProperty("visibility");
+      if (settleLevelCelebration === settle) settleLevelCelebration = null;
+    };
+    settleLevelCelebration = settle;
+    frame = requestAnimationFrame(() => {
+      if (!target.isConnected) { settle(); return; }
+      const bounds = target.getBoundingClientRect();
+      const scale = Math.min(180, window.innerHeight * .32, window.innerWidth * .45) / (bounds.width + 10);
+      const size = bounds.width * scale;
+      const left = (window.innerWidth - size) / 2;
+      const top = (window.innerHeight - size) / 2;
+      copy.style.cssText = `--level-badge-size:${bounds.width}px;left:${left}px;top:${top}px;font-size:${getComputedStyle(target).fontSize}`;
+      document.body.append(copy);
+      target.style.opacity = "0";
+      trophy.style.visibility = "hidden";
+      card.classList.add("is-level-celebrating");
+      const fourth = copy.querySelector(".level-ring-segment:last-child");
+      const track = fourth.cloneNode(true);
+      track.setAttribute("class", "level-ring-segment");
+      fourth.before(track);
+      animations.push(fourth.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration:500, delay:100, fill:"both", easing:"ease-in-out" }));
+      const travel = copy.animate([
+        { transform:`translate(0, 0) scale(${scale})`, offset:0 },
+        { transform:`translate(0, 0) scale(${scale})`, offset:.5 },
+        { transform:`translate(${bounds.left - left}px, ${bounds.top - top}px) scale(1)`, offset:1 },
+      ], { duration:1200, fill:"forwards", easing:"ease-in-out" });
+      animations.push(travel);
+      animations.push(card.animate([{ opacity:.25 }, { opacity:.25, offset:.5 }, { opacity:1 }], { duration:1200, fill:"forwards" }));
+      travel.finished.then(() => {
+        if (settleLevelCelebration !== settle) return;
+        copy.remove();
+        target.style.removeProperty("opacity");
+        trophy.style.removeProperty("visibility");
+        const pop = trophy.animate([{ transform:"scale(.6)", opacity:0 }, { transform:"scale(1.12)", opacity:1, offset:.65 }, { transform:"scale(1)", opacity:1 }], { duration:300, easing:"ease-out" });
+        animations.push(pop);
+        pop.finished.then(settle, () => {});
+      }, () => {});
+    });
+  }
+
+  window.addEventListener("pointerdown", finishLevelCelebration, true);
+  window.addEventListener("keydown", finishLevelCelebration, true);
+  window.addEventListener("resize", finishLevelCelebration);
+  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", finishLevelCelebration);
+
   function render(options = {}) {
+    finishLevelCelebration();
+    const animateLevel = state.screen === "result" && !state.puzzleRewardOpen && state.resultNewLevelMastery && state.resultCelebrationPending;
+    hideExplorePointerLabel();
+    state.explorePreviewCode = null;
     const exploreListScrollTop = options.preserveExploreListScroll
       ? app.querySelector(".explore-country-list")?.scrollTop ?? null
       : null;
@@ -3353,6 +3441,7 @@
         )
         ?.focus({ preventScroll: true });
     }
+    if (animateLevel) startLevelCelebration();
     if (Number.isFinite(options.restoreWindowScrollY)) {
       window.scrollTo({ top: options.restoreWindowScrollY, behavior: "auto" });
     }
@@ -3603,9 +3692,14 @@
     });
 
     const status = app.querySelector(".explore-country-status-wrap");
-    if (status) {
+    const statusCode = state.explorePinnedCode ?? state.explorePreviewCode;
+    const statusSelected = Boolean(state.explorePinnedCode);
+    if (status && (
+      (status.firstElementChild?.dataset.code ?? null) !== statusCode ||
+      (status.firstElementChild?.tagName === "BUTTON") !== statusSelected
+    )) {
       status.innerHTML = exploreCountryStatusMarkup(
-        state.explorePinnedCode,
+        statusCode,
       );
     }
 
@@ -3623,7 +3717,8 @@
   function setExplorePreview(code) {
     if (
       state.screen !== "explore" ||
-      state.exploreRegionPickerOpen
+      state.exploreRegionPickerOpen ||
+      (code && (state.countryDetailsCode || exploreMapDrag?.dragging || exploreMapGesture))
     ) {
       return;
     }
@@ -3633,6 +3728,38 @@
     state.explorePreviewCode = previewCode;
     if (!state.explorePinnedCode) state.silhouetteExpanded = false;
     syncExploreCountryUi();
+  }
+
+  function hideExplorePointerLabel() {
+    explorePointerLabel?.remove();
+    explorePointerLabel = null;
+  }
+
+  function updateExplorePointerLabel(event) {
+    const control = event.target.closest?.(
+      ".explore-map-country, .explore-map-marker-control",
+    );
+    const country = countriesByCode.get(control?.dataset.exploreCode);
+    if (!country || !app.contains(control) || event.pointerType === "touch" ||
+        state.screen !== "explore" || state.exploreRegionPickerOpen ||
+        state.countryDetailsCode || exploreMapDrag?.dragging || exploreMapGesture) {
+      hideExplorePointerLabel();
+      return;
+    }
+    if (!explorePointerLabel) {
+      explorePointerLabel = document.createElement("div");
+      explorePointerLabel.className = "explore-pointer-label";
+      explorePointerLabel.setAttribute("aria-hidden", "true");
+      document.body.append(explorePointerLabel);
+    }
+    explorePointerLabel.textContent = countryName(country);
+    const bounds = explorePointerLabel.getBoundingClientRect();
+    const left = event.clientX + 14 + bounds.width <= window.innerWidth - 8
+      ? event.clientX + 14 : event.clientX - bounds.width - 14;
+    const top = event.clientY + 18 + bounds.height <= window.innerHeight - 8
+      ? event.clientY + 18 : event.clientY - bounds.height - 18;
+    explorePointerLabel.style.left = `${Math.max(8, left)}px`;
+    explorePointerLabel.style.top = `${Math.max(8, top)}px`;
   }
 
   function clearExploreCountrySelection() {
@@ -3863,6 +3990,7 @@
     state.resultPreviousBestScore = null; state.resultNewQuizMastery = false; state.resultNewLevelMastery = false; state.resultNewStageMastery = false;
     state.resultCelebrationPending = false; state.puzzleRewardPending = false; state.puzzleRewardOpen = false;
     state.screen = "quiz";
+    persist(progress.markQuizStarted(progressStore, progressStore.activeProfileId, quiz));
     if (savedAttempt && savedAttempt.questionIndex >= state.questions.length && !savedAttempt.correctionPending) {
       state.questionIndex = state.questions.length - 1; state.resultRecorded = false; finishCurriculumAttempt(); state.screen = "result";
     }
@@ -4616,6 +4744,8 @@
   }
 
   app.addEventListener("pointerdown", (event) => {
+    hideExplorePointerLabel();
+    if (event.pointerType === "touch") setExplorePreview(null);
     const viewport = event.target.closest(".puzzle-viewport");
     if (!viewport || (event.pointerType !== "touch" && event.button !== 0)) return;
     if (puzzlePointers.size >= 2) return;
@@ -4634,6 +4764,7 @@
   });
 
   window.addEventListener("pointermove", (event) => {
+    updateExplorePointerLabel(event);
     const point = puzzlePointers.get(event.pointerId);
     const gesture = puzzleGesture;
     if (!point || !gesture) return;
@@ -5257,6 +5388,10 @@
   });
 
   function finishExploreMapPointer(event) {
+    if (event.type === "pointercancel") {
+      hideExplorePointerLabel();
+      setExplorePreview(null);
+    }
     if (exploreMapDrag?.pointerId === event.pointerId) {
       if (exploreMapDrag.dragging) {
         suppressExploreMapClickUntil = Date.now() + 500;
@@ -5280,7 +5415,10 @@
 
   window.addEventListener("pointerup", finishExploreMapPointer);
   window.addEventListener("pointercancel", finishExploreMapPointer);
+  window.addEventListener("blur", hideExplorePointerLabel);
+  window.addEventListener("scroll", hideExplorePointerLabel, true);
   window.addEventListener("resize", () => {
+    hideExplorePointerLabel();
     scheduleScrollAffordanceUpdate();
     scheduleRecommendedNavigationUpdate();
     scheduleResponsiveRegionMaps();
@@ -5304,6 +5442,7 @@
   );
 
   app.addEventListener("pointerover", (event) => {
+    updateExplorePointerLabel(event);
     const countryControl = event.target.closest("[data-explore-code]");
     if (
       countryControl &&
@@ -5334,6 +5473,7 @@
       app.contains(countryControl) &&
       !countryControl.contains(event.relatedTarget)
     ) {
+      hideExplorePointerLabel();
       if (event.pointerType !== "touch") {
         setExplorePreview(null);
       }

@@ -16,9 +16,9 @@ test("manual preview menu scenarios", () => {
 
   const groups = menu.scenarioGroups();
   const items = groups.flatMap((group) => group.items);
-  assert.equal(items.length, 68, "the test page should expose all curated scenarios");
+  assert.equal(items.length, 70, "the test page should expose all curated scenarios");
 
-  assert.equal(groups.find((group) => group.id === "basic").items.length, 17);
+  assert.equal(groups.find((group) => group.id === "basic").items.length, 19);
 
   assert.equal(new Set(items.map((item) => menu.buildHref(item.params))).size, items.length, "no duplicate preview links");
   assert.ok(!items.some((item) => item.params.preview === "puzzle-collection"), "obsolete collection entry is replaced by stage viewers");

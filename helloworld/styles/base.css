@@ -66,6 +66,9 @@ img {
 
 .level-badge {
   --level-badge-size: 2.3rem;
+  letter-spacing:normal;
+  position: relative;
+  margin: 4px;
   width: var(--level-badge-size);
   height: var(--level-badge-size);
   flex: 0 0 var(--level-badge-size);
@@ -875,3 +878,7 @@ footer a {
       transition-duration: 0.01ms !important;
     }
 }
+
+.level-progress-ring { position:absolute; width:calc(100% + 10px); height:calc(100% + 10px); inset:-5px; overflow:visible; pointer-events:none; fill:none; }
+.level-ring-segment { stroke:#b8b4a866; stroke-width:2.5; stroke-linecap:round; }
+.level-ring-segment.is-filled { stroke:var(--stage-accent, var(--green)); }
