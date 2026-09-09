@@ -143,9 +143,11 @@ unavailable.
 ## Privacy and traffic measurement
 
 Game profiles and progress remain in the browser under `hello-world-progress`.
-They are not sent to the site operator unless a player deliberately shares a
-challenge or invitation, copies a progress-transfer link, or downloads and
-later imports a backup.
+Sharing and backups are user-initiated and do not automatically send profiles
+or progress to the operator. Invitations contain the game URL and optional
+language; challenge query parameters reach the providers when opened. Progress
+transfers use URL fragments, which are not sent in HTTP requests. Backups are
+downloaded and imported locally; recipients of a transfer can import its copy.
 
 The production site remains a GitHub Pages deployment at
 `https://lanceolav.com/helloworld/`, with Cloudflare acting as its reverse proxy.
@@ -155,15 +157,18 @@ Browser Insights/RUM, Zaraz, or any equivalent browser-side analytics. The app
 must not load `beacon.min.js`, set analytics cookies, fingerprint browsers, or
 send in-game events.
 
-For an approximate game-load count, filter Security Analytics to host
-`lanceolav.com`, path `/helloworld/`, method `GET`, successful HTML document
-responses, and available bot exclusions. Describe the result as “game loads”,
-not unique people. On the free plan this view has seven days of retained data
-and accepts a maximum 24-hour query window, so longer comparisons must be made
-from daily aggregate figures. Zone Analytics provides contextual whole-domain
-requests, bandwidth, visitor estimates, and countries.
+HTTP Traffic offers whole-domain rolling views for the previous 24 hours,
+7 days and 30 days: requests, cached/uncached requests, bandwidth, countries and
+“Unique Visitors” estimates. These include assets, crawlers and threats and
+support broad, approximate site-usage trends, not reliable counts of game loads
+or individual people. Security Analytics uses adaptively sampled request logs;
+the available Free dashboard has no suitable path filter for an accurate
+`/helloworld/` counter. Its [seven-day retention and maximum 24-hour query window](https://developers.cloudflare.com/waf/analytics/security-analytics/)
+are separate from HTTP Traffic reporting periods.
 
-Cloudflare DNS must preserve the GitHub Pages A and AAAA origin records as
-proxied web records. One.com MX, SPF, DKIM, DMARC, verification, and other mail
-records remain DNS-only. GitHub Pages HTTPS stays enabled, Cloudflare TLS uses
-Full (strict), and default caching is the initial policy.
+The Cloudflare Free zone is active with proxied GitHub Pages A/AAAA records and
+`www` pointing to `norwegiankiwi.github.io`. Full (strict) TLS, Universal SSL and
+DNSSEC are active. One.com MX, SPF and four DKIM records remain DNS-only; email
+and `privacy@lanceolav.com` forwarding were tested during migration. Default
+caching is in use, with no Workers routes, Page Rules or custom Cache Rules.
+RUM is disabled; Zaraz, Consent Management and Google Tag Gateway are inactive.

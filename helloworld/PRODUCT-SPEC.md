@@ -98,9 +98,16 @@ requiring the player to scroll through a map or region list.
 
 The footer contains the copyright notice and one localized **Licences and
 privacy** link. Its dedicated static page explains asset licences, local
-progress, deliberate sharing, hosting, and aggregate request measurement in
+progress, deliberate sharing, hosting, and broad, approximate traffic trends in
 both Norwegian and English. Norwegian is the default, `?lang=en` selects
 English, and both versions remain readable without JavaScript.
+
+GitHub Pages remains the host and deployment system; Cloudflare provides the
+DNS/CDN/reverse proxy with Full (strict) TLS, active Universal SSL and DNSSEC,
+preserved DNS-only mail records and default caching. Browser instrumentation
+remains disabled. HTTP Traffic shows whole-domain trends, including assets,
+crawlers and threats; “Unique Visitors” is an estimate, not a reliable count of
+people. Sampled Security Analytics requests cannot reliably count game loads.
 
 ## 5. Level overview
 

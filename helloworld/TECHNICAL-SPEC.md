@@ -429,15 +429,17 @@ checkbox-selection workflow while supporting both needs.
 - Ordinary delivery still exposes request metadata such as IP address, user
   agent, requested URL and time to the GitHub Pages origin and Cloudflare
   reverse proxy. The operator uses only Cloudflare's aggregate edge dashboards
-  to estimate game document loads for service operation and improvement.
+  to understand broad, approximate whole-domain traffic trends for operation
+  and maintenance; assets, crawlers and threats are included.
 - The app contains no analytics beacon, analytics cookie, browser fingerprint,
-  individual activity profile or in-game event reporting. An edge request
-  estimate is not a reliable unique-person count.
+  individual activity profile or in-game event reporting. Dashboard estimates
+  cannot reliably count game loads or individual people.
 - The dedicated `licenses-and-privacy.html` page identifies the operator,
   contact address, legitimate-interest purpose, retention limits, processors,
   international-transfer safeguards and data-subject rights. It contains both
   locales in its static HTML; `legal-page.js` only selects the preferred
-  presentation language.
+  presentation language and normalizes home links to `./` over HTTP(S) or
+  `./index.html` for direct-file use; static fallback links use `index.html`.
 
 ## 15. URL state and routing
 
@@ -566,19 +568,29 @@ zero-size fallback.
 
 - GitHub Pages remains the origin and deployment system for
   `https://lanceolav.com/helloworld/`; Cloudflare proxies the apex domain.
-- Cloudflare's GitHub Pages A and AAAA records are proxied. One.com mail and
-  verification records are copied exactly and kept DNS-only before any
-  nameserver change.
-- GitHub Pages HTTPS remains enabled and Cloudflare uses Full (strict) TLS with
-  its default cache behaviour initially.
-- Cloudflare Web Analytics, automatic beacon injection, Browser Insights/RUM,
-  Zaraz and equivalent client instrumentation remain disabled.
-- Zone Analytics may be used for whole-domain context. The game-load estimate
-  uses successful `GET` HTML document requests for host `lanceolav.com` and path
-  `/helloworld/`, with available bot exclusions. It is labelled approximate
-  “game loads”, never unique people.
-- Operational reporting accounts for the free Security Analytics seven-day
-  retention and 24-hour maximum query window.
+- The Cloudflare Free zone is active. Nameservers are `aliza.ns.cloudflare.com`
+  and `brian.ns.cloudflare.com`; preserved GitHub Pages A/AAAA records are proxied,
+  and `www` points to `norwegiankiwi.github.io`.
+- One.com MX, SPF and four DKIM records remain DNS-only. Email and forwarding
+  for `privacy@lanceolav.com` were tested successfully during migration.
+- GitHub Pages remains the HTTPS origin. Cloudflare uses Full (strict) TLS;
+  Universal SSL and DNSSEC using Cloudflare's DS record are active.
+- Default caching is in use. No Workers routes, Page Rules or custom Cache
+  Rules are configured.
+- Cloudflare Web Analytics and automatic beacon injection are prohibited.
+  Browser Insights/RUM is disabled; Zaraz, Consent Management and Google Tag
+  Gateway are inactive. No browser tracking or in-game event reporting is used.
+- HTTP Traffic provides whole-domain rolling periods for the previous 24 hours,
+  7 days and 30 days: requests, cached/uncached requests, bandwidth, countries
+  and “Unique Visitors” estimates. Assets, crawlers and threats are included.
+  These support broad, approximate site-usage trends, not reliable counts of
+  `/helloworld/` game loads or individual people.
+- Security Analytics can show that `GET /helloworld/` requests occur, but uses
+  adaptively sampled request logs. The available Free dashboard lacks a suitable
+  path filter for an accurate game-load counter. Do not reconstruct one from
+  daily samples. Its [up-to-seven-day retention and maximum 24-hour query window](https://developers.cloudflare.com/waf/analytics/security-analytics/)
+  are distinct from HTTP Traffic periods and do not define all provider log
+  retention. Provider policies and agreements govern other operational records.
 
 ## 19. Tests and validation
 
