@@ -24,7 +24,7 @@ This file is the authoritative guide for maintaining and refactoring Hello World
 
 - Prefer plain JavaScript, explicit data flow, small pure functions, early returns, and names that describe domain intent.
 - Share logic when the rule is stable and genuinely common. A little local duplication is preferable to an abstraction that couples unrelated screens or hides simple behavior.
-- Keep browser-only effects at the application boundary. Pure calculations and validation belong in domain modules and should have Node tests.
+- Keep browser-only effects at the application boundary. Pure calculations and validation belong in domain modules; use Node tests where they provide meaningful regression protection, following the verification guidance below.
 - Escape dynamic HTML, validate external or persisted input before normalization, and fail safely when storage or optional browser APIs are unavailable.
 - Keep selectors feature-scoped. Before deleting a selector, check template strings and dynamically constructed classes as well as literal HTML.
 - Preserve responsive cascade intent and verify layout after moving rules; a brace-balanced stylesheet is not sufficient evidence.
@@ -32,13 +32,25 @@ This file is the authoritative guide for maintaining and refactoring Hello World
 
 ## Verification
 
-Run the canonical automated checks from the repository root:
+Match verification to the behavior and risk of the change, not just the file type. Use the smallest set of checks that provides meaningful confidence:
+
+- For documentation, comments, and ordinary wording changes, review the diff and relevant translations and run `git diff --check`. No automated suite or browser run is required unless the edit also changes behavior or could materially affect layout.
+- For small visual changes or text likely to affect wrapping, also inspect the affected screen at relevant viewport sizes and in both locales when localized content is affected.
+- For JavaScript logic or behavior changes, run the relevant automated tests and check affected browser interactions. Pure domain changes do not require browser checks unless they affect browser behavior.
+- For changes to shared logic, storage or transfer formats, curriculum, maps, dependencies, or testing tools, run the full canonical checks below and any applicable browser or data checks. Comments or ordinary wording in these files still follow the lighter rules above.
+- For broad layout, navigation, or accessibility changes, run the full browser matrix below in addition to relevant automated checks.
+
+Run the full canonical automated checks from the repository root when required above:
 
 ```sh
 python3 tools/check.py
 ```
 
-For rendering or interaction changes, also test `index.html` and `test.html` directly and through a local static server. Cover representative desktop, tablet, portrait-phone, and short-landscape viewports; both locales; keyboard navigation; reduced motion; and affected dialogs or result states. There must be no unexpected console errors or horizontal overflow.
+The full browser matrix covers `index.html` and `test.html` directly and through a local static server, at representative desktop, tablet, portrait-phone, and short-landscape viewports; both locales; keyboard navigation; reduced motion; and affected dialogs or result states. Include any other page affected by the change. For narrower browser checks, select the screens, access methods, and interactions relevant to the change. In all checked states, there must be no unexpected console errors or horizontal overflow.
+
+Add or extend tests when they protect meaningful behavior, reproduce a bug, or cover a credible failure mode. Prefer observable outcomes and important contracts over implementation details. Do not add low-value tests merely to accompany every edit: avoid tests for ordinary prose, assertions that only check source-code spelling or structure, tests that repeat the implementation's logic, and redundant cases already covered without adding a distinct risk. Exact strings or source checks are appropriate when the string or structure itself is a required contract, such as a stable storage key or a prohibited tracking endpoint. Do not introduce a new test framework or elaborate harness for a trivial change.
+
+Do not repeat successful checks unless subsequent changes, failures, or unresolved concerns affect what they verify. Briefly report the checks performed and any material limitations; choosing the lighter verification path above does not require separate approval.
 
 Regenerate intentional artifacts only with their documented tools:
 
