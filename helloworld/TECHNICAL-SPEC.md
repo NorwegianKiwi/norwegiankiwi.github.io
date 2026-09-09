@@ -426,6 +426,20 @@ checkbox-selection workflow while supporting both needs.
 - Import data is untrusted input and must be validated just like network data.
 - No secret key is embedded in client code to pretend that static data is
   authenticated.
+- Ordinary delivery still exposes request metadata such as IP address, user
+  agent, requested URL and time to the GitHub Pages origin and Cloudflare
+  reverse proxy. The operator uses only Cloudflare's aggregate edge dashboards
+  to understand broad, approximate whole-domain traffic trends for operation
+  and maintenance; assets, crawlers and threats are included.
+- The app contains no analytics beacon, analytics cookie, browser fingerprint,
+  individual activity profile or in-game event reporting. Dashboard estimates
+  cannot reliably count game loads or individual people.
+- The dedicated `licenses-and-privacy.html` page identifies the operator,
+  contact address, legitimate-interest purpose, retention limits, processors,
+  international-transfer safeguards and data-subject rights. It contains both
+  locales in its static HTML; `legal-page.js` only selects the preferred
+  presentation language and normalizes home links to `./` over HTTP(S) or
+  `./index.html` for direct-file use; static fallback links use `index.html`.
 
 ## 15. URL state and routing
 
@@ -449,6 +463,10 @@ checkbox-selection workflow while supporting both needs.
   requires the current origin and normalised app path, and classifies a current
   challenge, `#progress` transfer or ordinary Home invitation. Challenge query
   fields retain precedence if a link also contains a transfer fragment.
+
+The legal page is outside application routing. Norwegian is its default and
+`licenses-and-privacy.html?lang=en` selects English. This does not change the
+canonical game URL, route parameters, progress-transfer fragments or PWA scope.
 
 ## 16. Sharing and friend challenges
 
@@ -546,7 +564,35 @@ without changing smaller-country framing. It retains an 8× zoom ceiling and
 clamps to the generated regional bleed extent; marker coordinates are the
 zero-size fallback.
 
-## 18. Tests and validation
+## 18. Deployment and edge measurement
+
+- GitHub Pages remains the origin and deployment system for
+  `https://lanceolav.com/helloworld/`; Cloudflare proxies the apex domain.
+- The Cloudflare Free zone is active. Nameservers are `aliza.ns.cloudflare.com`
+  and `brian.ns.cloudflare.com`; preserved GitHub Pages A/AAAA records are proxied,
+  and `www` points to `norwegiankiwi.github.io`.
+- One.com MX, SPF and four DKIM records remain DNS-only. Email and forwarding
+  for `privacy@lanceolav.com` were tested successfully during migration.
+- GitHub Pages remains the HTTPS origin. Cloudflare uses Full (strict) TLS;
+  Universal SSL and DNSSEC using Cloudflare's DS record are active.
+- Default caching is in use. No Workers routes, Page Rules or custom Cache
+  Rules are configured.
+- Cloudflare Web Analytics and automatic beacon injection are prohibited.
+  Browser Insights/RUM is disabled; Zaraz, Consent Management and Google Tag
+  Gateway are inactive. No browser tracking or in-game event reporting is used.
+- HTTP Traffic provides whole-domain rolling periods for the previous 24 hours,
+  7 days and 30 days: requests, cached/uncached requests, bandwidth, countries
+  and “Unique Visitors” estimates. Assets, crawlers and threats are included.
+  These support broad, approximate site-usage trends, not reliable counts of
+  `/helloworld/` game loads or individual people.
+- Security Analytics can show that `GET /helloworld/` requests occur, but uses
+  adaptively sampled request logs. The available Free dashboard lacks a suitable
+  path filter for an accurate game-load counter. Do not reconstruct one from
+  daily samples. Its [up-to-seven-day retention and maximum 24-hour query window](https://developers.cloudflare.com/waf/analytics/security-analytics/)
+  are distinct from HTTP Traffic periods and do not define all provider log
+  retention. Provider policies and agreements govern other operational records.
+
+## 19. Tests and validation
 
 At minimum, add automated coverage for:
 
@@ -609,7 +655,7 @@ with 0–4 mastered quizzes. Stage and final celebrations
 remain available in their own sections. All previews are temporary and must
 leave persisted player progress unchanged.
 
-## 19. Acceptance criteria
+## 20. Acceptance criteria
 
 The progression system must continue to satisfy these criteria:
 

@@ -69,9 +69,10 @@ in [AGENTS.md](AGENTS.md).
 
 ## Project structure
 
-- `index.html`, `manifest.webmanifest`, and `icons/` — document shell and
-  installable-app metadata
+- `index.html`, `licenses-and-privacy.html`, `manifest.webmanifest`, and
+  `icons/` — document shells, legal information, and installable-app metadata
 - `app.js` — browser state, rendering orchestration, lifecycle, and events
+- `legal-page.js` — progressive language selection for the legal page
 - `localization.js` — bilingual interface catalogs and interpolation
 - `countries.js` — localized place, relationship, civic-centre, and region data
 - `curriculum.js` — ordered levels, stable quizzes, and deterministic attempts
@@ -133,3 +134,41 @@ projection settings, and editorial overrides are stored in
 
 The globe graphic is Twemoji’s Globe showing Europe–Africa, used unchanged under
 CC BY 4.0. Local licence copies are stored in `licenses/`.
+
+The home footer links to `licenses-and-privacy.html`, which explains these
+sources and the site's privacy practices in Norwegian and English. Both
+languages are present in the document and remain readable when JavaScript is
+unavailable.
+
+## Privacy and traffic measurement
+
+Game profiles and progress remain in the browser under `hello-world-progress`.
+Sharing and backups are user-initiated and do not automatically send profiles
+or progress to the operator. Invitations contain the game URL and optional
+language; challenge query parameters reach the providers when opened. Progress
+transfers use URL fragments, which are not sent in HTTP requests. Backups are
+downloaded and imported locally; recipients of a transfer can import its copy.
+
+The production site remains a GitHub Pages deployment at
+`https://lanceolav.com/helloworld/`, with Cloudflare acting as its reverse proxy.
+Traffic measurement is limited to Cloudflare's server-side zone and security
+dashboards. Do not enable Cloudflare Web Analytics, automatic beacon injection,
+Browser Insights/RUM, Zaraz, or any equivalent browser-side analytics. The app
+must not load `beacon.min.js`, set analytics cookies, fingerprint browsers, or
+send in-game events.
+
+HTTP Traffic offers whole-domain rolling views for the previous 24 hours,
+7 days and 30 days: requests, cached/uncached requests, bandwidth, countries and
+“Unique Visitors” estimates. These include assets, crawlers and threats and
+support broad, approximate site-usage trends, not reliable counts of game loads
+or individual people. Security Analytics uses adaptively sampled request logs;
+the available Free dashboard has no suitable path filter for an accurate
+`/helloworld/` counter. Its [seven-day retention and maximum 24-hour query window](https://developers.cloudflare.com/waf/analytics/security-analytics/)
+are separate from HTTP Traffic reporting periods.
+
+The Cloudflare Free zone is active with proxied GitHub Pages A/AAAA records and
+`www` pointing to `norwegiankiwi.github.io`. Full (strict) TLS, Universal SSL and
+DNSSEC are active. One.com MX, SPF and four DKIM records remain DNS-only; email
+and `privacy@lanceolav.com` forwarding were tested during migration. Default
+caching is in use, with no Workers routes, Page Rules or custom Cache Rules.
+RUM is disabled; Zaraz, Consent Management and Google Tag Gateway are inactive.

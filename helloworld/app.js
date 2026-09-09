@@ -1677,7 +1677,7 @@
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
         <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button" data-action="open-challenge">${t("openSharedLink")}</button>${installActionMarkup()}</nav></div>
-        <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a><a href="./licenses/local-flags.txt">${t("localFlagsLicence")}</a><a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a><a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a></span></footer>
+        <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses-and-privacy.html${state.locale === "en" ? "?lang=en" : ""}">${t("licencesAndPrivacy")}</a></span></footer>
         ${profilePanelMarkup()}${installHelpMarkup()}${openChallengeMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}
       </main></div>`;
   }
