@@ -19,6 +19,10 @@ test("generated test-profile backup fixture", () => {
 
   const profiles = progress.parseBackup(fixture);
   assert.equal(profiles.length, generator.scenarios.length);
+  for (const scenario of generator.scenarios) {
+    assert.equal(profiles.find((profile) => profile.id === scenario.id).name, scenario.name,
+      `${scenario.id}: generated names must survive profile normalization without truncation`);
+  }
 
   const expected = {
     "test-new": [0, 0, 0],

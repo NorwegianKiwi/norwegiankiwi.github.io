@@ -1147,7 +1147,7 @@
     },
     {
       "id": "test-globetrotter-half",
-      "name": "Test · 34 levels · Globetrotter half ass",
+      "name": "Test · Globetrotter halfway",
       "createdAt": "2026-08-22T10:00:00.000Z",
       "updatedAt": "2026-08-22T12:16:00.000Z",
       "lastQuizId": "pack-greater-caribbean:country-capital",
@@ -11621,7 +11621,7 @@
     },
     {
       "id": "test-navigator-tourist-gap",
-      "name": "Test · Navigator earned; Tourist name le",
+      "name": "Test · Navigator; Tourist name missing",
       "createdAt": "2026-08-22T10:00:00.000Z",
       "updatedAt": "2026-08-22T11:07:00.000Z",
       "lastQuizId": "tour-world-icons:country-capital",

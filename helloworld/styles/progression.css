@@ -299,6 +299,8 @@ button.milestone-sticker:focus-visible { outline:3px solid var(--coral); outline
 .import-card { max-width:44rem; }
 .import-list { display:grid; gap:.6rem; margin:1.5rem 0; }
 .import-list article { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem; border:1px solid #d8d2c5; border-radius:.8rem; }
+.import-list article > div { flex:1; min-width:0; text-align:left; overflow-wrap:anywhere; }
+.import-list article > button { flex-shrink:0; }
 .import-list strong,.import-list span { display:block; }
 .import-list span { color:#687272; margin-top:.2rem; }
 .import-actions { display:flex; flex-wrap:wrap; gap:.7rem; }

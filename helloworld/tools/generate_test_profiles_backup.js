@@ -17,7 +17,7 @@ const scenarios = Object.freeze([
   { id: "test-level-1", name: "Test · 1 level mastered", masteredLevels: 1 },
   { id: "test-level-5", name: "Test · 5 levels mastered", masteredLevels: 5 },
   { id: "test-level-20", name: "Test · 20 levels + current partial", masteredLevels: 20, masteredQuizzesInNextLevel: 2, playedQuizInNextLevel: 2 },
-  { id: "test-globetrotter-half", name: "Test · 34 levels · Globetrotter half assembled", masteredLevels: 34 },
+  { id: "test-globetrotter-half", name: "Test · Globetrotter halfway", masteredLevels: 34 },
   { id: "test-all-stages-half", name: "Test · First half of every stage", firstHalfOfEveryStage: true },
   { id: "test-regular-complete", name: "Test · All 41 regular levels", masteredLevels: 41 },
   { id: "test-regional-progress", name: "Test · 46 levels + current partial", masteredLevels: 46, masteredQuizzesInNextLevel: 2, playedQuizInNextLevel: 2 },
@@ -25,7 +25,7 @@ const scenarios = Object.freeze([
   { id: "test-final-quiz", name: "Test · Final quiz remaining", masteredLevels: 57, masteredQuizzesInNextLevel: 3 },
   {
     id: "test-navigator-tourist-gap",
-    name: "Test · Navigator earned; Tourist name left",
+    name: "Test · Navigator; Tourist name missing",
     masteredStageIds: ["navigator"],
     almostMasteredStage: { stageId: "tourist", missingMode: "flag-country" },
   },

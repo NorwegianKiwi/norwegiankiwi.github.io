@@ -161,7 +161,7 @@
           const href = buildHref(item.params, locale);
           return `<article class="test-card"><strong>${item.title[locale]}</strong><p>${item.description[locale]}${item.oneQuestion ? ` <b>${copy[locale].finalQuestion}</b>` : ""}</p><code>${href}</code><a class="test-link" href="${href}">${copy[locale].open}</a></article>`;
         }).join("")}</div></section>`;
-      }).join("") + `<section class="test-section"><h2>${copy[locale].sections.profiles[0]}</h2><p class="test-note">${copy[locale].sections.profiles[1]}<br><strong>Test · 34 levels · Globetrotter half assembled</strong><br><strong>Test · First half of every stage</strong><br><strong>Test · Navigator earned; Tourist name left</strong><br><strong>Test · All stages except Tourist flag</strong></p></section>`;
+      }).join("") + `<section class="test-section"><h2>${copy[locale].sections.profiles[0]}</h2><p class="test-note">${copy[locale].sections.profiles[1]}<br><strong>Test · Globetrotter halfway</strong><br><strong>Test · First half of every stage</strong><br><strong>Test · Navigator; Tourist name missing</strong><br><strong>Test · All stages except Tourist flag</strong></p></section>`;
     }
 
     document.querySelectorAll("[data-test-language]").forEach((button) => {
