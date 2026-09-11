@@ -27,6 +27,8 @@ test("generated test-profile backup fixture", () => {
     "test-level-1": [1, 4, 4],
     "test-level-5": [5, 20, 20],
     "test-level-20": [20, 82, 83],
+    "test-globetrotter-half": [34, 136, 136],
+    "test-all-stages-half": [28, 116, 116],
     "test-regular-complete": [41, 164, 164],
     "test-regional-progress": [46, 186, 187],
     "test-world-next": [52, 208, 208],
@@ -44,6 +46,25 @@ test("generated test-profile backup fixture", () => {
       profile.name,
     );
   }
+
+  const puzzles = require("../puzzles.js");
+  const half = profiles.find((profile) => profile.id === "test-all-stages-half");
+  for (const stage of curriculum.stages) {
+    const quizzes = curriculum.levels.slice(stage.startLevel - 1, stage.endLevel).flatMap((level) => level.quizzes);
+    quizzes.forEach((quiz, index) => assert.equal(
+      progress.quizState(half, curriculum.quizById.get(quiz.id)),
+      index < quizzes.length / 2 ? "mastered" : "unplayed", quiz.id,
+    ));
+    assert.equal(puzzles.stageProgress(half, stage.id, curriculum, progress).count, quizzes.length / 2);
+  }
+  const globe = profiles.find((profile) => profile.id === "test-globetrotter-half");
+  assert.equal(puzzles.stageProgress(globe, "globetrotter", curriculum, progress).count, 28);
+  for (const level of curriculum.levels.slice(34)) {
+    for (const quiz of level.quizzes) assert.equal(progress.quizState(globe, curriculum.quizById.get(quiz.id)), "unplayed");
+  }
+  const profileIds = profiles.map((profile) => profile.id);
+  const insertAt = profileIds.indexOf("test-level-20");
+  assert.deepEqual(profileIds.slice(insertAt, insertAt + 4), ["test-level-20", "test-globetrotter-half", "test-all-stages-half", "test-regular-complete"]);
 
   const complete = profiles.find((profile) => profile.id === "test-all-mastered");
   assert.deepEqual(progress.continueSelection(complete, curriculum.levels), { type: "all-mastered" });

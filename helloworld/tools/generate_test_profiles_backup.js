@@ -17,6 +17,8 @@ const scenarios = Object.freeze([
   { id: "test-level-1", name: "Test · 1 level mastered", masteredLevels: 1 },
   { id: "test-level-5", name: "Test · 5 levels mastered", masteredLevels: 5 },
   { id: "test-level-20", name: "Test · 20 levels + current partial", masteredLevels: 20, masteredQuizzesInNextLevel: 2, playedQuizInNextLevel: 2 },
+  { id: "test-globetrotter-half", name: "Test · 34 levels · Globetrotter half assembled", masteredLevels: 34 },
+  { id: "test-all-stages-half", name: "Test · First half of every stage", firstHalfOfEveryStage: true },
   { id: "test-regular-complete", name: "Test · All 41 regular levels", masteredLevels: 41 },
   { id: "test-regional-progress", name: "Test · 46 levels + current partial", masteredLevels: 46, masteredQuizzesInNextLevel: 2, playedQuizInNextLevel: 2 },
   { id: "test-world-next", name: "Test · 52 levels (world next)", masteredLevels: 52 },
@@ -86,6 +88,16 @@ function buildProfile(scenario) {
     const ids = new Set(scenario.masteredStageIds.flatMap(stageQuizIds));
     for (const quiz of curriculum.quizById.values()) {
       if (ids.has(quiz.id)) record(quiz, quiz.countryCodes.length);
+    }
+  }
+
+  if (scenario.firstHalfOfEveryStage) {
+    for (const stage of curriculum.stages) {
+      const ids = stageQuizIds(stage.id);
+      for (const id of ids.slice(0, ids.length / 2)) {
+        const quiz = curriculum.quizById.get(id);
+        record(quiz, quiz.countryCodes.length);
+      }
     }
   }
 

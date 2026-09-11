@@ -308,7 +308,11 @@ regional or world mastery. Sound must be optional if introduced.
 ### Stage picture rewards
 
 Each curriculum quiz's first mastery automatically reveals one fixed puzzle
-piece belonging to that quiz's stage. Replays and imperfect attempts award no
+piece belonging to that quiz's stage. Pieces follow a fixed irregular mapping,
+with gentle spread across the picture and occasional clusters as quizzes are
+mastered in curriculum order. The September 2026 remapping changes the positions
+of previously earned pieces while preserving mastery and piece counts; completed
+pictures remain complete. Replays and imperfect attempts award no
 additional pieces. Existing mastery counts immediately; several pictures may
 be in progress at once. There is no manual placement or reward currency.
 

@@ -689,6 +689,12 @@ puzzle persistence schema, backup field, transfer change or mastery migration.
 
 Geometry uses a 1536 × 1024 canvas. Adjacent pieces share exactly reversed
 curved boundaries; unequal row counts use shared straight horizontal boundaries.
+The September 2026 mapping intentionally replaces the previous patterned positions;
+existing mastery immediately reveals the newly assigned positions without a save
+migration. Keep this new mapping stable. `node tools/generate_puzzle_mapping.js`
+prints its reproducible candidate manifest: stage-seeded shuffled quadrants feed
+shuffled batches of up to two positions per quadrant, assigned in curriculum
+quiz order. Review candidate sequences before replacing the checked-in manifest.
 Do not reorder the manifest's quiz IDs or change layouts independently of the
 artwork. New curriculum or revision decisions must explicitly consider their
 effect on earned pictures.
@@ -777,3 +783,20 @@ Web Animations draws the fourth arc, moves the clone, fades the result, and pops
 the separate trophy. One cleanup cancels pending frames and animations, removes
 the clone, and restores target visibility on completion or interruption. Reduced
 motion and unavailable animation APIs render the ordinary final result directly.
+
+### Internal puzzle reveal preview
+
+`test.html` loads `puzzle-preview.js` for an isolated six-picture viewer. It uses
+production piece geometry and quiz mappings in curriculum order without reading
+or writing player progress. Selecting a picture resets to empty and paused.
+Start/Pause advances one piece every 200 ms with no movement effects; Next piece
+and the count slider pause playback, and Restart resets to empty and paused.
+Playback stops on completion, picture changes, page hiding or exit. Controls wait
+for artwork loading; errors are localized and selecting the picture retries.
+Both locales and keyboard controls are supported; playback is always explicit.
+
+The generated test backup includes `test-globetrotter-half` (levels 1–34 mastered,
+28/56 Globetrotter pieces) and `test-all-stages-half` (the first half of each
+stage’s quizzes mastered, with each second half unplayed). The latter has
+116 mastered quizzes, 28 fully mastered levels, and piece counts 8, 20, 26, 28,
+22 and 12. Navigator and Cartographer each end halfway through a level.

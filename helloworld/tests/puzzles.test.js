@@ -8,6 +8,28 @@ const progress = require("../progress.js");
 const puzzles = require("../puzzles.js");
 const localization = require("../localization.js");
 
+test("spread mapping is reproducible and remains fixed across releases", () => {
+  const { buildManifest } = require("../tools/generate_puzzle_mapping.js");
+  assert.deepEqual(buildManifest(), puzzles.stages.map(({ id, rows, quizIds }) => ({ id, rows: [...rows], quizIds: [...quizIds] })));
+  const digest = require("node:crypto").createHash("sha256")
+    .update(JSON.stringify(puzzles.stages.map((stage) => stage.quizIds))).digest("hex");
+  assert.equal(digest, "a20f4edea982342a86cb7d7e89397827d23d6f7c534f2e0d77db7a6ff8eb80f0", "changing positions requires an intentional compatibility decision");
+});
+
+test("every reward reveals exactly its mapped position with no change to counts", () => {
+  for (const stage of puzzles.stages) {
+    const mastered = new Set();
+    const progressStub = { quizState: (_, quiz) => mastered.has(quiz.id) ? "mastered" : "unplayed" };
+    for (const quizId of stage.quizIds) {
+      mastered.add(quizId);
+      const value = puzzles.stageProgress({}, stage.id, curriculum, progressStub);
+      assert.equal(value.count, mastered.size);
+      assert.equal(value.earned[puzzles.pieceForQuiz(quizId).piece.id], true);
+      assert.deepEqual(value.earned, stage.quizIds.map((id) => mastered.has(id)));
+    }
+  }
+});
+
 test("every curriculum quiz owns exactly one permanent piece in its own stage", () => {
   assert.deepEqual(puzzles.stages.map((s) => s.pieces.length), [16, 40, 52, 56, 44, 24]);
   const allIds = puzzles.stages.flatMap((s) => s.quizIds);
@@ -20,8 +42,8 @@ test("every curriculum quiz owns exactly one permanent piece in its own stage", 
     assert.equal(stage.pieces.length, stage.quizIds.length);
     for (const locale of ["nb", "en"]) assert.ok(localization.translate(locale, `puzzleDescription_${stage.id}`).length > 30);
   }
-  assert.equal(puzzles.pieceForQuiz("tour-hello-world:country-flag").piece.id, 0);
-  assert.equal(puzzles.pieceForQuiz("tour-hello-world:flag-country").piece.id, 7);
+  assert.equal(puzzles.pieceForQuiz("tour-hello-world:country-flag").piece.id, 3);
+  assert.equal(puzzles.pieceForQuiz("tour-hello-world:flag-country").piece.id, 8);
   assert.equal(puzzles.pieceForQuiz("unknown"), null);
 });
 

@@ -53,11 +53,13 @@ fixture checks, and repository-hygiene checks.
 Open `test.html` for the unlinked manual preview catalog. It contains result,
 puzzle reward, celebration, replay, one-question, out-of-order progression, and final-completion
 states in both languages. Preview progress is temporary and never changes saved
-profiles.
+profiles. The puzzle reveal viewer offers six pictures with Start/Pause, single
+steps, Restart, and a piece-count slider in curriculum quiz order.
 
 Import `fixtures/test-profiles-backup.json` through **Settings → Import backup
 file → Import all profiles** to add reusable browser test profiles ranging from
-a new player to full mastery. Regenerate the fixture after an intentional
+a new player to full mastery, including a half-assembled Globetrotter picture
+and a profile with the first half of every stage mastered. Regenerate the fixture after an intentional
 curriculum change:
 
 ```sh
