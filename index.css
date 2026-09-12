@@ -6,7 +6,7 @@ body {
 body {
     min-height: 100vh;
     min-height: 100dvh;
-    overflow: hidden;
+    overflow-x: hidden;
     background:
         radial-gradient(circle at 50% 49%, rgba(101, 184, 189, 0.03), transparent 26rem),
         radial-gradient(circle at 58% 43%, rgba(236, 235, 230, 0.014), transparent 18rem),
@@ -309,4 +309,8 @@ body {
         animation: none !important;
         transform: rotate(var(--static-counter-angle));
     }
+}
+
+.page-shell > .site-privacy-footer {
+    text-align: right;
 }

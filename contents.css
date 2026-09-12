@@ -153,3 +153,7 @@ body {
         padding-left: 8px;
     }
 }
+
+body > .site-privacy-footer {
+    text-align: right;
+}

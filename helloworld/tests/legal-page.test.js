@@ -47,22 +47,19 @@ test("runtime documents contain no browser analytics endpoint", () => {
   assert.doesNotMatch(runtime, /data-cf-beacon|__cfBeacon|zaraz\s*\.|\/cdn-cgi\/zaraz|navigator\.sendBeacon/i);
 });
 
-test("each locale explains dashboard limits and links every licence", () => {
+test("each locale links the shared notice and preserves every licence", () => {
   const html = read("licenses-and-privacy.html");
   for (const locale of ["nb", "en"]) {
     const article = html.match(new RegExp(`<article[^>]*data-legal-locale="${locale}"[^>]*>([\\s\\S]*?)</article>`))[1];
-    for (const name of ["HTTP Traffic", "Security Analytics", "Unique Visitors", "24", "7", "30", "hello-world-progress"]) {
-      assert.ok(article.includes(name), `${locale}: ${name}`);
-    }
-    assert.match(article, /sampl/);
-    assert.match(article, /https:\/\/developers\.cloudflare\.com\/waf\/analytics\/security-analytics\//);
+    assert.ok(article.includes("hello-world-progress"));
+    assert.match(article, /NEL/);
+    assert.ok(article.includes(locale === "en" ? 'href="../privacy.html"' : 'href="../privacy.html?lang=nb"'));
     const licences = [...article.matchAll(/href="\.\/licenses\/([^"]+)"/g)].map((match) => match[1]);
     assert.deepEqual(licences.sort(), ["flag-icons-MIT.txt", "local-flags.txt", "natural-earth-public-domain.txt", "twemoji-CC-BY-4.0.txt"]);
     for (const file of licences) assert.ok(fs.statSync(path.join(root, "licenses", file)).isFile());
     assert.equal([...article.matchAll(/href="https:\/\/commons\.wikimedia\.org\/wiki\/File:/g)].length, 4);
     assert.match(article, /Twitter/);
     assert.match(article, /5\.1\.1/);
-    assert.match(article, locale === "en" ? /not reliable counts of game loads or individual people/ : /ikke et pålitelig mål på spillinnlastinger eller enkeltpersoner/);
   }
 });
 

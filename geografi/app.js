@@ -1499,6 +1499,7 @@
         <footer>
           <span class="copyright">&copy; 2026 Lance Olav Eastgate</span>
           <span class="license-links">
+            <a href="../privacy.html${state.locale === "en" ? "" : "?lang=nb"}">${state.locale === "en" ? "Licences and privacy" : "Lisenser og personvern"}</a>
             <a href="./licenses/flag-icons-MIT.txt">${t("flagsLicence")}</a>
             <a href="./licenses/twemoji-CC-BY-4.0.txt">${t("globeLicence")}</a>
             <a href="./licenses/natural-earth-public-domain.txt">${t("mapLicence")}</a>

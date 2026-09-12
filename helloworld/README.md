@@ -138,7 +138,8 @@ The globe graphic is Twemoji’s Globe showing Europe–Africa, used unchanged u
 CC BY 4.0. Local licence copies are stored in `licenses/`.
 
 The home footer links to `licenses-and-privacy.html`, which explains these
-sources and the site's privacy practices in Norwegian and English. Both
+sources and local game privacy in Norwegian and English, linking to the shared
+`../privacy.html` notice for provider processing, NEL and rights. Both
 languages are present in the document and remain readable when JavaScript is
 unavailable.
 
@@ -154,7 +155,8 @@ downloaded and imported locally; recipients of a transfer can import its copy.
 The production site remains a GitHub Pages deployment at
 `https://lanceolav.com/helloworld/`, with Cloudflare acting as its reverse proxy.
 Traffic measurement is limited to Cloudflare's server-side zone and security
-dashboards. Do not enable Cloudflare Web Analytics, automatic beacon injection,
+dashboards. Cloudflare NEL separately reports connection failures from supported
+browsers; it remains enabled and is disclosed in the shared notice. Do not enable Cloudflare Web Analytics, automatic beacon injection,
 Browser Insights/RUM, Zaraz, or any equivalent browser-side analytics. The app
 must not load `beacon.min.js`, set analytics cookies, fingerprint browsers, or
 send in-game events.
@@ -170,7 +172,6 @@ are separate from HTTP Traffic reporting periods.
 
 The Cloudflare Free zone is active with proxied GitHub Pages A/AAAA records and
 `www` pointing to `norwegiankiwi.github.io`. Full (strict) TLS, Universal SSL and
-DNSSEC are active. One.com MX, SPF and four DKIM records remain DNS-only; email
-and `privacy@lanceolav.com` forwarding were tested during migration. Default
-caching is in use, with no Workers routes, Page Rules or custom Cache Rules.
+DNSSEC are active. Cloudflare Email Routing forwards contact email to Gmail.
+Default caching is in use, with no Workers routes, Page Rules or custom Cache Rules.
 RUM is disabled; Zaraz, Consent Management and Google Tag Gateway are inactive.

@@ -130,12 +130,8 @@ li::marker {
     filter: saturate(0.86) contrast(1.03);
 }
 
-.email img {
-    max-width: 100%;
-    height: 19px;
-    margin-bottom: -3px;
-    filter: invert(1) grayscale(1);
-    opacity: 0.88;
+.email a {
+    overflow-wrap: anywhere;
 }
 
 .subtext {
@@ -243,4 +239,8 @@ li::marker {
     .subtext {
         color: #444;
     }
+}
+
+body > .site-privacy-footer {
+    text-align: right;
 }

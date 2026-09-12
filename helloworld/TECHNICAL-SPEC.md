@@ -434,9 +434,11 @@ checkbox-selection workflow while supporting both needs.
 - The app contains no analytics beacon, analytics cookie, browser fingerprint,
   individual activity profile or in-game event reporting. Dashboard estimates
   cannot reliably count game loads or individual people.
-- The dedicated `licenses-and-privacy.html` page identifies the operator,
-  contact address, legitimate-interest purpose, retention limits, processors,
-  international-transfer safeguards and data-subject rights. It contains both
+- Cloudflare NEL separately enables browser connection-failure reports. It is
+  retained with disclosure; RUM remains disabled.
+- The dedicated `licenses-and-privacy.html` page covers local game data and
+  licences and links to `../privacy.html` for site-wide provider processing,
+  NEL, email and rights. It contains both
   locales in its static HTML; `legal-page.js` only selects the preferred
   presentation language and normalizes home links to `./` over HTTP(S) or
   `./index.html` for direct-file use; static fallback links use `index.html`.
@@ -571,8 +573,7 @@ zero-size fallback.
 - The Cloudflare Free zone is active. Nameservers are `aliza.ns.cloudflare.com`
   and `brian.ns.cloudflare.com`; preserved GitHub Pages A/AAAA records are proxied,
   and `www` points to `norwegiankiwi.github.io`.
-- One.com MX, SPF and four DKIM records remain DNS-only. Email and forwarding
-  for `privacy@lanceolav.com` were tested successfully during migration.
+- Cloudflare Email Routing forwards contact email to Gmail.
 - GitHub Pages remains the HTTPS origin. Cloudflare uses Full (strict) TLS;
   Universal SSL and DNSSEC using Cloudflare's DS record are active.
 - Default caching is in use. No Workers routes, Page Rules or custom Cache
