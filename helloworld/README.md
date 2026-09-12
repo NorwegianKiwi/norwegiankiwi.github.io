@@ -175,3 +175,19 @@ The Cloudflare Free zone is active with proxied GitHub Pages A/AAAA records and
 DNSSEC are active. Cloudflare Email Routing forwards contact email to Gmail.
 Default caching is in use, with no Workers routes, Page Rules or custom Cache Rules.
 RUM is disabled; Zaraz, Consent Management and Google Tag Gateway are inactive.
+
+## Search discovery
+
+The preferred search URLs are `https://lanceolav.com/helloworld/` (Norwegian)
+and `https://lanceolav.com/helloworld/?lang=en` (English). Canonicals identify
+these language versions without gameplay parameters or fragments; the actual
+shared URLs and app routes remain usable. Reciprocal language annotations and
+crawlable flag links identify both translations. Language switching keeps the
+current URL payload and does not reload the app.
+
+The repository-root `sitemap.xml` lists only these two app entry URLs. After
+publishing, submit `https://lanceolav.com/sitemap.xml` in Search Console and
+inspect the rendered HTML of both language URLs for matching titles, canonical
+URLs and language annotations. Test pages and individual game states are not
+sitemap entries. Cloudflare manages the live robots.txt; this change does not
+replace it or add visitor tracking.

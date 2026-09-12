@@ -464,18 +464,19 @@
           .map(({ locale, flag, labelKey }) => {
             const label = t(labelKey);
             return `
-              <button
-                type="button"
+              <a
+                href="${escapeHtml(navigation.createLanguageUrl(window.location.href, locale).href)}"
+                hreflang="${locale}"
                 class="language-button ${state.locale === locale ? "is-selected" : ""}"
                 data-action="language"
                 data-value="${locale}"
                 lang="${locale}"
                 aria-label="${escapeHtml(label)}"
-                aria-pressed="${state.locale === locale}"
+                ${state.locale === locale ? 'aria-current="true"' : ""}
                 title="${escapeHtml(label)}"
               >
                 <img src="./flags/${flag}.svg" alt="" aria-hidden="true" draggable="false" />
-              </button>
+              </a>
             `;
           })
           .join("")}
@@ -626,6 +627,9 @@
   function updateDocumentMetadata() {
     document.documentElement.lang = state.locale;
     document.title = t("metaTitle");
+    document.querySelector('link[rel="canonical"]')?.setAttribute(
+      "href", navigation.createLanguageUrl(sharing.PUBLIC_APP_URL, state.locale).href,
+    );
     const metadata = {
       'meta[name="description"]': t("metaDescription"),
       'meta[property="og:title"]': t("metaTitle"),
@@ -3820,7 +3824,12 @@
     if (!supportedLocales.includes(locale) || locale === state.locale) return;
     const scrollTop = window.scrollY;
     state.locale = locale;
-    syncUrlState();
+    try {
+      window.history.replaceState(window.history.state, "",
+        navigation.createLanguageUrl(window.location.href, locale).href);
+    } catch (error) {
+      console.warn("Could not update the language URL.", error);
+    }
     render({ focusLanguage: locale });
     window.scrollTo({ top: scrollTop });
   }
@@ -5105,6 +5114,8 @@
     }
 
     if (action === "language") {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
       setLocale(control.dataset.value);
       return;
     }

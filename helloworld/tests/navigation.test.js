@@ -125,3 +125,22 @@ test("stable route parsing and serialization", () => {
     null,
   );
 });
+
+test("language links retain routes and shared payloads without mutating the source", () => {
+  const assert = require("node:assert/strict");
+  const { createLanguageUrl } = require("../navigation.js");
+  for (const base of ["https://lanceolav.com/helloworld/", "file:///tmp/helloworld/index.html"]) {
+    const original = new URL(base + "?view=explore&region=europe&lang=nb&cv=2&proof=a%2Bb#progress=private");
+    const english = createLanguageUrl(original, "en");
+    assert.equal(original.searchParams.get("lang"), "nb");
+    assert.equal(english.searchParams.get("lang"), "en");
+    assert.equal(english.searchParams.get("view"), "explore");
+    assert.equal(english.searchParams.get("region"), "europe");
+    assert.equal(english.searchParams.get("proof"), "a+b");
+    assert.equal(english.hash, original.hash);
+    const norwegian = createLanguageUrl(english, "nb");
+    assert.equal(norwegian.searchParams.has("lang"), false);
+    english.searchParams.delete("lang");
+    assert.equal(norwegian.href, english.href);
+  }
+});

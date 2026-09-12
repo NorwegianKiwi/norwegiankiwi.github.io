@@ -160,9 +160,9 @@ const messages = Object.freeze({
     correctAnnouncement: "Riktig.",
     wrongAnnouncement:
       "Feil. Riktig svar er {answer}. Aktiver det markerte alternativet for å gå videre.",
-    metaTitle: "Hei verden! – lær land, flagg, hovedsteder og kart",
+    metaTitle: "Hei verden! – utforsk land, flagg, hovedsteder og kart",
     metaDescription:
-      "Utforsk og test deg selv på 197 land og 30 andre steder, med flagg, hovedsteder og regionale kart.",
+      "Utforsk verden med interaktive kart, og lær land, flagg og hovedsteder gjennom spill og øvingskort. Tilgjengelig på norsk og engelsk.",
   }),
   en: Object.freeze({
     "stagePicture": "Stage picture",
@@ -314,9 +314,9 @@ const messages = Object.freeze({
     correctAnnouncement: "Correct.",
     wrongAnnouncement:
       "Incorrect. The correct answer is {answer}. Activate the highlighted option to continue.",
-    metaTitle: "Hello World! – learn countries, flags, capitals and maps",
+    metaTitle: "Hello World! – Explore countries, flags, capitals and maps",
     metaDescription:
-      "Explore and test yourself on 197 countries and 30 other places, with flags, capitals and regional maps.",
+      "Explore the world with interactive maps, and learn countries, flags and capitals through games and flashcards. Available in English and Norwegian.",
   }),
 });
 const progressionMessages = Object.freeze({

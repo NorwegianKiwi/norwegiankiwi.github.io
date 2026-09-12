@@ -5,29 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Utforsk og test deg selv på 197 land og 30 andre steder, med flagg, hovedsteder og regionale kart."
+      content="Utforsk verden med interaktive kart, og lær land, flagg og hovedsteder gjennom spill og øvingskort. Tilgjengelig på norsk og engelsk."
     />
-    <meta property="og:title" content="Hei verden! – lær land, flagg, hovedsteder og kart" />
+    <meta property="og:title" content="Hei verden! – utforsk land, flagg, hovedsteder og kart" />
     <meta
       property="og:description"
-      content="Utforsk og test deg selv på 197 land og 30 andre steder, med flagg, hovedsteder og regionale kart."
+      content="Utforsk verden med interaktive kart, og lær land, flagg og hovedsteder gjennom spill og øvingskort. Tilgjengelig på norsk og engelsk."
     />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="nb_NO" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Hei verden! – lær land, flagg, hovedsteder og kart" />
+    <meta name="twitter:title" content="Hei verden! – utforsk land, flagg, hovedsteder og kart" />
     <meta
       name="twitter:description"
-      content="Utforsk og test deg selv på 197 land og 30 andre steder, med flagg, hovedsteder og regionale kart."
+      content="Utforsk verden med interaktive kart, og lær land, flagg og hovedsteder gjennom spill og øvingskort. Tilgjengelig på norsk og engelsk."
     />
-    <title>Hei verden! – lær land, flagg, hovedsteder og kart</title>
+    <title>Hei verden! – utforsk land, flagg, hovedsteder og kart</title>
+    <link rel="alternate" hreflang="nb" href="https://lanceolav.com/helloworld/" />
+    <link rel="alternate" hreflang="en" href="https://lanceolav.com/helloworld/?lang=en" />
+    <link rel="alternate" hreflang="x-default" href="https://lanceolav.com/helloworld/" />
+    <script>
+      // Select the language before deferred app scripts run; never publish an
+      // initial Norwegian canonical for an English URL.
+      const canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      canonical.href = "https://lanceolav.com/helloworld/" +
+        (new URL(location.href).searchParams.get("lang") === "en" ? "?lang=en" : "");
+      document.head.appendChild(canonical);
+    </script>
     <meta name="theme-color" content="#f6f3eb" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Hello World!" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="stylesheet" href="./styles/base.css?v=20260831-result-progress2" />
+    <link rel="stylesheet" href="./styles/base.css?v=20260912-seo1" />
     <link rel="stylesheet" href="./styles/quiz.css?v=20260831-map-highlight1" />
     <link rel="stylesheet" href="./styles/results.css?v=20260905-puzzle-seamless4" />
     <link rel="stylesheet" href="./styles/explore.css?v=20260829-levelbadge1" />
@@ -42,11 +54,11 @@
     <script src="./shared-link.js?v=20260829-sharing2" defer></script>
     <script src="./sharing.js?v=20260829-sharing4" defer></script>
     <script src="./explore-state.js?v=20260827-africa1" defer></script>
-    <script src="./navigation.js?v=20260826-navigation1" defer></script>
-    <script src="./localization.js?v=20260906-cleanup1" defer></script>
+    <script src="./navigation.js?v=20260912-seo1" defer></script>
+    <script src="./localization.js?v=20260912-seo1" defer></script>
     <script src="./map-view.js?v=20260829-mapview5" defer></script>
     <script src="./preview.js?v=20260906-cleanup1" defer></script>
-    <script src="./app.js?v=20260906-cleanup1" defer></script>
+    <script src="./app.js?v=20260912-seo1" defer></script>
   </head>
   <body>
     <div id="app"></div>

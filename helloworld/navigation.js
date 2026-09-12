@@ -112,5 +112,13 @@
     return url;
   }
 
-  return { readUrl, createUrl, hasSpecialPayload };
+  // Language links retain the current route and any shared payload verbatim.
+  function createLanguageUrl(value, locale) {
+    const url = new URL(value instanceof URL ? value.href : value);
+    url.searchParams.delete("lang");
+    if (locale === "en") url.searchParams.set("lang", "en");
+    return url;
+  }
+
+  return { readUrl, createUrl, hasSpecialPayload, createLanguageUrl };
 });

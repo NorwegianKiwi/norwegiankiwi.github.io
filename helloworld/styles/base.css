@@ -162,6 +162,8 @@ a:focus-visible {
 }
 
 .language-button {
+  display: inline-block;
+  text-decoration: none;
   width: 34px;
   height: 26px;
   padding: 4px;

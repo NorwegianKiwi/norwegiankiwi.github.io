@@ -525,6 +525,18 @@ hidden in standalone mode. iOS receives manual Safari guidance; Chromium mobile
 requires an actionable `beforeinstallprompt`. Desktop install events are not
 cancelled so browser-owned installation UI remains available.
 
+Search metadata treats game states as views of the app, with one canonical per
+locale: `https://lanceolav.com/helloworld/` and its `?lang=en` variant. The head
+creates the initial canonical before deferred scripts execute; metadata updates
+keep it aligned with the active locale. Canonicals omit routes and payloads,
+while reciprocal `nb`, `en`, and `x-default` alternates identify the entry URLs.
+
+Language controls are anchors. `navigation.createLanguageUrl` changes only the
+language parameter, retaining the current path, other query values, and fragment.
+Ordinary activation uses `replaceState` and renders the current session without
+reloading; modified clicks retain native link behavior. The current locale uses
+`aria-current`, and focus returns to the activated language link.
+
 ## 17. Rendering and state separation
 
 The application should distinguish:
