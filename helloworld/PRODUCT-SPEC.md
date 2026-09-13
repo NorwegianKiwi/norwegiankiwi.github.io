@@ -51,11 +51,14 @@ content source of truth.
 
 ## 4. Home screen and information hierarchy
 
-The home screen presents two primary actions:
+The home screen presents two primary actions. On desktop and portrait layouts,
+the milestone strip follows the primary and secondary actions. Short landscape
+keeps its compact milestone side column.
 
 ### Continue game
 
-For a new profile, the label is **Start game**. For an existing profile it is
+For a new profile, the label is **Start game**, with **Geography quiz** beneath
+it (**Start spillet** / **Quiz i geografi** in Norwegian). For an existing profile it is
 **Continue game** and includes concise context, for example:
 
 > Level 6 · Iberia and the Alps

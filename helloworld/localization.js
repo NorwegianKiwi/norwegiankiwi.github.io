@@ -160,9 +160,9 @@ const messages = Object.freeze({
     correctAnnouncement: "Riktig.",
     wrongAnnouncement:
       "Feil. Riktig svar er {answer}. Aktiver det markerte alternativet for å gå videre.",
-    metaTitle: "Hei verden! – utforsk land, flagg, hovedsteder og kart",
+    metaTitle: "Hei verden! – quiz i geografi og interaktivt verdenskart",
     metaDescription:
-      "Utforsk verden med interaktive kart, og lær land, flagg og hovedsteder gjennom spill og øvingskort. Tilgjengelig på norsk og engelsk.",
+      "Spill quiz i geografi, utforsk et interaktivt verdenskart og lær land, flagg og hovedsteder med øvingskort. Tilgjengelig på norsk og engelsk.",
   }),
   en: Object.freeze({
     "stagePicture": "Stage picture",
@@ -314,14 +314,14 @@ const messages = Object.freeze({
     correctAnnouncement: "Correct.",
     wrongAnnouncement:
       "Incorrect. The correct answer is {answer}. Activate the highlighted option to continue.",
-    metaTitle: "Hello World! – Explore countries, flags, capitals and maps",
+    metaTitle: "Hello World! – Geography quiz and interactive world map",
     metaDescription:
-      "Explore the world with interactive maps, and learn countries, flags and capitals through games and flashcards. Available in English and Norwegian.",
+      "Play a geography quiz, explore an interactive world map, and learn countries, flags and capitals with flashcards. Available in English and Norwegian.",
   }),
 });
 const progressionMessages = Object.freeze({
   nb: Object.freeze({
-    startGame: "Start spillet", continueGame: "Fortsett spillet", exploreWorld: "Utforsk verden",
+    startGame: "Start spillet", startGameDescription: "Quiz i geografi", continueGame: "Fortsett spillet", exploreWorld: "Utforsk verden",
     viewLevels: "Se alle nivåer", levels: "Nivåer", level: "Nivå {number}",
     levelRange: "Nivå {start}–{end}",
     levelsMastered: "{count} av {total} nivåer mestret", quizzesMastered: "{count} av 4 quizer mestret",
@@ -388,7 +388,7 @@ const progressionMessages = Object.freeze({
     shareUnavailable: "Kunne ikke dele akkurat nå.", profilePrivacy: "Fremgangen lagres bare på denne enheten.",
   }),
   en: Object.freeze({
-    startGame: "Start game", continueGame: "Continue game", exploreWorld: "Explore the world",
+    startGame: "Start game", startGameDescription: "Geography quiz", continueGame: "Continue game", exploreWorld: "Explore the world",
     viewLevels: "View all levels", levels: "Levels", level: "Level {number}",
     levelRange: "Levels {start}–{end}",
     levelsMastered: "{count} of {total} levels mastered", quizzesMastered: "{count} of 4 quizzes mastered",

@@ -1671,16 +1671,17 @@
           <div><p class="kicker">${t("heroKicker")}</p><h1>${allMastered ? t("worldMastered") : `${t("heroTitleBefore")} <em>${t("heroTitleEmphasis")}</em>`}</h1></div>
           ${homeProgressMarkup(totals)}
         </section>
-        <section class="home-milestones" aria-labelledby="home-milestones-title"><strong id="home-milestones-title">${t("milestones")}</strong>${milestoneStickersMarkup(profile, { interactive: true })}</section>
         <section class="home-primary-actions" aria-label="${escapeHtml(t("chooseActivity"))}">
           <button class="home-action-card continue-card" data-action="${showSurprise ? "surprise-quiz" : "continue-game"}">
             <span class="home-action-icon" aria-hidden="true">${continueIcon}</span>
             <span><strong>${showSurprise ? t("surpriseQuiz") : hasPlayed ? t("continueGame") : t("startGame")}</strong>
-            ${quiz && hasPlayed ? `<small class="home-level-context">${levelBadgeMarkup(quiz.levelIndex, "small")}<span>${escapeHtml(modeLabel(quiz.mode))}</span></small>` : ""}</span>
+            ${!showSurprise && !hasPlayed ? `<small>${t("startGameDescription")}</small>` : quiz && hasPlayed ? `<small class="home-level-context">${levelBadgeMarkup(quiz.levelIndex, "small")}<span>${escapeHtml(modeLabel(quiz.mode))}</span></small>` : ""}</span>
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
-        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button" data-action="open-challenge">${t("openSharedLink")}</button>${installActionMarkup()}</nav></div>
+        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button" data-action="open-challenge">${t("openSharedLink")}</button>${installActionMarkup()}</nav>
+        <section class="home-milestones" aria-labelledby="home-milestones-title"><strong id="home-milestones-title">${t("milestones")}</strong>${milestoneStickersMarkup(profile, { interactive: true })}</section>
+        </div>
         <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses-and-privacy.html${state.locale === "en" ? "?lang=en" : ""}">${t("licencesAndPrivacy")}</a></span></footer>
         ${profilePanelMarkup()}${installHelpMarkup()}${openChallengeMarkup()}${milestoneCelebrationMarkup()}${worldCelebrationMarkup()}
       </main></div>`;
