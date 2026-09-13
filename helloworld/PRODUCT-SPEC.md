@@ -53,7 +53,10 @@ content source of truth.
 
 The home screen presents two primary actions. On desktop and portrait layouts,
 the milestone strip follows the primary and secondary actions. Short landscape
-keeps its compact milestone side column.
+keeps its compact milestone side column, with the heading visually hidden but
+available to assistive technology. On portrait phones, Levels occupies a centered
+row, followed by centered shared-link and optional installation actions that
+wrap together when necessary.
 
 ### Continue game
 

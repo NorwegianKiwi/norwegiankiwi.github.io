@@ -1679,7 +1679,7 @@
           </button>
           <button class="home-action-card explore-home-card" data-action="explore" data-value="map"><span class="home-action-icon" aria-hidden="true">◎</span><span><strong>${t("exploreWorld")}</strong><small>${t("places", { count: countries.length })}</small></span></button>
         </section>
-        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><button class="quiet-button" data-action="open-challenge">${t("openSharedLink")}</button>${installActionMarkup()}</nav>
+        <nav class="home-secondary-actions" aria-label="${t("settings")}"><button class="secondary-button" data-action="levels">${allMastered ? t("chooseLevel") : t("viewLevels")}</button><div class="home-quiet-actions"><button class="quiet-button" data-action="open-challenge">${t("openSharedLink")}</button>${installActionMarkup()}</div></nav>
         <section class="home-milestones" aria-labelledby="home-milestones-title"><strong id="home-milestones-title">${t("milestones")}</strong>${milestoneStickersMarkup(profile, { interactive: true })}</section>
         </div>
         <footer><span class="copyright">&copy; 2026 Lance Olav Eastgate</span><span class="license-links"><a href="./licenses-and-privacy.html${state.locale === "en" ? "?lang=en" : ""}">${t("licencesAndPrivacy")}</a></span></footer>
