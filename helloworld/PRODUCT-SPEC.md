@@ -103,7 +103,8 @@ On phones, the two primary actions must appear in the first viewport without
 requiring the player to scroll through a map or region list.
 
 The footer contains the copyright notice and one localized **Licences and
-privacy** link. Its dedicated static page explains asset licences, local
+privacy** link. On phones, they share a row when space permits; the complete
+link wraps underneath when needed. Its dedicated static page explains asset licences, local
 progress and deliberate sharing, with a link to the site-wide privacy notice in
 both Norwegian and English. Norwegian is the default, `?lang=en` selects
 English, and both versions remain readable without JavaScript.
