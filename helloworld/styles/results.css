@@ -583,11 +583,9 @@ body.result-page {
 .puzzle-reward-count { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; margin: 0; font-size: clamp(1rem, 2.5vmin, 1.4rem); font-weight: 800; font-variant-numeric: tabular-nums; color: #fff4ce; }
 .puzzle-reward-card > button { min-width: 180px; background: var(--gold); color: var(--ink); }
 .puzzle-reward-card > button:hover { background: #f0c75f; }
-.is-piece-landed .puzzle-reward-count { animation: puzzle-count-pop 400ms ease-out both; }
 .puzzle-confetti { position: absolute; inset: 0; pointer-events: none; overflow: clip; }
 .puzzle-confetti i { position: absolute; left: 50%; top: 50%; width: 7px; height: 12px; border-radius: 2px; opacity: 0; background: var(--confetti-color); }
 .is-piece-landed .puzzle-confetti i { animation: puzzle-confetti-burst 1.1s ease-out both; }
-@keyframes puzzle-count-pop { 0% { transform: scale(1); } 45% { transform: scale(1.15); } 100% { transform: scale(1); } }
 @keyframes puzzle-confetti-burst {
   0% { opacity: 0; transform: rotate(var(--confetti-angle)) translateY(0) rotate(0); }
   15% { opacity: 1; }
@@ -617,7 +615,7 @@ body.result-page {
 .is-art-ready .puzzle-new-piece > path:last-child { animation-play-state: running; }
 
 @media (prefers-reduced-motion: reduce) {
-  .puzzle-new-piece, .is-complete.is-revealing .puzzle-seams, .puzzle-new-piece > path:last-child, .is-piece-landed .puzzle-reward-count, .is-piece-landed .puzzle-confetti i { animation: none; }
+  .puzzle-new-piece, .is-complete.is-revealing .puzzle-seams, .puzzle-new-piece > path:last-child, .is-piece-landed .puzzle-confetti i { animation: none; }
 }
 
 /* Perfect results fit the viewport without concealing content or controls. */
