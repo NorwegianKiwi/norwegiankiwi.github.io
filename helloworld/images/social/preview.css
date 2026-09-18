@@ -1,0 +1,16 @@
+/* Capture-only sizing. Product colours, typography, map and card treatments
+   come from base.css and quiz.css; nothing here is loaded by the game. */
+html, body { width: 1200px; height: 630px; min-height: 0; overflow: hidden; }
+.social-preview { padding: 28px 36px 36px; }
+.social-header { height: 70px; display: flex; align-items: flex-start; justify-content: space-between; }
+.social-header .brand { font-size: 30px; padding-top: 5px; }
+.social-header .question-prompt { margin: 0; }
+.social-header .question-prompt h1 { font-size: 46px; line-height: 1; }
+.social-game { display: grid; grid-template-columns: 744px 360px; gap: 24px; height: 496px; }
+.social-game .map-quiz-visual { display: block; height: 496px; }
+.social-answers { display: grid; grid-template-rows: repeat(4, 1fr); gap: 16px; }
+.social-answers .answer-card { display: flex; align-items: center; padding: 20px; cursor: default; }
+.social-answers .map-answer-content { display: grid; grid-template-columns: 88px 1fr; gap: 20px; align-items: center; }
+.social-answers .map-answer-flag { width: 88px; }
+.social-answers strong { font-size: 30px; line-height: 1.2; }
+.social-preview *, .social-preview *::after { transition: none !important; }

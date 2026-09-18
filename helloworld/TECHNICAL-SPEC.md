@@ -532,10 +532,13 @@ keep it aligned with the active locale. Canonicals omit routes and payloads,
 while reciprocal `nb`, `en`, and `x-default` alternates identify the entry URLs.
 
 The initial HTML includes an English title and description plus fixed English
-Open Graph and Twitter metadata. Social metadata uses the public base URL,
-`en_GB` with `nb_NO` as an alternate, and the 512×512 PNG globe app icon with
-image dimensions, type and alternative text. Twitter uses a square `summary`
-card. Runtime updates localize only the document title, description and HTML
+Open Graph and Twitter metadata. Social metadata uses the English entry URL
+(`https://lanceolav.com/helloworld/?lang=en`), `en_GB` with `nb_NO` as an
+alternate, and the approved 1200×630 Italy map-question PNG at
+`images/social/hello-world-italy-v1.png`, with an absolute HTTPS URL, image
+dimensions, type and alternative text. Twitter uses `summary_large_image`.
+Both locales share this fixed English social card; search canonicals remain
+locale-specific. Runtime updates localize only the document title, description and HTML
 language, alongside the canonical above; social metadata remains unchanged.
 The canonical still requires JavaScript, while all social metadata is static.
 
