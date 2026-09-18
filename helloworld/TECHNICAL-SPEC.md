@@ -531,6 +531,14 @@ creates the initial canonical before deferred scripts execute; metadata updates
 keep it aligned with the active locale. Canonicals omit routes and payloads,
 while reciprocal `nb`, `en`, and `x-default` alternates identify the entry URLs.
 
+The initial HTML includes an English title and description plus fixed English
+Open Graph and Twitter metadata. Social metadata uses the public base URL,
+`en_GB` with `nb_NO` as an alternate, and the 512×512 PNG globe app icon with
+image dimensions, type and alternative text. Twitter uses a square `summary`
+card. Runtime updates localize only the document title, description and HTML
+language, alongside the canonical above; social metadata remains unchanged.
+The canonical still requires JavaScript, while all social metadata is static.
+
 Language controls are anchors. `navigation.createLanguageUrl` changes only the
 language parameter, retaining the current path, other query values, and fragment.
 Ordinary activation uses `replaceState` and renders the current session without

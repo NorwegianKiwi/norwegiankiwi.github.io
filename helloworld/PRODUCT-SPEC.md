@@ -29,7 +29,11 @@ of the product's central features and must remain directly accessible.
 
 - The primary audience is children and adults, initially with a Nordic and
   European perspective.
-- The interface must continue to support Norwegian and English.
+- The interface must continue to support Norwegian and English. Norwegian remains
+  the default; `?lang=en` opens the game in English.
+- Public link previews use English text and the globe app icon. The initial HTML
+  exposes English metadata without JavaScript; the running game's browser title
+  and document description follow the selected language.
 - The recommended journey may start with familiar Nordic and European content,
   but all levels remain open to people whose geographic familiarity differs.
 - No account, email address, password or personal information is required.

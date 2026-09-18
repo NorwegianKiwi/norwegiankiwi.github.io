@@ -630,17 +630,10 @@
     document.querySelector('link[rel="canonical"]')?.setAttribute(
       "href", navigation.createLanguageUrl(sharing.PUBLIC_APP_URL, state.locale).href,
     );
-    const metadata = {
-      'meta[name="description"]': t("metaDescription"),
-      'meta[property="og:title"]': t("metaTitle"),
-      'meta[property="og:description"]': t("metaDescription"),
-      'meta[property="og:locale"]': state.locale === "nb" ? "nb_NO" : "en_GB",
-      'meta[name="twitter:title"]': t("metaTitle"),
-      'meta[name="twitter:description"]': t("metaDescription"),
-    };
-    Object.entries(metadata).forEach(([selector, content]) => {
-      document.querySelector(selector)?.setAttribute("content", content);
-    });
+    // Social previews stay English; browser metadata follows the player's language.
+    document.querySelector('meta[name="description"]')?.setAttribute(
+      "content", t("metaDescription"),
+    );
   }
 
   function mapRegionForCode(code) {
