@@ -83,6 +83,7 @@ a:focus-visible {
 }
 
 .home-mark {
+    position: relative;
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -92,17 +93,50 @@ a:focus-visible {
         0 0 18px rgba(142, 211, 214, 0.35);
 }
 
-.contents-mark {
-    width: 5px;
-    height: 5px;
+.home-mark::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 2px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
     background: currentColor;
     box-shadow:
-        -10px -6px 0 -0.5px currentColor,
-        10px -5px 0 -0.6px currentColor,
-        -8px 9px 0 -0.8px currentColor,
-        9px 8px 0 -0.5px currentColor;
-    transform: rotate(-7deg);
+        -10.4px 18px 0 currentColor,
+        10.4px 18px 0 currentColor;
+}
+
+.contents-mark {
+    position: relative;
+    width: 26px;
+    height: 20px;
+}
+
+.contents-mark::before,
+.contents-mark::after {
+    content: "";
+    position: absolute;
+    background: currentColor;
+    box-shadow:
+        0 8px 0 currentColor,
+        0 16px 0 currentColor;
+}
+
+.contents-mark::before {
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+}
+
+.contents-mark::after {
+    top: 1px;
+    left: 8px;
+    width: 18px;
+    height: 2px;
+    border-radius: 1px;
 }
 
 .sr-only {
