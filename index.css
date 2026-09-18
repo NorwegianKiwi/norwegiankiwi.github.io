@@ -82,6 +82,8 @@ body {
     filter: saturate(0.45);
     transform: translate(-50%, -50%);
     animation: sun-breathe 9s ease-in-out infinite;
+    cursor: pointer;
+    transition: box-shadow 180ms ease;
 }
 
 .central-light::after {
@@ -91,6 +93,25 @@ body {
     border-radius: 50%;
     background: radial-gradient(circle, rgba(236, 235, 220, 0.1), transparent 67%);
     filter: blur(7px);
+    pointer-events: none;
+    transition: filter 180ms ease;
+}
+
+.central-light:hover::after,
+.central-light:focus-visible::after {
+    filter: blur(7px) brightness(1.8);
+}
+
+.central-light:hover,
+.central-light:focus-visible {
+    animation-play-state: paused;
+    opacity: 1 !important;
+    filter: saturate(0.6) brightness(1.35) !important;
+    box-shadow: 0 0 24px 6px rgba(236, 235, 220, 0.25);
+}
+
+.central-light:focus-visible {
+    border-radius: 50%;
 }
 
 .orbit-track {

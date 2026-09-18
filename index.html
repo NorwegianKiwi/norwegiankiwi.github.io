@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="The personal homepage of Lance Olav Eastgate.">
   <link rel="stylesheet" href="nav.css">
-  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="index.css?v=solar-2">
   <title>Lance Olav Eastgate</title>
   <link rel="stylesheet" href="privacy-links.css">
+  <link rel="stylesheet" href="solar-transitions.css?v=4">
+  <script src="solar-transitions.js?v=5"></script>
 </head>
 <body>
   <div class="page-shell">
@@ -26,12 +28,12 @@
 
       <div class="orbit-stage">
         <div class="asteroid-belt" aria-hidden="true"></div>
-        <div class="central-light" aria-hidden="true"></div>
+        <a class="central-light" href="contents.html" aria-label="Open contents"></a>
 
         <div class="orbit-track orbit-cv">
           <a class="discovery" href="cv_english.html" aria-label="Curriculum vitae">
             <span class="discovery-orientation">
-              <img class="discovery-mark portrait-mark" src="portrait_wedding.png" alt="">
+              <img class="discovery-mark portrait-mark" data-planet="cv" src="portrait_wedding.png" alt="">
             </span>
           </a>
         </div>
@@ -39,7 +41,7 @@
         <div class="orbit-track orbit-geography">
           <a class="discovery" href="helloworld/" aria-label="Hello World! geography game">
             <span class="discovery-orientation">
-              <img class="discovery-mark globe-mark" src="helloworld/favicon.svg" alt="">
+              <img class="discovery-mark globe-mark" data-planet="geography" src="helloworld/favicon.svg" alt="">
             </span>
           </a>
         </div>
@@ -47,7 +49,7 @@
         <div class="orbit-track orbit-brainteaser">
           <a class="discovery" href="brainteaser.html" aria-label="Brain Teaser">
             <span class="discovery-orientation">
-              <span class="discovery-mark puzzle-fragment" aria-hidden="true">
+              <span class="discovery-mark puzzle-fragment" data-planet="puzzle" aria-hidden="true">
                 <span>2974</span>
                 <span>6666</span>
                 <span>2125</span>

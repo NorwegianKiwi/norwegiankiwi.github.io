@@ -1,0 +1,4 @@
+/* Only used by solar-transitions-fallback.js before its first animation frame. */
+.solar-fallback-pending main {
+    opacity: 0;
+}

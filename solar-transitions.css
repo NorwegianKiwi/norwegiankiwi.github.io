@@ -1,0 +1,55 @@
+/* Only the solar system and contents pages opt into shared navigation. */
+@view-transition {
+    navigation: auto;
+}
+
+[data-planet="cv"] {
+    view-transition-name: planet-cv;
+}
+
+[data-planet="geography"] {
+    view-transition-name: planet-geography;
+}
+
+[data-planet="puzzle"] {
+    view-transition-name: planet-puzzle;
+}
+
+.site-nav {
+    view-transition-name: site-navigation;
+}
+
+.solar-transition-active .orbit-track,
+.solar-transition-active .discovery-orientation,
+.solar-transition-active .central-light,
+.solar-transition-active .discovery::before {
+    animation-play-state: paused;
+}
+
+::view-transition-group(*) {
+    animation-duration: 500ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+    animation-duration: 500ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Keep the header in place, while its active icon changes with the page. */
+::view-transition-group(site-navigation) {
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition {
+        navigation: none;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
+}
