@@ -41,20 +41,20 @@ class StaticMetadataTests(unittest.TestCase):
             "Play a geography quiz, explore an interactive world map, and learn "
             "countries, flags and capitals with flashcards. Available in English and Norwegian."
         )
-        image = "https://lanceolav.com/helloworld/icons/app-icon-512.png"
+        image = "https://lanceolav.com/helloworld/images/social/hello-world-italy-v1.png"
         expected = {
             "description": description,
             "og:title": title,
             "og:description": description,
             "og:type": "website",
-            "og:url": "https://lanceolav.com/helloworld/",
+            "og:url": "https://lanceolav.com/helloworld/?lang=en",
             "og:locale": "en_GB",
             "og:locale:alternate": "nb_NO",
             "og:image": image,
             "og:image:type": "image/png",
-            "og:image:width": "512",
-            "og:image:height": "512",
-            "twitter:card": "summary",
+            "og:image:width": "1200",
+            "og:image:height": "630",
+            "twitter:card": "summary_large_image",
             "twitter:title": title,
             "twitter:description": description,
             "twitter:image": image,
@@ -65,6 +65,6 @@ class StaticMetadataTests(unittest.TestCase):
                 self.assertEqual(head.metadata.get(key), [value])
         self.assertTrue(head.metadata["og:image:alt"][0])
         self.assertEqual(head.metadata["twitter:image:alt"], head.metadata["og:image:alt"])
-        png = (ROOT / "icons/app-icon-512.png").read_bytes()
+        png = (ROOT / "images/social/hello-world-italy-v1.png").read_bytes()
         self.assertEqual(png[:8], b"\x89PNG\r\n\x1a\n")
-        self.assertEqual(struct.unpack(">II", png[16:24]), (512, 512))
+        self.assertEqual(struct.unpack(">II", png[16:24]), (1200, 630))

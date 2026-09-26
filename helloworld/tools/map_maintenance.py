@@ -349,12 +349,77 @@ def code_for_source_row(row, manifest):
     return code if re.fullmatch(r"[a-z]{2}", code) else None
 
 
+def validate_geometry_halos(map_data, manifest):
+    errors = []
+    covered = set(manifest["maritimeZones"]["includedCodes"])
+    for view in map_data["quizRegions"].values():
+        if "islandPositions" in view:
+            errors.append("Retired island-position metadata remains in a region")
+        if any(marker["code"] in covered for marker in view["markers"]):
+            errors.append("Halo place retains a regional country locator")
+    for code, silhouette in map_data["silhouettes"].items():
+        layers = [silhouette]
+        if silhouette.get("expanded"):
+            layers += [silhouette["expanded"], *silhouette["expanded"]["insets"]]
+        for layer in layers:
+            if "islandPositions" in layer:
+                errors.append("Retired island-position metadata remains in a silhouette")
+            if code in covered and layer.get("markers"):
+                errors.append("Halo silhouette retains position dots: " + code)
+        if code in covered and not (silhouette.get("path") or silhouette.get("minorPath")):
+            errors.append("Halo silhouette has no land geometry: " + code)
+    for code, rule in manifest.get("silhouetteOverrides", {}).items():
+        anchor = rule.get("overviewCapitalAnchor")
+        if anchor and (not anchor.get("source") or not anchor.get("reason")
+                       or not isinstance(anchor.get("longitude"), (int, float))
+                       or not isinstance(anchor.get("latitude"), (int, float))
+                       or not -180 <= anchor["longitude"] <= 180
+                       or not -90 <= anchor["latitude"] <= 90
+                       or rule.get("insets")):
+            errors.append("Invalid overview capital anchor: " + code)
+    return errors
+
+
+def validate_maritime_zones(map_data, manifest, countries):
+    errors = []
+    included = set(manifest["maritimeZones"]["includedCodes"])
+    regions = {country["code"]: country["region"] for country in countries}
+    seen_codes, source_ids = set(), set()
+    for region, view in map_data["quizRegions"].items():
+        for zone in view.get("maritimeZones", []):
+            source_id = zone.get("sourceId")
+            if not isinstance(source_id, str) or not source_id.isdigit() or source_id in source_ids:
+                errors.append(f"Invalid or duplicate maritime source ID: {source_id}")
+            source_ids.add(source_id)
+            codes = zone.get("codes", [])
+            if not codes or any(code not in regions for code in codes):
+                errors.append(f"Unknown maritime place: {source_id}")
+            if not any(code in included and regions.get(code) == region for code in codes):
+                errors.append(f"Maritime zone in wrong region: {source_id}")
+            kind, code = zone.get("type"), zone.get("code")
+            if kind == "200NM":
+                if code not in included or codes != [code]:
+                    errors.append(f"Ambiguous selectable maritime zone: {source_id}")
+                seen_codes.add(code)
+            elif kind not in ("Joint regime", "Overlapping claim") or code is not None:
+                errors.append(f"Shared maritime zone must be neutral: {source_id}")
+            for key in ("path", "outlinePath"):
+                path = zone.get(key, "")
+                if not path or not re.fullmatch(r"[MLZ0-9., \-]+", path):
+                    errors.append(f"Invalid maritime {key}: {source_id}")
+    if seen_codes != included:
+        errors.append(f"Maritime coverage differs: {sorted(included - seen_codes)}")
+    return errors
+
+
 def validate_local_data(map_path=None):
     manifest = load_manifest()
     countries = load_countries()
     map_data = load_generated_map(map_path)
     errors = []
     warnings = []
+    errors.extend(validate_maritime_zones(map_data, manifest, countries))
+    errors.extend(validate_geometry_halos(map_data, manifest))
 
     codes = [country["code"] for country in countries]
     region_for_code = {
@@ -514,15 +579,6 @@ def validate_local_data(map_path=None):
         silhouette_override = manifest.get("silhouetteOverrides", {}).get(
             code, {}
         )
-        force_compact_markers = silhouette_override.get(
-            "forceCompactMarkers", False
-        )
-        if not isinstance(force_compact_markers, bool):
-            errors.append(f"{code} har ugyldig forceCompactMarkers-verdi")
-        if force_compact_markers and (path or not markers or not minor_path):
-            errors.append(
-                f"{code} bruker ikke tvungne kompaktmarkører som forventet"
-            )
         expected_expanded = bool(
             silhouette_override.get("insets")
             or silhouette_override.get("division")
@@ -619,7 +675,7 @@ def validate_local_data(map_path=None):
 
     untouched_silhouette_codes = set(codes) - set(
         manifest.get("silhouetteOverrides", {})
-    )
+    ) - set(manifest.get("maritimeZones", {}).get("includedCodes", []))
     if map_path:
         checked_in = load_generated_map()
         changed_without_override = sorted(

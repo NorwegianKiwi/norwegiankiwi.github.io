@@ -884,3 +884,40 @@ footer a {
 .level-progress-ring { position:absolute; width:calc(100% + 10px); height:calc(100% + 10px); inset:-5px; overflow:visible; pointer-events:none; fill:none; }
 .level-ring-segment { stroke:#b8b4a866; stroke-width:2.5; stroke-linecap:round; }
 .level-ring-segment.is-filled { stroke:var(--stage-accent, var(--green)); }
+
+/* Shared maritime layer in regional Explorer and quiz maps. */
+.maritime-zone {
+  pointer-events: none;
+}
+
+.maritime-zone-fill {
+  fill: rgba(65, 111, 131, 0.065);
+  stroke: none;
+}
+
+.maritime-zone-outline {
+  fill: none;
+  stroke: rgba(65, 111, 131, 0.48);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.maritime-zone.is-highlighted .maritime-zone-fill {
+  fill: rgba(217, 111, 78, 0.13);
+}
+
+.maritime-zone.is-highlighted .maritime-zone-outline {
+  stroke: var(--coral);
+  stroke-width: 1.6;
+}
+
+.maritime-zone.is-neutral .maritime-zone-fill {
+  fill: rgba(95, 100, 105, 0.08);
+}
+
+.maritime-zone.is-neutral .maritime-zone-outline {
+  stroke: rgba(95, 100, 105, 0.5);
+  stroke-dasharray: 2 4;
+}

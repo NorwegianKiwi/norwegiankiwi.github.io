@@ -1540,3 +1540,16 @@ body.standalone-mode .explore-map-shell .explore-country-panel {
       font-size: 8px;
     }
 }
+
+.explore-maritime-zone .maritime-zone-fill {
+  pointer-events: fill;
+  cursor: pointer;
+}
+
+.explore-region-map.is-zoomed .explore-maritime-zone .maritime-zone-fill {
+  cursor: grab;
+}
+
+.explore-region-map.is-dragging .explore-maritime-zone .maritime-zone-fill {
+  cursor: grabbing;
+}

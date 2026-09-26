@@ -6,10 +6,13 @@ script never replaces the checked-in runtime file automatically.
 """
 
 import argparse
+import copy
 import json
 import math
 import struct
 import sys
+import tempfile
+import zipfile
 from collections import defaultdict
 from pathlib import Path
 
@@ -22,6 +25,7 @@ from map_maintenance import (
     load_manifest,
     read_dbf,
     resolve_capital_points,
+    sha256,
 )
 
 
@@ -1335,10 +1339,14 @@ def build_silhouette_capitals(
             or override.get("divisionSharedBoundary")
         ):
             projection = silhouette_projection(main_items)
-            output[code] = {
-                "main": project_silhouette_capitals(capitals, projection),
-                "insets": [],
-            }
+            projected_capitals = project_silhouette_capitals(capitals, projection)
+            anchor = (override or {}).get("overviewCapitalAnchor")
+            if anchor:
+                x, y = project_silhouette_ring([(anchor["longitude"], anchor["latitude"])], projection)[0]
+                for capital in projected_capitals:
+                    if capital["kind"] == "quiz":
+                        capital.update(x=round(x, 5), y=round(y, 5))
+            output[code] = {"main": projected_capitals, "insets": []}
             continue
 
         inset_capitals = [[] for _ in override.get("insets", [])]
@@ -1429,7 +1437,6 @@ def build_silhouette_layer(
     division_items=None,
     division_lines=None,
     merge_stroke=False,
-    force_markers=False,
 ):
     projection = silhouette_projection(ring_items, frame, padding)
 
@@ -1438,7 +1445,7 @@ def build_silhouette_layer(
     for index, projected in enumerate(projection["projectedRings"]):
         width = max(x for x, _ in projected) - min(x for x, _ in projected)
         height = max(y for _, y in projected) - min(y for _, y in projected)
-        if force_markers or (width < 1.4 and height < 1.4):
+        if width < 1.4 and height < 1.4:
             marker_candidates.append(
                 {
                     "x": round(sum(x for x, _ in projected) / len(projected), 1),
@@ -1517,9 +1524,6 @@ def build_silhouettes(features, country_codes, overrides=None):
             **build_silhouette_layer(
                 main_items,
                 merge_stroke=bool(override and override.get("mergeStroke")),
-                force_markers=bool(
-                    override and override.get("forceCompactMarkers")
-                ),
             ),
             "corner": "bottom-left",
         }
@@ -1591,6 +1595,149 @@ def compact_json(value):
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
 
+def load_maritime_features(source_directory, manifest):
+    """Read only the pinned archive; never trust an unrelated extracted file."""
+    dataset = manifest["datasets"]["maritimeZones"]
+    archive_path = source_directory / dataset["file"]
+    if sha256(archive_path) != dataset["sha256"]:
+        raise ValueError("Maritime source checksum does not match the manifest")
+    with zipfile.ZipFile(archive_path) as archive, tempfile.TemporaryDirectory() as temp:
+        files = {}
+        for suffix in (".dbf", ".shp"):
+            matches = [name for name in archive.namelist() if name.endswith(suffix)]
+            if len(matches) != 1:
+                raise ValueError(f"Expected one maritime {suffix} file")
+            files[suffix] = Path(temp) / ("maritime" + suffix)
+            files[suffix].write_bytes(archive.read(matches[0]))
+        rows = read_dbf(files[".dbf"])
+        shapes = read_shapefile(files[".shp"])
+    if len(rows) != len(shapes):
+        raise ValueError("Maritime attributes and shapes do not match")
+    return select_maritime_features(rows, shapes, manifest["maritimeZones"])
+
+
+def select_maritime_features(rows, shapes, settings):
+    mappings = settings["territoryCodes"]
+    included = set(settings["includedCodes"])
+    found = set()
+    features = []
+    for row, shape in zip(rows, shapes):
+        codes = sorted({mappings[row[f"ISO_TER{i}"]] for i in (1, 2, 3)
+                        if row.get(f"ISO_TER{i}") in mappings})
+        if not included.intersection(codes):
+            continue
+        kind = row["POL_TYPE"]
+        if kind not in ("200NM", "Joint regime", "Overlapping claim"):
+            raise ValueError(f"Unknown maritime zone type: {kind}")
+        code = codes[0] if kind == "200NM" and len(codes) == 1 else None
+        if kind == "200NM" and (not code or row.get("ISO_TER2")):
+            raise ValueError("Ambiguous maritime territory mapping")
+        if code:
+            found.add(code)
+        rings = shape["rings"]
+        if not rings or any(len(ring) < 4 or ring[0] != ring[-1] or
+                            any(not math.isfinite(v) for p in ring for v in p)
+                            for ring in rings):
+            raise ValueError(f"Invalid maritime geometry: {row['MRGID']}")
+        features.append({"sourceId": row["MRGID"], "codes": codes,
+                         "code": code, "type": kind, "rings": rings})
+    if found != included:
+        raise ValueError(f"Missing maritime places: {sorted(included - found)}")
+    if len({f["sourceId"] for f in features}) != len(features):
+        raise ValueError("Duplicate maritime source identifiers")
+    return sorted(features, key=lambda feature: int(feature["sourceId"]))
+
+
+def maritime_outline_lines(ring, projected):
+    """Omit the source's artificial +/-180 closing edges, retaining real edges."""
+    lines = []
+    line = []
+    for index, (start, end) in enumerate(zip(ring, ring[1:])):
+        seam = (abs(abs(start[0]) - 180) < 1e-7 and
+                abs(abs(end[0]) - 180) < 1e-7)
+        if seam:
+            if len(line) > 1:
+                lines.append(line)
+            line = []
+        else:
+            if not line:
+                line.append(projected[index])
+            line.append(projected[index + 1])
+    if len(line) > 1:
+        lines.append(line)
+    return lines
+
+
+def maritime_ring_is_exterior(ring):
+    """Shapefile exteriors are clockwise in geographic coordinates, holes CCW."""
+    geographic = unwrap_ring(ring, 0)
+    signed_area = sum(x1 * y2 - x2 * y1
+                      for (x1, y1), (x2, y2) in zip(geographic, geographic[1:]))
+    return signed_area < 0
+
+
+def add_maritime_zones(views, features, manifest, countries):
+    region_for_code = {country["code"]: country["region"] for country in countries}
+    output = {}
+    for region, view in views.items():
+        settings = manifest["quizRegions"][region]
+        center = settings["centerLongitude"]
+        bounds = settings["bounds"]
+        projection = regional_projection(center, (bounds[1] + bounds[3]) / 2)
+        transform = bounds_transform(bounds, center, projection, *QUIZ_SIZE)
+        zones = []
+        for feature in features:
+            if not any(region_for_code.get(code) == region for code in feature["codes"]
+                       if code in manifest["maritimeZones"]["includedCodes"]):
+                continue
+            rings, lines = [], []
+            for ring in feature["rings"]:
+                projected = [projection(*point) for point in unwrap_ring(ring, center)]
+                if crosses_azimuthal_antipode(projected):
+                    raise ValueError(f"Maritime zone crosses projection antipode: {feature['sourceId']}")
+                projected = [transform(point) for point in projected]
+                rings.append(projected)
+                if maritime_ring_is_exterior(ring):
+                    lines.extend(maritime_outline_lines(ring, projected))
+            # The low-resolution source is already simplified. Keep all vertices,
+            # holes and shared edges in fills. Only exterior rings are outlined;
+            # source coastal holes must not look like additional land geometry.
+            # The SVG viewport clips without fake borders.
+            zones.append({key: value for key, value in feature.items() if key != "rings"} |
+                         {"path": path_from_rings(rings, precision=2),
+                          "outlinePath": path_from_polylines(lines, precision=2)})
+        output[region] = {**view, "maritimeZones": zones}
+    return output
+
+
+def candidate_from_existing(existing, quiz_regions):
+    return {
+        "base": {key: existing[key] for key in
+                 ("viewBox", "source", "projection", "features", "markers")},
+        **{key: existing[key] for key in
+           ("quizProjection", "silhouetteViewBox", "silhouettes", "silhouetteCapitals")},
+        "quizRegions": quiz_regions,
+    }
+
+
+def refresh_halo_data(existing, manifest):
+    """Retire display positions without changing any geographic paths or cameras."""
+    result = copy.deepcopy(candidate_from_existing(existing, existing["quizRegions"]))
+    covered = set(manifest["maritimeZones"]["includedCodes"])
+    for view in result["quizRegions"].values():
+        view.pop("islandPositions", None)
+        view["markers"] = [marker for marker in view["markers"] if marker["code"] not in covered]
+    for code, silhouette in result["silhouettes"].items():
+        layers = [silhouette]
+        if silhouette.get("expanded"):
+            layers += [silhouette["expanded"], *silhouette["expanded"]["insets"]]
+        for layer in layers:
+            layer.pop("islandPositions", None)
+            if code in covered:
+                layer["markers"] = []
+    return result
+
+
 def write_candidate(path, data):
     script = f"""(function () {{
   "use strict";
@@ -1605,6 +1752,13 @@ def write_candidate(path, data):
     Object.freeze(view.features);
     Object.freeze(view.markers);
     Object.freeze(view.backgroundFeatures);
+    if (view.maritimeZones) {{
+      view.maritimeZones.forEach((zone) => {{
+        Object.freeze(zone.codes);
+        Object.freeze(zone);
+      }});
+      Object.freeze(view.maritimeZones);
+    }}
     Object.freeze(view);
   }});
   Object.freeze(data.quizRegions);
@@ -1643,6 +1797,10 @@ def main():
     )
     parser.add_argument("source_directory", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--refresh-halo-data", action="store_true",
+                        help="Remove retired island-position metadata and covered locators; requires --base-map. No source download needed.")
+    parser.add_argument("--refresh-maritime-zones", action="store_true",
+                        help="Refresh only maritime zones; requires --base-map.")
     parser.add_argument(
         "--base-map",
         type=Path,
@@ -1684,6 +1842,16 @@ def main():
         ),
     )
     args = parser.parse_args()
+    if args.refresh_halo_data and (not args.base_map or any((
+        args.refresh_maritime_zones, args.refresh_silhouettes, args.refresh_silhouette_overrides,
+        args.refresh_world_overrides, args.refresh_world,
+    ))):
+        parser.error("--refresh-halo-data requires --base-map and no other refresh flag")
+    if args.refresh_maritime_zones and (not args.base_map or any((
+        args.refresh_silhouettes, args.refresh_silhouette_overrides,
+        args.refresh_world_overrides, args.refresh_world,
+    ))):
+        parser.error("--refresh-maritime-zones requires --base-map and no other refresh flag")
     if args.refresh_silhouette_overrides and not args.base_map:
         parser.error("--refresh-silhouette-overrides krever --base-map")
     if args.refresh_silhouette_overrides and args.refresh_silhouettes:
@@ -1716,6 +1884,20 @@ def main():
     try:
         manifest = load_manifest()
         countries = load_countries()
+        if args.refresh_maritime_zones:
+            existing = load_generated_map(args.base_map)
+            zones = load_maritime_features(args.source_directory, manifest)
+            views = add_maritime_zones(existing["quizRegions"], zones, manifest, countries)
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            write_candidate(args.output, candidate_from_existing(existing, views))
+            print(f"Wrote maritime candidate: {args.output}; validate and visually review before use.")
+            return 0
+        if args.refresh_halo_data:
+            data = refresh_halo_data(load_generated_map(args.base_map), manifest)
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            write_candidate(args.output, data)
+            print("Wrote halo-data candidate; validate and visually review before use:", args.output)
+            return 0
         local_names = {
             country["code"]: country["name"] for country in countries
         }
@@ -1825,6 +2007,10 @@ def main():
                 manifest.get("regionalGeometryOverrides", {}),
             )
         silhouette_overrides = manifest.get("silhouetteOverrides", {})
+        if not (args.refresh_silhouette_overrides or args.refresh_world_overrides or args.refresh_world):
+            quiz_regions = add_maritime_zones(
+                quiz_regions, load_maritime_features(args.source_directory, manifest), manifest, countries,
+            )
         if args.refresh_silhouette_overrides:
             regenerated = build_silhouettes(
                 countries10,
@@ -1886,6 +2072,9 @@ def main():
             "silhouettes": silhouettes,
             "silhouetteCapitals": silhouette_capitals,
         }
+        if not (args.refresh_world or args.refresh_world_overrides):
+            combined = {**data["base"], **{k: v for k, v in data.items() if k != "base"}}
+            data = refresh_halo_data(combined, manifest)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         write_candidate(args.output, data)
         print(f"Skrev kandidat: {args.output}")

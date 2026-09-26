@@ -824,3 +824,49 @@ The generated test backup includes `test-globetrotter-half` (levels 1–34 maste
 stage’s quizzes mastered, with each second half unplayed). The latter has
 116 mastered quizzes, 28 fully mastered levels, and piece counts 8, 20, 26, 28,
 22 and 12. Navigator and Cartographer each end halfway through a level.
+
+## Regional maritime-zone layer
+
+`quizRegions[region].maritimeZones` optionally contains generated Marine Regions
+EEZ v12 geometry for 18 island places. Entries carry `sourceId`, `codes`, nullable
+`code`, `type`, `path`, and `outlinePath`. The manifest pins the source, license,
+checksum and territory mappings; MAP-DATA.md documents regeneration and source
+limitations. World views and silhouettes do not include this layer.
+Fill paths retain every source ring; outline paths contain only exterior rings,
+classified by geographic shapefile winding before projection, and omit artificial
+date-line closing edges. Interior coastal holes receive no stroke.
+
+Rendering places the zone fill/outline layer below land and locator markers.
+Only single-place `200NM` zones in the active Explorer scope receive pointer
+selection actions. Shared or overlapping polygons remain neutral. Zone controls
+reuse the existing place selection, hover and drag-suppression paths without
+adding tab stops. Existing land controls provide keyboard access and synchronize
+highlighting across all components. Quiz zones are noninteractive. Existing
+land-based regional and Nearby camera calculations are unchanged.
+
+The bilingual licenses page supplies maritime explanations and source/license
+links. No source is fetched at runtime and no storage, curriculum or transfer
+interface changes are involved.
+
+## Island geometry halos
+
+`geometryHaloCodes` in `app.js` covers the same 18 codes as the source manifest's
+maritime coverage. Shared regional markup draws an always-visible decorative
+layer between maritime zones and actual land, including background land.
+Existing land paths receive an opaque `#b7cbc1` fill and rounded 2px non-scaling
+stroke. A mask excludes artificial `cropPath` edges from the halo. The layer is
+`aria-hidden`, has no pointer events, and does not enter camera calculations.
+World maps do not receive halos; existing quiz-target highlighting stays above.
+
+Silhouettes duplicate both `path` and `minorPath` beneath each layer's actual
+land with the same colour, even-odd fill, and a 4px non-scaling stroke. The
+`has-geometry-halo` class scopes styling and accessible wording. Even all-minor
+silhouettes render their real land. Capital indicators, compositions, and inset
+connectors are preserved. There is no marker sampling, visibility threshold,
+collision logic, resize observer, blur, or user preference for this treatment.
+
+Generated regional locators and silhouette markers are empty for covered
+places. Other places retain established locator behaviour. Retired
+`islandPositions` fields are removed by the targeted halo-data cleanup; current
+full generation produces the same geometry-only contract. MAP-DATA.md documents
+the command and Tuvalu's source-based overview capital anchor.

@@ -637,3 +637,49 @@ When a material curriculum revision invalidates current mastery:
 - Historical best results are retained internally and may appear in a details
   view, but must not compete with the current result in the main level display.
 - One concise notice explains that some quizzes were updated.
+
+## Maritime grouping aid
+
+Regional Explorer maps and regional/Nearby map questions show subtle maritime
+zones for Kiribati, Marshall Islands, Micronesia, Tuvalu, Tonga, Palau, Cook Islands,
+French Polynesia, Northern Mariana Islands, American Samoa, Bahamas, Antigua and
+Barbuda, Saint Kitts and Nevis, Saint Vincent and the Grenadines, Grenada, Cayman
+Islands, Maldives and Seychelles. World maps and silhouettes remain land-based.
+
+The zones follow sourced EEZ/coastal-water geometry rather than invented island
+envelopes. They are always faintly visible and highlight together with the
+associated place on preview, focus, selection or as a quiz target. In Explorer,
+clicking or tapping the enclosed water selects the place; land and marker
+controls take precedence. Quizzes continue to use answer buttons. Shared or
+source-designated disputed zones are neutral and cannot select a place.
+Dashed lines trace exterior zone boundaries only. Interior holes reveal the
+ocean colour without outlines that could be mistaken for additional islands.
+
+The bilingual licenses page explains maritime resource rights, calculated or
+unsettled limits, selected-place coverage, and source attribution. These areas
+are not land territory or universally agreed borders. Unshaded areas are not
+necessarily high seas. Existing map framing stays focused on land, so a zone
+can extend outside the viewport. No information control overlays the map.
+
+### Island geometry halos and silhouettes
+
+All 18 maritime-zone places use actual land geometry with a pale, opaque
+blue-green visibility surround instead of generic regional locators or island
+position dots. Halos have rounded joins and caps, no blur, and a constant screen
+width: 2 CSS pixels in regional Explorer and regional/Nearby quizzes, 4 CSS pixels
+in compact/expanded silhouettes and their detail insets. They remain visible
+when unselected, beneath all land and selection highlights and above maritime
+tint. Halos exaggerate land extent; they cannot recover missing source detail.
+
+Every main and minor land component is retained without dot sampling or
+readability filtering. Scattered archipelagos retain their geographic overview
+when enlarged, with connected detail insets occupying the smaller part of the
+composition. Tuvalu keeps its overview and capital star without an enlarged
+polygon inset. Other useful main-land and remote-island compositions remain.
+Capital indicators and inset connectors stay visible above the surround.
+
+Halos are decorative: they add no click targets, keyboard stops, or camera
+bounds. Maritime zones retain country selection and highlighting; shared zones
+remain neutral. The licenses page explains the treatment in both languages,
+and silhouette controls retain a concise accessible explanation. World maps,
+places outside the 18-place coverage, scoring, and saved progress are unchanged.

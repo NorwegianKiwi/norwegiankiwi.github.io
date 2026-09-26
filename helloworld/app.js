@@ -213,6 +213,8 @@
   const exploreMapMaxZoom = 8;
   const exploreMapZoomLevels = [1, 1.5, 2, 3, 4, 6, 8];
   const exploreMapGeometryReadableSize = 5;
+  // Maritime-zone places use land geometry halos instead of country locators.
+  const geometryHaloCodes = new Set(["ki", "mh", "fm", "tv", "to", "pw", "ck", "pf", "mp", "as", "bs", "ag", "kn", "vc", "gd", "ky", "mv", "sc"]);
   const keyboardHintIgnoredKeys = new Set([
     "Tab",
     "Escape",
@@ -776,6 +778,24 @@
     `;
   }
 
+  function regionalGeometryHalosMarkup(view) {
+    const features = [...(view.backgroundFeatures ?? []), ...view.features]
+      .filter((feature) => geometryHaloCodes.has(feature.code));
+    return `<g class="regional-geometry-halos" aria-hidden="true">${features.map((feature, index) => {
+      // Erase artificial crop edges from the surround, not from actual land.
+      const maskId = `regional-halo-crop-${index}`;
+      const mask = feature.cropPath ? `<defs><mask id="${maskId}" maskUnits="userSpaceOnUse"
+        x="-10000" y="-10000" width="20000" height="20000">
+        <rect x="-10000" y="-10000" width="20000" height="20000" fill="white" />
+        <path d="${feature.cropPath}" fill="none" stroke="black" stroke-width="2"
+          vector-effect="non-scaling-stroke" />
+      </mask></defs>` : "";
+      return `${mask}<path class="regional-geometry-halo" data-halo-code="${escapeHtml(feature.code)}"
+        d="${feature.path}" fill-rule="evenodd" vector-effect="non-scaling-stroke"
+        ${feature.cropPath ? `mask="url(#${maskId})"` : ""} />`;
+    }).join("")}</g>`;
+  }
+
   function regionalMapMarkerMarkup(
     marker,
     className,
@@ -828,7 +848,8 @@
     { interactive = true, expanded = state.silhouetteExpanded } = {},
   ) {
     const silhouette = mapData.silhouettes[countryCode];
-    const hasSilhouettePath = Boolean(silhouette.path);
+    const hasGeometryHalo = geometryHaloCodes.has(countryCode);
+    const hasSilhouettePath = Boolean(silhouette.path || (hasGeometryHalo && silhouette.minorPath));
     const expandedSilhouette = silhouette.expanded;
     const capitalLayers = mapData.silhouetteCapitals[countryCode] ?? {
       main: [],
@@ -855,6 +876,7 @@
       "country-silhouette-inset",
       "is-bottom-left",
       hasSilhouettePath ? "has-silhouette-path" : "is-marker-only",
+      hasGeometryHalo ? "has-geometry-halo" : "",
       expandedSilhouette ? "has-expanded-composition" : "",
       interactive ? "is-interactive" : "is-preview-only",
       interactive && expanded ? "is-expanded" : "",
@@ -873,6 +895,9 @@
         .filter(Boolean)
         .join(" ");
       return `
+      ${hasGeometryHalo ? [layer.path, layer.minorPath].filter(Boolean).map((path) =>
+        `<path class="country-silhouette-geometry-halo" d="${path}" fill-rule="evenodd" vector-effect="non-scaling-stroke" />`
+      ).join("") : ""}
       ${
         layer.path
           ? `<path class="country-silhouette-shape ${layerClass}" d="${layer.path}" />`
@@ -1012,11 +1037,27 @@
         class="${classes}"
         data-action="toggle-silhouette"
         aria-expanded="${expanded}"
-        aria-label="${escapeHtml(expanded ? t("shrinkShape") : t("enlargeShape"))}"
+        aria-label="${escapeHtml((expanded ? t("shrinkShape") : t("enlargeShape")) + (hasGeometryHalo ? ". " + t("geometryHaloExplanation") : ""))}"
       >
         ${contents}
       </button>
     `;
+  }
+
+  function maritimeZonesMarkup(view, { targetCode = null, selectableCodes = null } = {}) {
+    return (view.maritimeZones ?? []).map((zone) => {
+      const code = zone.type === "200NM" ? zone.code : null;
+      const interactive = code && selectableCodes?.has(code);
+      const highlighted = code && (selectableCodes
+        ? code === state.explorePinnedCode || code === state.explorePreviewCode
+        : code === targetCode);
+      return `<g class="maritime-zone${interactive ? " explore-maritime-zone" : ""}${highlighted ? " is-highlighted" : ""}${!code ? " is-neutral" : ""}"
+          data-maritime-id="${escapeHtml(zone.sourceId)}" aria-hidden="true"
+          ${interactive ? `data-action="explore-country" data-explore-code="${escapeHtml(code)}"` : ""}>
+        <path class="maritime-zone-fill" d="${escapeHtml(zone.path)}" fill-rule="evenodd" />
+        <path class="maritime-zone-outline" d="${escapeHtml(zone.outlinePath)}" vector-effect="non-scaling-stroke" />
+      </g>`;
+    }).join("");
   }
 
   function questionMapMarkup(regionId, targetCode) {
@@ -1075,7 +1116,7 @@
         ? t("highlightedNearbyMap", { region: regionLabel(region) })
         : t("highlightedMap", { region: regionLabel(region) });
     return `
-      <div class="map-quiz-visual${isWorld ? " is-world-area" : ""}${state.silhouetteExpanded ? " has-expanded-silhouette" : ""}">
+      <div class="map-quiz-visual${isWorld ? " is-world-area" : ""}">
         <div class="question-map-tabs" role="tablist" aria-label="${escapeHtml(t("mapAreaControls"))}">
           ${mapAreas.map((area) => `
             <button
@@ -1110,6 +1151,8 @@
           >
             <rect class="question-map-ocean" x="-10000" y="-10000" width="20000" height="20000" />
             <g aria-hidden="true">
+              ${maritimeZonesMarkup(view, { targetCode })}
+              ${isWorld ? "" : regionalGeometryHalosMarkup(view)}
               ${pathMarkup(contextFeatures, "question-map-country")}
               ${pathMarkup(otherFeatures, "question-map-country")}
               ${pathMarkup(targetFeatures, "question-map-country is-target")}
@@ -2677,6 +2720,8 @@
             preserveAspectRatio="xMidYMid meet"
           >
             <rect class="question-map-ocean" x="-10000" y="-10000" width="20000" height="20000" />
+            ${maritimeZonesMarkup(view, { selectableCodes: scopedCodes })}
+            ${extent === "world" ? "" : regionalGeometryHalosMarkup(view)}
             <g aria-hidden="true">${contextPaths}${contextMarkers}</g>
             ${sortedCountries
               .map((country) =>
@@ -3671,6 +3716,9 @@
   function syncExploreCountryUi() {
     if (state.screen !== "explore" || state.exploreRegionPickerOpen) return;
 
+    app.querySelector(".explore-region-map")?.classList.toggle(
+      "has-expanded-silhouette", state.silhouetteExpanded,
+    );
     app.querySelectorAll("[data-explore-code]").forEach((control) => {
       const code = control.dataset.exploreCode;
       control.classList.toggle(
@@ -3681,6 +3729,10 @@
         "is-preview",
         code === state.explorePreviewCode,
       );
+      if (control.classList.contains("explore-maritime-zone")) {
+        control.classList.toggle("is-highlighted",
+          code === state.explorePinnedCode || code === state.explorePreviewCode);
+      }
       if (!control.hasAttribute("aria-hidden")) {
         control.setAttribute(
           "aria-pressed",
@@ -3735,7 +3787,7 @@
 
   function updateExplorePointerLabel(event) {
     const control = event.target.closest?.(
-      ".explore-map-country, .explore-map-marker-control",
+      ".explore-map-country, .explore-map-marker-control, .explore-maritime-zone",
     );
     const country = countriesByCode.get(control?.dataset.exploreCode);
     if (!country || !app.contains(control) || event.pointerType === "touch" ||
@@ -3836,14 +3888,12 @@
     app
       .querySelector(".explore-region-map")
       ?.classList.toggle("has-expanded-silhouette", expanded);
-    app
-      .querySelector(".map-quiz-visual")
-      ?.classList.toggle("has-expanded-silhouette", expanded);
     control.classList.toggle("is-expanded", expanded);
     control.setAttribute("aria-expanded", String(expanded));
     control.setAttribute(
       "aria-label",
-      expanded ? t("shrinkShape") : t("enlargeShape"),
+      (expanded ? t("shrinkShape") : t("enlargeShape")) +
+        (control.classList.contains("has-geometry-halo") ? ". " + t("geometryHaloExplanation") : ""),
     );
     control
       .querySelectorAll(".country-silhouette-marker")

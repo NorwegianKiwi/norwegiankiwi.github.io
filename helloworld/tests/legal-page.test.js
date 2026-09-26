@@ -21,6 +21,7 @@ test("legal page contains both static locales and every local licence record", (
     "local-flags.txt",
     "twemoji-CC-BY-4.0.txt",
     "natural-earth-public-domain.txt",
+    "marine-regions-CC-BY-4.0.txt",
   ]) {
     assert.match(html, new RegExp(`href="\\./licenses/${file.replaceAll(".", "\\.")}"`));
     assert.ok(fs.existsSync(path.join(root, "licenses", file)));
@@ -55,7 +56,7 @@ test("each locale links the shared notice and preserves every licence", () => {
     assert.match(article, /NEL/);
     assert.ok(article.includes(locale === "en" ? 'href="../privacy.html"' : 'href="../privacy.html?lang=nb"'));
     const licences = [...article.matchAll(/href="\.\/licenses\/([^"]+)"/g)].map((match) => match[1]);
-    assert.deepEqual(licences.sort(), ["flag-icons-MIT.txt", "local-flags.txt", "natural-earth-public-domain.txt", "twemoji-CC-BY-4.0.txt"]);
+    assert.deepEqual(licences.sort(), ["flag-icons-MIT.txt", "local-flags.txt", "marine-regions-CC-BY-4.0.txt", "natural-earth-public-domain.txt", "twemoji-CC-BY-4.0.txt"]);
     for (const file of licences) assert.ok(fs.statSync(path.join(root, "licenses", file)).isFile());
     assert.equal([...article.matchAll(/href="https:\/\/commons\.wikimedia\.org\/wiki\/File:/g)].length, 4);
     assert.match(article, /Twitter/);

@@ -2,6 +2,16 @@
   "naturalEarthVersion": "5.1.1",
   "boundaryView": "Natural Earth default de facto viewpoint",
   "datasets": {
+    "maritimeZones": {
+      "file": "World_EEZ_v12_20231025_LR.zip",
+      "url": "https://zenodo.org/records/16355917/files/World_EEZ_v12_20231025_LR.zip",
+      "sha256": "5be66b2b2038b489ee9ad1675ae9c1ef3ac7b10fa016e6a6e8796fb37d31e55a",
+      "version": "12 (2023-10-25), low resolution",
+      "attribution": "Flanders Marine Institute (2023), Maritime Boundaries and Exclusive Economic Zones (200NM), version 12; projected and rounded for display.",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourceUrl": "https://www.marineregions.org/eez.php"
+    },
     "countries50m": {
       "file": "ne_50m_admin_0_countries.zip",
       "url": "https://naciscdn.org/naturalearth/5.1.1/50m/cultural/ne_50m_admin_0_countries.zip",
@@ -22,6 +32,54 @@
       "url": "https://naciscdn.org/naturalearth/5.1.2/10m/cultural/ne_10m_populated_places.zip",
       "sha256": "cd149186f03d2603e0410da399b980a4357d0ac32d3a2305a49ed3dffcc41d7b",
       "version": "5.1.2"
+    }
+  },
+  "maritimeZones": {
+    "includedCodes": [
+      "ki",
+      "mh",
+      "fm",
+      "tv",
+      "to",
+      "pw",
+      "ck",
+      "pf",
+      "mp",
+      "as",
+      "bs",
+      "ag",
+      "kn",
+      "vc",
+      "gd",
+      "ky",
+      "mv",
+      "sc"
+    ],
+    "territoryCodes": {
+      "KIR": "ki",
+      "MHL": "mh",
+      "FSM": "fm",
+      "TUV": "tv",
+      "TON": "to",
+      "PLW": "pw",
+      "COK": "ck",
+      "PYF": "pf",
+      "MNP": "mp",
+      "ASM": "as",
+      "BHS": "bs",
+      "ATG": "ag",
+      "KNA": "kn",
+      "VCT": "vc",
+      "GRD": "gd",
+      "CYM": "ky",
+      "MDV": "mv",
+      "SYC": "sc",
+      "HND": "hn"
+    },
+    "crossCheck": {
+      "date": "2026-09-20",
+      "source": "https://pacific-data.sprep.org/dataset/pacific-islands-and-territories-eez-only",
+      "notes": "Pacific Community catalogue confirms all ten included Pacific territories and 200NM zone basis. Kiribati high-seas pockets remain unassigned. This is a catalogue/definition cross-check, not coordinate-level certification. Marine Regions includes inner waters whereas the SPC EEZ-only product describes waters measured from territorial-sea baselines. Keep the pinned Marine Regions geometry; no official-agreement claim."
     }
   },
   "countryCodeField": "ISO_A2_EH",
@@ -281,30 +339,128 @@
       ]
     },
     "mh": {
-      "main": [{"bounds": [164, 4, 173, 15]}],
-      "forceCompactMarkers": true,
-      "expandedMainFrame": [4, 4, 38, 92],
+      "main": [
+        {
+          "bounds": [
+            164,
+            4,
+            173,
+            15
+          ]
+        }
+      ],
+      "expandedMainFrame": [
+        4,
+        4,
+        60,
+        92
+      ],
       "insets": [
-        {"selection": [{"bounds": [170.9, 6.9, 172, 7.3]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+        {
+          "selection": [
+            {
+              "bounds": [
+                170.9,
+                6.9,
+                172,
+                7.3
+              ]
+            }
+          ],
+          "frame": [
+            69,
+            26,
+            27,
+            48
+          ],
+          "connectToSource": true
+        }
       ]
     },
     "fm": {
-      "main": [{"bounds": [137, 0, 164, 11]}],
-      "forceCompactMarkers": true,
-      "expandedMainFrame": [4, 4, 38, 92],
+      "main": [
+        {
+          "bounds": [
+            137,
+            0,
+            164,
+            11
+          ]
+        }
+      ],
+      "expandedMainFrame": [
+        4,
+        4,
+        60,
+        92
+      ],
       "insets": [
-        {"selection": [{"bounds": [157.8, 6.5, 158.5, 7.2]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+        {
+          "selection": [
+            {
+              "bounds": [
+                157.8,
+                6.5,
+                158.5,
+                7.2
+              ]
+            }
+          ],
+          "frame": [
+            69,
+            26,
+            27,
+            48
+          ],
+          "connectToSource": true
+        }
       ]
     },
     "ki": {
       "main": [
-        {"bounds": [168, -12, 180, 6]},
-        {"bounds": [-180, -12, -150, 6]}
+        {
+          "bounds": [
+            168,
+            -12,
+            180,
+            6
+          ]
+        },
+        {
+          "bounds": [
+            -180,
+            -12,
+            -150,
+            6
+          ]
+        }
       ],
-      "forceCompactMarkers": true,
-      "expandedMainFrame": [4, 4, 38, 92],
+      "expandedMainFrame": [
+        4,
+        4,
+        60,
+        92
+      ],
       "insets": [
-        {"selection": [{"bounds": [172.8, 1.1, 173.3, 1.7]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+        {
+          "selection": [
+            {
+              "bounds": [
+                172.8,
+                1.1,
+                173.3,
+                1.7
+              ]
+            }
+          ],
+          "frame": [
+            69,
+            26,
+            27,
+            48
+          ],
+          "connectToSource": true
+        }
       ]
     },
     "pw": {
@@ -316,19 +472,55 @@
       ]
     },
     "to": {
-      "main": [{"bounds": [-177, -23, -173, -15]}],
-      "forceCompactMarkers": true,
-      "expandedMainFrame": [4, 4, 38, 92],
+      "main": [
+        {
+          "bounds": [
+            -177,
+            -23,
+            -173,
+            -15
+          ]
+        }
+      ],
+      "expandedMainFrame": [
+        4,
+        4,
+        60,
+        92
+      ],
       "insets": [
-        {"selection": [{"bounds": [-175.6, -21.7, -174.7, -20.8]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+        {
+          "selection": [
+            {
+              "bounds": [
+                -175.6,
+                -21.7,
+                -174.7,
+                -20.8
+              ]
+            }
+          ],
+          "frame": [
+            69,
+            26,
+            27,
+            48
+          ],
+          "connectToSource": true
+        }
       ]
     },
     "tv": {
-      "main": [{"bounds": [175, -10, 181, -5]}],
-      "forceCompactMarkers": true,
-      "expandedMainFrame": [4, 4, 38, 92],
-      "insets": [
-        {"selection": [{"bounds": [178.9, -8.7, 179.4, -8.3]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+      "overviewCapitalAnchor": {"longitude": 179.21058030946634, "latitude": -8.519789320999934, "source": "Natural Earth countries10m 5.1.1, Tuvalu component beed25c2091f3a1e", "reason": "Point inside the source Funafuti land component; preserves the capital star in the geographic overview."},
+      "main": [
+        {
+          "bounds": [
+            175,
+            -10,
+            181,
+            -5
+          ]
+        }
       ]
     },
     "as": {
@@ -361,28 +553,139 @@
       ]
     },
     "ck": {
-      "main": [{"bounds": [-166, -23, -156, -8]}],
-      "forceCompactMarkers": true,
-      "expandedMainFrame": [4, 4, 34, 92],
+      "main": [
+        {
+          "bounds": [
+            -166,
+            -23,
+            -156,
+            -8
+          ]
+        }
+      ],
+      "expandedMainFrame": [
+        4,
+        4,
+        60,
+        92
+      ],
       "insets": [
-        {"selection": [{"bounds": [-158.1, -9.05, -157.85, -8.85]}], "frame": [44, 4, 52, 42], "connectToSource": true},
-        {"selection": [{"bounds": [-160, -21.5, -159.5, -21]}], "frame": [44, 54, 52, 42], "connectToSource": true}
+        {
+          "selection": [
+            {
+              "bounds": [
+                -158.1,
+                -9.05,
+                -157.85,
+                -8.85
+              ]
+            }
+          ],
+          "frame": [
+            69,
+            8,
+            27,
+            38
+          ],
+          "connectToSource": true
+        },
+        {
+          "selection": [
+            {
+              "bounds": [
+                -160,
+                -21.5,
+                -159.5,
+                -21
+              ]
+            }
+          ],
+          "frame": [
+            69,
+            54,
+            27,
+            38
+          ],
+          "connectToSource": true
+        }
       ]
     },
     "pf": {
-      "main": [{"bounds": [-155, -29, -134, -7]}],
-      "forceCompactMarkers": true,
-      "expandedMainFrame": [4, 4, 38, 92],
+      "main": [
+        {
+          "bounds": [
+            -155,
+            -29,
+            -134,
+            -7
+          ]
+        }
+      ],
+      "expandedMainFrame": [
+        4,
+        4,
+        60,
+        92
+      ],
       "insets": [
-        {"selection": [{"bounds": [-153, -18.5, -148, -15.5]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+        {
+          "selection": [
+            {
+              "bounds": [
+                -153,
+                -18.5,
+                -148,
+                -15.5
+              ]
+            }
+          ],
+          "frame": [
+            69,
+            26,
+            27,
+            48
+          ],
+          "connectToSource": true
+        }
       ]
     },
     "mp": {
-      "main": [{"bounds": [144.5, 13.5, 146, 21]}],
-      "forceCompactMarkers": true,
-      "expandedMainFrame": [4, 4, 38, 92],
+      "main": [
+        {
+          "bounds": [
+            144.5,
+            13.5,
+            146,
+            21
+          ]
+        }
+      ],
+      "expandedMainFrame": [
+        4,
+        4,
+        60,
+        92
+      ],
       "insets": [
-        {"selection": [{"bounds": [145, 14, 146, 16]}], "frame": [47, 18, 49, 64], "connectToSource": true}
+        {
+          "selection": [
+            {
+              "bounds": [
+                145,
+                14,
+                146,
+                16
+              ]
+            }
+          ],
+          "frame": [
+            69,
+            26,
+            27,
+            48
+          ],
+          "connectToSource": true
+        }
       ]
     }
   },

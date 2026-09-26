@@ -105,11 +105,9 @@ The committed geometry consists of three separate products:
 3. Shape inset: 1:10m, north-up silhouette, `0 0 100 100`. Very small
    components are retained as separate polygon geometry with lighter stroke
    treatment. Countries whose entire geometry is below the readability
-   threshold receive up to eight representative points in the compact shape
-   inset. An editorial rule can force the same compact-marker treatment for a
-   dispersed island state whose few readable components would otherwise hide
-   the country's full extent; the real geometry always replaces those markers
-   when enlarged.
+   threshold receive up to eight representative points in the legacy compact
+   inset. The 18 maritime-zone places instead retain all land geometry with
+   visibility halos in regional maps and compact/expanded silhouettes.
 
 Countries with dispersed islands or remote territories can have editorial
 silhouette rules in `silhouetteOverrides` in `tools/map-sources.json`. Their
@@ -135,7 +133,7 @@ Cayman Islands, Guernsey, and New Caledonia keep a recognizable main island or
 nearby group in the compact silhouette and relocate selected distant islands
 to directionally placed frames when enlarged. The Cook Islands, French
 Polynesia, the Northern Mariana Islands, the Marshall Islands, Micronesia, and
-Kiribati use representative extent markers in the compact silhouette. Their
+Kiribati use complete land geometry with visibility halos in the compact silhouette. Their
 enlarged views retain a geographic overview and connect one or two source
 rectangles to readable details of a representative island or the capital
 island. The Cook Islands use Penrhyn and Rarotonga as the northern and southern
@@ -170,8 +168,8 @@ World maps use the 1:50m source consistently; regional maps use 1:10m consistent
 Background clipping happens after shared simplification, with no subsequent
 simplification of the clipped ring. Final coordinates are rounded to one decimal
 place. Shape insets retain their independent silhouette simplification.
-Natural Earth tiny-country points are used when a polygon is too small to be
-readable. Country membership in region maps must always be looked up in
+Outside the 18-place halo coverage, Natural Earth tiny-country
+points are used when a polygon is too small to be readable. Country membership in region maps must always be looked up in
 `countries.js`; the `CONTINENT`, `REGION_UN`, and `SUBREGION` fields in Natural
 Earth serve only as a basis for comparison.
 
@@ -263,7 +261,7 @@ Each region map has active countries in `features` and `markers`, while
 use the same central meridian, projection, and simplification tolerance.
 The shared-arc regression tests run as part of `python3 tools/check.py`; they
 cover ring direction, junctions, enclaves, and clipped background borders.
-Each tiny-country marker has a `readableSize`, calculated from the largest
+Legacy tiny-country markers outside halo coverage have a `readableSize`, calculated from the largest
 minor axis of an actual polygon component. The interface therefore does not
 show the polygon until a single component is readable; the combined bounding
 box of a dispersed island nation is not sufficient.
@@ -316,7 +314,7 @@ window.GEOGRAFI_QUIZ_MAP_DATA = {
   features,
   markers,
   quizProjection,
-  quizRegions: { [id]: { viewBox, bleedViewBox, backgroundFeatures, features, markers } },
+  quizRegions: { [id]: { viewBox, bleedViewBox, backgroundFeatures, features, markers, maritimeZones } },
   silhouetteViewBox,
   silhouettes,
   silhouetteCapitals: { [countryCode]: { main, insets } }
@@ -358,11 +356,11 @@ Before replacing `world-map.js`:
 - Inspect microstates and island nations, especially Vatican City, Monaco,
   Bahrain, the Maldives, Nauru, Tuvalu, and the Caribbean.
 - Expand ordinary, multi-capital, and inset silhouettes. Confirm that San
-  Marino has a star, Monaco and Vatican City do not, and Tonga and Tuvalu place
-  their stars only in the detailed inset.
+  Marino has a star, Monaco and Vatican City do not, Tonga has its star in the
+  detailed inset, and Tuvalu has its star in the geographic overview.
 - Inspect the ten editorial island silhouettes separately. Confirm readable
   compact main forms for American Samoa, the Cayman Islands, Guernsey, and New
-  Caledonia; eight or fewer compact extent markers for the other six; connected
+  Caledonia; geographic land arrangements with halos for the other six; connected
   detail frames for the Cook Islands, French Polynesia, the Northern Mariana
   Islands, the Marshall Islands, Micronesia, and Kiribati; and no duplicated
   capital stars.
@@ -378,3 +376,126 @@ Before replacing `world-map.js`:
 Keep the previous `world-map.js` until the visual comparison is complete. Map
 borders are both a data decision and an editorial decision; an automated update
 must therefore never be published without review.
+
+## Maritime zones for island places
+
+Regional maps include a separate optional `maritimeZones` array, generated from
+Marine Regions / Flanders Marine Institute **EEZ v12 (2023-10-25), low resolution**.
+The pinned archive URL, SHA-256, CC BY 4.0 license and attribution are in
+`datasets.maritimeZones` in `tools/map-sources.json`. `maritimeZones.includedCodes`
+selects 18 curriculum places; `territoryCodes` maps the source's `ISO_TER1/2/3`
+territories explicitly, including Honduras for the neutral Cayman joint regime.
+Never group by sovereign-state names: these do not define our curriculum places.
+
+Each generated zone contains `sourceId` (MRGID), `codes` (associated places),
+`code` (selectable place or null), `type` (200NM, Joint regime, Overlapping claim),
+`path` (closed fill rings, including holes) and `outlinePath` (open boundary lines).
+Kiribati keeps separate Gilbert, Phoenix and Line records. Shared/overlapping
+areas have no selectable code. The layer does not cover every country's maritime
+zone; unshaded water must not be described as necessarily high seas.
+
+The source is already simplified. Generation retains its vertices and holes,
+projects through each region's existing transform and rounds to two decimal
+places. It does not change the geographic extent or the land-based camera.
+Full zone geometry is clipped by the SVG viewport, without strokes on viewport
+edges. Artificial source closing segments on +/-180 degrees are omitted from
+outlines; projected fills meet at that seam. Land, markers, silhouettes, IDs,
+progress and quiz definitions are independent of this layer.
+
+Only exterior rings receive dashed outlines, identified by clockwise source
+shapefile winding before projection (with longitudes unwrapped at the date line).
+Interior holes remain in the fill and reveal the underlying ocean colour, but
+are not outlined: the source's coastal geometry differs from the Natural Earth
+land layer and must not appear to introduce additional islands. Every separate
+exterior component is retained.
+
+Download sources with the existing `map_maintenance.py download` command, or
+place the pinned archive named `World_EEZ_v12_20231025_LR.zip` in a source directory.
+The targeted command verifies the archive checksum itself and needs no Natural
+Earth source files:
+
+```sh
+python3 tools/generate_map_data.py \
+  /tmp/geografi-map-sources /tmp/world-map.maritime-candidate.js \
+  --base-map world-map.js --refresh-maritime-zones
+python3 tools/map_maintenance.py validate \
+  --map-file /tmp/world-map.maritime-candidate.js
+```
+
+Other selective refreshes preserve maritime data; full regional regeneration
+also regenerates maritime zones and requires the pinned archive. A candidate
+must pass the usual automated and visual review before replacement. Check all
+18 places, three Kiribati groups, the neutral Cayman/Honduras zone, both locales,
+water selection, land/marker precedence, keyboard focus, dragging and zooming.
+Compare the candidate to the base with `maritimeZones` removed: all remaining
+fields must be identical for a targeted refresh.
+
+### Source interpretation and Pacific cross-check (2026-09-20)
+
+Marine Regions' EEZ product includes territorial, internal and archipelagic
+waters, in addition to EEZs in the strict legal sense. Its limits combine treaties,
+claims, calculated median/200NM lines and connecting segments. A `200NM` polygon
+is not proof that every boundary is officially agreed. See the
+[methodology](https://www.marineregions.org/eezmethodology.php) and
+[line classifications](https://www.marineregions.org/eezlinetype.php).
+
+The [Pacific Community EEZ catalogue, mirrored by SPREP](https://pacific-data.sprep.org/dataset/pacific-islands-and-territories-eez-only)
+confirms all ten included Pacific territories and the 200-nautical-mile basis.
+It describes authoritative layers alongside provisional Marine Regions layers;
+its October 2023 release is comparable in date to the pinned source. The
+[Kiribati catalogue](https://pacificdata.org/data/dataset/?member_countries=ki&organization=spc-gem&q=&tags=exclusive-economic-zone&topic=Ocean+and+Maritime)
+also identifies high-seas pockets near Kiribati, French Polynesia and Cook Islands;
+our source's gaps remain intact.
+
+This cross-check establishes coverage and definitions, not coordinate-level
+certification: the SPC polygon download returned HTTP 403 during review.
+Terminology differs (SPC labels its product EEZ-only; Marine Regions explicitly
+includes inner waters). Marine Regions also supplies sovereign labels such as
+New Zealand for Cook Islands; those labels are not imported into the app.
+No geometry was redrawn to reconcile these differences. Keep source-designated
+shared/overlapping areas neutral, and describe the display as maritime zones,
+not official land borders. A later source update requires a fresh comparison.
+
+The licenses-page attribution links to Marine Regions and CC BY 4.0 and identifies the
+projection/rounding adaptation. Do not redistribute the complete upstream
+archive in the app; retain only generated display geometry.
+
+## Island geometry halos
+
+All 18 places listed in `maritimeZones.includedCodes` use existing Natural Earth
+land paths with a visibility surround: 2 CSS pixels on regional/Nearby maps and
+4 CSS pixels on compact/expanded silhouettes and detail insets. Halos include
+minor land components, remain visible when unselected, and exaggerate land
+extent. They cannot restore geometry absent from the pinned source. Marine
+Regions remains exclusively responsible for maritime geometry; its holes are
+never used as land. Artificial clipping edges are masked from regional halos.
+The bilingual licenses page holds the explanation and attribution.
+
+Regional country locators and silhouette position dots are omitted for these
+places. Land, camera bounds, world locators, silhouette compositions and capitals
+are unchanged. The earlier display-group positions, grouping overrides, and
+group audit are no longer generated or used. Established markers for places
+outside this coverage remain intact.
+
+Tuvalu's `silhouetteOverrides.tv.overviewCapitalAnchor` records the geographic
+point inside the pinned Natural Earth Funafuti land component that anchors its
+capital star. This documented display placement preserves the geographic
+overview without a polygon detail inset. It does not change the curriculum's
+capital or claim survey precision. Full generation projects it at five decimal
+places to reproduce the existing placement.
+
+To clean an older generated map without downloading sources or changing its
+paths, use the targeted cleanup and review a separate candidate:
+
+```sh
+python3 tools/generate_map_data.py . /tmp/world-map.halo-candidate.js \
+  --base-map world-map.js --refresh-halo-data
+python3 tools/map_maintenance.py validate --map-file /tmp/world-map.halo-candidate.js
+```
+
+The source-directory argument is unused in this mode. It removes retired
+`islandPositions` fields and covered locators, preserving all geographic paths,
+maritime outlines, compositions, capitals and camera settings. Full generation
+applies the same halo rules. Compare candidate data and visually review all 18
+places on desktop and phone, in regional/Nearby maps and compact/expanded
+silhouettes, before replacing `world-map.js` with the validated candidate.
