@@ -84,12 +84,32 @@ class MaritimeTests(unittest.TestCase):
         data, manifest, countries = load_generated_map(), load_manifest(), load_countries()
         self.assertEqual(validate_maritime_zones(data, manifest, countries), [])
         zones = [z for view in data['quizRegions'].values() for z in view.get('maritimeZones', [])]
-        self.assertEqual(len({z['code'] for z in zones if z['code']}), 18)
+        self.assertEqual(len({z['code'] for z in zones if z['code']}), 44)
         self.assertEqual({z['sourceId'] for z in zones if z['code'] == 'ki'}, {'8450', '8441', '8488'})
         shared = next(z for z in zones if z['sourceId'] == '48972')
         self.assertIsNone(shared['code'])
         self.assertEqual(shared['codes'], ['hn', 'ky'])
         self.assertNotIn('maritimeZones', data)
+
+    def test_expanded_mapping_keeps_explicit_claims_neutral(self):
+        settings = load_manifest()["maritimeZones"]
+        rows = []
+        for iso, code in settings["territoryCodes"].items():
+            if code in settings["includedCodes"]:
+                rows.append(dict(self.row, MRGID=str(len(rows) + 1), ISO_TER1=iso))
+        # The source's territory fields alone omit the relevant claimants.
+        rows.extend([
+            dict(self.row, MRGID="48944", ISO_TER1="MYT", ISO_TER2="MYT", POL_TYPE="Overlapping claim"),
+            dict(self.row, MRGID="48946", ISO_TER1="", POL_TYPE="Overlapping claim"),
+        ])
+        result = maps.select_maritime_features(rows, [self.shape] * len(rows), settings)
+        self.assertEqual(
+            {feature["code"] for feature in result if feature["code"]},
+            set(settings["includedCodes"]),
+        )
+        claims = {feature["sourceId"]: feature for feature in result if feature["code"] is None}
+        self.assertEqual(claims["48944"]["codes"], ["km", "yt"])
+        self.assertEqual(claims["48946"]["codes"], ["fr", "mg", "mu"])
 
     def test_validator_rejects_shared_selection_and_missing_coverage(self):
         data, manifest, countries = load_generated_map(), load_manifest(), load_countries()

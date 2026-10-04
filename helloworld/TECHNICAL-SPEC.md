@@ -828,7 +828,7 @@ stage’s quizzes mastered, with each second half unplayed). The latter has
 ## Regional maritime-zone layer
 
 `quizRegions[region].maritimeZones` optionally contains generated Marine Regions
-EEZ v12 geometry for 18 island places. Entries carry `sourceId`, `codes`, nullable
+EEZ v12 geometry for 44 island places. Entries carry `sourceId`, `codes`, nullable
 `code`, `type`, `path`, and `outlinePath`. The manifest pins the source, license,
 checksum and territory mappings; MAP-DATA.md documents regeneration and source
 limitations. World views and silhouettes do not include this layer.
@@ -850,13 +850,23 @@ interface changes are involved.
 
 ## Island geometry halos
 
-`geometryHaloCodes` in `app.js` covers the same 18 codes as the source manifest's
-maritime coverage. Shared regional markup draws an always-visible decorative
-layer between maritime zones and actual land, including background land.
-Existing land paths receive an opaque `#b7cbc1` fill and rounded 2px non-scaling
-stroke. A mask excludes artificial `cropPath` edges from the halo. The layer is
-`aria-hidden`, has no pointer events, and does not enter camera calculations.
-World maps do not receive halos; existing quiz-target highlighting stays above.
+`geometryHaloCodes` in `app.js` covers the same 44 codes as the manifest's
+maritime coverage. It controls regional and silhouette halos and keeps land
+visible when a covered place retains a locator. The five locator exceptions live in the
+manifest's `retainedLocatorCodes` and are retained during generation; runtime
+marker visibility uses the established land-readability handoff.
+
+Shared regional markup reuses existing foreground and background land paths
+for covered places, with an opaque `#b7cbc1` fill and rounded 2px non-scaling
+stroke. Crop-edge masks suppress artificial edges. The layer sits above maritime
+fills and beneath land, is `aria-hidden`, has no pointer events, and never enters
+camera calculations. It requires no additional generated coastline geometry.
+World maps receive neither this layer nor the regional quiz palette.
+
+Regional/Nearby quizzes paint non-target land borders beneath the fill, using
+Explorer's `#d9ded5` fill and `#6e7c72` 0.85px border. Background features use
+Explorer's translucent context fill and 0.7px border. These views omit the second
+non-target border pass; the target's coral halo and border overlay remain.
 
 Silhouettes duplicate both `path` and `minorPath` beneath each layer's actual
 land with the same colour, even-odd fill, and a 4px non-scaling stroke. The
@@ -865,8 +875,9 @@ silhouettes render their real land. Capital indicators, compositions, and inset
 connectors are preserved. There is no marker sampling, visibility threshold,
 collision logic, resize observer, blur, or user preference for this treatment.
 
-Generated regional locators and silhouette markers are empty for covered
-places. Other places retain established locator behaviour. Retired
+Generated silhouette markers are empty for covered places. Regional locators
+remain only for the five declared exceptions. Other places retain established
+locator behaviour. Retired
 `islandPositions` fields are removed by the targeted halo-data cleanup; current
 full generation produces the same geometry-only contract. MAP-DATA.md documents
 the command and Tuvalu's source-based overview capital anchor.

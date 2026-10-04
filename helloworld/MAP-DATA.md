@@ -106,7 +106,7 @@ The committed geometry consists of three separate products:
    components are retained as separate polygon geometry with lighter stroke
    treatment. Countries whose entire geometry is below the readability
    threshold receive up to eight representative points in the legacy compact
-   inset. The 18 maritime-zone places instead retain all land geometry with
+   inset. The 44 maritime-zone places instead retain all land geometry with
    visibility halos in regional maps and compact/expanded silhouettes.
 
 Countries with dispersed islands or remote territories can have editorial
@@ -168,8 +168,9 @@ World maps use the 1:50m source consistently; regional maps use 1:10m consistent
 Background clipping happens after shared simplification, with no subsequent
 simplification of the clipped ring. Final coordinates are rounded to one decimal
 place. Shape insets retain their independent silhouette simplification.
-Outside the 18-place halo coverage, Natural Earth tiny-country
-points are used when a polygon is too small to be readable. Country membership in region maps must always be looked up in
+Outside the 44-place halo coverage, and for its five retained-locator exceptions,
+Natural Earth tiny-country points are used when a polygon is too small to be
+readable. Country membership in region maps must always be looked up in
 `countries.js`; the `CONTINENT`, `REGION_UN`, and `SUBREGION` fields in Natural
 Earth serve only as a basis for comparison.
 
@@ -383,7 +384,7 @@ Regional maps include a separate optional `maritimeZones` array, generated from
 Marine Regions / Flanders Marine Institute **EEZ v12 (2023-10-25), low resolution**.
 The pinned archive URL, SHA-256, CC BY 4.0 license and attribution are in
 `datasets.maritimeZones` in `tools/map-sources.json`. `maritimeZones.includedCodes`
-selects 18 curriculum places; `territoryCodes` maps the source's `ISO_TER1/2/3`
+selects 44 curriculum places; `territoryCodes` maps the source's `ISO_TER1/2/3`
 territories explicitly, including Honduras for the neutral Cayman joint regime.
 Never group by sovereign-state names: these do not define our curriculum places.
 
@@ -425,7 +426,7 @@ python3 tools/map_maintenance.py validate \
 Other selective refreshes preserve maritime data; full regional regeneration
 also regenerates maritime zones and requires the pinned archive. A candidate
 must pass the usual automated and visual review before replacement. Check all
-18 places, three Kiribati groups, the neutral Cayman/Honduras zone, both locales,
+44 places, three Kiribati groups, the neutral Cayman/Honduras zone, both locales,
 water selection, land/marker precedence, keyboard focus, dragging and zooming.
 Compare the candidate to the base with `maritimeZones` removed: all remaining
 fields must be identical for a targeted refresh.
@@ -462,20 +463,44 @@ archive in the app; retain only generated display geometry.
 
 ## Island geometry halos
 
-All 18 places listed in `maritimeZones.includedCodes` use existing Natural Earth
-land paths with a visibility surround: 2 CSS pixels on regional/Nearby maps and
-4 CSS pixels on compact/expanded silhouettes and detail insets. Halos include
-minor land components, remain visible when unselected, and exaggerate land
-extent. They cannot restore geometry absent from the pinned source. Marine
-Regions remains exclusively responsible for maritime geometry; its holes are
-never used as land. Artificial clipping edges are masked from regional halos.
-The bilingual licenses page holds the explanation and attribution.
+All 44 places in `maritimeZones.includedCodes` reuse existing Natural Earth land
+paths with visibility surrounds: 2 CSS pixels on regional/Nearby maps and 4 CSS
+pixels on silhouette main/minor land and detail insets. Artificial crop edges
+are masked in regional views. No additional coastline paths are generated.
+Land, camera bounds, world locators, silhouette compositions and capitals are
+unchanged. Regional locators are removed except `retainedLocatorCodes`: Guernsey, Jersey, Isle of Man, Bahrain and
+Singapore. These retain visible land beneath their locators. Åland has no
+separately identified zone in this source and retains its locator, as do inland
+places and mainland/outlying-island locators. The source does not supply missing
+coastline detail; halos only exaggerate the extent of existing land geometry.
 
-Regional country locators and silhouette position dots are omitted for these
-places. Land, camera bounds, world locators, silhouette compositions and capitals
-are unchanged. The earlier display-group positions, grouping overrides, and
-group audit are no longer generated or used. Established markers for places
-outside this coverage remain intact.
+The 2026-09-27 extension adds Malta, Faroe Islands, Guernsey, Jersey, Isle of Man,
+São Tomé and Príncipe, Mauritius, Comoros, Bahrain, Singapore, Samoa, Niue, Guam,
+Nauru, Vanuatu, Bermuda, Curaçao, Aruba, Guadeloupe, Dominica, Martinique, Saint
+Lucia, Barbados, Trinidad and Tobago, US Virgin Islands and Sint Maarten.
+Territory identifiers are mapped explicitly. `sharedSourceCodes` also associates
+MRGID 48944 (Mayotte/Comoros) and 48946 (Tromelin/Mauritius): territory fields alone
+omit those claimants, while source sovereign fields and record names identify
+them. Both remain neutral. Joint regimes involving the Faroes, Barbados and
+São Tomé, and claims involving Aruba, Trinidad and Singapore are also retained.
+This is an audit of the pinned source, not new independent boundary certification;
+no geometry is redrawn and no missing maritime boundaries are inferred.
+
+To extend maritime coverage and apply locator rules while preserving existing
+land, world data, cameras, capitals and silhouette geometry, run the two targeted
+refreshes in sequence. Use a base generated map with the established land data:
+
+```sh
+python3 tools/generate_map_data.py /tmp/helloworld-island-sources \
+  /tmp/world-map.maritime-candidate.js --base-map world-map.js --refresh-maritime-zones
+python3 tools/generate_map_data.py . /tmp/world-map.halo-candidate.js \
+  --base-map /tmp/world-map.maritime-candidate.js --refresh-halo-data
+python3 tools/map_maintenance.py validate --map-file /tmp/world-map.halo-candidate.js
+```
+
+The maritime refresh verifies the pinned archive checksum. The halo cleanup
+needs no sources. Review the final candidate before replacing `world-map.js`.
+Full generation applies the same rules. Halos need no runtime source access.
 
 Tuvalu's `silhouetteOverrides.tv.overviewCapitalAnchor` records the geographic
 point inside the pinned Natural Earth Funafuti land component that anchors its
@@ -496,6 +521,6 @@ python3 tools/map_maintenance.py validate --map-file /tmp/world-map.halo-candida
 The source-directory argument is unused in this mode. It removes retired
 `islandPositions` fields and covered locators, preserving all geographic paths,
 maritime outlines, compositions, capitals and camera settings. Full generation
-applies the same halo rules. Compare candidate data and visually review all 18
+applies the same halo rules. Compare candidate data and visually review all 44
 places on desktop and phone, in regional/Nearby maps and compact/expanded
 silhouettes, before replacing `world-map.js` with the validated candidate.

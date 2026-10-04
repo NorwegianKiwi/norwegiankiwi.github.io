@@ -1885,4 +1885,17 @@
   pointer-events: none;
 }
 
+/* Match Explorer's stroke-under-fill treatment; targets keep their overlay. */
+.question-map.is-regional .question-map-country:not(.is-target):not(.is-crop-edge) {
+  fill: #d9ded5;
+  stroke: #6e7c72;
+  stroke-width: 0.85;
+}
+
+.question-map.is-regional .question-map-country.is-context:not(.is-target):not(.is-crop-edge) {
+  fill: rgba(112, 129, 118, 0.14);
+  stroke: rgba(73, 91, 80, 0.16);
+  stroke-width: 0.7;
+}
+
 .country-silhouette-inset.has-geometry-halo.is-expanded .country-silhouette-minor-shape { stroke: none; }

@@ -1624,6 +1624,7 @@ def select_maritime_features(rows, shapes, settings):
     for row, shape in zip(rows, shapes):
         codes = sorted({mappings[row[f"ISO_TER{i}"]] for i in (1, 2, 3)
                         if row.get(f"ISO_TER{i}") in mappings})
+        codes = sorted(set(codes) | set(settings.get("sharedSourceCodes", {}).get(row["MRGID"], [])))
         if not included.intersection(codes):
             continue
         kind = row["POL_TYPE"]
@@ -1724,9 +1725,10 @@ def refresh_halo_data(existing, manifest):
     """Retire display positions without changing any geographic paths or cameras."""
     result = copy.deepcopy(candidate_from_existing(existing, existing["quizRegions"]))
     covered = set(manifest["maritimeZones"]["includedCodes"])
+    retained = set(manifest["maritimeZones"].get("retainedLocatorCodes", []))
     for view in result["quizRegions"].values():
         view.pop("islandPositions", None)
-        view["markers"] = [marker for marker in view["markers"] if marker["code"] not in covered]
+        view["markers"] = [marker for marker in view["markers"] if marker["code"] not in covered or marker["code"] in retained]
     for code, silhouette in result["silhouettes"].items():
         layers = [silhouette]
         if silhouette.get("expanded"):

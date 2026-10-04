@@ -352,10 +352,11 @@ def code_for_source_row(row, manifest):
 def validate_geometry_halos(map_data, manifest):
     errors = []
     covered = set(manifest["maritimeZones"]["includedCodes"])
+    retained = set(manifest["maritimeZones"].get("retainedLocatorCodes", []))
     for view in map_data["quizRegions"].values():
         if "islandPositions" in view:
             errors.append("Retired island-position metadata remains in a region")
-        if any(marker["code"] in covered for marker in view["markers"]):
+        if any(marker["code"] in covered - retained for marker in view["markers"]):
             errors.append("Halo place retains a regional country locator")
     for code, silhouette in map_data["silhouettes"].items():
         layers = [silhouette]

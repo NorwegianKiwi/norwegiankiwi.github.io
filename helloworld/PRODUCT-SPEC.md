@@ -641,10 +641,9 @@ When a material curriculum revision invalidates current mastery:
 ## Maritime grouping aid
 
 Regional Explorer maps and regional/Nearby map questions show subtle maritime
-zones for Kiribati, Marshall Islands, Micronesia, Tuvalu, Tonga, Palau, Cook Islands,
-French Polynesia, Northern Mariana Islands, American Samoa, Bahamas, Antigua and
-Barbuda, Saint Kitts and Nevis, Saint Vincent and the Grenadines, Grenada, Cayman
-Islands, Maldives and Seychelles. World maps and silhouettes remain land-based.
+zones for 44 selected island places. MAP-DATA.md lists the coverage extension;
+the source manifest defines the complete set. World maps and silhouettes remain
+land-based.
 
 The zones follow sourced EEZ/coastal-water geometry rather than invented island
 envelopes. They are always faintly visible and highlight together with the
@@ -663,13 +662,26 @@ can extend outside the viewport. No information control overlays the map.
 
 ### Island geometry halos and silhouettes
 
-All 18 maritime-zone places use actual land geometry with a pale, opaque
-blue-green visibility surround instead of generic regional locators or island
-position dots. Halos have rounded joins and caps, no blur, and a constant screen
-width: 2 CSS pixels in regional Explorer and regional/Nearby quizzes, 4 CSS pixels
-in compact/expanded silhouettes and their detail insets. They remain visible
-when unselected, beneath all land and selection highlights and above maritime
-tint. Halos exaggerate land extent; they cannot recover missing source detail.
+The 44 maritime-zone places use pale, opaque blue-green visibility surrounds
+on their existing land geometry: 2 CSS pixels in regional Explorer and
+regional/Nearby quizzes, and 4 CSS pixels in compact/expanded silhouettes and
+detail insets. Halos have rounded joins and caps, remain constant on screen,
+and sit beneath land and target highlighting. Artificial crop edges are masked.
+There is no blur, extra coastline geometry, or position-dot sampling. The
+surround exaggerates land extent and cannot recover details missing from the
+source. It is decorative, not a new boundary or selection area.
+
+Regional/Nearby quizzes use Explorer's light land fill and thin borders painted
+beneath the fill, with neighbouring regions muted. The oversized coral target
+halo and target border remain. Explorer retains its green selection and
+sand-coloured territory styling. World maps retain their existing styling.
+
+Regional locators are omitted for covered places except Guernsey, Jersey, Isle
+of Man, Bahrain and Singapore. These five keep locators until land is readable,
+while actual land and geometry surrounds remain visible beneath them. Åland,
+inland small countries, and mainland/outlying-island locators such as Norway
+and Portugal retain their existing behaviour. Maritime water remains selectable;
+shared/overlapping zones stay neutral. No maritime areas are invented.
 
 Every main and minor land component is retained without dot sampling or
 readability filtering. Scattered archipelagos retain their geographic overview
@@ -682,4 +694,5 @@ Halos are decorative: they add no click targets, keyboard stops, or camera
 bounds. Maritime zones retain country selection and highlighting; shared zones
 remain neutral. The licenses page explains the treatment in both languages,
 and silhouette controls retain a concise accessible explanation. World maps,
-places outside the 18-place coverage, scoring, and saved progress are unchanged.
+scoring, and saved progress are unchanged. Places outside maritime
+coverage retain their existing locator and silhouette behaviour without halos.

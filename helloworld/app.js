@@ -213,8 +213,9 @@
   const exploreMapMaxZoom = 8;
   const exploreMapZoomLevels = [1, 1.5, 2, 3, 4, 6, 8];
   const exploreMapGeometryReadableSize = 5;
-  // Maritime-zone places use land geometry halos instead of country locators.
-  const geometryHaloCodes = new Set(["ki", "mh", "fm", "tv", "to", "pw", "ck", "pf", "mp", "as", "bs", "ag", "kn", "vc", "gd", "ky", "mv", "sc"]);
+  // Maritime coverage controls regional and silhouette halos; five locators remain.
+  const geometryHaloCodes = new Set(["ki", "mh", "fm", "tv", "to", "pw", "ck", "pf", "mp", "as", "bs", "ag", "kn", "vc", "gd", "ky", "mv", "sc",
+    "mt", "fo", "gg", "je", "im", "st", "mu", "km", "bh", "sg", "ws", "nu", "gu", "nr", "vu", "bm", "cw", "aw", "gp", "dm", "mq", "lc", "bb", "tt", "vi", "sx"]);
   const keyboardHintIgnoredKeys = new Set([
     "Tab",
     "Escape",
@@ -1099,7 +1100,7 @@
           regionalMapPathMarkup(
             feature,
             `${className}${
-              locatorCodes.has(feature.code) ? " is-locator-hidden" : ""
+              locatorCodes.has(feature.code) && (isWorld || !geometryHaloCodes.has(feature.code)) ? " is-locator-hidden" : ""
             }`,
           ),
         )
@@ -1139,7 +1140,7 @@
           aria-labelledby="question-map-tab-${state.quizMapArea}"
         >
           <svg
-            class="question-map"
+            class="question-map${isWorld ? "" : " is-regional"}"
             data-responsive-region-map
             data-question-map-area="${state.quizMapArea}"
             data-base-view-box="${view.viewBox}"
@@ -1153,7 +1154,7 @@
             <g aria-hidden="true">
               ${maritimeZonesMarkup(view, { targetCode })}
               ${isWorld ? "" : regionalGeometryHalosMarkup(view)}
-              ${pathMarkup(contextFeatures, "question-map-country")}
+              ${pathMarkup(contextFeatures, `question-map-country${isWorld ? "" : " is-context"}`)}
               ${pathMarkup(otherFeatures, "question-map-country")}
               ${pathMarkup(targetFeatures, "question-map-country is-target")}
               ${pathMarkup(targetFeatures, "question-map-target-halo")}
@@ -1162,8 +1163,8 @@
                 "question-map-marker is-target-halo",
                 markerRadius * 2.8,
               )}
-              ${pathMarkup(contextFeatures, "question-map-country-border")}
-              ${pathMarkup(otherFeatures, "question-map-country-border")}
+              ${isWorld ? pathMarkup(contextFeatures, "question-map-country-border") : ""}
+              ${isWorld ? pathMarkup(otherFeatures, "question-map-country-border") : ""}
               ${pathMarkup(targetFeatures, "question-map-country-border is-target")}
               ${markerMarkup(otherMarkers, "question-map-marker", markerRadius)}
               ${markerMarkup(
@@ -2063,7 +2064,7 @@
       country.category === "other-place" ? "is-other-place" : "",
       state.explorePinnedCode === country.code ? "is-pinned" : "",
       state.explorePreviewCode === country.code ? "is-preview" : "",
-      hasLocatorMarker ? "has-locator-marker is-locator-hidden" : "",
+      hasLocatorMarker ? `has-locator-marker${state.exploreMapExtent !== "world" && geometryHaloCodes.has(country.code) ? "" : " is-locator-hidden"}` : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -2175,7 +2176,7 @@
         );
         countryControl?.classList.toggle(
           "is-locator-hidden",
-          !geometryReadable,
+          !geometryReadable && !(svg.querySelector(".regional-geometry-halos") && geometryHaloCodes.has(exploreCode)),
         );
         countryControl?.classList.toggle(
           "is-geometry-readable",
@@ -2198,7 +2199,7 @@
       svg
         .querySelectorAll(`[data-map-country-code="${code}"]`)
         .forEach((shape) =>
-          shape.classList.toggle("is-locator-hidden", !geometryReadable),
+          shape.classList.toggle("is-locator-hidden", !geometryReadable && !(svg.querySelector(".regional-geometry-halos") && geometryHaloCodes.has(code))),
         );
     });
   }

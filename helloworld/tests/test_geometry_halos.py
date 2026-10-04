@@ -39,16 +39,36 @@ class GeometryHaloTests(unittest.TestCase):
     def test_covered_locators_are_removed_without_changing_world_or_other_places(self):
         data = load_generated_map()
         world_markers = copy.deepcopy(data["markers"])
-        data["quizRegions"]["oceania"]["markers"] = [{"code": "tv"}, {"code": "nr"}]
+        data["quizRegions"]["oceania"]["markers"] = [{"code": "tv"}, {"code": "fj"}]
         data["silhouettes"]["tv"]["markers"] = [{"x": 1, "y": 2}]
         result = maps.refresh_halo_data(data, load_manifest())
-        self.assertEqual(result["quizRegions"]["oceania"]["markers"], [{"code": "nr"}])
+        self.assertEqual(result["quizRegions"]["oceania"]["markers"], [{"code": "fj"}])
         self.assertEqual(result["silhouettes"]["tv"]["markers"], [])
         self.assertEqual(result["base"]["markers"], world_markers)
         normalized = {**result["base"], **{k: v for k, v in result.items() if k != "base"}}
         self.assertEqual(validate_geometry_halos(normalized, load_manifest()), [])
         normalized["silhouettes"]["tv"]["markers"] = [{"x": 1, "y": 2}]
         self.assertTrue(validate_geometry_halos(normalized, load_manifest()))
+
+    def test_marker_exceptions_keep_geometry_and_cameras(self):
+        manifest = load_manifest()
+        base = load_generated_map()
+        # Nauru now uses halos; tiny exceptions and unrelated locators survive.
+        codes = ["nr", "sg", "bh", "gg", "je", "im", "pt", "li", "ax"]
+        base["quizRegions"]["europe"]["markers"] = [{"code": code} for code in codes]
+        original = copy.deepcopy(base)
+        result = maps.refresh_halo_data(base, manifest)
+        self.assertEqual(base, original)
+        self.assertEqual(
+            result["quizRegions"]["europe"]["markers"],
+            [{"code": code} for code in codes if code != "nr"],
+        )
+        self.assertEqual(result["base"]["markers"], base["markers"])
+        for region, view in result["quizRegions"].items():
+            self.assertEqual(
+                {key: value for key, value in view.items() if key != "markers"},
+                {key: value for key, value in base["quizRegions"][region].items() if key != "markers"},
+            )
 
     def test_overview_capital_uses_documented_geographic_anchor(self):
         feature = {"code": "tv", "name": "Tuvalu", "rings": [[(175, -10), (175, -5), (181, -5), (181, -10), (175, -10)]]}
