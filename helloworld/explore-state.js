@@ -31,13 +31,11 @@
   }
 
   function zoomOutExtent(extent) {
-    if (extent === "world") return "world";
     return "world";
   }
 
   function extentForSelection(extent, selectedRegion) {
     if (!selectedRegion || extent === "world") return extent;
-    if (extent === selectedRegion) return extent;
     return selectedRegion;
   }
 

@@ -3602,6 +3602,14 @@
     milestoneCelebrationTimer = null;
   }
 
+  function resetMilestoneCelebration() {
+    clearMilestoneCelebrationTimer();
+    state.milestoneCelebrationStageId = null;
+    state.milestoneCelebrationOrigin = null;
+    state.milestoneCelebrationReturnScrollY = null;
+    state.milestoneCelebrationSettled = false;
+  }
+
   function openMilestoneCelebration(stageId, origin) {
     const stage = curriculum.stages.find((candidate) => candidate.id === stageId);
     if (!stage) return;
@@ -3620,14 +3628,10 @@
   }
 
   function dismissMilestoneCelebration({ returnHome = false } = {}) {
-    clearMilestoneCelebrationTimer();
     const stageId = state.milestoneCelebrationStageId;
     const origin = state.milestoneCelebrationOrigin;
     const returnScrollY = state.milestoneCelebrationReturnScrollY;
-    state.milestoneCelebrationStageId = null;
-    state.milestoneCelebrationOrigin = null;
-    state.milestoneCelebrationReturnScrollY = null;
-    state.milestoneCelebrationSettled = false;
+    resetMilestoneCelebration();
     if (returnHome) returnToSetup({ historyMode: "replace" });
     else render({
       focusActionDialogReturn: origin?.endsWith("-replay")
@@ -3638,11 +3642,7 @@
   }
 
   function openWorldCelebration(origin = state.screen === "setup" ? "home-replay" : "newly-earned") {
-    clearMilestoneCelebrationTimer();
-    state.milestoneCelebrationStageId = null;
-    state.milestoneCelebrationOrigin = null;
-    state.milestoneCelebrationReturnScrollY = null;
-    state.milestoneCelebrationSettled = false;
+    resetMilestoneCelebration();
     clearWorldCelebrationTimer();
     state.worldCelebrationOpen = true;
     state.worldCelebrationOrigin = origin;
@@ -4017,36 +4017,56 @@
       });
       return;
     }
-    clearAutoAdvance(); setKeyboardHintsVisible(false);
+    clearAutoAdvance();
+    setKeyboardHintsVisible(false);
     const level = curriculum.levelById.get(quiz.levelId);
     const savedAttempt = shouldResume ? matchingAttempt : null;
-    state.curriculumQuizId = quiz.id; state.activeLevelId = level.id; state.mode = quiz.mode;
+    state.curriculumQuizId = quiz.id;
+    state.activeLevelId = level.id;
+    state.mode = quiz.mode;
     state.quizMapArea = "region";
     state.quizReturn = quizSource === "levels" ? "levels" : "home";
     state.challengeActive = challengeRound || state.challengeActive;
     state.attemptSeed = savedAttempt?.attemptSeed ?? freshAttemptSeed();
     const recipe = curriculum.createAttempt(quiz, state.attemptSeed);
-    state.questions = recipe.map((question) => ({ country: countriesByCode.get(question.countryCode), choices: question.choiceCodes.map((code) => countriesByCode.get(code)) }));
+    state.questions = recipe.map((question) => ({
+      country: countriesByCode.get(question.countryCode),
+      choices: question.choiceCodes.map((code) => countriesByCode.get(code)),
+    }));
     state.attemptAnswers = savedAttempt?.answers ? [...savedAttempt.answers] : [];
     state.score = savedAttempt?.score ?? 0;
-    state.wrongAnswers = state.attemptAnswers.filter((answer) => !answer.correct).map((answer) => countriesByCode.get(answer.targetCode)).filter(Boolean);
+    state.wrongAnswers = state.attemptAnswers
+      .filter((answer) => !answer.correct)
+      .map((answer) => countriesByCode.get(answer.targetCode))
+      .filter(Boolean);
     if (savedAttempt?.correctionPending) {
       state.questionIndex = Math.max(0, savedAttempt.questionIndex - 1);
       state.selectedCode = savedAttempt.answers.at(-1)?.selectedCode ?? null;
       state.answerStatus = "correction";
     } else {
       state.questionIndex = Math.min(savedAttempt?.questionIndex ?? 0, state.questions.length - 1);
-      state.selectedCode = null; state.answerStatus = "unanswered";
+      state.selectedCode = null;
+      state.answerStatus = "unanswered";
     }
     const regions = new Set(quiz.countryCodes.map((code) => countriesByCode.get(code)?.region));
     state.region = quiz.region ?? (regions.size === 1 ? [...regions][0] : "world");
-    state.silhouetteExpanded = false; state.resultRecorded = false; state.resultBestScore = null;
-    state.resultPreviousBestScore = null; state.resultNewQuizMastery = false; state.resultNewLevelMastery = false; state.resultNewStageMastery = false;
-    state.resultCelebrationPending = false; state.puzzleRewardPending = false; state.puzzleRewardOpen = false;
+    state.silhouetteExpanded = false;
+    state.resultRecorded = false;
+    state.resultBestScore = null;
+    state.resultPreviousBestScore = null;
+    state.resultNewQuizMastery = false;
+    state.resultNewLevelMastery = false;
+    state.resultNewStageMastery = false;
+    state.resultCelebrationPending = false;
+    state.puzzleRewardPending = false;
+    state.puzzleRewardOpen = false;
     state.screen = "quiz";
     persist(progress.markQuizStarted(progressStore, progressStore.activeProfileId, quiz));
     if (savedAttempt && savedAttempt.questionIndex >= state.questions.length && !savedAttempt.correctionPending) {
-      state.questionIndex = state.questions.length - 1; state.resultRecorded = false; finishCurriculumAttempt(); state.screen = "result";
+      state.questionIndex = state.questions.length - 1;
+      state.resultRecorded = false;
+      finishCurriculumAttempt();
+      state.screen = "result";
     }
     if (historyMode !== "none") syncUrlState({ push: historyMode === "push" });
     renderAtTop({ focusCorrect: state.answerStatus === "correction" });
@@ -4637,10 +4657,7 @@
     state.worldCelebrationOpen = false;
     state.worldCelebrationOrigin = null;
     state.worldCelebrationSettled = false;
-    state.milestoneCelebrationStageId = null;
-    state.milestoneCelebrationOrigin = null;
-    state.milestoneCelebrationReturnScrollY = null;
-    state.milestoneCelebrationSettled = false;
+    resetMilestoneCelebration();
     state.challengeActive = false;
     state.curriculumQuizId = null;
     state.activeLevelId = null;
@@ -4720,7 +4737,10 @@
     if (!viewport) return;
     const content = viewport.querySelector(".puzzle-zoom-content");
     const bounds = viewport.getBoundingClientRect();
-    const target = point ?? { x: bounds.left + viewport.clientWidth / 2, y: bounds.top + viewport.clientHeight / 2 };
+    const target = point ?? {
+      x: bounds.left + viewport.clientWidth / 2,
+      y: bounds.top + viewport.clientHeight / 2,
+    };
     const imagePoint = anchor ?? puzzleImagePoint(viewport, target);
     state.puzzleZoom = clamp(zoom, 1, 4);
     // Use the same fitted size for both drawing and anchoring. The content's CSS
@@ -4783,15 +4803,22 @@
     if (entries.length === 2) {
       const [secondId, second] = entries[1];
       puzzleGesture = {
-        kind: "pinch", viewport, ids: [firstId, secondId],
+        kind: "pinch",
+        viewport,
+        ids: [firstId, secondId],
         distance: Math.max(1, mapView.distance(first, second)),
         zoom: state.puzzleZoom,
         anchor: puzzleImagePoint(viewport, mapView.midpoint(first, second)),
       };
     } else {
       puzzleGesture = {
-        kind: "pan", viewport, id: firstId, x: first.x, y: first.y,
-        left: viewport.scrollLeft, top: viewport.scrollTop,
+        kind: "pan",
+        viewport,
+        id: firstId,
+        x: first.x,
+        y: first.y,
+        left: viewport.scrollLeft,
+        top: viewport.scrollTop,
       };
     }
     viewport.classList.toggle("is-panning", state.puzzleZoom > 1.001);
@@ -4804,7 +4831,11 @@
     if (!viewport || (event.pointerType !== "touch" && event.button !== 0)) return;
     if (puzzlePointers.size >= 2) return;
     if (puzzleGesture && puzzleGesture.viewport !== viewport) clearPuzzlePointers();
-    puzzlePointers.set(event.pointerId, { x: event.clientX, y: event.clientY, viewport });
+    puzzlePointers.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+      viewport,
+    });
     try {
       viewport.setPointerCapture(event.pointerId);
     } catch {
@@ -4826,8 +4857,11 @@
     point.y = event.clientY;
     if (gesture.kind === "pinch") {
       const [first, second] = gesture.ids.map((id) => puzzlePointers.get(id));
-      setPuzzleZoom(gesture.zoom * mapView.distance(first, second) / gesture.distance,
-        mapView.midpoint(first, second), gesture.anchor);
+      setPuzzleZoom(
+        gesture.zoom * mapView.distance(first, second) / gesture.distance,
+        mapView.midpoint(first, second),
+        gesture.anchor,
+      );
       gesture.viewport.classList.toggle("is-panning", state.puzzleZoom > 1.001);
     } else {
       gesture.viewport.scrollLeft = gesture.left + gesture.x - point.x;
@@ -4846,8 +4880,9 @@
     }
     puzzlePointers.delete(event.pointerId);
     if (point.viewport.hasPointerCapture(event.pointerId)) point.viewport.releasePointerCapture(event.pointerId);
-    if (puzzlePointers.size) startPuzzleGesture(point.viewport);
-    else {
+    if (puzzlePointers.size) {
+      startPuzzleGesture(point.viewport);
+    } else {
       point.viewport.classList.remove("is-panning");
       puzzleGesture = null;
     }
@@ -4889,17 +4924,27 @@
     }
     if (action === "open-puzzles") {
       if (!puzzles.stages.some((s) => s.id === control.dataset.stageId)) return;
-      puzzleReturnFocus = { action, stageId: control.dataset.stageId, ...(control.dataset.puzzleOrigin ? { puzzleOrigin: control.dataset.puzzleOrigin } : {}) };
+      puzzleReturnFocus = {
+        action,
+        stageId: control.dataset.stageId,
+        ...(control.dataset.puzzleOrigin
+          ? { puzzleOrigin: control.dataset.puzzleOrigin }
+          : {}),
+      };
       state.puzzleStageId = control.dataset.stageId;
       state.puzzleZoom = 1;
       render({ focusPuzzleDialog: true });
       return;
     }
-    if (action === "close-puzzles") { closePuzzles(); return; }
+    if (action === "close-puzzles") {
+      closePuzzles();
+      return;
+    }
     if (action.startsWith("puzzle-zoom-")) {
       clearPuzzlePointers();
-      if (action === "puzzle-zoom-reset") setPuzzleZoom(1, null, { x: .5, y: .5 });
-      else {
+      if (action === "puzzle-zoom-reset") {
+        setPuzzleZoom(1, null, { x: .5, y: .5 });
+      } else {
         const nextZoom = action === "puzzle-zoom-in"
           ? puzzleZoomLevels.find((zoom) => zoom > state.puzzleZoom + .001) ?? 4
           : [...puzzleZoomLevels].reverse().find((zoom) => zoom < state.puzzleZoom - .001) ?? 1;
@@ -5003,11 +5048,7 @@
       return;
     }
     if (action === "next-curriculum-quiz") {
-      clearMilestoneCelebrationTimer();
-      state.milestoneCelebrationStageId = null;
-      state.milestoneCelebrationOrigin = null;
-      state.milestoneCelebrationReturnScrollY = null;
-      state.milestoneCelebrationSettled = false;
+      resetMilestoneCelebration();
       const quiz = curriculum.quizById.get(control.dataset.nextQuizId) ?? progress.nextUnmastered(
         currentProfile(), curriculum.levels, state.curriculumQuizId,
       );
@@ -5080,19 +5121,65 @@
       startFlashcards(shuffle(countriesInExploreMapScope()), "explore");
       return;
     }
-    if (action === "open-profile-panel") { state.profilePanelOpen = true; render({ focusProfilePanel: true }); return; }
-    if (action === "close-profile-panel") { if (event.target === control) { state.profilePanelOpen = false; render(); } return; }
-    if (action === "close-profile-panel-button") { state.profilePanelOpen = false; render(); return; }
-    if (action === "switch-profile") { persist(progress.switchProfile(progressStore, control.dataset.profileId)); state.profilePanelOpen = false; renderAtTop(); return; }
-    if (action === "add-profile") { openActionDialog("add-profile"); return; }
-    if (action === "rename-profile") { openActionDialog("rename-profile"); return; }
-    if (action === "clear-profile") { openActionDialog("clear-profile"); return; }
-    if (action === "delete-profile") { openActionDialog("delete-profile"); return; }
-    if (action === "copy-transfer") { void copyTransferLink(control); return; }
-    if (action === "download-backup") { downloadBackup(); return; }
-    if (action === "share-progress") { void shareProgress(control); return; }
-    if (action === "share-curriculum-challenge") { void shareCurriculumChallenge(control); return; }
-    if (action === "create-imported-profile") { if (state.importProfiles?.[0]) createImportedProfile(state.importProfiles[0]); return; }
+    if (action === "open-profile-panel") {
+      state.profilePanelOpen = true;
+      render({ focusProfilePanel: true });
+      return;
+    }
+    if (action === "close-profile-panel") {
+      if (event.target === control) {
+        state.profilePanelOpen = false;
+        render();
+      }
+      return;
+    }
+    if (action === "close-profile-panel-button") {
+      state.profilePanelOpen = false;
+      render();
+      return;
+    }
+    if (action === "switch-profile") {
+      persist(progress.switchProfile(progressStore, control.dataset.profileId));
+      state.profilePanelOpen = false;
+      renderAtTop();
+      return;
+    }
+    if (action === "add-profile") {
+      openActionDialog("add-profile");
+      return;
+    }
+    if (action === "rename-profile") {
+      openActionDialog("rename-profile");
+      return;
+    }
+    if (action === "clear-profile") {
+      openActionDialog("clear-profile");
+      return;
+    }
+    if (action === "delete-profile") {
+      openActionDialog("delete-profile");
+      return;
+    }
+    if (action === "copy-transfer") {
+      void copyTransferLink(control);
+      return;
+    }
+    if (action === "download-backup") {
+      downloadBackup();
+      return;
+    }
+    if (action === "share-progress") {
+      void shareProgress(control);
+      return;
+    }
+    if (action === "share-curriculum-challenge") {
+      void shareCurriculumChallenge(control);
+      return;
+    }
+    if (action === "create-imported-profile") {
+      if (state.importProfiles?.[0]) createImportedProfile(state.importProfiles[0]);
+      return;
+    }
     if (action === "update-imported-profile") {
       const imported = state.importProfiles?.[0];
       if (imported && progressStore.profiles[imported.id]) {
@@ -5112,8 +5199,15 @@
       }
       return;
     }
-    if (action === "import-one") { const imported = state.importProfiles?.[Number(control.dataset.importIndex)]; if (imported) importSingleProfile(imported); return; }
-    if (action === "import-all") { importAllProfiles(); return; }
+    if (action === "import-one") {
+      const imported = state.importProfiles?.[Number(control.dataset.importIndex)];
+      if (imported) importSingleProfile(imported);
+      return;
+    }
+    if (action === "import-all") {
+      importAllProfiles();
+      return;
+    }
     if (action === "cancel-import") {
       state.importProfiles = null;
       state.importError = false;
@@ -5686,36 +5780,31 @@
     setKeyboardHintsVisible(true);
   });
 
+  function activeDialog() {
+    if (state.puzzleStageId) return app.querySelector(".puzzle-dialog");
+    if (state.actionDialog) return app.querySelector(".action-dialog");
+    if (state.milestoneCelebrationStageId !== null) {
+      return app.querySelector(".milestone-celebration-dialog");
+    }
+    if (state.worldCelebrationOpen) return app.querySelector(".world-celebration-dialog");
+    if (state.openChallengeOpen) return app.querySelector(".open-challenge-dialog");
+    if (state.installHelpOpen) return app.querySelector(".install-help-dialog");
+    if (state.profilePanelOpen) return app.querySelector(".profile-panel");
+    if (state.countryDetailsCode !== null) return app.querySelector(".country-details-dialog");
+    return null;
+  }
+
   document.addEventListener("keydown", (event) => {
-    const activeDialog = state.puzzleStageId
-      ? app.querySelector(".puzzle-dialog")
-      : state.actionDialog
-      ? app.querySelector(".action-dialog")
-      : state.milestoneCelebrationStageId !== null
-      ? app.querySelector(".milestone-celebration-dialog")
-      : state.worldCelebrationOpen
-      ? app.querySelector(".world-celebration-dialog")
-      : state.openChallengeOpen
-      ? app.querySelector(".open-challenge-dialog")
-      : state.installHelpOpen
-          ? app.querySelector(".install-help-dialog")
-          : state.profilePanelOpen
-            ? app.querySelector(".profile-panel")
-            : state.countryDetailsCode !== null
-              ? app.querySelector(".country-details-dialog")
-              : null;
-    if (activeDialog && event.key === "Tab") {
-      const dialog = activeDialog;
-      const focusable = dialog
-        ? [
-            ...dialog.querySelectorAll(
-              "button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])",
-            ),
-          ].filter((control) => !control.disabled)
-        : [];
+    const dialog = activeDialog();
+    if (dialog && event.key === "Tab") {
+      const focusable = [
+        ...dialog.querySelectorAll(
+          "button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])",
+        ),
+      ].filter((control) => !control.disabled);
       if (focusable.length === 0) {
         event.preventDefault();
-        dialog?.focus();
+        dialog.focus();
         return;
       }
 
